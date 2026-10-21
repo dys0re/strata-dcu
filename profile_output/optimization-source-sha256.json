@@ -1,0 +1,7 @@
+{
+  "src/kernels/cuda/native_mmvq.cu": "fb3f04d419f321710473d07c43c04f940aa573419fd7deca7293ce977790bef8",
+  "src/kernels/bf16_q8_mmvq_parity.cpp": "af6f21206d7d4ff3da29a414084d276c009bf4b86c43170d3bc670a9fd12d2d2",
+  "src/program/generate.cpp": "7b44d9d257b7b516882619e6a91f18d5bfdf33a9d131a3cd2bc494564696d204",
+  "tools/autoround_pack.py": "bbc1681c987632641c3762f600d23255863f1574828600d24b33b039719b577f",
+  "strata-test/run-autoround.sh": "482bc3cd853902b2273615d6a1263723ab8a596cfc30fac02cde5242eb185506"
+}

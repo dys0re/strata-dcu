@@ -1,0 +1,2 @@
+strata generate: PCIe probe: 48.3 GB/s host->device (best of 48.3 48.3 48.3 48.2) -> pcie_frac 0.55 (default 0.55)
+strata generate: /root/strata-dcu/autoround/pack is a native (IQ) pack: it needs --native SHARD1, --spec T (T >= 2) and --prefill CHUNK

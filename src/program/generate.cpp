@@ -16312,6 +16312,9 @@ int main(int argc, char** argv) {
         std::printf("%-24s", "accepted per round");
         for (size_t i = 0; i < accepted_hist.size(); ++i) std::printf(" %zu:%lld", i, (long long) accepted_hist[i]);
         std::printf("\n");
+        // [PROFILE] Expose the existing opt-in GPU stamps for single-shot runs too.
+        if (const std::string profile = ver.profile_report(); !profile.empty())
+            std::fprintf(stderr, "strata decode GPU stages (ms/window):%s\n", profile.c_str());
         if (rounds > 0)
             std::printf("%-24s wait for rings %.3f  pool %.3f  host %.3f  commit %.3f ms/round; CPU experts %.2f "
                         "distinct / %.2f routed per layer\n",

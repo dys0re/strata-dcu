@@ -1,0 +1,21 @@
+speculation              128 rounds of 2, drafts accepted 0 of 0 (0.000), 1.00 tokens per round
+accepted per round       0:128 1:0
+verify window            wait for rings 27.577  pool 7.476  host 0.062  commit 0.000 ms/round; CPU experts 2.55 distinct / 2.55 routed per layer
+pool multi               gate/up 4.354  quantize 0.049  down 2.274 ms/round; 51.1 GB/s over the rows phases; CPU pool call 7.449 ms/round
+dispatch                 plan 0.357  activation quantize 0.039  jobs 0.042  run 6.691 ms/round
+resident RAM             12.08 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+expert tiers             decode: RAM 15677 blobs, files 0 blobs, 0.0 MB read from the files (0.00 MB/round, 0.0 ms/round of reading, 0.00 GB/s per reading thread); prompt copies 54975.3 MB
+io path                  file reads: page cache held 12975.2 MB, not 0.0 MB (mincore at the read); io prefetch on: 0 read ahead, 0 used, 0 unused, 0 skipped (cached), 0 dropped; pread 0.0 MB in 0 calls (0.00 ms each); decode waited 0.0 ms/round in the fetches
+routing prefetch         0 experts warmed, 0 of the file tier's 0 blob reads had been warmed (0.0%); predictor 16.5 ms/round on its thread, 276 layers skipped (still busy)
+pcie experts             0.00 distinct experts per layer read over PCIe (share 141/256 of the misses)
+prompt  : 248045 846 198 7734 264 11346 220 23 15 15 36093 3255 883 264 11952 23218 449 22263 9006 5101 13 18037 279 3255 6849 321 2962 440 8807 26884 321 20623 13 248046 198 248045 74455 198 248068 271 248069 271
+output  : 4413 220 22 18 19 11 22471 328 57517 1288 23562 888 279 11823 314 279 85275 5157 3017 11 1141 41653 33124 780 76584 54166 303 279 92626 3594 13 561 22263 9006 5101 11 791 2320 5652 277 12922 383 279 25888 3438 33528 314 10113 357 744 300 51698 11 995 978 20413 364 34227 1578 13 30939 3724 287 80863 303 279 3074 22690 314 3000 57121 1472 279 53507 55419 11 41567 1060 264 76435 314 29712 13 28970 725 27374 24296 22643 11 30787 494 56093 310 1496 85984 8851 19142 11 38460 279 54231 16473 4467 314 36964 25 1016 19447 5984 421 92445 30581 6340 11 22353 290 10679 13176 793 421 10174 49698 1172 279 4528 314 854 11
+decode                   128 tokens in 7309.5 ms  ->  17.51 tok/s
+prefill                  41 tokens in 3180.2 ms  ->  12.89 tok/s  (time to first token 34633.2 ms)
+  per token              57.105 ms/token (WALL CLOCK: embed, layers, head, sample)
+  ple io: 6800 rows, 0.5% row-cache hits, 6768 SSD reads (29.6 MB), read p50 857 us p99 8782 us, blocked 174.098 ms total (submit 14.528 ms), cache 6768/65536 rows, SSD kept awake by 636 reads (slowest 60.8 ms)
+  the CPU expert pool    7.449 ms/token over 48 layers (128 positions, 6144 dispatches)
+  pool phases              wait-park 0.000  drain 6.685  re-park 0.000  ms/token
+  expert blobs           16336 blobs read
+  R4 overlap             0 of 0 layers the hit work was DONE when the pool returned
+  R4 expert-cache hits   45763 of 61440 = 0.7448      (0 admitted, 15677 refused, cache 100.0000% full)

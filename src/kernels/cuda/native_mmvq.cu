@@ -90,6 +90,54 @@ __global__ void bf16_q81_kernel(const uint16_t* w, const Q81Block* x, float* y,
         sum += __shfl_down_sync(0xffffffffu, sum, off, 32);
     if (lane == 0) y[size_t(col) * n_out + row] = sum;
 }
+#if defined(STRATA_HIP_GFX906)
+// Opt-in gfx936 path: four adjacent BF16 weights and Q8 codes per lane.
+// Weight/activation bits are unchanged; four accumulators change FP32 sum order.
+template<int Lanes>
+__global__ __launch_bounds__(256) void bf16_q81_vec4_kernel(const uint16_t* __restrict__ w,
+        const Q81Block* __restrict__ x, float* __restrict__ y, int n_in, int n_out) {
+    const int lane = threadIdx.x % Lanes;
+    const int row = int(blockIdx.x) * (256 / Lanes) + int(threadIdx.x) / Lanes;
+    if (row >= n_out) return;
+    const int col = blockIdx.y;
+    const Q81Block* a = x + size_t(col) * (n_in / 32);
+    float sums[4] = {};
+    for (int i = lane * 4; i < n_in; i += Lanes * 4) {
+        unsigned long long weights;
+        uint32_t codes;
+        __builtin_memcpy(&weights, w + size_t(row) * n_in + i, sizeof weights);
+        __builtin_memcpy(&codes, a[i / 32].qs + i % 32, sizeof codes);
+        const float scale = __half2float(__low2half(a[i / 32].ds));
+#pragma unroll
+        for (int j = 0; j < 4; ++j)
+            sums[j] = __fmaf_rn(__uint_as_float(uint32_t((weights >> (j * 16)) & 65535u) << 16),
+                               scale * float(static_cast<int8_t>(codes >> (j * 8))), sums[j]);
+    }
+    float sum = (sums[0] + sums[1]) + (sums[2] + sums[3]);
+    for (int off = Lanes / 2; off > 0; off >>= 1)
+        sum += __shfl_down_sync(0xffffffffu, sum, off, Lanes);
+    if (lane == 0) y[size_t(col) * n_out + row] = sum;
+}
+
+bool bf16_q81_vec4_on() {
+    static const bool requested = [] {
+        const char* v = std::getenv("STRATA_BF16_Q8_VEC4");
+        return v != nullptr && std::atoi(v) != 0;
+    }();
+    if (!requested) return false;
+    int device = -1;
+    if (cudaGetDevice(&device) != cudaSuccess) return false;
+    thread_local int cached_device = -2;
+    thread_local bool enabled = false;
+    if (device != cached_device) {
+        cudaDeviceProp p{};
+        enabled = cudaGetDeviceProperties(&p, device) == cudaSuccess && p.warpSize == 64 &&
+                  gfx_arch_is(p.gcnArchName, "gfx936");
+        cached_device = device;
+    }
+    return enabled;
+}
+#endif
 struct Q20Block {
     half d;
     uint8_t qs[16];
@@ -2946,6 +2994,18 @@ void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float* 
         validate_pointer(weights); validate_pointer(x_q8_1); validate_pointer(y);
         validate_stream(stream);
         if (n_out <= 0) throw std::invalid_argument("BF16 native MMVQ requires positive output rows");
+#if defined(STRATA_HIP_GFX906)
+        if (bf16_q81_vec4_on()) {
+            if (n_in >= 1024)
+                bf16_q81_vec4_kernel<64><<<dim3((n_out + 3) / 4, ncols), 256, 0, (cudaStream_t) stream>>>(
+                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
+            else
+                bf16_q81_vec4_kernel<32><<<dim3((n_out + 7) / 8, ncols), 256, 0, (cudaStream_t) stream>>>(
+                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
+            launch_check();
+            break;
+        }
+#endif
         bf16_q81_kernel<<<dim3((n_out + 3) / 4, ncols), 128, 0, (cudaStream_t) stream>>>(
             static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
         launch_check();

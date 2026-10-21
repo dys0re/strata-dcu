@@ -1,0 +1,113 @@
+{
+  "story": {
+    "baseline": {
+      "decode_tps": [
+        24.76,
+        24.49
+      ],
+      "median": 24.625,
+      "output_tokens": 256
+    },
+    "vec4": {
+      "decode_tps": [
+        33.56,
+        32.48
+      ],
+      "median": 33.019999999999996,
+      "output_tokens": 256
+    },
+    "speedup": 1.340913705583756
+  },
+  "quality": [
+    {
+      "case": "ok",
+      "baseline_tps": 18.231540565177756,
+      "vec4_tps": 21.691973969631235,
+      "output_tokens": 2,
+      "first_token_KL": 0.0003632813929624174,
+      "argmax_equal": true,
+      "generated_ids_equal": true,
+      "short_answer": "OK"
+    },
+    {
+      "case": "arithmetic",
+      "baseline_tps": 26.385224274406333,
+      "vec4_tps": 36.83241252302026,
+      "output_tokens": 2,
+      "first_token_KL": 7.629366481747884e-05,
+      "argmax_equal": true,
+      "generated_ids_equal": true,
+      "short_answer": "4"
+    },
+    {
+      "case": "capital",
+      "baseline_tps": 26.28120893561104,
+      "vec4_tps": 37.03703703703704,
+      "output_tokens": 2,
+      "first_token_KL": 0.00020339955235514087,
+      "argmax_equal": true,
+      "generated_ids_equal": true,
+      "short_answer": "北京"
+    },
+    {
+      "case": "code",
+      "baseline_tps": 25.940074375056998,
+      "vec4_tps": 36.16176740638198,
+      "output_tokens": 256,
+      "first_token_KL": 0.000479865594825048,
+      "argmax_equal": true,
+      "generated_ids_equal": false,
+      "short_answer": null
+    },
+    {
+      "case": "chinese",
+      "baseline_tps": 26.05942771053676,
+      "vec4_tps": 36.86689036420456,
+      "output_tokens": 256,
+      "first_token_KL": 0.00025445033791837593,
+      "argmax_equal": true,
+      "generated_ids_equal": false,
+      "short_answer": null
+    }
+  ],
+  "experiments": {
+    "lookahead-ab": [
+      {
+        "arm": "baseline",
+        "decode_tps": 24.96,
+        "decode_ms": 10257.3
+      },
+      {
+        "arm": "no_lookahead",
+        "decode_tps": 25.18,
+        "decode_ms": 10166.1
+      }
+    ],
+    "vec4-stream-ab": [
+      {
+        "arm": "vec4",
+        "decode_tps": 33.6,
+        "decode_ms": 7619.0
+      },
+      {
+        "arm": "vec4_serial",
+        "decode_tps": 27.71,
+        "decode_ms": 9237.3
+      }
+    ]
+  },
+  "limits": [
+    "Short context only: max 512, MTP off.",
+    "BF16 sum order differs; long completions need not be token-identical.",
+    "First-token KL on five requests is not a full model-quality evaluation.",
+    "Code generation reached the token cap before completing the class; no execution correctness claim.",
+    "Other GPU backends not built or run."
+  ],
+  "baseline_ids_match_original": true,
+  "final_wrapper": {
+    "decode_tps": 35.55,
+    "decode_ms": 7200.4,
+    "output_tokens": 256,
+    "engine_exit": 0
+  }
+}

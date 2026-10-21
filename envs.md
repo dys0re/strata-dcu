@@ -272,3 +272,25 @@ python3 /root/strata-dcu/Strata/tools/autoround_pack.py prepare \
 这是单次短上下文测试；之前 2-token 回答的 9–11.5 token/s 受启动摊销影响，不能当作持续生成速度。
 
 原始证据：[运行日志](profile_output/autoround-decode256.log)、[生成结果](profile_output/autoround-decode256.json)。仅新增测试日志及本文档记录，未修改推理源码或增加计时插桩。
+
+
+### 单 token 验证窗口修正（2026-10-21）
+
+初始 18.77 token/s 的入口没有 MTP，却使用默认两 token 验证窗口；日志为 255 个候选全部拒绝，每轮仅提交 1 个 token。相同输入、相同引擎和权重，仅增加 `--mtp-max-t 1`，连续生成 256 tokens 耗时 10,029.1ms，达到 **25.53 token/s**，比初始单次测试提高约 36%。全部 256 个输出 token IDs 与初始测试一致。
+
+`--spec 1` 被 native-pack 入口校验拒绝（退出 2）；因此保留其要求的 `--spec 2`，用 `--mtp-max-t 1` 限制实际运行窗口。`tools/autoround_pack.py` 已采用该配置并同步远程。MTP 仍关闭，PLE 仍从原始磁盘文件读取。
+
+原始对照证据：[单窗口日志](profile_output/autoround-window1.log)、[生成结果](profile_output/autoround-window1.json)、[实际命令](profile_output/autoround-window1-command.json)。初始实测与先前源文件哈希记录保留；本次仅改变入口的窗口配置。
+
+正式启动脚本再次复跑：256 tokens / 9,954.7ms = **25.72 token/s**，退出 0，全部输出 token IDs 仍与初始测试一致。两次单窗口测试为 25.53 / 25.72 token/s；尚未完成交错多轮基准。日志：[启动脚本复跑](profile_output/autoround-window1-wrapper.log)。
+
+
+### gfx936 BF16/Q8_1 decode 优化（2026-10-21）
+
+在实际单 token 验证窗口下，英文 256-token 生成按基线/新内核/新内核/基线交错实测：基线 24.76、24.49 token/s，新内核 33.56、32.48 token/s，中位数 **24.63 → 33.02 token/s（+34.09%）**。常驻进程的代码/中文请求分别为 36.16、36.87 token/s；正式启动脚本中文 256-token 复跑为 **35.55 token/s**。
+
+本机启动脚本默认设置 `STRATA_BF16_Q8_VEC4=1`。用 `STRATA_BF16_Q8_VEC4=0 bash /root/strata-dcu/run-autoround.sh ...` 切回原内核。新路径仅对 gfx936/wave64 生效；引擎本身仍需显式开启。原权重及 INT4 code/scale 未改变，PLE 仍放磁盘，MTP 仍关闭。变化是 BF16 投影的向量读取与浮点归约顺序，长回答不保证逐 token 相同。
+
+新旧内核各 60 种形状的独立 CPU double 参考检查通过；三个短问答均正确。六个提示的首 token KL 为 3.05e-5–4.80e-4，未完成全面质量或长上下文评测。关闭路由预取没有稳定收益；关闭共享专家跨流反而变慢，均保留原默认。
+
+完整方法、结果、验证边界和文件清单：[decode 优化报告](profile_output/dcu-decode-optimization.md)。

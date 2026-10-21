@@ -1,0 +1,35 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+Starting AutoRound model; 39 prompt tokens
+speculation              256 rounds of 2, drafts accepted 0 of 0 (0.000), 1.00 tokens per round
+accepted per round       0:256 1:0
+verify window            wait for rings 19.967  pool 3.508  host 0.114  commit 0.000 ms/round; CPU experts 0.97 distinct / 0.97 routed per layer
+pool multi               gate/up 1.755  quantize 0.019  down 0.881 ms/round; 49.1 GB/s over the rows phases; CPU pool call 3.408 ms/round
+dispatch                 plan 0.449  activation quantize 0.025  jobs 0.020  run 2.664 ms/round
+resident RAM             12.08 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+expert tiers             decode: RAM 11977 blobs, files 0 blobs, 0.0 MB read from the files (0.00 MB/round, 0.0 ms/round of reading, 0.00 GB/s per reading thread); prompt copies 54975.3 MB
+io path                  file reads: page cache held 12975.2 MB, not 0.0 MB (mincore at the read); io prefetch on: 0 read ahead, 0 used, 0 unused, 0 skipped (cached), 0 dropped; pread 0.0 MB in 0 calls (0.00 ms each); decode waited 0.0 ms/round in the fetches
+routing prefetch         0 experts warmed, 0 of the file tier's 0 blob reads had been warmed (0.0%); predictor 14.1 ms/round on its thread, 2334 layers skipped (still busy)
+pcie experts             0.00 distinct experts per layer read over PCIe (share 141/256 of the misses)
+prompt  : 248045 846 198 96220 98153 98682 95779 98277 122826 829 7320 220 95793 16401 220 98007 121040 3709 98404 98662 114094 99454 114520 1710 96220 121164 98419 102753 96724 1710 248046 198 248045 74455 198 248068 271 248069 271
+output  : 95779 98277 103725 9616 3950 44 7313 95726 111892 97424 99151 96147 120877 97889 140189 98007 245342 28999 473 9616 96468 111049 14 99162 96961 203309 98007 95793 2972 31489 9616 121966 14 103910 203309 98007 1710 109514 98007 95772 97792 103908 5205 108777 99978 97794 98404 99454 114520 95802 97322 100120 100721 1710 271 97155 96123 121164 98153 98682 109514 98007 111916 101625 99454 114520 3709 96172 133300 97990 102177 98419 1710 271 4277 271 13962 220 16 13 41173 473 220 98007 9616 96468 111049 98007 7313 271 794 2972 99546 95999 97424 332 198 28999 473 220 98007 110817 97237 99486 57491 9616 99162 96919 7313 99437 5205 103725 103910 103852 9372 220 99439 1710 198 12 2972 99486 332 4960 98275 57491 220 104653 9616 108532 35760 96220 98682 113672 112453 828 71748 198 12 2972 97324 332 4960 103725 119548 95852 96961 96983 99486 9372 3709 97792 111085 5141 12 1094 318 79852 8 18887 3709 96172 103910 103852 100627 9372 1710 198 12 2972 98432 332 245342 97792 142084 9616 44712 7428 770 203309 1710 96789 96983 99486 9372 220 144537 119548 97792 3709 48213 220 95726 130111 115562 104093 1710 271 794 2972 99454 114520 332 198 12 2972 96709 114520 4960 97792 96852 9616 37 1537 19797 203309 198 220 471 41173 473 220 98007 96442 96961 98275 57491 220 124466 1710 96604 57491 220 105929 9616 96031 119096 95840 9372 46662 97792 96021 95825 118538 1710 198 220 471 220 99121 95761 119548 97792 3709 48213 220
+decode                   256 tokens in 7200.4 ms  ->  35.55 tok/s
+prefill                  38 tokens in 2741.0 ms  ->  13.86 tok/s  (time to first token 27746.7 ms)
+GENERATED TEXT: 大语言模型（LLM）的推理过程通常被划分为两个截然不同的阶段：**Prefill（预填充/提示处理）**阶段和 **Decode（解码/生成）**阶段。这两个阶段在计算特性、内存访问模式以及性能瓶颈上存在显著差异。
+
+以下将分段详细解释这两个阶段的区别及其性能瓶颈，并辅以具体例子说明。
+
+---
+
+### 1. Prefill 阶段（预填充阶段）
+
+#### **定义与过程**
+Prefill 阶段发生在用户输入 Prompt（提示词）之后、模型生成第一个 Token 之前。
+- **输入**：整个 Prompt 序列（例如：“请解释量子力学”）。
+- **操作**：模型并行地处理所有输入 Token，计算它们的 Key-Value (KV) Cache，并生成第一个输出 Token。
+- **特点**：**计算密集型（Compute-Bound）**。因为所有输入 Token 可以同时并行计算，GPU 的算力利用率较高。
+
+#### **性能瓶颈**
+- **主要瓶颈：计算资源（FLOPs）**
+  - Prefill 阶段需要处理整个 Prompt 的长度。如果 Prompt 很长（如几千个 Token），计算量会非常大。
+  - 由于是并行计算，GPU 

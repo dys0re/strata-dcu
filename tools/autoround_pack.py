@@ -296,7 +296,9 @@ def run_model(ck, out, a):
            "--pack", str(out / "pack"), "--ple-gguf", str(out / "ple.gguf"),
            "--tokens-file", str(token_file), "--max-new", str(a.max_new),
            "--eos-ids", ",".join(map(str, eos)),
-           "--max-context", str(a.context), "--prefill", "32", "--spec", "2",
+           # Native packs require --spec >= 2, but this entry has no drafter.
+           # Run only the real token, rather than verifying an unused zero draft.
+           "--max-context", str(a.context), "--prefill", "32", "--spec", "2", "--mtp-max-t", "1",
            "--expert-profile", str(HERE.parent / "data" / "expert-profile.bin"),
            "--expert-cache", "auto", "--mmap-experts", "--resident-cpu-experts",
            "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",

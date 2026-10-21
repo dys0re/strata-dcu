@@ -1,0 +1,193 @@
+diff --git a/envs.md b/envs.md
+index c61f083..5dfa473 100644
+--- a/envs.md
++++ b/envs.md
+@@ -272,3 +272,25 @@ python3 /root/strata-dcu/Strata/tools/autoround_pack.py prepare \
+ 这是单次短上下文测试；之前 2-token 回答的 9–11.5 token/s 受启动摊销影响，不能当作持续生成速度。
+ 
+ 原始证据：[运行日志](profile_output/autoround-decode256.log)、[生成结果](profile_output/autoround-decode256.json)。仅新增测试日志及本文档记录，未修改推理源码或增加计时插桩。
++
++
++### 单 token 验证窗口修正（2026-10-21）
++
++初始 18.77 token/s 的入口没有 MTP，却使用默认两 token 验证窗口；日志为 255 个候选全部拒绝，每轮仅提交 1 个 token。相同输入、相同引擎和权重，仅增加 `--mtp-max-t 1`，连续生成 256 tokens 耗时 10,029.1ms，达到 **25.53 token/s**，比初始单次测试提高约 36%。全部 256 个输出 token IDs 与初始测试一致。
++
++`--spec 1` 被 native-pack 入口校验拒绝（退出 2）；因此保留其要求的 `--spec 2`，用 `--mtp-max-t 1` 限制实际运行窗口。`tools/autoround_pack.py` 已采用该配置并同步远程。MTP 仍关闭，PLE 仍从原始磁盘文件读取。
++
++原始对照证据：[单窗口日志](profile_output/autoround-window1.log)、[生成结果](profile_output/autoround-window1.json)、[实际命令](profile_output/autoround-window1-command.json)。初始实测与先前源文件哈希记录保留；本次仅改变入口的窗口配置。
++
++正式启动脚本再次复跑：256 tokens / 9,954.7ms = **25.72 token/s**，退出 0，全部输出 token IDs 仍与初始测试一致。两次单窗口测试为 25.53 / 25.72 token/s；尚未完成交错多轮基准。日志：[启动脚本复跑](profile_output/autoround-window1-wrapper.log)。
++
++
++### gfx936 BF16/Q8_1 decode 优化（2026-10-21）
++
++在实际单 token 验证窗口下，英文 256-token 生成按基线/新内核/新内核/基线交错实测：基线 24.76、24.49 token/s，新内核 33.56、32.48 token/s，中位数 **24.63 → 33.02 token/s（+34.09%）**。常驻进程的代码/中文请求分别为 36.16、36.87 token/s；正式启动脚本中文 256-token 复跑为 **35.55 token/s**。
++
++本机启动脚本默认设置 `STRATA_BF16_Q8_VEC4=1`。用 `STRATA_BF16_Q8_VEC4=0 bash /root/strata-dcu/run-autoround.sh ...` 切回原内核。新路径仅对 gfx936/wave64 生效；引擎本身仍需显式开启。原权重及 INT4 code/scale 未改变，PLE 仍放磁盘，MTP 仍关闭。变化是 BF16 投影的向量读取与浮点归约顺序，长回答不保证逐 token 相同。
++
++新旧内核各 60 种形状的独立 CPU double 参考检查通过；三个短问答均正确。六个提示的首 token KL 为 3.05e-5–4.80e-4，未完成全面质量或长上下文评测。关闭路由预取没有稳定收益；关闭共享专家跨流反而变慢，均保留原默认。
++
++完整方法、结果、验证边界和文件清单：[decode 优化报告](profile_output/dcu-decode-optimization.md)。
+diff --git a/src/kernels/bf16_q8_mmvq_parity.cpp b/src/kernels/bf16_q8_mmvq_parity.cpp
+index 8ed1253..8e2711e 100644
+--- a/src/kernels/bf16_q8_mmvq_parity.cpp
++++ b/src/kernels/bf16_q8_mmvq_parity.cpp
+@@ -19,7 +19,9 @@ int main() {
+     try {
+         cudaStream_t stream;
+         check(cudaStreamCreate(&stream));
+-        for (int k : {64, 2560}) for (int n : {5, 33}) for (int t : {1, 3, 8}) {
++        int cases = 0;
++        for (int k : {32, 64, 640, 2560, 6144}) for (int n : {1, 5, 33}) for (int t : {1, 2, 3, 8}) {
++            ++cases;
+             std::vector<uint16_t> w(size_t(k) * n);
+             std::vector<float> x(size_t(k) * t), got(size_t(n) * t);
+             for (size_t i = 0; i < w.size(); ++i) w[i] = bf16_from_f32(std::sin(float(i) * .13f) * .1f);
+@@ -55,13 +57,14 @@ int main() {
+             }
+             void* converted = nullptr;
+             check(cudaMalloc(&converted, w.size() * 4));
+-            dequant_f32(30, dw, 1, n - 1, k, static_cast<float*>(converted), stream);
++            const int row0 = n > 1 ? 1 : 0;
++            dequant_f32(30, dw, row0, n - row0, k, static_cast<float*>(converted), stream);
+             check(cudaStreamSynchronize(stream));
+-            std::vector<float> floats(size_t(n - 1) * k);
++            std::vector<float> floats(size_t(n - row0) * k);
+             check(cudaMemcpy(floats.data(), converted, floats.size() * 4, cudaMemcpyDeviceToHost));
+             for (size_t i = 0; i < floats.size(); ++i)
+-                if (floats[i] != f32_from_bf16(w[i + k])) throw std::runtime_error("BF16 row-slice copy changed values");
+-            dequant_f16(30, dw, 1, n - 1, k, static_cast<uint16_t*>(converted), stream);
++                if (floats[i] != f32_from_bf16(w[i + row0 * k])) throw std::runtime_error("BF16 row-slice copy changed values");
++            dequant_f16(30, dw, row0, n - row0, k, static_cast<uint16_t*>(converted), stream);
+             check(cudaStreamSynchronize(stream));
+             std::vector<uint16_t> halves(floats.size());
+             check(cudaMemcpy(halves.data(), converted, halves.size() * 2, cudaMemcpyDeviceToHost));
+@@ -71,7 +74,7 @@ int main() {
+             check(cudaFree(dy)); check(cudaFree(dq)); check(cudaFree(dx)); check(cudaFree(dw));
+         }
+         check(cudaStreamDestroy(stream));
+-        std::puts("bf16_q8_mmvq_parity OK: 12 shapes, all outputs finite and within summation tolerance");
++        std::printf("bf16_q8_mmvq_parity OK: %d shapes, all outputs finite and within summation tolerance\n", cases);
+         return 0;
+     } catch (const std::exception& e) { std::fprintf(stderr, "%s\n", e.what()); return 1; }
+ }
+diff --git a/src/kernels/cuda/native_mmvq.cu b/src/kernels/cuda/native_mmvq.cu
+index 2a6c59a..d72400d 100644
+--- a/src/kernels/cuda/native_mmvq.cu
++++ b/src/kernels/cuda/native_mmvq.cu
+@@ -90,6 +90,54 @@ __global__ void bf16_q81_kernel(const uint16_t* w, const Q81Block* x, float* y,
+         sum += __shfl_down_sync(0xffffffffu, sum, off, 32);
+     if (lane == 0) y[size_t(col) * n_out + row] = sum;
+ }
++#if defined(STRATA_HIP_GFX906)
++// Opt-in gfx936 path: four adjacent BF16 weights and Q8 codes per lane.
++// Weight/activation bits are unchanged; four accumulators change FP32 sum order.
++template<int Lanes>
++__global__ __launch_bounds__(256) void bf16_q81_vec4_kernel(const uint16_t* __restrict__ w,
++        const Q81Block* __restrict__ x, float* __restrict__ y, int n_in, int n_out) {
++    const int lane = threadIdx.x % Lanes;
++    const int row = int(blockIdx.x) * (256 / Lanes) + int(threadIdx.x) / Lanes;
++    if (row >= n_out) return;
++    const int col = blockIdx.y;
++    const Q81Block* a = x + size_t(col) * (n_in / 32);
++    float sums[4] = {};
++    for (int i = lane * 4; i < n_in; i += Lanes * 4) {
++        unsigned long long weights;
++        uint32_t codes;
++        __builtin_memcpy(&weights, w + size_t(row) * n_in + i, sizeof weights);
++        __builtin_memcpy(&codes, a[i / 32].qs + i % 32, sizeof codes);
++        const float scale = __half2float(__low2half(a[i / 32].ds));
++#pragma unroll
++        for (int j = 0; j < 4; ++j)
++            sums[j] = __fmaf_rn(__uint_as_float(uint32_t((weights >> (j * 16)) & 65535u) << 16),
++                               scale * float(static_cast<int8_t>(codes >> (j * 8))), sums[j]);
++    }
++    float sum = (sums[0] + sums[1]) + (sums[2] + sums[3]);
++    for (int off = Lanes / 2; off > 0; off >>= 1)
++        sum += __shfl_down_sync(0xffffffffu, sum, off, Lanes);
++    if (lane == 0) y[size_t(col) * n_out + row] = sum;
++}
++
++bool bf16_q81_vec4_on() {
++    static const bool requested = [] {
++        const char* v = std::getenv("STRATA_BF16_Q8_VEC4");
++        return v != nullptr && std::atoi(v) != 0;
++    }();
++    if (!requested) return false;
++    int device = -1;
++    if (cudaGetDevice(&device) != cudaSuccess) return false;
++    thread_local int cached_device = -2;
++    thread_local bool enabled = false;
++    if (device != cached_device) {
++        cudaDeviceProp p{};
++        enabled = cudaGetDeviceProperties(&p, device) == cudaSuccess && p.warpSize == 64 &&
++                  gfx_arch_is(p.gcnArchName, "gfx936");
++        cached_device = device;
++    }
++    return enabled;
++}
++#endif
+ struct Q20Block {
+     half d;
+     uint8_t qs[16];
+@@ -2946,6 +2994,18 @@ void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float*
+         validate_pointer(weights); validate_pointer(x_q8_1); validate_pointer(y);
+         validate_stream(stream);
+         if (n_out <= 0) throw std::invalid_argument("BF16 native MMVQ requires positive output rows");
++#if defined(STRATA_HIP_GFX906)
++        if (bf16_q81_vec4_on()) {
++            if (n_in >= 1024)
++                bf16_q81_vec4_kernel<64><<<dim3((n_out + 3) / 4, ncols), 256, 0, (cudaStream_t) stream>>>(
++                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
++            else
++                bf16_q81_vec4_kernel<32><<<dim3((n_out + 7) / 8, ncols), 256, 0, (cudaStream_t) stream>>>(
++                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
++            launch_check();
++            break;
++        }
++#endif
+         bf16_q81_kernel<<<dim3((n_out + 3) / 4, ncols), 128, 0, (cudaStream_t) stream>>>(
+             static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
+         launch_check();
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index d53e22b..f0d27a6 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -16312,6 +16312,9 @@ int main(int argc, char** argv) {
+         std::printf("%-24s", "accepted per round");
+         for (size_t i = 0; i < accepted_hist.size(); ++i) std::printf(" %zu:%lld", i, (long long) accepted_hist[i]);
+         std::printf("\n");
++        // [PROFILE] Expose the existing opt-in GPU stamps for single-shot runs too.
++        if (const std::string profile = ver.profile_report(); !profile.empty())
++            std::fprintf(stderr, "strata decode GPU stages (ms/window):%s\n", profile.c_str());
+         if (rounds > 0)
+             std::printf("%-24s wait for rings %.3f  pool %.3f  host %.3f  commit %.3f ms/round; CPU experts %.2f "
+                         "distinct / %.2f routed per layer\n",
+diff --git a/strata-test/run-autoround.sh b/strata-test/run-autoround.sh
+index e7afdf3..affe6d7 100644
+--- a/strata-test/run-autoround.sh
++++ b/strata-test/run-autoround.sh
+@@ -5,6 +5,8 @@ source /opt/hyhal/env.sh
+ export OMP_NUM_THREADS="${OMP_NUM_THREADS:-4}"
+ export MKL_NUM_THREADS="${MKL_NUM_THREADS:-4}"
+ export TOKENIZERS_PARALLELISM=false
++# gfx936-only BF16/Q8_1 fast path; set to 0 for the original FP32 sum order.
++export STRATA_BF16_Q8_VEC4="${STRATA_BF16_Q8_VEC4:-1}"
+ exec python3 /root/strata-dcu/Strata/tools/autoround_pack.py run \
+   --model /root/private_data/Qwen3.8-F \
+   --out /root/strata-dcu/autoround \
+diff --git a/tools/autoround_pack.py b/tools/autoround_pack.py
+index eb624f3..73445ce 100644
+--- a/tools/autoround_pack.py
++++ b/tools/autoround_pack.py
+@@ -296,7 +296,9 @@ def run_model(ck, out, a):
+            "--pack", str(out / "pack"), "--ple-gguf", str(out / "ple.gguf"),
+            "--tokens-file", str(token_file), "--max-new", str(a.max_new),
+            "--eos-ids", ",".join(map(str, eos)),
+-           "--max-context", str(a.context), "--prefill", "32", "--spec", "2",
++           # Native packs require --spec >= 2, but this entry has no drafter.
++           # Run only the real token, rather than verifying an unused zero draft.
++           "--max-context", str(a.context), "--prefill", "32", "--spec", "2", "--mtp-max-t", "1",
+            "--expert-profile", str(HERE.parent / "data" / "expert-profile.bin"),
+            "--expert-cache", "auto", "--mmap-experts", "--resident-cpu-experts",
+            "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",

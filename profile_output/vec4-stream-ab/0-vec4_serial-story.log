@@ -1,0 +1,14 @@
+speculation              256 rounds of 2, drafts accepted 0 of 0 (0.000), 1.00 tokens per round
+accepted per round       0:256 1:0
+verify window            wait for rings 17.188  pool 6.714  host 0.070  commit 0.000 ms/round; CPU experts 2.23 distinct / 2.23 routed per layer
+pool multi               gate/up 3.721  quantize 0.065  down 1.843 ms/round; 53.2 GB/s over the rows phases; CPU pool call 6.679 ms/round
+dispatch                 plan 0.312  activation quantize 0.039  jobs 0.045  run 5.643 ms/round
+resident RAM             12.08 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+expert tiers             decode: RAM 27418 blobs, files 0 blobs, 0.0 MB read from the files (0.00 MB/round, 0.0 ms/round of reading, 0.00 GB/s per reading thread); prompt copies 54975.3 MB
+io path                  file reads: page cache held 12975.2 MB, not 0.0 MB (mincore at the read); io prefetch on: 0 read ahead, 0 used, 0 unused, 0 skipped (cached), 0 dropped; pread 0.0 MB in 0 calls (0.00 ms each); decode waited 0.0 ms/round in the fetches
+routing prefetch         0 experts warmed, 0 of the file tier's 0 blob reads had been warmed (0.0%); predictor 13.6 ms/round on its thread, 2493 layers skipped (still busy)
+pcie experts             0.00 distinct experts per layer read over PCIe (share 141/256 of the misses)
+prompt  : 248045 846 198 7734 264 11346 220 23 15 15 36093 3255 883 264 11952 23218 449 22263 9006 5101 13 18037 279 3255 6849 321 2962 440 8807 26884 321 20623 13 248046 198 248045 74455 198 248068 271 248069 271
+output  : 4413 220 22 18 19 11 22471 328 57517 1288 23562 888 279 11823 314 279 85275 5157 3017 11 1141 41653 33124 780 76584 54166 303 279 92626 3594 13 561 22263 9006 5101 11 791 2320 5652 277 12922 383 279 25888 3438 33528 314 10113 357 744 300 51698 11 995 978 20413 364 34227 1578 13 30939 3724 287 80863 303 279 3074 22690 314 3000 57121 1472 279 53507 55419 11 41567 1060 264 76435 314 29712 13 28970 725 27374 24296 22643 11 30787 494 56093 310 1496 85984 8851 19142 11 38460 279 54231 16473 4467 314 36964 25 1016 19447 5984 421 92445 30581 6340 11 22353 290 10679 13176 793 421 10174 49698 1172 279 4528 314 854 11 321 279 65987 8198 314 74765 17969 421 2957 31961 279 60666 13 271 1 79233 8307 4434 1288 28970 725 5138 17128 10036 11 279 7497 87871 694 73248 314 19169 13 328 1597 8367 31186 17498 25 220 22 23 4 44857 11 220 17 16 4 22817 11 11319 2455 22433 13 70229 16126 25 220 19 17 13948 25997 25 16093 53442 16022 303 39379 220 19 1149 271 57517 7481 4487 11 1141 67924 7303 3154 874 4950 383 279 41423 39926 6220 13 1049 557 524 1532 364 795 4281 11 6130 364 69299 13 1049 557 1532 1521 1141 5839 32740 11 1248 2394 47739 539 264 12570 58230 2250 10476 3998 11 995 81897 1083 2414 50161 310 38896 13
+decode                   256 tokens in 9237.3 ms  ->  27.71 tok/s
+prefill                  41 tokens in 3110.2 ms  ->  13.18 tok/s  (time to first token 32920.8 ms)

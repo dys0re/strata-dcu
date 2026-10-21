@@ -5,6 +5,8 @@ source /opt/hyhal/env.sh
 export OMP_NUM_THREADS="${OMP_NUM_THREADS:-4}"
 export MKL_NUM_THREADS="${MKL_NUM_THREADS:-4}"
 export TOKENIZERS_PARALLELISM=false
+# gfx936-only BF16/Q8_1 fast path; set to 0 for the original FP32 sum order.
+export STRATA_BF16_Q8_VEC4="${STRATA_BF16_Q8_VEC4:-1}"
 exec python3 /root/strata-dcu/Strata/tools/autoround_pack.py run \
   --model /root/private_data/Qwen3.8-F \
   --out /root/strata-dcu/autoround \

@@ -19,7 +19,9 @@ int main() {
     try {
         cudaStream_t stream;
         check(cudaStreamCreate(&stream));
-        for (int k : {64, 2560}) for (int n : {5, 33}) for (int t : {1, 3, 8}) {
+        int cases = 0;
+        for (int k : {32, 64, 640, 2560, 6144}) for (int n : {1, 5, 33}) for (int t : {1, 2, 3, 8}) {
+            ++cases;
             std::vector<uint16_t> w(size_t(k) * n);
             std::vector<float> x(size_t(k) * t), got(size_t(n) * t);
             for (size_t i = 0; i < w.size(); ++i) w[i] = bf16_from_f32(std::sin(float(i) * .13f) * .1f);
@@ -55,13 +57,14 @@ int main() {
             }
             void* converted = nullptr;
             check(cudaMalloc(&converted, w.size() * 4));
-            dequant_f32(30, dw, 1, n - 1, k, static_cast<float*>(converted), stream);
+            const int row0 = n > 1 ? 1 : 0;
+            dequant_f32(30, dw, row0, n - row0, k, static_cast<float*>(converted), stream);
             check(cudaStreamSynchronize(stream));
-            std::vector<float> floats(size_t(n - 1) * k);
+            std::vector<float> floats(size_t(n - row0) * k);
             check(cudaMemcpy(floats.data(), converted, floats.size() * 4, cudaMemcpyDeviceToHost));
             for (size_t i = 0; i < floats.size(); ++i)
-                if (floats[i] != f32_from_bf16(w[i + k])) throw std::runtime_error("BF16 row-slice copy changed values");
-            dequant_f16(30, dw, 1, n - 1, k, static_cast<uint16_t*>(converted), stream);
+                if (floats[i] != f32_from_bf16(w[i + row0 * k])) throw std::runtime_error("BF16 row-slice copy changed values");
+            dequant_f16(30, dw, row0, n - row0, k, static_cast<uint16_t*>(converted), stream);
             check(cudaStreamSynchronize(stream));
             std::vector<uint16_t> halves(floats.size());
             check(cudaMemcpy(halves.data(), converted, halves.size() * 2, cudaMemcpyDeviceToHost));
@@ -71,7 +74,7 @@ int main() {
             check(cudaFree(dy)); check(cudaFree(dq)); check(cudaFree(dx)); check(cudaFree(dw));
         }
         check(cudaStreamDestroy(stream));
-        std::puts("bf16_q8_mmvq_parity OK: 12 shapes, all outputs finite and within summation tolerance");
+        std::printf("bf16_q8_mmvq_parity OK: %d shapes, all outputs finite and within summation tolerance\n", cases);
         return 0;
     } catch (const std::exception& e) { std::fprintf(stderr, "%s\n", e.what()); return 1; }
 }
