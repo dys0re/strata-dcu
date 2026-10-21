@@ -1,3 +1,4 @@
+#include "strata/core/graph_upload.hpp"
 // src/core/mtp.cpp - see include/strata/core/mtp.hpp.
 #include "strata/core/mtp.hpp"
 #include "strata/core/pin_budget.hpp"
@@ -1243,7 +1244,7 @@ bool finish_capture(cudaStream_t cs, bool ok, cudaGraphExec_t& exec, const char*
     mtp_list_nodes(graph, what);
     cudaGraphDestroy(graph);
     // an explicit upload: the first launch's implicit one blocked behind a device-side spin (verify.cpp)
-    cudaGraphUpload(exec, cs);
+    graph_upload(exec, cs);
     cudaStreamSynchronize(cs);
     return true;
 }

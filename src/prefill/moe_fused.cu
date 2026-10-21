@@ -23,6 +23,7 @@
 
 #include <cuda_fp16.h>
 #include <cuda_runtime.h>
+#include "strata/kernels/hip_launch_bounds.hpp"
 
 #include <algorithm>
 #include <cstdio>
@@ -107,7 +108,7 @@ __global__ void quant_act_kernel(const float* __restrict__ x, int64_t nblk, uint
 }
 
 // ---- grouping: counts, offsets and tiles, placement
-__global__ void count_kernel(const int32_t* __restrict__ ids, int64_t n, int E, int32_t* __restrict__ cnt) {
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) count_kernel(const int32_t* __restrict__ ids, int64_t n, int E, int32_t* __restrict__ cnt) {
     extern __shared__ int32_t hist[];
     for (int e = threadIdx.x; e < E; e += blockDim.x) hist[e] = 0;
     __syncthreads();

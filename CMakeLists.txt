@@ -1221,6 +1221,11 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
   target_link_libraries(bf16_gemv_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
   add_test(NAME bf16_gemv_parity COMMAND bf16_gemv_parity --selftest)
 
+  add_executable(bf16_q8_mmvq_parity src/kernels/bf16_q8_mmvq_parity.cpp)
+  target_include_directories(bf16_q8_mmvq_parity PRIVATE ${_strata_gpu_include_directories})
+  target_link_libraries(bf16_q8_mmvq_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+  add_test(NAME bf16_q8_mmvq_parity COMMAND bf16_q8_mmvq_parity)
+
   # the V100 fusion work: every fused kernel against its unfused pipeline, bitwise, and the before/after
   # CUDA-event timings at decode shapes (`--bench`).  It is a .cu because it carries the unfused reference
   # kernels it compares against.
@@ -1349,6 +1354,11 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
   target_include_directories(ple_reader_test PRIVATE ${_strata_gpu_include_directories})
   target_link_libraries(ple_reader_test PRIVATE strata_kernels ${_strata_gpu_runtime_target})
   add_test(NAME ple_reader_selftest COMMAND ple_reader_test --selftest)
+
+  add_executable(ple_external_test tests/core/ple_external_test.cpp)
+  target_include_directories(ple_external_test PRIVATE ${_strata_gpu_include_directories})
+  target_link_libraries(ple_external_test PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+  add_test(NAME ple_external_test COMMAND ple_external_test)
 
   # The GPU test runs ON THE TARGET PC. `--selftest` allocates
   # and writes real VRAM, so a machine without a device fails this test rather than skipping it silently -

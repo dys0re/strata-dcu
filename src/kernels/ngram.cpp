@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <cstring>
 #include <limits>
+#include <filesystem>
 #if !defined(_WIN32)
 #include <sys/mman.h>
 #endif
@@ -259,6 +260,47 @@ bool PleTable::open(const std::string& gguf_path, std::string& err, const PleIoO
     } catch (const std::exception& e) {
         err = e.what();
         return false;
+    }
+    // A small descriptor may refer directly to the checkpoint's contiguous BF16
+    // PLE payload. Only bounded direct reads are allowed: never map or lock the
+    // hundred-GB source table, and never fall back to a different table.
+    if (const MetaValue* path = impl_->file->get("strata.ple.external.path")) {
+        try {
+            const auto* off = impl_->file->get("strata.ple.external.offset");
+            const auto* rows = impl_->file->get("strata.ple.external.rows");
+            const auto* size = impl_->file->get("strata.ple.external.file_size");
+            const auto integer = [](const MetaValue* v) {
+                return v && (v->type == MetaType::U64 || v->type == MetaType::U32);
+            };
+            if (path->type != MetaType::STRING || path->s.empty() || !integer(off) ||
+                !integer(rows) || !integer(size) || !rows->u || rows->u > UINT32_MAX ||
+                rows->u > UINT64_MAX / PLE_ROW_BYTES_BF16)
+                throw std::runtime_error("invalid external BF16 PLE descriptor");
+            if (io.mode != PleIo::Direct)
+                throw std::runtime_error("external BF16 PLE requires --ple-io direct (table stays on disk)");
+            auto raw = std::filesystem::path(path->s);
+            if (raw.is_relative()) raw = std::filesystem::path(gguf_path).parent_path() / raw;
+            const uint64_t bytes = rows->u * PLE_ROW_BYTES_BF16;
+            if (std::filesystem::file_size(raw) != size->u || off->u > size->u || bytes > size->u - off->u)
+                throw std::runtime_error("external BF16 PLE file size or payload bounds changed");
+            impl_->fmt = &ple_format_info(PleFormat::BF16);
+            impl_->rb = PLE_ROW_BYTES_BF16;
+            impl_->n_rows = rows->u;
+            if (!impl_->reader.open(raw.string(), off->u, rows->u, io.max_inflight,
+                                   io.cache_rows, err, io.io_thread, impl_->rb)) {
+                close();
+                return false;
+            }
+            impl_->reader.set_keepalive(io.keepalive_ms, io.keepalive_window_s);
+            delete impl_->file;
+            impl_->file = nullptr;
+            impl_->mode = PleIo::Direct;
+            return true;
+        } catch (const std::exception& e) {
+            err = std::string("external PLE: ") + e.what();
+            close();
+            return false;
+        }
     }
     const TensorInfo* t = impl_->file->find("per_layer_token_embd.weight");
     if (t == nullptr) {

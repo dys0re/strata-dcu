@@ -22,6 +22,9 @@ namespace strata::kernels {
 // IQ4_XS=136 bytes per 256 elements; Q2_0 is 18 bytes per 64 elements.
 // Q4_0/IQ4_NL=18, Q5_0=22, Q8_0=34 bytes per 32 elements.
 // Q8_1 scratch has 36 bytes per 32 elements, with no extra row padding here.
+// BF16 (type 30) also keeps its original two-byte weights, with n_in a
+// multiple of 32. Its native projection consumes the same Q8_1 activations;
+// the prompt path converts BF16 weights to its FP16 compute scratch.
 // Input floats must be finite, and their block scales/sums representable in FP16.
 std::size_t native_q8_1_bytes(int n_in, int ncols = 1);
 

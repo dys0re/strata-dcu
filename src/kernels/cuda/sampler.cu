@@ -25,6 +25,7 @@
 #include "strata/core/emulate.hpp"
 
 #include <cuda_runtime.h>
+#include "strata/kernels/hip_launch_bounds.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -116,7 +117,7 @@ __device__ __forceinline__ float apply_penalties(float logit, int count, const S
 /// ascending with `if (s > bv)`, so the LOWEST index wins a tie.  Each thread keeps that rule over its own
 /// strided subset and the reduction resolves two candidates by taking the larger value and, on equality, the
 /// SMALLER index - the same total order, so `sampler_parity` and C1 see no change.
-__global__ void sampler_greedy_kernel(const float* __restrict__ logits, int n_vocab,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) sampler_greedy_kernel(const float* __restrict__ logits, int n_vocab,
                                       const int* __restrict__ history, int history_len, const SamplerParams p,
                                       int pmin, int plen, int* __restrict__ out) {
     const int t = blockIdx.x;
@@ -293,7 +294,7 @@ __global__ void __launch_bounds__(kAmThreads) sampler_greedy_cluster_kernel(cons
 /// sweep is O(k) per logit per round, O(k^2 x n_vocab) per row (47 M shared-memory compares at k = 20, 500 M at
 /// 64), and the double-precision tail runs on all 1,024 threads where one warp suffices - GeForce issues FP64 at
 /// 1/64 of FP32.  The kernels after this one remove both and select the same list in the same order.
-__global__ void sampler_kernel(const float* __restrict__ logits, int n_vocab, int n_tokens,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) sampler_kernel(const float* __restrict__ logits, int n_vocab, int n_tokens,
                                const int* __restrict__ history, int history_len, const SamplerParams p,
                                int* __restrict__ out) {
     const int t = blockIdx.x;
@@ -819,7 +820,7 @@ __global__ void coupled_stage_kernel(const SamplerParams* __restrict__ mp, const
 /// `apply_penalties` to the same token with the same count over the same window before its own.  Draft j's window
 /// is the ring's [cap + j - h, cap + j): the base plus drafts 0 .. j-1.  A history token outside the draft head's
 /// subset has no logit here.  Each distinct token is penalised once: the entry whose `atomicOr` sets its bit does it.
-__global__ void coupled_penalize_kernel(float* __restrict__ logits, int nv, const int* __restrict__ id_to_sub,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) coupled_penalize_kernel(float* __restrict__ logits, int nv, const int* __restrict__ id_to_sub,
                                         int id_vocab, const SamplerParams* __restrict__ dp, const int* __restrict__ ring,
                                         int cap, int j) {
     const SamplerParams p = *dp;

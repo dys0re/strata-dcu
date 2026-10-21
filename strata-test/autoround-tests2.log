@@ -1,0 +1,9 @@
+Test project /root/strata-dcu/build-gfx936
+    Start 75: bf16_q8_mmvq_parity
+1/2 Test #75: bf16_q8_mmvq_parity ..............   Passed    0.21 sec
+    Start 95: ple_external_test
+2/2 Test #95: ple_external_test ................   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.30 sec

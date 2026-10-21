@@ -71,6 +71,25 @@ struct Q81Block {
     half2 ds;
     int8_t qs[32];
 };
+// Unquantized projections of an AutoRound checkpoint. Keep the BF16 weight bits;
+// activations use the same Q8_1 contract as the other native projection types.
+__global__ void bf16_q81_kernel(const uint16_t* w, const Q81Block* x, float* y,
+                                int n_in, int n_out) {
+    const int lane = threadIdx.x & 31;
+    const int row = int(blockIdx.x) * 4 + int(threadIdx.x) / 32;
+    if (row >= n_out) return;
+    const int col = blockIdx.y;
+    const Q81Block* a = x + size_t(col) * (n_in / 32);
+    float sum = 0.0f;
+    for (int i = lane; i < n_in; i += 32) {
+        const float weight = __uint_as_float(uint32_t(w[size_t(row) * n_in + i]) << 16);
+        const float value = __half2float(__low2half(a[i / 32].ds)) * float(a[i / 32].qs[i % 32]);
+        sum = __fmaf_rn(weight, value, sum);
+    }
+    for (int off = 16; off > 0; off >>= 1)
+        sum += __shfl_down_sync(0xffffffffu, sum, off, 32);
+    if (lane == 0) y[size_t(col) * n_out + row] = sum;
+}
 struct Q20Block {
     half d;
     uint8_t qs[16];
@@ -2885,7 +2904,7 @@ void native_iq4_nl_f32(const void* weights, const float* x, void* scratch_q8_1,
 }
 
 bool native_mmvq_supported(int ggml_type) noexcept {
-    return ggml_type == 2 || ggml_type == 6 || ggml_type == 7 || ggml_type == 8 || ggml_type == 11 ||
+    return ggml_type == 30 || ggml_type == 2 || ggml_type == 6 || ggml_type == 7 || ggml_type == 8 || ggml_type == 11 ||
            ggml_type == 12 || ggml_type == 13 || ggml_type == 14 || ggml_type == 20 ||
            ggml_type == 23 || ggml_type == 42 || ggml_type == 16 || ggml_type == 17 || ggml_type == 18 ||
            ggml_type == 21 || ggml_type == 22 || ggml_type == 29;
@@ -2894,6 +2913,7 @@ bool native_mmvq_supported(int ggml_type) noexcept {
 std::size_t native_mmvq_weight_bytes(int ggml_type, int n_in, int n_out) {
     int block_elems, block_bytes;
     switch (ggml_type) {
+    case 30: block_elems = 32; block_bytes = 64; break;
     case 2: block_elems = 32; block_bytes = 18; break;
     case 6: block_elems = 32; block_bytes = 22; break;
     case 7: block_elems = 32; block_bytes = 24; break;
@@ -2921,6 +2941,15 @@ std::size_t native_mmvq_weight_bytes(int ggml_type, int n_in, int n_out) {
 void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float* y,
                  int n_in, int n_out, int ncols, void* stream) {
     switch (ggml_type) {
+    case 30:
+        validate_shape(n_in, ncols, 32);
+        validate_pointer(weights); validate_pointer(x_q8_1); validate_pointer(y);
+        validate_stream(stream);
+        if (n_out <= 0) throw std::invalid_argument("BF16 native MMVQ requires positive output rows");
+        bf16_q81_kernel<<<dim3((n_out + 3) / 4, ncols), 128, 0, (cudaStream_t) stream>>>(
+            static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
+        launch_check();
+        break;
     case 2: native_q4_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
     case 6: native_q5_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
     case 7: iq_mmvq(ggml_type, weights, x_q8_1, y, n_in, n_out, ncols, stream); break;

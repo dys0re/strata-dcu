@@ -1,0 +1,56 @@
+[
+  {
+    "site": "https://hf-mirror.net",
+    "path": "/api/models/google-bert/bert-base-uncased",
+    "status": 200,
+    "json_object": true,
+    "id": "google-bert/bert-base-uncased",
+    "model_type": null,
+    "seconds": 1.59
+  },
+  {
+    "site": "https://hf-mirror.net",
+    "path": "/google-bert/bert-base-uncased/resolve/main/config.json",
+    "status": 200,
+    "json_object": true,
+    "id": null,
+    "model_type": "bert",
+    "seconds": 1.04
+  },
+  {
+    "site": "https://hf-mirror.com",
+    "path": "/api/models/google-bert/bert-base-uncased",
+    "status": 200,
+    "json_object": true,
+    "id": "google-bert/bert-base-uncased",
+    "model_type": null,
+    "seconds": 2.77
+  },
+  {
+    "site": "https://hf-mirror.com",
+    "path": "/google-bert/bert-base-uncased/resolve/main/config.json",
+    "status": 200,
+    "json_object": true,
+    "id": null,
+    "model_type": "bert",
+    "seconds": 3.56
+  },
+  {
+    "site": "https://alpha.hf-mirror.com",
+    "path": "/api/models/google-bert/bert-base-uncased",
+    "status": 200,
+    "json_object": true,
+    "id": "google-bert/bert-base-uncased",
+    "model_type": null,
+    "seconds": 1.07
+  },
+  {
+    "site": "https://alpha.hf-mirror.com",
+    "path": "/google-bert/bert-base-uncased/resolve/main/config.json",
+    "status": 200,
+    "json_object": true,
+    "id": null,
+    "model_type": "bert",
+    "seconds": 1.7
+  }
+]

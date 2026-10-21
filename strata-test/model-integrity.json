@@ -1,0 +1,127 @@
+{
+  "model_dir": "/root/private_data/Qwen3.8-F",
+  "files": [
+    {
+      "file": "model-00001-of-00017.safetensors",
+      "actual_bytes": 2899311784,
+      "expected_bytes": 2899311784,
+      "size_matches": true,
+      "tensor_count": 9255
+    },
+    {
+      "file": "model-00003-of-00017.safetensors",
+      "actual_bytes": 5370548192,
+      "expected_bytes": 5370548192,
+      "size_matches": true,
+      "tensor_count": 16677
+    },
+    {
+      "file": "model-00004-of-00017.safetensors",
+      "actual_bytes": 5370910416,
+      "expected_bytes": 5370910416,
+      "size_matches": true,
+      "tensor_count": 16873
+    },
+    {
+      "file": "model-00005-of-00017.safetensors",
+      "actual_bytes": 5370140704,
+      "expected_bytes": 5370140704,
+      "size_matches": true,
+      "tensor_count": 17383
+    },
+    {
+      "file": "model-00006-of-00017.safetensors",
+      "actual_bytes": 5370205184,
+      "expected_bytes": 5370205184,
+      "size_matches": true,
+      "tensor_count": 16881
+    },
+    {
+      "file": "model-00007-of-00017.safetensors",
+      "actual_bytes": 5370927288,
+      "expected_bytes": 5370927288,
+      "size_matches": true,
+      "tensor_count": 16873
+    },
+    {
+      "file": "model-00008-of-00017.safetensors",
+      "actual_bytes": 5344445352,
+      "expected_bytes": 5344445352,
+      "size_matches": true,
+      "tensor_count": 17191
+    },
+    {
+      "file": "model-00009-of-00017.safetensors",
+      "actual_bytes": 5370355648,
+      "expected_bytes": 5370355648,
+      "size_matches": true,
+      "tensor_count": 16983
+    },
+    {
+      "file": "model-00010-of-00017.safetensors",
+      "actual_bytes": 5370927288,
+      "expected_bytes": 5370927288,
+      "size_matches": true,
+      "tensor_count": 16873
+    },
+    {
+      "file": "model-00011-of-00017.safetensors",
+      "actual_bytes": 5324173744,
+      "expected_bytes": 5324173744,
+      "size_matches": true,
+      "tensor_count": 17070
+    },
+    {
+      "file": "model-00012-of-00017.safetensors",
+      "actual_bytes": 5370438520,
+      "expected_bytes": 5370438520,
+      "size_matches": true,
+      "tensor_count": 16987
+    },
+    {
+      "file": "model-00013-of-00017.safetensors",
+      "actual_bytes": 5370927288,
+      "expected_bytes": 5370927288,
+      "size_matches": true,
+      "tensor_count": 16873
+    },
+    {
+      "file": "model-00014-of-00017.safetensors",
+      "actual_bytes": 5342689856,
+      "expected_bytes": 5342689856,
+      "size_matches": true,
+      "tensor_count": 17075
+    },
+    {
+      "file": "model-00015-of-00017.safetensors",
+      "actual_bytes": 5050474736,
+      "expected_bytes": 5050474736,
+      "size_matches": true,
+      "tensor_count": 9589
+    },
+    {
+      "file": "model-00016-of-00017.safetensors",
+      "actual_bytes": 102400512256,
+      "expected_bytes": 102400512256,
+      "size_matches": true,
+      "tensor_count": 128
+    },
+    {
+      "file": "model-00017-of-00017.safetensors",
+      "actual_bytes": 1284526608,
+      "expected_bytes": 1284526608,
+      "size_matches": true,
+      "tensor_count": 4
+    },
+    {
+      "file": "model_extra_tensors.safetensors",
+      "actual_bytes": 5214492152,
+      "expected_bytes": 5214492152,
+      "size_matches": true,
+      "tensor_count": 1565
+    }
+  ],
+  "all_sizes_match": true,
+  "file_count": 17,
+  "total_bytes": 181196007016
+}

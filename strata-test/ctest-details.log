@@ -1,0 +1,352 @@
+Start testing: Oct 21 18:34 CST
+----------------------------------------------------------
+37/147 Testing: mmvq_multi_parity
+37/147 Test: mmvq_multi_parity
+Command: "/root/strata-dcu/build-gfx936/mmvq_multi_parity"
+Directory: /root/strata-dcu/build-gfx936
+"mmvq_multi_parity" start time: Oct 21 18:34 CST
+Output:
+----------------------------------------------------------
+
+=== multi_exact ON (the default) ===
+type           T    outputs  bits diff    finite diff  nonfinite
+Q4_0           1        512          0              0          0  ok
+Q4_0           2       1024          0              0          0  ok
+Q4_0           3       1536          0              0          0  ok
+Q4_0           4       2048          0              0          0  ok
+Q4_0           5       2560          0              0          0  ok
+Q4_0           6       3072          0              0          0  ok
+Q4_0           8       4096          0              0          0  ok
+Q8_0           1        512          0              0          0  ok
+Q8_0           2       1024          0              0          0  ok
+Q8_0           3       1536          0              0          0  ok
+Q8_0           4       2048          0              0          0  ok
+Q8_0           5       2560          0              0          0  ok
+Q8_0           6       3072          0              0          0  ok
+Q8_0           8       4096          0              0          0  ok
+Q4_K           1        512          0              0          0  ok
+Q4_K           2       1024          0              0          0  ok
+Q4_K           3       1536          0              0          0  ok
+Q4_K           4       2048          0              0          0  ok
+Q4_K           5       2560          0              0          0  ok
+Q4_K           6       3072          0              0          0  ok
+Q4_K           8       4096          0              0          0  ok
+Q5_K           1        512          0              0          0  ok
+Q5_K           2       1024          0              0          0  ok
+Q5_K           3       1536          0              0          0  ok
+Q5_K           4       2048          0              0          0  ok
+Q5_K           5       2560          0              0          0  ok
+Q5_K           6       3072          0              0          0  ok
+Q5_K           8       4096          0              0          0  ok
+Q6_K           1        512          0              0          0  ok
+Q6_K           2       1024          0              0          0  ok
+Q6_K           3       1536          0              0          0  ok
+Q6_K           4       2048          0              0          0  ok
+Q6_K           5       2560          0              0          0  ok
+Q6_K           6       3072          0              0          0  ok
+Q6_K           8       4096          0              0          0  ok
+IQ4_XS         1        512          0              0          0  ok
+IQ4_XS         2       1024          0              0          0  ok
+IQ4_XS         3       1536          0              0          0  ok
+IQ4_XS         4       2048          0              0          0  ok
+IQ4_XS         5       2560          0              0          0  ok
+IQ4_XS         6       3072          0              0          0  ok
+IQ4_XS         8       4096          0              0          0  ok
+Q5_K wide      1       2048          0              0          0  ok
+Q5_K wide      2       4096          0              0          0  ok
+Q5_K wide      3       6144          0              0          0  ok
+Q5_K wide      4       8192          0              0          0  ok
+Q5_K wide      5      10240          0              0          0  ok
+Q5_K wide      6      12288          0              0          0  ok
+Q5_K wide      8      16384          0              0          0  ok
+
+=== multi_exact off (negative control) ===
+type           T    outputs  bits diff    finite diff  nonfinite
+Q4_0           1        512          0              0          0  layouts coincide here (NW = 4)
+Q4_0           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q4_0           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q4_0           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q4_0           5       2560          0              0          0  no power at this T
+Q4_0           6       3072          0              0          0  no power at this T
+Q4_0           8       4096          0              0          0  no power at this T
+Q8_0           1        512          0              0          0  layouts coincide here (NW = 4)
+Q8_0           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q8_0           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q8_0           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q8_0           5       2560          0              0          0  no power at this T
+Q8_0           6       3072          0              0          0  no power at this T
+Q8_0           8       4096          0              0          0  no power at this T
+Q4_K           1        512          0              0          0  layouts coincide here (NW = 4)
+Q4_K           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q4_K           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q4_K           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q4_K           5       2560          0              0          0  no power at this T
+Q4_K           6       3072          0              0          0  no power at this T
+Q4_K           8       4096          0              0          0  no power at this T
+Q5_K           1        512          0              0          0  layouts coincide here (NW = 4)
+Q5_K           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q5_K           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q5_K           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q5_K           5       2560          0              0          0  no power at this T
+Q5_K           6       3072          0              0          0  no power at this T
+Q5_K           8       4096          0              0          0  no power at this T
+Q6_K           1        512          0              0          0  layouts coincide here (NW = 4)
+Q6_K           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q6_K           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q6_K           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q6_K           5       2560          0              0          0  no power at this T
+Q6_K           6       3072          0              0          0  no power at this T
+Q6_K           8       4096          0              0          0  no power at this T
+IQ4_XS         1        512          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         2       1024          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         3       1536          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         4       2048          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         5       2560          0              0          0  no power at this T
+IQ4_XS         6       3072          0              0          0  no power at this T
+IQ4_XS         8       4096          0              0          0  no power at this T
+Q5_K wide      1       2048          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      2       4096          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      3       6144          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      4       8192          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      5      10240          0              0          0  no power at this T
+Q5_K wide      6      12288          0              0          0  no power at this T
+Q5_K wide      8      16384          0              0          0  no power at this T
+
+multi_exact on:   148480 outputs compared, 0 differ bitwise, 0 non-finite
+multi_exact off:  148480 outputs compared, 0 differ bitwise (0 on finite outputs, 0 at T > 4)
+
+mmvq_multi_parity: ok (gfx906 wave64 layout: every column count runs the same exact kernel, so the negative control has no other layout to find; mmvq_multi_parity_cuda_layout checks it).
+<end of output>
+Test time =   1.04 sec
+----------------------------------------------------------
+Test Passed.
+"mmvq_multi_parity" end time: Oct 21 18:34 CST
+"mmvq_multi_parity" time elapsed: 00:00:01
+----------------------------------------------------------
+
+38/147 Testing: mmvq_multi_parity_cuda_layout
+38/147 Test: mmvq_multi_parity_cuda_layout
+Command: "/root/strata-dcu/build-gfx936/mmvq_multi_parity"
+Directory: /root/strata-dcu/build-gfx936
+"mmvq_multi_parity_cuda_layout" start time: Oct 21 18:34 CST
+Output:
+----------------------------------------------------------
+
+=== multi_exact ON (the default) ===
+type           T    outputs  bits diff    finite diff  nonfinite
+Q4_0           1        512          0              0          0  ok
+Q4_0           2       1024          0              0          0  ok
+Q4_0           3       1536          0              0          0  ok
+Q4_0           4       2048          0              0          0  ok
+Q4_0           5       2560          0              0          0  ok
+Q4_0           6       3072          0              0          0  ok
+Q4_0           8       4096          0              0          0  ok
+Q8_0           1        512          0              0          0  ok
+Q8_0           2       1024          0              0          0  ok
+Q8_0           3       1536          0              0          0  ok
+Q8_0           4       2048          0              0          0  ok
+Q8_0           5       2560          0              0          0  ok
+Q8_0           6       3072          0              0          0  ok
+Q8_0           8       4096          0              0          0  ok
+Q4_K           1        512          0              0          0  ok
+Q4_K           2       1024        689            689          0  FAIL
+Q4_K           3       1536        998            998          0  FAIL
+Q4_K           4       2048       1303           1303          0  FAIL
+Q4_K           5       2560       1647           1647          0  FAIL
+Q4_K           6       3072       1960           1960          0  FAIL
+Q4_K           8       4096       2675           2675          0  FAIL
+Q5_K           1        512          0              0          0  ok
+Q5_K           2       1024          0              0          0  ok
+Q5_K           3       1536          0              0          0  ok
+Q5_K           4       2048          0              0          0  ok
+Q5_K           5       2560          0              0          0  ok
+Q5_K           6       3072          0              0          0  ok
+Q5_K           8       4096          0              0          0  ok
+Q6_K           1        512          0              0          0  ok
+Q6_K           2       1024          0              0          0  ok
+Q6_K           3       1536          0              0          0  ok
+Q6_K           4       2048          0              0          0  ok
+Q6_K           5       2560          0              0          0  ok
+Q6_K           6       3072          0              0          0  ok
+Q6_K           8       4096          0              0          0  ok
+IQ4_XS         1        512          0              0          0  ok
+IQ4_XS         2       1024          0              0          0  ok
+IQ4_XS         3       1536          0              0          0  ok
+IQ4_XS         4       2048          0              0          0  ok
+IQ4_XS         5       2560          0              0          0  ok
+IQ4_XS         6       3072          0              0          0  ok
+IQ4_XS         8       4096          0              0          0  ok
+Q5_K wide      1       2048          0              0          0  ok
+Q5_K wide      2       4096          0              0          0  ok
+Q5_K wide      3       6144          0              0          0  ok
+Q5_K wide      4       8192          0              0          0  ok
+Q5_K wide      5      10240          0              0          0  ok
+Q5_K wide      6      12288          0              0          0  ok
+Q5_K wide      8      16384          0              0          0  ok
+
+=== multi_exact off (negative control) ===
+type           T    outputs  bits diff    finite diff  nonfinite
+Q4_0           1        512          0              0          0  layouts coincide here (NW = 4)
+Q4_0           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q4_0           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q4_0           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q4_0           5       2560       1746           1746          0  control sees it
+Q4_0           6       3072       2110           2110          0  control sees it
+Q4_0           8       4096       2795           2795          0  control sees it
+Q8_0           1        512          0              0          0  layouts coincide here (NW = 4)
+Q8_0           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q8_0           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q8_0           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q8_0           5       2560       1713           1713          0  control sees it
+Q8_0           6       3072       2085           2085          0  control sees it
+Q8_0           8       4096       2770           2770          0  control sees it
+Q4_K           1        512          0              0          0  layouts coincide here (NW = 4)
+Q4_K           2       1024        689            689          0  control sees it
+Q4_K           3       1536        998            998          0  control sees it
+Q4_K           4       2048       1303           1303          0  control sees it
+Q4_K           5       2560       1716           1716          0  control sees it
+Q4_K           6       3072       2079           2079          0  control sees it
+Q4_K           8       4096       2837           2837          0  control sees it
+Q5_K           1        512          0              0          0  layouts coincide here (NW = 4)
+Q5_K           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q5_K           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q5_K           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q5_K           5       2560       1522           1522          0  control sees it
+Q5_K           6       3072       1885           1885          0  control sees it
+Q5_K           8       4096       2460           2460          0  control sees it
+Q6_K           1        512          0              0          0  layouts coincide here (NW = 4)
+Q6_K           2       1024          0              0          0  layouts coincide here (NW = 4)
+Q6_K           3       1536          0              0          0  layouts coincide here (NW = 4)
+Q6_K           4       2048          0              0          0  layouts coincide here (NW = 4)
+Q6_K           5       2560       1710           1710          0  control sees it
+Q6_K           6       3072       2024           2024          0  control sees it
+Q6_K           8       4096       2746           2746          0  control sees it
+IQ4_XS         1        512          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         2       1024          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         3       1536          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         4       2048          0              0          0  layouts coincide here (NW = 4)
+IQ4_XS         5       2560       1598           1598          0  control sees it
+IQ4_XS         6       3072       1924           1924          0  control sees it
+IQ4_XS         8       4096       2515           2515          0  control sees it
+Q5_K wide      1       2048          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      2       4096          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      3       6144          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      4       8192          0              0          0  layouts coincide here (NW = 4)
+Q5_K wide      5      10240       6923           6923          0  control sees it
+Q5_K wide      6      12288       8121           8121          0  control sees it
+Q5_K wide      8      16384      11201          11201          0  control sees it
+
+multi_exact on:   148480 outputs compared, 9272 differ bitwise, 0 non-finite
+multi_exact off:  148480 outputs compared, 67470 differ bitwise (67470 on finite outputs, 64480 at T > 4)
+
+mmvq_multi_parity: FAILED. 6 case(s) with multi_exact on differ from single-column calls or did not run, 0 case(s) did not run with it off. If they differ, the sentence in native_mmvq.hpp does not hold, and neither does the bit-exactness verify.hpp claims.
+<end of output>
+Test time =   1.06 sec
+----------------------------------------------------------
+Test Failed.
+"mmvq_multi_parity_cuda_layout" end time: Oct 21 18:34 CST
+"mmvq_multi_parity_cuda_layout" time elapsed: 00:00:01
+----------------------------------------------------------
+
+48/147 Testing: gfx906_gdn_rec_head
+48/147 Test: gfx906_gdn_rec_head
+Command: "/root/strata-dcu/build-gfx936/gfx906_gdn_rec_head"
+Directory: /root/strata-dcu/build-gfx936
+"gfx906_gdn_rec_head" start time: Oct 21 18:34 CST
+Output:
+----------------------------------------------------------
+PASS T 1 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 1 variant 1 vs 0: y 6144, y16 0, state 0 values differ
+PASS T 1 variant 4 vs 0: y 6144, y16 0, state 0 values differ
+PASS T 1 variant 5 vs 0: y 6144, y16 0, state 0 values differ
+PASS T 7 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 7 variant 1 vs 0: y 43008, y16 0, state 0 values differ
+PASS T 7 variant 4 vs 0: y 43008, y16 0, state 0 values differ
+PASS T 7 variant 5 vs 0: y 43008, y16 0, state 0 values differ
+PASS T 8 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 8 variant 1 vs 0: y 49152, y16 0, state 0 values differ
+PASS T 8 variant 4 vs 0: y 49152, y16 0, state 0 values differ
+PASS T 8 variant 5 vs 0: y 49152, y16 0, state 0 values differ
+PASS T 9 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 9 variant 1 vs 0: y 55296, y16 0, state 0 values differ
+PASS T 9 variant 4 vs 0: y 55296, y16 0, state 0 values differ
+PASS T 9 variant 5 vs 0: y 55296, y16 0, state 0 values differ
+PASS T 17 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 17 variant 1 vs 0: y 104448, y16 0, state 0 values differ
+PASS T 17 variant 4 vs 0: y 104448, y16 0, state 0 values differ
+PASS T 17 variant 5 vs 0: y 104448, y16 0, state 0 values differ
+PASS T 100 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 100 variant 1 vs 0: y 614400, y16 0, state 0 values differ
+PASS T 100 variant 4 vs 0: y 614400, y16 0, state 0 values differ
+PASS T 100 variant 5 vs 0: y 614400, y16 0, state 0 values differ
+PASS T 2048 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 2048 variant 1 vs 0: y 12582912, y16 0, state 0 values differ
+PASS T 2048 variant 4 vs 0: y 12582912, y16 0, state 0 values differ
+PASS T 2048 variant 5 vs 0: y 12582912, y16 0, state 0 values differ
+  T 2048 variant 0: 3.779 ms per call (1.85 us per token)
+  T 2048 variant 1: 4.127 ms per call (2.01 us per token)
+PASS T 2051 variant 3 vs 0: y 0, y16 0, state 0 values differ
+PASS T 2051 variant 1 vs 0: y 12601344, y16 0, state 0 values differ
+PASS T 2051 variant 4 vs 0: y 12601344, y16 0, state 0 values differ
+PASS T 2051 variant 5 vs 0: y 12601344, y16 0, state 0 values differ
+  T 2051 variant 0: 3.787 ms per call (1.85 us per token)
+  T 2051 variant 1: 4.443 ms per call (2.17 us per token)
+FAILURES: 0
+<end of output>
+Test time =  23.47 sec
+----------------------------------------------------------
+Test Passed.
+"gfx906_gdn_rec_head" end time: Oct 21 18:34 CST
+"gfx906_gdn_rec_head" time elapsed: 00:00:23
+----------------------------------------------------------
+
+65/147 Testing: router_top10_parity
+65/147 Test: router_top10_parity
+Command: "/root/strata-dcu/build-gfx936/router_top10_parity" "--selftest"
+Directory: /root/strata-dcu/build-gfx936
+"router_top10_parity" start time: Oct 21 18:34 CST
+Output:
+----------------------------------------------------------
+  random normal              ids exact (0 bad)   weights worst rel 1.378e-07 (0 over tol)   |sum-1| 2.2e-08
+  all equal (ties)           ids exact (0 bad)   weights worst rel 0.000e+00 (0 over tol)   |sum-1| 1.5e-08
+  12-way exact tie           ids exact (0 bad)   weights worst rel 1.347e-07 (0 over tol)   |sum-1| 2.2e-08
+  dominant expert            ids exact (0 bad)   weights worst rel 5.960e-08 (0 over tol)   |sum-1| 1.9e-08
+  clamp reachability         top-10 sum >= k/n = 0.01953, clamp is 6.104e-05 -> margin 320x  (CLAMP IS UNREACHABLE, asserted)
+
+router_top10: 0 failures over 4 distributions x 64 tokens x 512 experts, top-10
+router_top10_parity OK
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"router_top10_parity" end time: Oct 21 18:34 CST
+"router_top10_parity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+74/147 Testing: bf16_gemv_parity
+74/147 Test: bf16_gemv_parity
+Command: "/root/strata-dcu/build-gfx936/bf16_gemv_parity" "--selftest"
+Directory: /root/strata-dcu/build-gfx936
+"bf16_gemv_parity" start time: Oct 21 18:34 CST
+Output:
+----------------------------------------------------------
+  ssm_alpha.weight  [2560, 48]       naive 3.85e-07  warp 9.07e-08  split256 5.99e-08
+      bf16 vs fp16 activation        yes (0.1447% apart)
+  indexer.k_proj   [2560, 128]       naive 8.22e-08  warp 8.22e-08  split256 6.62e-08
+      bf16 vs fp16 activation        yes (0.1561% apart)
+  indexer.q_proj   [2560, 512]       naive 7.73e-08  warp 7.73e-08  split256 7.08e-08
+      bf16 vs fp16 activation        yes (0.1456% apart)
+  ple_value        [2560, 2560]      naive 8.00e-08  warp 8.00e-08  split256 6.80e-08
+      bf16 vs fp16 activation        yes (0.1411% apart)
+
+bf16_gemv: 0 failures
+bf16_gemv_parity OK
+<end of output>
+Test time =   1.66 sec
+----------------------------------------------------------
+Test Passed.
+"bf16_gemv_parity" end time: Oct 21 18:34 CST
+"bf16_gemv_parity" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 21 18:34 CST

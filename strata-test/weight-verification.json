@@ -1,0 +1,86 @@
+[
+  {
+    "layer": 0,
+    "expert": 0,
+    "role": "gate",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 4,
+    "expert": 137,
+    "role": "up",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 8,
+    "expert": 274,
+    "role": "down",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 12,
+    "expert": 411,
+    "role": "gate",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 17,
+    "expert": 36,
+    "role": "up",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 21,
+    "expert": 173,
+    "role": "down",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 25,
+    "expert": 310,
+    "role": "gate",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 29,
+    "expert": 447,
+    "role": "up",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 34,
+    "expert": 72,
+    "role": "down",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 38,
+    "expert": 209,
+    "role": "gate",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 42,
+    "expert": 346,
+    "role": "up",
+    "weights": 1638400,
+    "bit_exact": true
+  },
+  {
+    "layer": 47,
+    "expert": 483,
+    "role": "down",
+    "weights": 1638400,
+    "bit_exact": true
+  }
+]

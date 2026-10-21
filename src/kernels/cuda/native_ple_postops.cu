@@ -23,6 +23,7 @@
 #include "strata/kernels/native_gr_norm.hpp"
 #include "strata/kernels/ngram.hpp"
 #include <cuda_runtime.h>
+#include "strata/kernels/hip_launch_bounds.hpp"
 #include <cuda_fp16.h>
 #include <cmath>
 #include <cstddef>
@@ -39,7 +40,7 @@ __device__ float warp_sum(float x) {
     for (int offset = 16; offset; offset >>= 1) x += __shfl_xor_sync(0xffffffffu, x, offset);
     return x;
 }
-__global__ void gate_kernel(const float* key, const float* query, float* gate, float scale) {
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(512) gate_kernel(const float* key, const float* query, float* gate, float scale) {
     // SUM_ROWS selects 512 threads for four rows on the target GPU. Preserve
     // its eight partial lanes and materialized MUL rounding (never a dot FMA).
     float sums[8] = {};
@@ -95,7 +96,7 @@ __device__ float norm_warp_sum(float value) {
     for (int offset = 16; offset > 0; offset >>= 1) value += __shfl_xor_sync(0xffffffffu, value, offset, 32);
     return value;
 }
-__global__ void rms_rep_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) rms_rep_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
                                float* __restrict__ output) {
     constexpr int BlockSize = 1024;             // native_gr_rms_norm_weighted's choice for 2560 columns
     const int tid = threadIdx.x;
@@ -123,7 +124,7 @@ __global__ void rms_rep_kernel(const float* __restrict__ input, const float* __r
 // rms_rep_kernel with the column count as a RUN-TIME divisor, as weighted_rms_norm<1024> (native_gr_rms_norm_weighted,
 // the per-token path) divides: under --use_fast_math a division by the constant N may become a multiplication by its
 // rounded reciprocal, which is not bitwise the run-time division.
-__global__ void rms_rep_rt_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) rms_rep_rt_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
                                   float* __restrict__ output, int n_cols, float epsilon) {
     constexpr int BlockSize = 1024;
     const int tid = threadIdx.x;

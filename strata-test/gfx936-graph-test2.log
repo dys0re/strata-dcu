@@ -1,0 +1,22 @@
+In file included from /root/strata-dcu/Strata/tests/core/gfx936_graph_test.cpp:3:
+In file included from /root/strata-dcu/Strata/include/strata/core/graph_upload.hpp:2:
+In file included from /root/strata-dcu/Strata/include/strata/platform/hip_compat/cuda_runtime.h:2:
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:220:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:228:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+2 warnings generated when compiling for gfx936.
+In file included from /root/strata-dcu/Strata/tests/core/gfx936_graph_test.cpp:3:
+In file included from /root/strata-dcu/Strata/include/strata/core/graph_upload.hpp:2:
+In file included from /root/strata-dcu/Strata/include/strata/platform/hip_compat/cuda_runtime.h:2:
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:220:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:228:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+2 warnings generated when compiling for host.
+strata: gfx936: skip DTK hipGraphUpload warm-up; graphs instantiate and launch normally
+gfx936_graph_test OK: 1024-thread norm captured, launched, and matched host reference

@@ -1,0 +1,43 @@
+{
+  "source_inventory_unchanged": true,
+  "source_files_match_local": true,
+  "wrapper_generation": {
+    "prompt": "2+2等于多少？只回答数字。",
+    "prompt_ids": [
+      248045,
+      846,
+      198,
+      17,
+      10,
+      17,
+      102149,
+      98425,
+      10992,
+      96227,
+      97913,
+      99129,
+      1710,
+      248046,
+      198,
+      248045,
+      74455,
+      198,
+      248068,
+      271,
+      248069,
+      271
+    ],
+    "generated_ids": [
+      19,
+      248046
+    ],
+    "text": "4",
+    "raw_text": "4<|im_end|>",
+    "engine_exit": 0,
+    "finish_reason": "eos"
+  },
+  "expert_cache_bytes": 67947724800,
+  "ple_descriptor_bytes": 318,
+  "engine_sha256": "b9b7a4e6262f47958baf5106ef81e999bc161bac176797292f270fdc489c971b",
+  "original_ple": "/root/private_data/Qwen3.8-F/model-00016-of-00017.safetensors"
+}

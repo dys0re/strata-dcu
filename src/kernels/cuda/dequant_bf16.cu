@@ -42,7 +42,11 @@ __device__ __forceinline__ void scale_min_k4(int j, const uint8_t* q, int& d, in
 // One 32-element group `g` (row-major over the whole slice); `out` points at that group's 32 outputs.
 template <int TYPE, typename T>
 __device__ __forceinline__ void group32(const uint8_t* row_blocks, int gi_in_row, T* out) {
-    if constexpr (TYPE == 42) {                                   // Q2_0: 64 per block of 18 B
+    if constexpr (TYPE == 30) {                                   // unchanged BF16 projection
+        const uint16_t* p = reinterpret_cast<const uint16_t*>(row_blocks) + gi_in_row * 32;
+#pragma unroll
+        for (int j = 0; j < 32; ++j) put(out, j, __uint_as_float(uint32_t(p[j]) << 16));
+    } else if constexpr (TYPE == 42) {                            // Q2_0: 64 per block of 18 B
         const uint8_t* b = row_blocks + (size_t) (gi_in_row / 2) * 18;
         const float d = h2f(b);
         const int e0 = (gi_in_row % 2) * 32;
@@ -323,6 +327,7 @@ __global__ void dequant_q8_0_kernel(const uint8_t* __restrict__ blocks, int64_t 
 
 bool geometry(int type, int& block_elems, int& block_bytes) {
     switch (type) {
+    case 30: block_elems = 32; block_bytes = 64; return true;
     case 2: block_elems = 32; block_bytes = 18; return true;
     case 6: block_elems = 32; block_bytes = 22; return true;
     case 7: block_elems = 32; block_bytes = 24; return true;
@@ -389,6 +394,7 @@ void launch(int type, const void* blocks, int64_t row0, int64_t rows, int64_t co
     else dequant_kernel<TY, T, false><<<grid, 256, 0, st>>>(p, row_bytes, row0, rows, gpr, ld, out);       \
     break
     switch (type) {
+    case 30: STRATA_DQ(30);
     case 2: STRATA_DQ(2);
     case 6: STRATA_DQ(6);
     case 7: STRATA_DQ(7);

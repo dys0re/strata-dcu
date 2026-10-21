@@ -1,0 +1,113 @@
+[
+  {
+    "case": "ok",
+    "passed": true,
+    "prompt": "Reply with exactly OK.",
+    "prompt_ids": [
+      248045,
+      846,
+      198,
+      20206,
+      440,
+      6681,
+      10092,
+      13,
+      248046,
+      198,
+      248045,
+      74455,
+      198,
+      248068,
+      271,
+      248069,
+      271
+    ],
+    "generated_ids": [
+      3793,
+      248046
+    ],
+    "text": "OK",
+    "raw_text": "OK<|im_end|>",
+    "engine_exit": 0,
+    "finish_reason": "eos"
+  },
+  {
+    "prompt": "What is 2+2? Answer only the number.",
+    "prompt_ids": [
+      248045,
+      846,
+      198,
+      3710,
+      369,
+      220,
+      17,
+      10,
+      17,
+      30,
+      21134,
+      1132,
+      279,
+      1324,
+      13,
+      248046,
+      198,
+      248045,
+      74455,
+      198,
+      248068,
+      271,
+      248069,
+      271
+    ],
+    "generated_ids": [
+      19,
+      248046
+    ],
+    "text": "4",
+    "raw_text": "4<|im_end|>",
+    "engine_exit": 0,
+    "finish_reason": "eos",
+    "case": "arithmetic",
+    "passed": true,
+    "wall_seconds": 72.07
+  },
+  {
+    "prompt": "中国的首都是哪座城市？只回答城市名称。",
+    "prompt_ids": [
+      248045,
+      846,
+      198,
+      96328,
+      102357,
+      96878,
+      96795,
+      130699,
+      10992,
+      96227,
+      97913,
+      97035,
+      98436,
+      1710,
+      248046,
+      198,
+      248045,
+      74455,
+      198,
+      248068,
+      271,
+      248069,
+      271
+    ],
+    "generated_ids": [
+      98116,
+      248046
+    ],
+    "text": "北京",
+    "raw_text": "北京<|im_end|>",
+    "engine_exit": 0,
+    "finish_reason": "eos",
+    "case": "chinese",
+    "passed": true,
+    "wall_seconds": 68.21
+  }
+]

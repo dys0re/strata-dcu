@@ -1,0 +1,1282 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index adfdece..77a6a5e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1221,6 +1221,11 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
+   target_link_libraries(bf16_gemv_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+   add_test(NAME bf16_gemv_parity COMMAND bf16_gemv_parity --selftest)
+ 
++  add_executable(bf16_q8_mmvq_parity src/kernels/bf16_q8_mmvq_parity.cpp)
++  target_include_directories(bf16_q8_mmvq_parity PRIVATE ${_strata_gpu_include_directories})
++  target_link_libraries(bf16_q8_mmvq_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
++  add_test(NAME bf16_q8_mmvq_parity COMMAND bf16_q8_mmvq_parity)
++
+   # the V100 fusion work: every fused kernel against its unfused pipeline, bitwise, and the before/after
+   # CUDA-event timings at decode shapes (`--bench`).  It is a .cu because it carries the unfused reference
+   # kernels it compares against.
+@@ -1350,6 +1355,11 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
+   target_link_libraries(ple_reader_test PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+   add_test(NAME ple_reader_selftest COMMAND ple_reader_test --selftest)
+ 
++  add_executable(ple_external_test tests/core/ple_external_test.cpp)
++  target_include_directories(ple_external_test PRIVATE ${_strata_gpu_include_directories})
++  target_link_libraries(ple_external_test PRIVATE strata_kernels ${_strata_gpu_runtime_target})
++  add_test(NAME ple_external_test COMMAND ple_external_test)
++
+   # The GPU test runs ON THE TARGET PC. `--selftest` allocates
+   # and writes real VRAM, so a machine without a device fails this test rather than skipping it silently -
+   # which is correct: an engine that targets one GPU should not report a pass for having no GPU.
+diff --git a/include/strata/kernels/native_mmvq.hpp b/include/strata/kernels/native_mmvq.hpp
+index ce11095..e8a8119 100644
+--- a/include/strata/kernels/native_mmvq.hpp
++++ b/include/strata/kernels/native_mmvq.hpp
+@@ -22,6 +22,9 @@ namespace strata::kernels {
+ // IQ4_XS=136 bytes per 256 elements; Q2_0 is 18 bytes per 64 elements.
+ // Q4_0/IQ4_NL=18, Q5_0=22, Q8_0=34 bytes per 32 elements.
+ // Q8_1 scratch has 36 bytes per 32 elements, with no extra row padding here.
++// BF16 (type 30) also keeps its original two-byte weights, with n_in a
++// multiple of 32. Its native projection consumes the same Q8_1 activations;
++// the prompt path converts BF16 weights to its FP16 compute scratch.
+ // Input floats must be finite, and their block scales/sums representable in FP16.
+ std::size_t native_q8_1_bytes(int n_in, int ncols = 1);
+ 
+diff --git a/src/core/mtp.cpp b/src/core/mtp.cpp
+index 5862702..c99de09 100644
+--- a/src/core/mtp.cpp
++++ b/src/core/mtp.cpp
+@@ -1,3 +1,4 @@
++#include "strata/core/graph_upload.hpp"
+ // src/core/mtp.cpp - see include/strata/core/mtp.hpp.
+ #include "strata/core/mtp.hpp"
+ #include "strata/core/pin_budget.hpp"
+@@ -1243,7 +1244,7 @@ bool finish_capture(cudaStream_t cs, bool ok, cudaGraphExec_t& exec, const char*
+     mtp_list_nodes(graph, what);
+     cudaGraphDestroy(graph);
+     // an explicit upload: the first launch's implicit one blocked behind a device-side spin (verify.cpp)
+-    cudaGraphUpload(exec, cs);
++    graph_upload(exec, cs);
+     cudaStreamSynchronize(cs);
+     return true;
+ }
+diff --git a/src/core/native_dense.cpp b/src/core/native_dense.cpp
+index aba2882..9c4ed9d 100644
+--- a/src/core/native_dense.cpp
++++ b/src/core/native_dense.cpp
+@@ -206,7 +206,8 @@ bool NativeDense::weight_bytes_for(const std::vector<std::string>& shards, Weigh
+                 const auto& ref = found->second;
+                 if (!strata::kernels::native_mmvq_supported(tensor.type)) continue;
+                 if (tensor.name == "blk.1.ple_key.weight" && !ref.quantized()) continue;
+-                if (!ref.quantized() || tensor.shape.size() != 2 ||
++                const bool bf16 = tensor.type == 30 && ref.kind == WeightKind::Bf16InF32 && ref.code_bits == 0;
++                if ((!ref.quantized() && !bf16) || tensor.shape.size() != 2 ||
+                     ref.ne0 <= 0 || ref.ne0 > INT_MAX || ref.ne1 <= 0 || ref.ne1 > INT_MAX ||
+                     tensor.shape[0] != (uint64_t) ref.ne0 || tensor.shape[1] != (uint64_t) ref.ne1) {
+                     err = "native dense: incompatible matrix " + tensor.name;
+@@ -342,7 +343,8 @@ bool NativeDense::load(const std::vector<std::string>& shards, WeightTable& tabl
+                 if (!strata::kernels::native_mmvq_supported(tensor.type)) continue;
+                 // #326: the pack keeps an unquantized (--compat-bf16) key, which the PLE reads from the arena
+                 if (tensor.name == "blk.1.ple_key.weight" && !ref.quantized()) continue;
+-                if (!ref.quantized() || tensor.shape.size() != 2 ||
++                const bool bf16 = tensor.type == 30 && ref.kind == WeightKind::Bf16InF32 && ref.code_bits == 0;
++                if ((!ref.quantized() && !bf16) || tensor.shape.size() != 2 ||
+                     ref.ne0 <= 0 || ref.ne0 > INT_MAX || ref.ne1 <= 0 || ref.ne1 > INT_MAX ||
+                     tensor.shape[0] != (uint64_t) ref.ne0 || tensor.shape[1] != (uint64_t) ref.ne1) {
+                     err = "native dense: incompatible matrix " + tensor.name; return false;
+diff --git a/src/core/verify.cpp b/src/core/verify.cpp
+index e8f747f..2e9d81d 100644
+--- a/src/core/verify.cpp
++++ b/src/core/verify.cpp
+@@ -1,5 +1,6 @@
+ // src/core/verify.cpp - see include/strata/core/verify.hpp.
+ #include "strata/core/batch_rows.hpp"
++#include "strata/core/graph_upload.hpp"
+ #include "strata/core/sm75_series.hpp"
+ #include "strata/core/sm120_series.hpp"
+ #include "strata/kernels/gfx_arch.hpp"
+@@ -2414,7 +2415,7 @@ bool Verifier::capture(int T, std::string& err) {
+     const bool made = instantiate_evicting(exec_t, graph, {}, "verify: instantiate: ", err);
+     cudaGraphDestroy(graph);
+     if (!made) return false;
+-    const cudaError_t ue = cudaGraphUpload(exec_t, cs_);
++    const cudaError_t ue = graph_upload(exec_t, cs_);
+     const cudaError_t us = cudaStreamSynchronize(cs_);
+     std::fprintf(stderr, "strata verify: captured the %d-token window (upload %s, sync %s)\n", T,
+                  cudaGetErrorString(ue), cudaGetErrorString(us));
+@@ -3323,7 +3324,7 @@ bool Verifier::capture_batch(const int* rows, int S, int hbase, std::string& err
+     const bool made = instantiate_evicting(ex, graph, bkey(rows, S, hbase), "verify: batch instantiate: ", err);
+     cudaGraphDestroy(graph);
+     if (!made) return false;
+-    cudaGraphUpload(ex, cs_);
++    graph_upload(ex, cs_);
+     cudaStreamSynchronize(cs_);
+     std::string list;
+     for (int t = 0; t < S; ++t) list += (t ? "," : "") + std::to_string(rows[t]);
+diff --git a/src/kernels/cuda/dequant_bf16.cu b/src/kernels/cuda/dequant_bf16.cu
+index f0aaa92..6c1d36f 100644
+--- a/src/kernels/cuda/dequant_bf16.cu
++++ b/src/kernels/cuda/dequant_bf16.cu
+@@ -42,7 +42,11 @@ __device__ __forceinline__ void scale_min_k4(int j, const uint8_t* q, int& d, in
+ // One 32-element group `g` (row-major over the whole slice); `out` points at that group's 32 outputs.
+ template <int TYPE, typename T>
+ __device__ __forceinline__ void group32(const uint8_t* row_blocks, int gi_in_row, T* out) {
+-    if constexpr (TYPE == 42) {                                   // Q2_0: 64 per block of 18 B
++    if constexpr (TYPE == 30) {                                   // unchanged BF16 projection
++        const uint16_t* p = reinterpret_cast<const uint16_t*>(row_blocks) + gi_in_row * 32;
++#pragma unroll
++        for (int j = 0; j < 32; ++j) put(out, j, __uint_as_float(uint32_t(p[j]) << 16));
++    } else if constexpr (TYPE == 42) {                            // Q2_0: 64 per block of 18 B
+         const uint8_t* b = row_blocks + (size_t) (gi_in_row / 2) * 18;
+         const float d = h2f(b);
+         const int e0 = (gi_in_row % 2) * 32;
+@@ -323,6 +327,7 @@ __global__ void dequant_q8_0_kernel(const uint8_t* __restrict__ blocks, int64_t
+ 
+ bool geometry(int type, int& block_elems, int& block_bytes) {
+     switch (type) {
++    case 30: block_elems = 32; block_bytes = 64; return true;
+     case 2: block_elems = 32; block_bytes = 18; return true;
+     case 6: block_elems = 32; block_bytes = 22; return true;
+     case 7: block_elems = 32; block_bytes = 24; return true;
+@@ -389,6 +394,7 @@ void launch(int type, const void* blocks, int64_t row0, int64_t rows, int64_t co
+     else dequant_kernel<TY, T, false><<<grid, 256, 0, st>>>(p, row_bytes, row0, rows, gpr, ld, out);       \
+     break
+     switch (type) {
++    case 30: STRATA_DQ(30);
+     case 2: STRATA_DQ(2);
+     case 6: STRATA_DQ(6);
+     case 7: STRATA_DQ(7);
+diff --git a/src/kernels/cuda/elementwise.cu b/src/kernels/cuda/elementwise.cu
+index a67550a..ac1c97c 100644
+--- a/src/kernels/cuda/elementwise.cu
++++ b/src/kernels/cuda/elementwise.cu
+@@ -6,6 +6,7 @@
+ #include "strata/kernels/f16_bits.hpp"
+ 
+ #include <cuda_runtime.h>
++#include "strata/kernels/hip_launch_bounds.hpp"
+ 
+ #include <cmath>
+ #include <cstdio>
+@@ -308,7 +309,7 @@ void copy_from_mapped(float* dst, const float* src, int64_t n, void* stream) {
+     check_launch("copy_from_mapped");
+ }
+ 
+-__global__ void doorbell_publish_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) doorbell_publish_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
+                                         const float* __restrict__ w, int n, int k, float* x_out, int32_t* ids_out,
+                                         float* w_out, uint32_t* seq) {
+     for (int i = threadIdx.x; i < n; i += blockDim.x) x_out[i] = x[i];
+@@ -326,7 +327,7 @@ __global__ void doorbell_publish_kernel(const float* __restrict__ x, const int32
+     }
+ }
+ 
+-__global__ void doorbell_publish_res_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) doorbell_publish_res_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
+                                             const int32_t* __restrict__ d_res, int n_expert, int n, int k,
+                                             float* x_out, int32_t* ids_out, uint32_t* seq) {
+     int any_miss = 0;
+@@ -352,7 +353,7 @@ __global__ void doorbell_publish_res_kernel(const float* __restrict__ x, const i
+ 
+ // #649 (HIP, STRATA_DOORBELL_STORE=1): the same publish, but the ring is STORED (the step's own number, known at
+ // capture) instead of read-modify-written over PCIe - one store, no read of host memory from the GPU.
+-__global__ void doorbell_publish_value_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) doorbell_publish_value_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
+                                               const float* __restrict__ w, int n, int k, float* x_out, int32_t* ids_out,
+                                               float* w_out, uint32_t* seq, uint32_t value) {
+     for (int i = threadIdx.x; i < n; i += blockDim.x) x_out[i] = x[i];
+diff --git a/src/kernels/cuda/iq_kernels.cu b/src/kernels/cuda/iq_kernels.cu
+index 4d988f1..9a5aa34 100644
+--- a/src/kernels/cuda/iq_kernels.cu
++++ b/src/kernels/cuda/iq_kernels.cu
+@@ -2260,7 +2260,11 @@ __global__ void __launch_bounds__(256, MINB) expdec_gu_kernel(const unsigned lon
+                                                                             float* __restrict__ gate, float* __restrict__ up, int rb) {
+     const int ng = *n_groups;
+     if (blockIdx.y >= ng) return;
++#if defined(__HIPCC__)
++    __shared__ int4 s_u[ED_NC * 2 * ED_XB] __attribute__((aligned(16)));
++#else
+     __shared__ alignas(16) int4 s_u[ED_NC * 2 * ED_XB];
++#endif
+     __shared__ float s_ds[ED_NC * ED_XB];
+     STRATA_SHARED_ALIGN16_U32(s_grid_buf, EdGrid<TG>::words);
+     const int tid = threadIdx.x;
+@@ -2447,7 +2451,11 @@ __global__ void __launch_bounds__(256, STRATA_EXPDEC_MINB) expdec_down_kernel(co
+     if (blockIdx.y >= ng) return;
+     constexpr int LANES = TD == 20 ? 8 : 16;
+     constexpr int RPP = (256 / LANES) * R;   // rows per pass
++#if defined(__HIPCC__)
++    __shared__ int4 s_u[ED_NC * 2 * ED_HB] __attribute__((aligned(16)));
++#else
+     __shared__ alignas(16) int4 s_u[ED_NC * 2 * ED_HB];
++#endif
+     __shared__ float s_ds[ED_NC * ED_HB];
+     const int tid = threadIdx.x;
+     const int sw = tid / LANES, t = tid % LANES;
+diff --git a/src/kernels/cuda/native_gr_norm.cu b/src/kernels/cuda/native_gr_norm.cu
+index 668c0bd..a233a61 100644
+--- a/src/kernels/cuda/native_gr_norm.cu
++++ b/src/kernels/cuda/native_gr_norm.cu
+@@ -25,6 +25,7 @@
+ #include "strata/kernels/native_gr_norm.hpp"
+ 
+ #include <cuda_runtime.h>
++#include "strata/kernels/hip_launch_bounds.hpp"
+ #include <cmath>
+ #include <cstddef>
+ #include <cstdint>
+@@ -43,7 +44,7 @@ __device__ __forceinline__ float norm_warp_sum(float value) {
+ }
+ 
+ template<int BlockSize>
+-__global__ void weighted_rms_norm(const float* __restrict__ input,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(BlockSize) weighted_rms_norm(const float* __restrict__ input,
+                                    const float* __restrict__ gamma,
+                                    float* __restrict__ output, int n_cols, float epsilon) {
+     const int tid = threadIdx.x;
+diff --git a/src/kernels/cuda/native_mmvq.cu b/src/kernels/cuda/native_mmvq.cu
+index 05f9b42..2a6c59a 100644
+--- a/src/kernels/cuda/native_mmvq.cu
++++ b/src/kernels/cuda/native_mmvq.cu
+@@ -71,6 +71,25 @@ struct Q81Block {
+     half2 ds;
+     int8_t qs[32];
+ };
++// Unquantized projections of an AutoRound checkpoint. Keep the BF16 weight bits;
++// activations use the same Q8_1 contract as the other native projection types.
++__global__ void bf16_q81_kernel(const uint16_t* w, const Q81Block* x, float* y,
++                                int n_in, int n_out) {
++    const int lane = threadIdx.x & 31;
++    const int row = int(blockIdx.x) * 4 + int(threadIdx.x) / 32;
++    if (row >= n_out) return;
++    const int col = blockIdx.y;
++    const Q81Block* a = x + size_t(col) * (n_in / 32);
++    float sum = 0.0f;
++    for (int i = lane; i < n_in; i += 32) {
++        const float weight = __uint_as_float(uint32_t(w[size_t(row) * n_in + i]) << 16);
++        const float value = __half2float(__low2half(a[i / 32].ds)) * float(a[i / 32].qs[i % 32]);
++        sum = __fmaf_rn(weight, value, sum);
++    }
++    for (int off = 16; off > 0; off >>= 1)
++        sum += __shfl_down_sync(0xffffffffu, sum, off, 32);
++    if (lane == 0) y[size_t(col) * n_out + row] = sum;
++}
+ struct Q20Block {
+     half d;
+     uint8_t qs[16];
+@@ -2885,7 +2904,7 @@ void native_iq4_nl_f32(const void* weights, const float* x, void* scratch_q8_1,
+ }
+ 
+ bool native_mmvq_supported(int ggml_type) noexcept {
+-    return ggml_type == 2 || ggml_type == 6 || ggml_type == 7 || ggml_type == 8 || ggml_type == 11 ||
++    return ggml_type == 30 || ggml_type == 2 || ggml_type == 6 || ggml_type == 7 || ggml_type == 8 || ggml_type == 11 ||
+            ggml_type == 12 || ggml_type == 13 || ggml_type == 14 || ggml_type == 20 ||
+            ggml_type == 23 || ggml_type == 42 || ggml_type == 16 || ggml_type == 17 || ggml_type == 18 ||
+            ggml_type == 21 || ggml_type == 22 || ggml_type == 29;
+@@ -2894,6 +2913,7 @@ bool native_mmvq_supported(int ggml_type) noexcept {
+ std::size_t native_mmvq_weight_bytes(int ggml_type, int n_in, int n_out) {
+     int block_elems, block_bytes;
+     switch (ggml_type) {
++    case 30: block_elems = 32; block_bytes = 64; break;
+     case 2: block_elems = 32; block_bytes = 18; break;
+     case 6: block_elems = 32; block_bytes = 22; break;
+     case 7: block_elems = 32; block_bytes = 24; break;
+@@ -2921,6 +2941,15 @@ std::size_t native_mmvq_weight_bytes(int ggml_type, int n_in, int n_out) {
+ void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float* y,
+                  int n_in, int n_out, int ncols, void* stream) {
+     switch (ggml_type) {
++    case 30:
++        validate_shape(n_in, ncols, 32);
++        validate_pointer(weights); validate_pointer(x_q8_1); validate_pointer(y);
++        validate_stream(stream);
++        if (n_out <= 0) throw std::invalid_argument("BF16 native MMVQ requires positive output rows");
++        bf16_q81_kernel<<<dim3((n_out + 3) / 4, ncols), 128, 0, (cudaStream_t) stream>>>(
++            static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
++        launch_check();
++        break;
+     case 2: native_q4_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
+     case 6: native_q5_0_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
+     case 7: iq_mmvq(ggml_type, weights, x_q8_1, y, n_in, n_out, ncols, stream); break;
+diff --git a/src/kernels/cuda/native_ple_postops.cu b/src/kernels/cuda/native_ple_postops.cu
+index 4f2db94..9e1089f 100644
+--- a/src/kernels/cuda/native_ple_postops.cu
++++ b/src/kernels/cuda/native_ple_postops.cu
+@@ -23,6 +23,7 @@
+ #include "strata/kernels/native_gr_norm.hpp"
+ #include "strata/kernels/ngram.hpp"
+ #include <cuda_runtime.h>
++#include "strata/kernels/hip_launch_bounds.hpp"
+ #include <cuda_fp16.h>
+ #include <cmath>
+ #include <cstddef>
+@@ -39,7 +40,7 @@ __device__ float warp_sum(float x) {
+     for (int offset = 16; offset; offset >>= 1) x += __shfl_xor_sync(0xffffffffu, x, offset);
+     return x;
+ }
+-__global__ void gate_kernel(const float* key, const float* query, float* gate, float scale) {
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(512) gate_kernel(const float* key, const float* query, float* gate, float scale) {
+     // SUM_ROWS selects 512 threads for four rows on the target GPU. Preserve
+     // its eight partial lanes and materialized MUL rounding (never a dot FMA).
+     float sums[8] = {};
+@@ -95,7 +96,7 @@ __device__ float norm_warp_sum(float value) {
+     for (int offset = 16; offset > 0; offset >>= 1) value += __shfl_xor_sync(0xffffffffu, value, offset, 32);
+     return value;
+ }
+-__global__ void rms_rep_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) rms_rep_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
+                                float* __restrict__ output) {
+     constexpr int BlockSize = 1024;             // native_gr_rms_norm_weighted's choice for 2560 columns
+     const int tid = threadIdx.x;
+@@ -123,7 +124,7 @@ __global__ void rms_rep_kernel(const float* __restrict__ input, const float* __r
+ // rms_rep_kernel with the column count as a RUN-TIME divisor, as weighted_rms_norm<1024> (native_gr_rms_norm_weighted,
+ // the per-token path) divides: under --use_fast_math a division by the constant N may become a multiplication by its
+ // rounded reciprocal, which is not bitwise the run-time division.
+-__global__ void rms_rep_rt_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) rms_rep_rt_kernel(const float* __restrict__ input, const float* __restrict__ gamma,
+                                   float* __restrict__ output, int n_cols, float epsilon) {
+     constexpr int BlockSize = 1024;
+     const int tid = threadIdx.x;
+diff --git a/src/kernels/cuda/native_qsa.cu b/src/kernels/cuda/native_qsa.cu
+index 2e2e1e6..23e3d1a 100644
+--- a/src/kernels/cuda/native_qsa.cu
++++ b/src/kernels/cuda/native_qsa.cu
+@@ -24,6 +24,7 @@
+ 
+ #include "strata/kernels/native_qsa.hpp"
+ #include <cuda_runtime.h>
++#include "strata/kernels/hip_launch_bounds.hpp"
+ #include <atomic>
+ #include <cmath>
+ #include <cstddef>
+@@ -42,7 +43,7 @@ __device__ __forceinline__ float warp_sum(float value) {
+     return value;
+ }
+ template<int BlockSize>
+-__global__ void norm(const float* input, const float* __restrict__ gamma, float* output,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(BlockSize) norm(const float* input, const float* __restrict__ gamma, float* output,
+                      int n_cols, float epsilon) {
+     const int tid = threadIdx.x;
+     const std::size_t row_offset = std::size_t(blockIdx.x) * n_cols;
+@@ -68,7 +69,7 @@ __global__ void norm(const float* input, const float* __restrict__ gamma, float*
+ }
+ // As norm, with gamma[groups * n_cols]: row r is group r % groups and reads its own slice of gamma.
+ template<int BlockSize>
+-__global__ void norm_grouped(const float* input, const float* __restrict__ gamma, float* output,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(BlockSize) norm_grouped(const float* input, const float* __restrict__ gamma, float* output,
+                              int n_cols, int groups, float epsilon) {
+     const int tid = threadIdx.x;
+     const std::size_t row_offset = std::size_t(blockIdx.x) * n_cols;
+diff --git a/src/kernels/cuda/sampler.cu b/src/kernels/cuda/sampler.cu
+index b9e0431..9b4a3cb 100644
+--- a/src/kernels/cuda/sampler.cu
++++ b/src/kernels/cuda/sampler.cu
+@@ -25,6 +25,7 @@
+ #include "strata/core/emulate.hpp"
+ 
+ #include <cuda_runtime.h>
++#include "strata/kernels/hip_launch_bounds.hpp"
+ 
+ #include <cmath>
+ #include <cstdio>
+@@ -116,7 +117,7 @@ __device__ __forceinline__ float apply_penalties(float logit, int count, const S
+ /// ascending with `if (s > bv)`, so the LOWEST index wins a tie.  Each thread keeps that rule over its own
+ /// strided subset and the reduction resolves two candidates by taking the larger value and, on equality, the
+ /// SMALLER index - the same total order, so `sampler_parity` and C1 see no change.
+-__global__ void sampler_greedy_kernel(const float* __restrict__ logits, int n_vocab,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) sampler_greedy_kernel(const float* __restrict__ logits, int n_vocab,
+                                       const int* __restrict__ history, int history_len, const SamplerParams p,
+                                       int pmin, int plen, int* __restrict__ out) {
+     const int t = blockIdx.x;
+@@ -293,7 +294,7 @@ __global__ void __launch_bounds__(kAmThreads) sampler_greedy_cluster_kernel(cons
+ /// sweep is O(k) per logit per round, O(k^2 x n_vocab) per row (47 M shared-memory compares at k = 20, 500 M at
+ /// 64), and the double-precision tail runs on all 1,024 threads where one warp suffices - GeForce issues FP64 at
+ /// 1/64 of FP32.  The kernels after this one remove both and select the same list in the same order.
+-__global__ void sampler_kernel(const float* __restrict__ logits, int n_vocab, int n_tokens,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) sampler_kernel(const float* __restrict__ logits, int n_vocab, int n_tokens,
+                                const int* __restrict__ history, int history_len, const SamplerParams p,
+                                int* __restrict__ out) {
+     const int t = blockIdx.x;
+@@ -819,7 +820,7 @@ __global__ void coupled_stage_kernel(const SamplerParams* __restrict__ mp, const
+ /// `apply_penalties` to the same token with the same count over the same window before its own.  Draft j's window
+ /// is the ring's [cap + j - h, cap + j): the base plus drafts 0 .. j-1.  A history token outside the draft head's
+ /// subset has no logit here.  Each distinct token is penalised once: the entry whose `atomicOr` sets its bit does it.
+-__global__ void coupled_penalize_kernel(float* __restrict__ logits, int nv, const int* __restrict__ id_to_sub,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) coupled_penalize_kernel(float* __restrict__ logits, int nv, const int* __restrict__ id_to_sub,
+                                         int id_vocab, const SamplerParams* __restrict__ dp, const int* __restrict__ ring,
+                                         int cap, int j) {
+     const SamplerParams p = *dp;
+diff --git a/src/kernels/cuda/verify_kernels.cu b/src/kernels/cuda/verify_kernels.cu
+index a451d9b..3ddba71 100644
+--- a/src/kernels/cuda/verify_kernels.cu
++++ b/src/kernels/cuda/verify_kernels.cu
+@@ -11,6 +11,7 @@
+ 
+ #include <cuda_fp16.h>
+ #include <cuda_runtime.h>
++#include "strata/kernels/hip_launch_bounds.hpp"
+ 
+ #include <algorithm>
+ #include <atomic>
+@@ -615,7 +616,7 @@ __global__ void add_streams_broadcast_kernel(const float* __restrict__ h, const
+     R[(size_t) t * n * hc + i] = h[(size_t) t * n * hc + i] + e[(size_t) t * n + i % n];
+ }
+ 
+-__global__ void ident_hits_kernel(const int32_t* __restrict__ ids, int n, int32_t* __restrict__ slot,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) ident_hits_kernel(const int32_t* __restrict__ ids, int n, int32_t* __restrict__ slot,
+                                   int32_t* __restrict__ dst, int32_t* __restrict__ count) {
+     const int i = threadIdx.x;
+     if (i < n) { slot[i] = ids[i]; dst[i] = i; }
+@@ -638,7 +639,7 @@ __global__ void map_ids_kernel(int32_t* ids, const int32_t* __restrict__ table,
+     if (i < n) ids[i] = table[ids[i]];
+ }
+ 
+-__global__ void row_top_prob_kernel(const float* __restrict__ logits, int n_vocab, const int32_t* __restrict__ ids,
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) row_top_prob_kernel(const float* __restrict__ logits, int n_vocab, const int32_t* __restrict__ ids,
+                                     float* __restrict__ probs) {
+     __shared__ float part[32];
+     const int t = blockIdx.x;
+diff --git a/src/kernels/ngram.cpp b/src/kernels/ngram.cpp
+index 07636d0..7b4c31a 100644
+--- a/src/kernels/ngram.cpp
++++ b/src/kernels/ngram.cpp
+@@ -13,6 +13,7 @@
+ #include <cstdio>
+ #include <cstring>
+ #include <limits>
++#include <filesystem>
+ #if !defined(_WIN32)
+ #include <sys/mman.h>
+ #endif
+@@ -260,6 +261,47 @@ bool PleTable::open(const std::string& gguf_path, std::string& err, const PleIoO
+         err = e.what();
+         return false;
+     }
++    // A small descriptor may refer directly to the checkpoint's contiguous BF16
++    // PLE payload. Only bounded direct reads are allowed: never map or lock the
++    // hundred-GB source table, and never fall back to a different table.
++    if (const MetaValue* path = impl_->file->get("strata.ple.external.path")) {
++        try {
++            const auto* off = impl_->file->get("strata.ple.external.offset");
++            const auto* rows = impl_->file->get("strata.ple.external.rows");
++            const auto* size = impl_->file->get("strata.ple.external.file_size");
++            const auto integer = [](const MetaValue* v) {
++                return v && (v->type == MetaType::U64 || v->type == MetaType::U32);
++            };
++            if (path->type != MetaType::STRING || path->s.empty() || !integer(off) ||
++                !integer(rows) || !integer(size) || !rows->u || rows->u > UINT32_MAX ||
++                rows->u > UINT64_MAX / PLE_ROW_BYTES_BF16)
++                throw std::runtime_error("invalid external BF16 PLE descriptor");
++            if (io.mode != PleIo::Direct)
++                throw std::runtime_error("external BF16 PLE requires --ple-io direct (table stays on disk)");
++            auto raw = std::filesystem::path(path->s);
++            if (raw.is_relative()) raw = std::filesystem::path(gguf_path).parent_path() / raw;
++            const uint64_t bytes = rows->u * PLE_ROW_BYTES_BF16;
++            if (std::filesystem::file_size(raw) != size->u || off->u > size->u || bytes > size->u - off->u)
++                throw std::runtime_error("external BF16 PLE file size or payload bounds changed");
++            impl_->fmt = &ple_format_info(PleFormat::BF16);
++            impl_->rb = PLE_ROW_BYTES_BF16;
++            impl_->n_rows = rows->u;
++            if (!impl_->reader.open(raw.string(), off->u, rows->u, io.max_inflight,
++                                   io.cache_rows, err, io.io_thread, impl_->rb)) {
++                close();
++                return false;
++            }
++            impl_->reader.set_keepalive(io.keepalive_ms, io.keepalive_window_s);
++            delete impl_->file;
++            impl_->file = nullptr;
++            impl_->mode = PleIo::Direct;
++            return true;
++        } catch (const std::exception& e) {
++            err = std::string("external PLE: ") + e.what();
++            close();
++            return false;
++        }
++    }
+     const TensorInfo* t = impl_->file->find("per_layer_token_embd.weight");
+     if (t == nullptr) {
+         err = "per_layer_token_embd.weight is not in " + gguf_path;
+diff --git a/src/prefill/moe_fused.cu b/src/prefill/moe_fused.cu
+index 3522e1c..88e9eb9 100644
+--- a/src/prefill/moe_fused.cu
++++ b/src/prefill/moe_fused.cu
+@@ -23,6 +23,7 @@
+ 
+ #include <cuda_fp16.h>
+ #include <cuda_runtime.h>
++#include "strata/kernels/hip_launch_bounds.hpp"
+ 
+ #include <algorithm>
+ #include <cstdio>
+@@ -107,7 +108,7 @@ __global__ void quant_act_kernel(const float* __restrict__ x, int64_t nblk, uint
+ }
+ 
+ // ---- grouping: counts, offsets and tiles, placement
+-__global__ void count_kernel(const int32_t* __restrict__ ids, int64_t n, int E, int32_t* __restrict__ cnt) {
++__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) count_kernel(const int32_t* __restrict__ ids, int64_t n, int E, int32_t* __restrict__ cnt) {
+     extern __shared__ int32_t hist[];
+     for (int e = threadIdx.x; e < E; e += blockDim.x) hist[e] = 0;
+     __syncthreads();
+diff --git a/include/strata/core/graph_upload.hpp b/include/strata/core/graph_upload.hpp
+new file mode 100644
+index 0000000..ec6aa09
+--- /dev/null
++++ b/include/strata/core/graph_upload.hpp
+@@ -0,0 +1,28 @@
++#pragma once
++#include <cuda_runtime.h>
++#include <atomic>
++#include <cstdio>
++#include <cstring>
++
++namespace strata::core {
++// Upload is an optional eager warm-up, not graph instantiation or execution.
++// DTK 26.04's hipGraphUpload segfaults for a real gfx936 verify graph (core
++// backtrace recorded in the DCU validation logs). Let the first launch upload
++// on that device; retain the runtime call and error behavior everywhere else.
++inline cudaError_t graph_upload(cudaGraphExec_t exec, cudaStream_t stream) {
++#if defined(STRATA_HIP_GFX906)
++    int device = -1;
++    cudaDeviceProp p{};
++    if (exec && cudaGetDevice(&device) == cudaSuccess &&
++        cudaGetDeviceProperties(&p, device) == cudaSuccess &&
++        std::strncmp(p.gcnArchName, "gfx936", 6) == 0 &&
++        (p.gcnArchName[6] == 0 || p.gcnArchName[6] == ':')) {
++        static std::atomic<bool> warned{false};
++        if (!warned.exchange(true))
++            std::fprintf(stderr, "strata: gfx936: skip DTK hipGraphUpload warm-up; graphs instantiate and launch normally\n");
++        return cudaSuccess;
++    }
++#endif
++    return cudaGraphUpload(exec, stream);
++}
++} // namespace strata::core
+diff --git a/include/strata/kernels/hip_launch_bounds.hpp b/include/strata/kernels/hip_launch_bounds.hpp
+new file mode 100644
+index 0000000..5324146
+--- /dev/null
++++ b/include/strata/kernels/hip_launch_bounds.hpp
+@@ -0,0 +1,8 @@
++#pragma once
++// DTK otherwise gives an unannotated HIP kernel a 256-thread limit. These
++// kernels really launch larger blocks. Keep every other backend unchanged.
++#if defined(STRATA_HIP_GFX906)
++#define STRATA_WAVE64_LAUNCH_BOUNDS(n) __launch_bounds__(n)
++#else
++#define STRATA_WAVE64_LAUNCH_BOUNDS(n)
++#endif
+diff --git a/src/kernels/bf16_q8_mmvq_parity.cpp b/src/kernels/bf16_q8_mmvq_parity.cpp
+new file mode 100644
+index 0000000..8ed1253
+--- /dev/null
++++ b/src/kernels/bf16_q8_mmvq_parity.cpp
+@@ -0,0 +1,77 @@
++// BF16 native projection against a double-precision host dot of the exact Q8_1
++// activation bytes. Includes row tails and several independent token columns.
++#include "strata/kernels/native_mmvq.hpp"
++#include "strata/kernels/bf16_bits.hpp"
++#include "strata/kernels/f16_bits.hpp"
++#include "strata/kernels/dequant_bf16.hpp"
++#include <cuda_runtime.h>
++#include <cmath>
++#include <cstdio>
++#include <cstring>
++#include <stdexcept>
++#include <vector>
++
++static void check(cudaError_t e) {
++    if (e != cudaSuccess) throw std::runtime_error(cudaGetErrorString(e));
++}
++int main() {
++    using namespace strata::kernels;
++    try {
++        cudaStream_t stream;
++        check(cudaStreamCreate(&stream));
++        for (int k : {64, 2560}) for (int n : {5, 33}) for (int t : {1, 3, 8}) {
++            std::vector<uint16_t> w(size_t(k) * n);
++            std::vector<float> x(size_t(k) * t), got(size_t(n) * t);
++            for (size_t i = 0; i < w.size(); ++i) w[i] = bf16_from_f32(std::sin(float(i) * .13f) * .1f);
++            for (size_t i = 0; i < x.size(); ++i) x[i] = std::cos(float(i) * .17f);
++            void *dw = nullptr, *dx = nullptr, *dq = nullptr, *dy = nullptr;
++            const size_t qb = native_q8_1_bytes(k, t);
++            check(cudaMalloc(&dw, w.size() * 2)); check(cudaMalloc(&dx, x.size() * 4));
++            check(cudaMalloc(&dq, qb)); check(cudaMalloc(&dy, got.size() * 4));
++            check(cudaMemcpy(dw, w.data(), w.size() * 2, cudaMemcpyHostToDevice));
++            check(cudaMemcpy(dx, x.data(), x.size() * 4, cudaMemcpyHostToDevice));
++            bool rejected = false;
++            try { native_mmvq(30, dw, dq, static_cast<float*>(dy), k, n, t, nullptr); }
++            catch (const std::invalid_argument&) { rejected = true; }
++            if (!rejected) throw std::runtime_error("null stream was not rejected");
++            native_quantize_q8_1(static_cast<float*>(dx), dq, k, t, stream);
++            native_mmvq(30, dw, dq, static_cast<float*>(dy), k, n, t, stream);
++            check(cudaStreamSynchronize(stream));
++            check(cudaMemcpy(got.data(), dy, got.size() * 4, cudaMemcpyDeviceToHost));
++            std::vector<uint8_t> q(qb);
++            check(cudaMemcpy(q.data(), dq, qb, cudaMemcpyDeviceToHost));
++            for (int col = 0; col < t; ++col) for (int row = 0; row < n; ++row) {
++                double expected = 0, magnitude = 0;
++                for (int j = 0; j < k; ++j) {
++                    const uint8_t* b = q.data() + (size_t(col) * (k / 32) + j / 32) * 36;
++                    uint16_t scale; std::memcpy(&scale, b, 2);
++                    const double v = double(f32_from_bf16(w[size_t(row) * k + j])) *
++                                     double(f32_from_f16(scale)) * double(int8_t(b[4 + j % 32]));
++                    expected += v; magnitude += std::fabs(v);
++                }
++                const float value = got[size_t(col) * n + row];
++                if (!std::isfinite(value) || std::fabs(double(value) - expected) > 2e-6 * magnitude + 1e-6)
++                    throw std::runtime_error("BF16/Q8_1 projection disagrees with host reference");
++            }
++            void* converted = nullptr;
++            check(cudaMalloc(&converted, w.size() * 4));
++            dequant_f32(30, dw, 1, n - 1, k, static_cast<float*>(converted), stream);
++            check(cudaStreamSynchronize(stream));
++            std::vector<float> floats(size_t(n - 1) * k);
++            check(cudaMemcpy(floats.data(), converted, floats.size() * 4, cudaMemcpyDeviceToHost));
++            for (size_t i = 0; i < floats.size(); ++i)
++                if (floats[i] != f32_from_bf16(w[i + k])) throw std::runtime_error("BF16 row-slice copy changed values");
++            dequant_f16(30, dw, 1, n - 1, k, static_cast<uint16_t*>(converted), stream);
++            check(cudaStreamSynchronize(stream));
++            std::vector<uint16_t> halves(floats.size());
++            check(cudaMemcpy(halves.data(), converted, halves.size() * 2, cudaMemcpyDeviceToHost));
++            for (size_t i = 0; i < halves.size(); ++i)
++                if (halves[i] != f16_from_f32(floats[i])) throw std::runtime_error("BF16 prompt conversion differs");
++            check(cudaFree(converted));
++            check(cudaFree(dy)); check(cudaFree(dq)); check(cudaFree(dx)); check(cudaFree(dw));
++        }
++        check(cudaStreamDestroy(stream));
++        std::puts("bf16_q8_mmvq_parity OK: 12 shapes, all outputs finite and within summation tolerance");
++        return 0;
++    } catch (const std::exception& e) { std::fprintf(stderr, "%s\n", e.what()); return 1; }
++}
+diff --git a/tests/core/gfx936_graph_test.cpp b/tests/core/gfx936_graph_test.cpp
+new file mode 100644
+index 0000000..0de9787
+--- /dev/null
++++ b/tests/core/gfx936_graph_test.cpp
+@@ -0,0 +1,99 @@
++// Regression for DTK's default block limit and crashing eager graph upload.
++// Verify the graph actually computes, not just that capture returns success.
++#include "strata/core/graph_upload.hpp"
++#include "strata/kernels/native_gr_norm.hpp"
++#include "strata/kernels/native_ple_postops.hpp"
++#include <cmath>
++#include <cstdio>
++#include <stdexcept>
++#include <vector>
++
++static void check(cudaError_t e) {
++    if (e != cudaSuccess) throw std::runtime_error(cudaGetErrorString(e));
++}
++int main() {
++    try {
++        constexpr int cols = 2560, rows = 3;
++        std::vector<float> input(cols * rows), gamma(cols * rows), output(cols * rows);
++        for (size_t i = 0; i < input.size(); ++i) {
++            input[i] = std::sin(float(i) * .17f);
++            gamma[i] = 1 + std::cos(float(i) * .31f) * .1f;
++        }
++        void *x = nullptr, *g = nullptr, *y = nullptr;
++        check(cudaMalloc(&x, input.size() * 4)); check(cudaMalloc(&g, gamma.size() * 4));
++        check(cudaMalloc(&y, output.size() * 4));
++        check(cudaMemcpy(x, input.data(), input.size() * 4, cudaMemcpyHostToDevice));
++        check(cudaMemcpy(g, gamma.data(), gamma.size() * 4, cudaMemcpyHostToDevice));
++        check(cudaMemset(y, 0, output.size() * 4));
++        cudaStream_t stream; check(cudaStreamCreate(&stream));
++        cudaGraph_t graph; cudaGraphExec_t exec;
++        check(cudaStreamBeginCapture(stream, cudaStreamCaptureModeThreadLocal));
++        strata::kernels::native_gr_rms_norm_weighted(static_cast<float*>(x), static_cast<float*>(g),
++                                                    static_cast<float*>(y), cols, rows, 1e-6f, stream);
++        check(cudaStreamEndCapture(stream, &graph));
++        check(cudaGraphInstantiate(&exec, graph, nullptr, nullptr, 0));
++        check(strata::core::graph_upload(exec, stream));
++        check(cudaGraphLaunch(exec, stream));
++        check(cudaStreamSynchronize(stream));
++        check(cudaMemcpy(output.data(), y, output.size() * 4, cudaMemcpyDeviceToHost));
++        for (int row = 0; row < rows; ++row) {
++            double square = 0;
++            for (int j = 0; j < cols; ++j) square += double(input[row * cols + j]) * input[row * cols + j];
++            const double scale = 1 / std::sqrt(square / cols + 1e-6);
++            for (int j = 0; j < cols; ++j) {
++                const size_t i = row * cols + j;
++                const double expected = scale * input[i] * gamma[i];
++                if (!std::isfinite(output[i]) || std::fabs(output[i] - expected) > 2e-5 * std::fabs(expected) + 1e-6)
++                    throw std::runtime_error("captured 1024-thread RMSNorm differs from host reference");
++            }
++        }
++        check(cudaGraphExecDestroy(exec)); check(cudaGraphDestroy(graph));
++        check(cudaFree(y)); check(cudaFree(g)); check(cudaFree(x));
++        // The real PLE gate launches 512 threads. With zero convolution taps,
++        // result = hidden + sigmoid(signed_sqrt(norm(key).norm(hidden)/sqrt(N))).
++        // A silently rejected launch would leave gate zero and must fail here.
++        constexpr int dim = 4 * cols;
++        std::vector<float> hidden(dim), ones(dim, 1.0f), values(cols, 1.0f), got(dim), gates(4);
++        for (int i = 0; i < dim; ++i) hidden[i] = std::sin(float(i) * .07f);
++        std::vector<void*> allocations;
++        auto alloc = [&](size_t bytes) { void* p = nullptr; check(cudaMalloc(&p, bytes)); check(cudaMemset(p, 0, bytes)); allocations.push_back(p); return p; };
++        auto* key = static_cast<float*>(alloc(dim * 4));
++        auto* h = static_cast<float*>(alloc(dim * 4));
++        auto* val = static_cast<float*>(alloc(cols * 4));
++        auto* gamma_p = static_cast<float*>(alloc(dim * 4));
++        auto* hist = static_cast<float*>(alloc(9 * dim * 4));
++        auto* query = static_cast<float*>(alloc(dim * 4));
++        auto* gated = static_cast<float*>(alloc(dim * 4));
++        auto* gate = static_cast<float*>(alloc(4 * 4));
++        auto* taps = static_cast<uint16_t*>(alloc(dim * 4 * 2));
++        auto* snap = static_cast<float*>(alloc(9 * dim * 4));
++        strata::kernels::PleWeights weights{};
++        weights.norm_key = weights.norm_query = weights.norm_conv = gamma_p;
++        weights.conv1d_f16 = taps;
++        check(cudaMemcpy(val, values.data(), values.size() * 4, cudaMemcpyHostToDevice));
++        check(cudaMemcpy(gamma_p, ones.data(), ones.size() * 4, cudaMemcpyHostToDevice));
++        for (bool snapshot : {false, true}) {
++            check(cudaMemcpy(key, hidden.data(), hidden.size() * 4, cudaMemcpyHostToDevice));
++            check(cudaMemcpy(h, hidden.data(), hidden.size() * 4, cudaMemcpyHostToDevice));
++            if (snapshot) strata::kernels::native_ple_postops_batch_snap(key, h, val, hist, weights, query, gated, gate, 1, snap, stream);
++            else strata::kernels::native_ple_postops_batch(key, h, val, hist, weights, query, gated, gate, 1, stream);
++            check(cudaStreamSynchronize(stream));
++            check(cudaMemcpy(got.data(), h, got.size() * 4, cudaMemcpyDeviceToHost));
++            check(cudaMemcpy(gates.data(), gate, gates.size() * 4, cudaMemcpyDeviceToHost));
++            for (int row = 0; row < 4; ++row) {
++                double square = 0;
++                for (int j = 0; j < cols; ++j) square += double(hidden[row * cols + j]) * hidden[row * cols + j];
++                const double dot = square / (square / cols + 1e-6);
++                const double expected = 1 / (1 + std::exp(-std::sqrt(dot / std::sqrt(double(cols)))));
++                if (std::fabs(gates[row] - expected) > 1e-5) throw std::runtime_error("PLE 512-thread gate differs");
++                for (int j = 0; j < cols; ++j)
++                    if (std::fabs(got[row * cols + j] - (hidden[row * cols + j] + expected)) > 1e-5)
++                        throw std::runtime_error("PLE gate/residual differs");
++            }
++        }
++        for (void* p : allocations) check(cudaFree(p));
++        check(cudaStreamDestroy(stream));
++        std::puts("gfx936_graph_test OK: 1024-thread norm captured, launched, and matched host reference");
++        return 0;
++    } catch (const std::exception& e) { std::fprintf(stderr, "%s\n", e.what()); return 1; }
++}
+diff --git a/tests/core/ple_external_test.cpp b/tests/core/ple_external_test.cpp
+new file mode 100644
+index 0000000..ad76f33
+--- /dev/null
++++ b/tests/core/ple_external_test.cpp
+@@ -0,0 +1,80 @@
++// Exercise disk-backed external BF16 PLE at unaligned offsets, EOF and cache
++// reuse; reject changed source sizes and out-of-bounds descriptors.
++#include "strata/kernels/ngram.hpp"
++#include "strata/kernels/bf16_bits.hpp"
++#include <chrono>
++#include <filesystem>
++#include <fstream>
++#include <cstdio>
++#include <cstring>
++#include <stdexcept>
++#include <vector>
++
++namespace fs = std::filesystem;
++static std::string le(uint64_t v, int n) {
++    std::string s(n, '\0');
++    for (int i = 0; i < n; ++i) s[i] = char(v >> (8 * i));
++    return s;
++}
++static std::string str(const std::string& s) { return le(s.size(), 8) + s; }
++static void descriptor(const fs::path& p, uint64_t offset, uint64_t rows, uint64_t size) {
++    std::string h = "GGUF" + le(3, 4) + le(0, 8) + le(5, 8);
++    h += str("general.architecture") + le(8, 4) + str("strata-ple");
++    h += str("strata.ple.external.path") + le(8, 4) + str("source.safetensors");
++    h += str("strata.ple.external.offset") + le(10, 4) + le(offset, 8);
++    h += str("strata.ple.external.rows") + le(10, 4) + le(rows, 8);
++    h += str("strata.ple.external.file_size") + le(10, 4) + le(size, 8);
++    std::ofstream(p, std::ios::binary).write(h.data(), h.size());
++}
++int main() {
++    using namespace strata::kernels;
++    const auto dir = fs::temp_directory_path() /
++        ("strata-ple-external-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
++    try {
++        fs::create_directories(dir);
++        constexpr uint64_t offset = 20736, rows = 29;
++        std::vector<uint16_t> weights(rows * 160);
++        for (size_t i = 0; i < weights.size(); ++i) weights[i] = bf16_from_f32(float(int(i % 101) - 50) / 16);
++        {
++            std::ofstream f(dir / "source.safetensors", std::ios::binary);
++            const std::string prefix(offset, 'h');
++            f.write(prefix.data(), prefix.size());
++            f.write(reinterpret_cast<const char*>(weights.data()), weights.size() * 2);
++        }
++        const uint64_t size = offset + weights.size() * 2;
++        descriptor(dir / "ple.gguf", offset, rows, size);
++        std::string err;
++        PleIoOptions io;
++        io.cache_rows = 32;
++        {
++            PleTable table;
++            if (!table.open((dir / "ple.gguf").string(), err, io)) throw std::runtime_error(err);
++            uint32_t ids[16];
++            float values[2560];
++            for (int repeat = 0; repeat < 2; ++repeat) {
++                for (int i = 0; i < 16; ++i) ids[i] = (i * 13) % rows;
++                ids[0] = 0; ids[1] = rows - 1;
++                if (!table.issue(ids) || !table.collect(values, err)) throw std::runtime_error(err);
++                for (int i = 0; i < 16; ++i) for (int j = 0; j < 160; ++j)
++                    if (values[i * 160 + j] != f32_from_bf16(weights[ids[i] * 160 + j]))
++                        throw std::runtime_error("external PLE read differs from original BF16 bits");
++            }
++        }
++        {
++            PleTable t; io.mode = PleIo::Mmap;
++            if (t.open((dir / "ple.gguf").string(), err, io)) throw std::runtime_error("mmap unexpectedly accepted");
++            io.mode = PleIo::Direct;
++            descriptor(dir / "ple.gguf", offset, rows, size + 1);
++            if (t.open((dir / "ple.gguf").string(), err, io)) throw std::runtime_error("changed file accepted");
++            descriptor(dir / "ple.gguf", offset + 320, rows, size);
++            if (t.open((dir / "ple.gguf").string(), err, io)) throw std::runtime_error("out of bounds accepted");
++        }
++        fs::remove_all(dir);
++        std::puts("ple_external_test OK: exact disk reads, EOF, relative path, cache, size/bounds guards");
++        return 0;
++    } catch (const std::exception& e) {
++        std::fprintf(stderr, "%s\n", e.what());
++        fs::remove_all(dir);
++        return 1;
++    }
++}
+diff --git a/tools/autoround_pack.py b/tools/autoround_pack.py
+new file mode 100644
+index 0000000..eb624f3
+--- /dev/null
++++ b/tools/autoround_pack.py
+@@ -0,0 +1,381 @@
++"""Import symmetric AutoRound GPTQ INT4 without re-quantizing its weights.
++
++Expert codes are losslessly reblocked as Q4_0 (same FP16 scale, zero point 8).
++Unquantized projections remain BF16/F32. PLE stays in the original Safetensors
++file: a tiny descriptor supplies its validated byte span to Strata's disk reader.
++
++Requires the engine's pinned llama.cpp converter, torch, numpy and safetensors.
++No model file is modified. Prepared files are bound to the source inventory.
++"""
++from __future__ import annotations
++
++import argparse
++import concurrent.futures
++import hashlib
++import json
++import os
++from pathlib import Path
++import re
++import subprocess
++import sys
++import time
++
++import numpy as np
++
++HERE = Path(__file__).resolve().parent
++sys.path.insert(0, str(HERE))
++from nvfp4_local_pack import Checkpoint, _VTensor, _VGguf
++
++
++def q4_0_reblock(qweight, qzeros, scales, group_size=128):
++    """GPTQ [K/8,N] words -> Q4_0 [N,K/32,18] bytes, preserving every weight."""
++    qw = np.asarray(qweight)
++    qz = np.asarray(qzeros)
++    s = np.asarray(scales)
++    if qw.ndim != 2 or qw.dtype.kind not in "iu" or qw.dtype.itemsize != 4:
++        raise ValueError("qweight must be an int32 matrix")
++    k, n = qw.shape[0] * 8, qw.shape[1]
++    if group_size < 32 or group_size % 32 or k % group_size or n % 8:
++        raise ValueError("only whole symmetric GPTQ groups divisible by 32 are supported")
++    if qz.shape != (k // group_size, n // 8) or qz.dtype.kind not in "iu" or qz.dtype.itemsize != 4:
++        raise ValueError("qzeros shape/dtype disagrees with qweight")
++    # auto_gptq stores zero point minus one. Refuse other/asymmetric zeros,
++    # rather than silently change the interpretation to make them fit Q4_0.
++    if not np.all(qz.view(np.uint32) == np.uint32(0x77777777)):
++        raise ValueError("expected GPTQ symmetric zero point 8 (packed qzeros 0x77777777)")
++    if s.dtype != np.dtype("<f2") or s.shape != (k // group_size, n) or not np.isfinite(s).all():
++        raise ValueError("scales must be finite FP16 [K/group_size,N]")
++    codes = ((qw.view(np.uint32)[:, None, :] >>
++              np.arange(0, 32, 4, dtype=np.uint32)[None, :, None]) & 15).astype(np.uint8)
++    codes = codes.reshape(k, n).T.reshape(n, k // 32, 32)
++    out = np.empty((n, k // 32, 18), dtype=np.uint8)
++    repeated = np.repeat(s.T, group_size // 32, axis=1).copy()
++    out[:, :, :2] = repeated.view(np.uint8).reshape(n, k // 32, 2)
++    out[:, :, 2:] = codes[:, :, :16] | (codes[:, :, 16:] << 4)
++    return out
++
++
++def decode_gptq_reference(qweight, qzeros, scales, group_size=128):
++    """Independent coordinate-wise reference, including GPTQ's zero offset."""
++    qw = np.asarray(qweight).view(np.uint32)
++    qz = np.asarray(qzeros).view(np.uint32)
++    k, n = qw.shape[0] * 8, qw.shape[1]
++    i = np.arange(k)
++    j = np.arange(n)
++    codes = (qw[i // 8, :] >> ((i % 8) * 4)[:, None]) & 15
++    zeros = ((qz[:, j // 8] >> ((j % 8) * 4)[None, :]) & 15) + 1
++    return ((codes.astype(np.int16) - zeros[i // group_size].astype(np.int16)) *
++            np.asarray(scales, np.float32)[i // group_size]).T
++
++
++def decode_q4_0_reference(blocks):
++    b = np.asarray(blocks)
++    n, nb, _ = b.shape
++    scale = b[:, :, :2].copy().view("<f2").reshape(n, nb).astype(np.float32)
++    code = np.concatenate((b[:, :, 2:] & 15, b[:, :, 2:] >> 4), axis=2).astype(np.int16)
++    return ((code - 8) * scale[:, :, None]).reshape(n, nb * 32)
++
++
++class AutoRoundCheckpoint(Checkpoint):
++    def __init__(self, folder):
++        super().__init__(folder)
++        self.config = json.loads((self.dir / "config.json").read_text())
++        q = self.config.get("quantization_config", {})
++        if self.config.get("model_type") != "qwen4_exp":
++            raise ValueError("this importer supports Qwen4Exp checkpoints only")
++        if (q.get("quant_method") != "auto-round" or q.get("bits") != 4 or
++                q.get("packing_format") != "auto_round:auto_gptq" or q.get("sym") is not True):
++            raise ValueError("expected symmetric INT4 auto-round:auto_gptq")
++        self.group_size = q["group_size"]
++        t = self.config["text_config"]
++        self.layers, self.experts = t["num_hidden_layers"], t["num_experts"]
++        self.n_embd, self.n_ff = t["hidden_size"], t["moe_intermediate_size"]
++        index = json.loads((self.dir / "model.safetensors.index.json").read_text())["weight_map"]
++        for name, fn in index.items():
++            if name not in self.meta or self.meta[name][0] != fn:
++                raise ValueError("index/header disagreement: " + name)
++        for fn in set(index.values()):
++            end = max(v[4] for v in self.meta.values() if v[0] == fn)
++            if (self.dir / fn).stat().st_size != end:
++                raise ValueError("truncated or trailing data in " + fn)
++
++    def projection(self, layer, expert, role):
++        base = f"model.language_model.layers.{layer}.mlp.experts.{expert}.{role}_proj."
++        if self.dtype(base + "qweight") != "I32" or self.dtype(base + "qzeros") != "I32":
++            raise ValueError("non-int32 GPTQ codes: " + base)
++        if self.dtype(base + "scales") != "F16":
++            raise ValueError("non-FP16 GPTQ scale: " + base)
++        return (self.array(base + "qweight", "<i4"), self.array(base + "qzeros", "<i4"),
++                self.array(base + "scales", "<f2"))
++
++    def inventory(self):
++        result = []
++        for fn in sorted({v[0] for v in self.meta.values()}):
++            st = (self.dir / fn).stat()
++            result.append({"name": fn, "size": st.st_size, "mtime_ns": st.st_mtime_ns})
++        return {"model": str(self.dir.resolve()), "files": result,
++                "config_sha256": hashlib.sha256((self.dir / "config.json").read_bytes()).hexdigest(),
++                "index_sha256": hashlib.sha256((self.dir / "model.safetensors.index.json").read_bytes()).hexdigest()}
++
++
++def converter_path(path):
++    path = Path(path).resolve()
++    if not (path / "conversion" / "qwen4exp.py").is_file():
++        raise ValueError("llama.cpp converter is missing: " + str(path))
++    sys.path.insert(0, str(path))
++    sys.path.insert(0, str(path / "gguf-py"))
++    os.environ["STRATA_GGUF_PY"] = str(path / "gguf-py")
++
++
++def convert_dense(ck, outfile):
++    """Reuse pinned architecture transforms, but neither dequantize nor quantize weights."""
++    import gguf
++    from conversion.base import ModelBase
++    from conversion.qwen4exp import Qwen4ExpTextModel
++    import iq_pack
++
++    orig_index = ModelBase.index_tensors
++    orig_hparams = ModelBase.load_hparams
++    orig_force = Qwen4ExpTextModel.tensor_force_quant
++
++    def index(self, remote_hf_model_id=None):
++        return {k: v for k, v in orig_index(self, remote_hf_model_id).items()
++                if ".mlp.experts." not in k and ".ngram_embedding.shard_" not in k
++                and not k.startswith("mtp.")}
++
++    def hparams(folder, is_mistral):
++        h = orig_hparams(folder, is_mistral)
++        h.pop("quantization_config", None)
++        if "text_config" in h:
++            h["text_config"].pop("quantization_config", None)
++        return h
++
++    def force(self, name, new_name, bid, n_dims):
++        form = iq_pack.form_of(new_name)
++        if form:
++            return getattr(gguf.GGMLQuantizationType, form)
++        if n_dims >= 2:
++            return gguf.GGMLQuantizationType.BF16
++        return orig_force(self, name, new_name, bid, n_dims)
++
++    ModelBase.index_tensors = index
++    ModelBase.load_hparams = staticmethod(hparams)
++    Qwen4ExpTextModel.tensor_force_quant = force
++    try:
++        model = Qwen4ExpTextModel(ck.dir, gguf.LlamaFileType.MOSTLY_BF16, Path(outfile))
++        # The source's PLE is deliberately not written; retain its row-width metadata.
++        model._ple_row_dim = 160
++        model.write()
++    finally:
++        ModelBase.index_tensors = orig_index
++        ModelBase.load_hparams = staticmethod(orig_hparams)
++        Qwen4ExpTextModel.tensor_force_quant = orig_force
++
++
++def write_ple_descriptor(ck, outfile):
++    import gguf
++    pieces = []
++    for name, info in ck.meta.items():
++        match = re.search(r"\.ple\.ple_embedding\.ngram_embedding\.shard_(\d+)\.weight$", name)
++        if match:
++            fn, dtype, shape, a, b = info
++            if dtype != "BF16" or len(shape) != 2 or shape[1] != 160 or b - a != shape[0] * 320:
++                raise ValueError("invalid BF16 PLE shard " + name)
++            pieces.append((int(match[1]), fn, shape[0], a, b))
++    pieces.sort()
++    want = ck.config["text_config"]["split_ngram_parts"]
++    if len(pieces) != want or [p[0] for p in pieces] != list(range(want)):
++        raise ValueError("missing/duplicate PLE shard numbers")
++    if len({p[1] for p in pieces}) != 1 or any(a[4] != b[3] for a, b in zip(pieces, pieces[1:])):
++        raise ValueError("PLE shards are not contiguous in numeric order; no implicit reorder/copy")
++    source = (ck.dir / pieces[0][1]).resolve()
++    w = gguf.GGUFWriter(str(outfile), "strata-ple")
++    w.add_string("strata.ple.external.path", str(source))
++    w.add_uint64("strata.ple.external.offset", pieces[0][3])
++    w.add_uint64("strata.ple.external.rows", sum(p[2] for p in pieces))
++    w.add_uint64("strata.ple.external.file_size", source.stat().st_size)
++    w.write_header_to_file()
++    w.write_kv_data_to_file()
++    w.write_ti_data_to_file()
++    w.close()
++    print(f"PLE descriptor: {sum(p[2] for p in pieces)} BF16 rows, source {source}, no table copied", flush=True)
++
++
++def attach_experts(model, ck, workers):
++    """Supply iq_pack with Q4_0 expert tensors, one layer/role resident at a time."""
++    source = model.paths[0]
++    cache = {}
++    geom = {"gate": (ck.n_embd, ck.n_ff), "up": (ck.n_embd, ck.n_ff), "down": (ck.n_ff, ck.n_embd)}
++    for layer in range(ck.layers):
++        for role, (k, n) in geom.items():
++            name = f"blk.{layer}.ffn_{role}_exps.weight"
++            tensor = _VTensor(name, [k, n, ck.experts], 2, "Q4_0", ck.experts * n * (k // 32) * 18)
++            model.where[name] = (_VGguf(), tensor, None, source)
++    original = type(model).bytes
++
++    def data(name):
++        match = re.fullmatch(r"blk\.(\d+)\.ffn_(gate|up|down)_exps\.weight", name)
++        if not match:
++            return original(model, name)
++        key = (int(match[1]), match[2])
++        if key not in cache:
++            cache.clear()
++            t0 = time.monotonic()
++
++            def one(expert):
++                return q4_0_reblock(*ck.projection(key[0], expert, key[1]), ck.group_size).reshape(-1)
++
++            with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
++                values = list(ex.map(one, range(ck.experts)))
++            cache[key] = np.stack(values).reshape(-1)
++            print(f"AutoRound layer {key[0]} {key[1]}: exact INT4 reblock in {time.monotonic()-t0:.1f}s", flush=True)
++        return cache[key]
++
++    model.bytes = data
++
++
++def pack_experts(ck, dense, out, workers):
++    import iq_pack
++    original = iq_pack.Model
++
++    class Model(original):
++        def __init__(self, first):
++            super().__init__(first)
++            attach_experts(self, ck, workers)
++
++    iq_pack.Model = Model
++    old_argv = sys.argv
++    try:
++        sys.argv = ["iq_pack.py", "--gguf", str(dense), "--out", str(out), "--experts-bin"]
++        rc = iq_pack.main()
++        if rc:
++            raise RuntimeError(f"iq_pack failed: {rc}")
++    finally:
++        iq_pack.Model = original
++        sys.argv = old_argv
++
++
++def verify(ck, count):
++    # Spread across layers, roles and expert ids, including first/last.
++    out = []
++    for i in range(count):
++        layer = i * (ck.layers - 1) // max(1, count - 1)
++        expert = (i * 137) % ck.experts
++        role = ("gate", "up", "down")[i % 3]
++        arrays = ck.projection(layer, expert, role)
++        packed = q4_0_reblock(*arrays, ck.group_size)
++        expected = decode_gptq_reference(*arrays, ck.group_size)
++        actual = decode_q4_0_reference(packed)
++        if not np.array_equal(expected.view(np.uint32), actual.view(np.uint32)):
++            raise AssertionError(f"reblock changed decoded weights: layer {layer}, expert {expert}, {role}")
++        out.append({"layer": layer, "expert": expert, "role": role, "weights": int(expected.size),
++                    "bit_exact": True})
++        print("verified", out[-1], flush=True)
++    return out
++
++
++def run_model(ck, out, a):
++    (out / "generation.json").unlink(missing_ok=True)
++    from transformers import AutoTokenizer
++    tokenizer = AutoTokenizer.from_pretrained(ck.dir, local_files_only=True)
++    tokenizer.chat_template = (ck.dir / "chat_template.jinja").read_text()
++    messages = [{"role": "user", "content": a.prompt}]
++    ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True, enable_thinking=False)
++    generation = ck.dir / "generation_config.json"
++    eos = json.loads(generation.read_text()).get("eos_token_id") if generation.is_file() else None
++    if eos is None:
++        eos = tokenizer.eos_token_id
++    eos = eos if isinstance(eos, list) else [eos]
++    if not eos or any(not isinstance(v, int) or v < 0 for v in eos):
++        raise ValueError("checkpoint has no valid end-of-turn token ids")
++    if len(ids) + a.max_new > a.context:
++        raise ValueError("prompt plus output exceeds --context")
++    token_file = out / "prompt.ids"
++    token_file.write_text(",".join(map(str, ids)) + "\n")
++    cmd = [str(Path(a.engine).resolve()), "--native", str(out / "dense.gguf"),
++           "--pack", str(out / "pack"), "--ple-gguf", str(out / "ple.gguf"),
++           "--tokens-file", str(token_file), "--max-new", str(a.max_new),
++           "--eos-ids", ",".join(map(str, eos)),
++           "--max-context", str(a.context), "--prefill", "32", "--spec", "2",
++           "--expert-profile", str(HERE.parent / "data" / "expert-profile.bin"),
++           "--expert-cache", "auto", "--mmap-experts", "--resident-cpu-experts",
++           "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",
++           "--kv", "int8", "--suffix-draft", "0", "--adapt-every", "0",
++           "--ple-io", "direct", "--ple-row-cache", "65536"]
++    (out / "run-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
++    print("Starting AutoRound model;", len(ids), "prompt tokens", flush=True)
++    with (out / "engine.stderr.log").open("w") as stderr:
++        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr, text=True)
++    (out / "engine.stdout.log").write_text(result.stdout)
++    print(result.stdout, end="", flush=True)
++    if result.returncode:
++        print((out / "engine.stderr.log").read_text()[-5000:], file=sys.stderr)
++        return result.returncode
++    errors = (out / "engine.stderr.log").read_text()
++    if "larger than launch bounds" in errors or "Launch params" in errors:
++        raise RuntimeError("DTK rejected a kernel launch; generated text is invalid (see engine.stderr.log)")
++    match = re.search(r"^output\s*:(.*)$", result.stdout, re.MULTILINE)
++    if not match:
++        raise RuntimeError("engine returned no output token ids")
++    generated = [int(v) for v in match[1].split()]
++    raw_text = tokenizer.decode(generated, skip_special_tokens=False)
++    decoded = tokenizer.decode(generated, skip_special_tokens=True)
++    report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
++              "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode,
++              "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
++    completed = out / "generation.json.tmp"
++    completed.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
++    completed.replace(out / "generation.json")
++    print("GENERATED TEXT:", decoded, flush=True)
++    return 0
++
++
++def main():
++    ap = argparse.ArgumentParser(description=__doc__)
++    ap.add_argument("command", choices=["verify", "convert", "ple", "pack", "prepare", "run"])
++    ap.add_argument("--model", required=True)
++    ap.add_argument("--out", required=True)
++    ap.add_argument("--llama", default=str(HERE.parent / "third_party" / "llama.cpp"))
++    ap.add_argument("--workers", type=int, default=4)
++    ap.add_argument("--verify-experts", type=int, default=12)
++    ap.add_argument("--engine", default=str(HERE.parent / "build" / "strata"))
++    ap.add_argument("--prompt", default="Reply with exactly OK.")
++    ap.add_argument("--max-new", type=int, default=32)
++    ap.add_argument("--context", type=int, default=512)
++    ap.add_argument("--pool-workers", type=int, default=12)
++    a = ap.parse_args()
++    if not 1 <= a.workers <= 16 or a.verify_experts < 1:
++        ap.error("workers must be 1..16 and verify-experts positive")
++    if a.max_new < 1 or a.context < 1 or a.pool_workers < 1:
++        ap.error("max-new, context and pool-workers must be positive")
++    converter_path(a.llama)
++    ck = AutoRoundCheckpoint(Path(a.model).resolve())
++    out = Path(a.out).resolve()
++    out.mkdir(parents=True, exist_ok=True)
++    identity = ck.inventory()
++    identity_file = out / "source.json"
++    if identity_file.exists() and json.loads(identity_file.read_text()) != identity:
++        raise ValueError("source checkpoint changed; use a new output directory")
++    if a.command == "run":
++        if not identity_file.is_file() or not (out / "pack" / "native_experts.txt").is_file():
++            raise ValueError("run requires a completed prepare in --out")
++        return run_model(ck, out, a)
++    identity_file.write_text(json.dumps(identity, indent=2) + "\n")
++    if a.command in ("verify", "prepare"):
++        report = verify(ck, a.verify_experts)
++        (out / "weight-verification.json").write_text(json.dumps(report, indent=2) + "\n")
++    if a.command in ("ple", "prepare"):
++        write_ple_descriptor(ck, out / "ple.gguf")
++    if a.command in ("convert", "prepare") and not (out / "dense.done").is_file():
++        tmp = out / "dense.tmp.gguf"
++        convert_dense(ck, tmp)
++        tmp.replace(out / "dense.gguf")
++        (out / "dense.done").write_text("BF16/F32 projections; experts and PLE excluded\n")
++    if a.command in ("pack", "prepare"):
++        pack_experts(ck, out / "dense.gguf", out / "pack", a.workers)
++    print("AutoRound importer completed:", a.command, out, flush=True)
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/test_autoround_pack.py b/tools/test_autoround_pack.py
+new file mode 100644
+index 0000000..bc8392e
+--- /dev/null
++++ b/tools/test_autoround_pack.py
+@@ -0,0 +1,51 @@
++"""Lossless layout conversion against independent GPTQ and gguf decoders."""
++import sys
++import unittest
++from pathlib import Path
++import numpy as np
++
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++from autoround_pack import q4_0_reblock, decode_gptq_reference, decode_q4_0_reference
++
++
++class AutoRoundPackingTests(unittest.TestCase):
++    def fixture(self, k=256, n=16):
++        rng = np.random.default_rng(17)
++        words = rng.integers(0, 2**32, size=(k // 8, n), dtype=np.uint32).view(np.int32)
++        zeros = np.full((k // 128, n // 8), 0x77777777, dtype=np.uint32).view(np.int32)
++        scales = rng.uniform(-0.1, 0.1, (k // 128, n)).astype('<f2')
++        scales.flat[:4] = [0, -0.0, np.finfo(np.float16).tiny, -np.finfo(np.float16).tiny]
++        return words, zeros, scales
++
++    def test_signed_scales_and_every_nibble_position(self):
++        for k in (128, 256, 640, 2560):
++            args = self.fixture(k)
++            blocks = q4_0_reblock(*args)
++            actual = decode_q4_0_reference(blocks)
++            expected = decode_gptq_reference(*args)
++            np.testing.assert_array_equal(actual.view(np.uint32), expected.view(np.uint32))
++
++    def test_gguf_reference_decoder(self):
++        from _paths import add_gguf_py
++        add_gguf_py()
++        import gguf
++        args = self.fixture()
++        packed = q4_0_reblock(*args)
++        actual = gguf.quants.dequantize(packed.reshape(16, -1), gguf.GGMLQuantizationType.Q4_0)
++        np.testing.assert_array_equal(actual.view(np.uint32), decode_gptq_reference(*args).view(np.uint32))
++
++    def test_refuse_unsupported_inputs(self):
++        w, z, s = self.fixture()
++        z[0, 0] = 0x66666666
++        with self.assertRaisesRegex(ValueError, 'zero point'):
++            q4_0_reblock(w, z, s)
++        w, z, s = self.fixture()
++        s[0, 0] = np.nan
++        with self.assertRaisesRegex(ValueError, 'finite FP16'):
++            q4_0_reblock(w, z, s)
++        with self.assertRaisesRegex(ValueError, 'int32'):
++            q4_0_reblock(w.astype(np.int16), z, s)
++
++
++if __name__ == '__main__':
++    unittest.main()

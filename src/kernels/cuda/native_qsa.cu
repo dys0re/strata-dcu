@@ -24,6 +24,7 @@
 
 #include "strata/kernels/native_qsa.hpp"
 #include <cuda_runtime.h>
+#include "strata/kernels/hip_launch_bounds.hpp"
 #include <atomic>
 #include <cmath>
 #include <cstddef>
@@ -42,7 +43,7 @@ __device__ __forceinline__ float warp_sum(float value) {
     return value;
 }
 template<int BlockSize>
-__global__ void norm(const float* input, const float* __restrict__ gamma, float* output,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(BlockSize) norm(const float* input, const float* __restrict__ gamma, float* output,
                      int n_cols, float epsilon) {
     const int tid = threadIdx.x;
     const std::size_t row_offset = std::size_t(blockIdx.x) * n_cols;
@@ -68,7 +69,7 @@ __global__ void norm(const float* input, const float* __restrict__ gamma, float*
 }
 // As norm, with gamma[groups * n_cols]: row r is group r % groups and reads its own slice of gamma.
 template<int BlockSize>
-__global__ void norm_grouped(const float* input, const float* __restrict__ gamma, float* output,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(BlockSize) norm_grouped(const float* input, const float* __restrict__ gamma, float* output,
                              int n_cols, int groups, float epsilon) {
     const int tid = threadIdx.x;
     const std::size_t row_offset = std::size_t(blockIdx.x) * n_cols;

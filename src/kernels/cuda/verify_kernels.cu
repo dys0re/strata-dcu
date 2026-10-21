@@ -11,6 +11,7 @@
 
 #include <cuda_fp16.h>
 #include <cuda_runtime.h>
+#include "strata/kernels/hip_launch_bounds.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -615,7 +616,7 @@ __global__ void add_streams_broadcast_kernel(const float* __restrict__ h, const 
     R[(size_t) t * n * hc + i] = h[(size_t) t * n * hc + i] + e[(size_t) t * n + i % n];
 }
 
-__global__ void ident_hits_kernel(const int32_t* __restrict__ ids, int n, int32_t* __restrict__ slot,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) ident_hits_kernel(const int32_t* __restrict__ ids, int n, int32_t* __restrict__ slot,
                                   int32_t* __restrict__ dst, int32_t* __restrict__ count) {
     const int i = threadIdx.x;
     if (i < n) { slot[i] = ids[i]; dst[i] = i; }
@@ -638,7 +639,7 @@ __global__ void map_ids_kernel(int32_t* ids, const int32_t* __restrict__ table, 
     if (i < n) ids[i] = table[ids[i]];
 }
 
-__global__ void row_top_prob_kernel(const float* __restrict__ logits, int n_vocab, const int32_t* __restrict__ ids,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) row_top_prob_kernel(const float* __restrict__ logits, int n_vocab, const int32_t* __restrict__ ids,
                                     float* __restrict__ probs) {
     __shared__ float part[32];
     const int t = blockIdx.x;

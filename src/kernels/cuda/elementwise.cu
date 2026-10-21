@@ -6,6 +6,7 @@
 #include "strata/kernels/f16_bits.hpp"
 
 #include <cuda_runtime.h>
+#include "strata/kernels/hip_launch_bounds.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -308,7 +309,7 @@ void copy_from_mapped(float* dst, const float* src, int64_t n, void* stream) {
     check_launch("copy_from_mapped");
 }
 
-__global__ void doorbell_publish_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) doorbell_publish_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
                                         const float* __restrict__ w, int n, int k, float* x_out, int32_t* ids_out,
                                         float* w_out, uint32_t* seq) {
     for (int i = threadIdx.x; i < n; i += blockDim.x) x_out[i] = x[i];
@@ -326,7 +327,7 @@ __global__ void doorbell_publish_kernel(const float* __restrict__ x, const int32
     }
 }
 
-__global__ void doorbell_publish_res_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) doorbell_publish_res_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
                                             const int32_t* __restrict__ d_res, int n_expert, int n, int k,
                                             float* x_out, int32_t* ids_out, uint32_t* seq) {
     int any_miss = 0;
@@ -352,7 +353,7 @@ __global__ void doorbell_publish_res_kernel(const float* __restrict__ x, const i
 
 // #649 (HIP, STRATA_DOORBELL_STORE=1): the same publish, but the ring is STORED (the step's own number, known at
 // capture) instead of read-modify-written over PCIe - one store, no read of host memory from the GPU.
-__global__ void doorbell_publish_value_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(1024) doorbell_publish_value_kernel(const float* __restrict__ x, const int32_t* __restrict__ ids,
                                               const float* __restrict__ w, int n, int k, float* x_out, int32_t* ids_out,
                                               float* w_out, uint32_t* seq, uint32_t value) {
     for (int i = threadIdx.x; i < n; i += blockDim.x) x_out[i] = x[i];

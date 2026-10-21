@@ -25,6 +25,7 @@
 #include "strata/kernels/native_gr_norm.hpp"
 
 #include <cuda_runtime.h>
+#include "strata/kernels/hip_launch_bounds.hpp"
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -43,7 +44,7 @@ __device__ __forceinline__ float norm_warp_sum(float value) {
 }
 
 template<int BlockSize>
-__global__ void weighted_rms_norm(const float* __restrict__ input,
+__global__ void STRATA_WAVE64_LAUNCH_BOUNDS(BlockSize) weighted_rms_norm(const float* __restrict__ input,
                                    const float* __restrict__ gamma,
                                    float* __restrict__ output, int n_cols, float epsilon) {
     const int tid = threadIdx.x;
