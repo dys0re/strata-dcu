@@ -46,6 +46,16 @@ class DraftLayer(unittest.TestCase):
         with self.assertRaises(ValueError):
             runconfig.apply(cfg, {"mtp": "off"})
 
+    def test_adaptive_flag_follows_the_existing_mtp_switch(self):
+        cfg = {"args": ["--spec", "5", "--mtp", "/m/rt", "--suffix-draft", "0"],
+               "user_args": ["--mtp-adaptive"]}
+        self.assertIn("--mtp-adaptive", engine_args(cfg))
+        cfg["mtp"] = False
+        with contextlib.redirect_stdout(io.StringIO()):
+            args = engine_args(cfg)
+        self.assertNotIn("--mtp-adaptive", args)
+        self.assertNotIn("--mtp", args)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,20 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+Starting AutoRound model; 42 prompt tokens
+speculation              59 rounds of 5, drafts accepted 37 of 78 (0.474), 1.63 tokens per round
+accepted per round       0:27 1:28 2:3 3:1 4:0
+verify window            wait for rings 26.691  pool 13.033  host 0.013  commit 0.060 ms/round; CPU experts 3.93 distinct / 6.30 routed per layer
+pool multi               gate/up 7.637  quantize 0.102  down 4.362 ms/round; 43.5 GB/s over the rows phases; CPU pool call 13.000 ms/round
+dispatch                 plan 0.243  activation quantize 0.095  jobs 0.075  run 12.115 ms/round
+resident RAM             13.37 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+expert tiers             decode: RAM 11135 blobs, files 0 blobs, 0.0 MB read from the files (0.00 MB/round, 0.0 ms/round of reading, 0.00 GB/s per reading thread); prompt copies 53595.6 MB
+io path                  file reads: page cache held 14354.8 MB, not 0.0 MB (mincore at the read); io prefetch on: 0 read ahead, 0 used, 0 unused, 0 skipped (cached), 0 dropped; pread 0.0 MB in 0 calls (0.00 ms each); decode waited 0.0 ms/round in the fetches
+routing prefetch         0 experts warmed, 0 of the file tier's 0 blob reads had been warmed (0.0%); predictor 23.4 ms/round on its thread, 180 layers skipped (still busy)
+pcie experts             0.00 distinct experts per layer read over PCIe (share 141/256 of the misses)
+mtp                      3.354 ms/round drafting (63 rounds), MTP prompt 43.2 ms, 1309 MiB of VRAM
+prompt  : 248045 846 198 7734 264 11346 220 23 15 15 36093 3255 883 264 11952 23218 449 22263 9006 5101 13 18037 279 3255 6849 321 2962 440 8807 26884 321 20623 13 248046 198 248045 74455 198 248068 271 248069 271
+output  : 4413 220 22 18 19 11 22471 328 57517 1288 23562 888 279 11823 314 279 85275 5157 3017 11 1141 41653 33124 780 76584 54166 303 279 92626 3594 13 561 22263 9006 5101 11 791 2320 5652 277 12922 383 279 25888 3438 33528 314 10113 357 744 300 51698 11 995 978 20413 364 34227 1578 13 30939 3724 287 80863 303 279 3074 22690 314 3000 57121 1472 279 53507 55419 11 41567 1060 264 76435 314 29712 13 28970 725 27374 24296 22643 11 30787 494 56093 310 1496 85984 8851
+decode                   96 tokens in 2973.0 ms  ->  32.29 tok/s
+prefill                  41 tokens in 3052.5 ms  ->  13.43 tok/s  (time to first token 29963.9 ms)
+mtp budget: 58 observations; T1=5@30.7764ms/1tok T2=40@43.4305ms/1.53328tok T3=5@59.8518ms/1.84388tok T4=4@72.5817ms/1.98501tok T5=4@91.1264ms/1.98501tok
+GENERATED TEXT: Unit 734, designated "Seven," stepped over the threshold of the crumbling archway, its hydraulic joints hissing softly in the stagnant air. The abandoned observatory, perched precariously on the jagged spine of Mount Aethelgard, had been silent for forty years. Dust motes danced in the single beam of light piercing through the shattered dome, illuminating a cathedral of decay. Seven’s optical sensors adjusted, shifting from infrared to high-definition visual

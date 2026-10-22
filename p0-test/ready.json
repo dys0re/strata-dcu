@@ -1,0 +1,121 @@
+{
+  "recipe": 1,
+  "source": {
+    "model": "/root/private_data/Qwen3.8-F",
+    "files": [
+      {
+        "name": "model-00001-of-00017.safetensors",
+        "size": 2899311784,
+        "mtime_ns": 1792570883000000000
+      },
+      {
+        "name": "model-00003-of-00017.safetensors",
+        "size": 5370548192,
+        "mtime_ns": 1792570948000000000
+      },
+      {
+        "name": "model-00004-of-00017.safetensors",
+        "size": 5370910416,
+        "mtime_ns": 1792570949000000000
+      },
+      {
+        "name": "model-00005-of-00017.safetensors",
+        "size": 5370140704,
+        "mtime_ns": 1792570944000000000
+      },
+      {
+        "name": "model-00006-of-00017.safetensors",
+        "size": 5370205184,
+        "mtime_ns": 1792571022000000000
+      },
+      {
+        "name": "model-00007-of-00017.safetensors",
+        "size": 5370927288,
+        "mtime_ns": 1792571124000000000
+      },
+      {
+        "name": "model-00008-of-00017.safetensors",
+        "size": 5344445352,
+        "mtime_ns": 1792571110000000000
+      },
+      {
+        "name": "model-00009-of-00017.safetensors",
+        "size": 5370355648,
+        "mtime_ns": 1792571107000000000
+      },
+      {
+        "name": "model-00010-of-00017.safetensors",
+        "size": 5370927288,
+        "mtime_ns": 1792571208000000000
+      },
+      {
+        "name": "model-00011-of-00017.safetensors",
+        "size": 5324173744,
+        "mtime_ns": 1792571254000000000
+      },
+      {
+        "name": "model-00012-of-00017.safetensors",
+        "size": 5370438520,
+        "mtime_ns": 1792571278000000000
+      },
+      {
+        "name": "model-00013-of-00017.safetensors",
+        "size": 5370927288,
+        "mtime_ns": 1792571330000000000
+      },
+      {
+        "name": "model-00014-of-00017.safetensors",
+        "size": 5342689856,
+        "mtime_ns": 1792571397000000000
+      },
+      {
+        "name": "model-00015-of-00017.safetensors",
+        "size": 5050474736,
+        "mtime_ns": 1792571393000000000
+      },
+      {
+        "name": "model-00016-of-00017.safetensors",
+        "size": 102400512256,
+        "mtime_ns": 1792574477000000000
+      },
+      {
+        "name": "model-00017-of-00017.safetensors",
+        "size": 1284526608,
+        "mtime_ns": 1792571377000000000
+      },
+      {
+        "name": "model_extra_tensors.safetensors",
+        "size": 5214492152,
+        "mtime_ns": 1792571616000000000
+      }
+    ],
+    "config_sha256": "0fabfa21fab8bfe69f02234f7ae8df4ed91b785fca2e22011c1230f6a07e5329",
+    "index_sha256": "35e503b758cf5441886042d315c48dfba70f947611816cbb90e02d4d5c5e58ff"
+  },
+  "draft_experts": "q2_0",
+  "draft_projections": "q8_0",
+  "source_tensors": 31,
+  "main_weights_modified": false,
+  "files": {
+    "experts.bin": {
+      "bytes": 707788800,
+      "mtime_ns": 1792593859374525929,
+      "sha256": "09398406be61f1f54c93861f449e48b8df0bfccbc9ec9b2b7636775a6ea9244f"
+    },
+    "dense.bin": {
+      "bytes": 116099072,
+      "mtime_ns": 1792593860730517920,
+      "sha256": "c724dc0b0822ada5d2977bf5bde821605feabaa64ea2e0045b67ca656329070a"
+    },
+    "dense.txt": {
+      "bytes": 1851,
+      "mtime_ns": 1792593860730517920,
+      "sha256": "991456cf4eb266eb8a888c349e548d11bc640f5dbd9149439aa9786af0f732fd"
+    },
+    "draft_vocab.bin": {
+      "bytes": 425196,
+      "mtime_ns": 1792577276000000000,
+      "sha256": "b1e1d3a7a9e4bf862dcd5923ce661fb59bbd07907e594df5cf86a62ac235cb91"
+    }
+  }
+}

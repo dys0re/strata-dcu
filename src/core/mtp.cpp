@@ -1552,6 +1552,16 @@ struct DraftTiming {
 DraftTiming g_dt;
 }  // namespace
 
+bool MtpDrafter::prepare_adaptive(std::string& err) {
+    const OnDevice device(device_);
+    if (!prepare_prefill(err)) return false;
+    for (int t = 1; t <= max_t_; ++t)
+        if (!capture_round(t, coupled_active_, err)) return false;
+    for (int j = 1; j < max_t_ - 1; ++j)
+        if (!capture_step(j, coupled_active_, err)) return false;
+    return true;
+}
+
 bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* drafts, std::string& err,
                        float* probs, float min_p, int* n_drafts) {
 #if defined(STRATA_GPU_METAL)
@@ -1571,6 +1581,52 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* 
     const OnDevice on_device(device_);
     if (T < 1 || T > max_t_ || a < 0 || a >= T) { err = "mtp: draft arguments out of range"; return false; }
     if (chain_live_) { err = "mtp: a pipelined chain is still in flight"; return false; }
+    if (max_drafts_ == 0) {
+        // A no-draft round must still append the committed pairs to the draft
+        // K/V. Otherwise resuming speculation would read holes in its prefix.
+        const Clock::time_point start = Clock::now();
+        if (!stage_source_R(a + 1, err) || !prefill(window_R_, tokens, a + 1, p, err)) return false;
+        // Diagnostic only: compare front-only writes with the original full
+        // draft on the SAME residuals, tokens and existing K/V prefix.
+        static const bool check_front = std::getenv("STRATA_MTP_FRONT_CHECK") != nullptr;
+        if (check_front) {
+            if (!st_.kv_int8 || st_.kv_q4 || st_.kv_mode != 0 || max_t_ < 2) {
+                err = "MTP front check needs resident INT8 KV and max_t >= 2";
+                return false;
+            }
+            const auto shape = shapes_of(*g_);
+            auto image = [&](std::vector<uint8_t>& data) {
+                const std::pair<const void*, int64_t> pools[] = {{st_.k_q, shape.head_dim}, {st_.v_q, shape.head_dim},
+                    {st_.k_scale, shape.head_dim / 64 * 2}, {st_.v_scale, shape.head_dim / 64 * 2}};
+                for (const auto& [pool, width] : pools)
+                    for (int64_t cell = p; cell <= p + a; ++cell)
+                        for (int64_t head = 0; head < shape.n_head_kv; ++head) {
+                            const auto offset = ((cell / shape.page_size * shape.n_head_kv + head) * shape.page_size +
+                                                 cell % shape.page_size) * width;
+                            const size_t old = data.size();
+                            data.resize(old + (size_t) width);
+                            if (cudaMemcpy(data.data() + old, (const uint8_t*) pool + offset,
+                                           (size_t) width, cudaMemcpyDeviceToHost) != cudaSuccess) return false;
+                        }
+                return true;
+            };
+            std::vector<uint8_t> before, after;
+            if (!image(before)) { err = "MTP front check read failed"; return false; }
+            std::vector<int32_t> reference((size_t) max_t_);
+            max_drafts_ = 1;
+            const bool ok = draft(T, tokens, p, a, reference.data(), err);
+            max_drafts_ = 0;
+            if (!ok) return false;
+            if (!image(after) || before != after) { err = "MTP front-only KV differs from full draft"; return false; }
+            std::fprintf(stderr, "mtp front-only check OK: cells %lld..%lld, %zu bytes\n",
+                         (long long) p, (long long) (p + a), before.size());
+        }
+        for (int j = 0; j < max_t_ - 1; ++j) { drafts[j] = 0; if (probs) probs[j] = 0; }
+        if (n_drafts) *n_drafts = 0;
+        ms_draft += ms_since(start);
+        ++rounds;
+        return true;
+    }
     // #783 PR-i (stuchapin909): the round runs for the cells up to the accepted row a (T = a + 1): the K/V of the rejected
     // rows is not caught up - no later read reaches a cell past the one being drafted and the next round writes it first
     if (!mtp_catchup_all()) T = a + 1;

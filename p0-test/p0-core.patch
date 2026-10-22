@@ -1,0 +1,817 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 77a6a5e..2f0efd1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1426,6 +1426,9 @@ if(STRATA_BUILD_TESTS)
+   add_executable(draft_policy_test src/spec/draft_policy_test.cpp)
+   target_link_libraries(draft_policy_test PRIVATE strata_spec)
+   add_test(NAME draft_policy_test COMMAND draft_policy_test)
++  add_executable(mtp_budget_test src/spec/mtp_budget_test.cpp)
++  target_link_libraries(mtp_budget_test PRIVATE strata_spec)
++  add_test(NAME mtp_budget_test COMMAND mtp_budget_test)
+ endif()
+ if(STRATA_BUILD_TESTS OR STRATA_BUILD_CONVERSATION_TESTS)
+   add_executable(message_boundary_test src/program/message_boundary_test.cpp)
+diff --git a/include/strata/core/mtp.hpp b/include/strata/core/mtp.hpp
+index 7216f01..7321ed5 100644
+--- a/include/strata/core/mtp.hpp
++++ b/include/strata/core/mtp.hpp
+@@ -92,6 +92,9 @@ public:
+     /// --pipeline-windows: capture the prefill graphs and size its input records for windows of up to max_t rows now,
+     /// so a later prefill(sync = false) of a window neither captures nor allocates (both wait for the device).
+     bool prepare_prefill(std::string& err);
++    /// Capture the single-sequence budget's candidate rounds before measuring costs.
++    /// Call after bind() and set_draft_sampling(), with no window in flight.
++    bool prepare_adaptive(std::string& err);
+     /// A prompt read beside running batch windows (STRATA_PIPED_CONCURRENT): the prompt pass's graphs captured and its
+     /// input records sized for chunks of up to n rows now, with nothing in flight.  On the read's thread a capture or
+     /// a free waits for the device, whose windows wait for the main thread's doorbell service (#31).
+diff --git a/serve/test_draft_layer.py b/serve/test_draft_layer.py
+index 9869724..c081cd0 100644
+--- a/serve/test_draft_layer.py
++++ b/serve/test_draft_layer.py
+@@ -46,6 +46,16 @@ class DraftLayer(unittest.TestCase):
+         with self.assertRaises(ValueError):
+             runconfig.apply(cfg, {"mtp": "off"})
+ 
++    def test_adaptive_flag_follows_the_existing_mtp_switch(self):
++        cfg = {"args": ["--spec", "5", "--mtp", "/m/rt", "--suffix-draft", "0"],
++               "user_args": ["--mtp-adaptive"]}
++        self.assertIn("--mtp-adaptive", engine_args(cfg))
++        cfg["mtp"] = False
++        with contextlib.redirect_stdout(io.StringIO()):
++            args = engine_args(cfg)
++        self.assertNotIn("--mtp-adaptive", args)
++        self.assertNotIn("--mtp", args)
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+diff --git a/src/core/mtp.cpp b/src/core/mtp.cpp
+index c99de09..ef5b1ad 100644
+--- a/src/core/mtp.cpp
++++ b/src/core/mtp.cpp
+@@ -1552,6 +1552,16 @@ struct DraftTiming {
+ DraftTiming g_dt;
+ }  // namespace
+ 
++bool MtpDrafter::prepare_adaptive(std::string& err) {
++    const OnDevice device(device_);
++    if (!prepare_prefill(err)) return false;
++    for (int t = 1; t <= max_t_; ++t)
++        if (!capture_round(t, coupled_active_, err)) return false;
++    for (int j = 1; j < max_t_ - 1; ++j)
++        if (!capture_step(j, coupled_active_, err)) return false;
++    return true;
++}
++
+ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* drafts, std::string& err,
+                        float* probs, float min_p, int* n_drafts) {
+ #if defined(STRATA_GPU_METAL)
+@@ -1571,6 +1581,52 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t*
+     const OnDevice on_device(device_);
+     if (T < 1 || T > max_t_ || a < 0 || a >= T) { err = "mtp: draft arguments out of range"; return false; }
+     if (chain_live_) { err = "mtp: a pipelined chain is still in flight"; return false; }
++    if (max_drafts_ == 0) {
++        // A no-draft round must still append the committed pairs to the draft
++        // K/V. Otherwise resuming speculation would read holes in its prefix.
++        const Clock::time_point start = Clock::now();
++        if (!stage_source_R(a + 1, err) || !prefill(window_R_, tokens, a + 1, p, err)) return false;
++        // Diagnostic only: compare front-only writes with the original full
++        // draft on the SAME residuals, tokens and existing K/V prefix.
++        static const bool check_front = std::getenv("STRATA_MTP_FRONT_CHECK") != nullptr;
++        if (check_front) {
++            if (!st_.kv_int8 || st_.kv_q4 || st_.kv_mode != 0 || max_t_ < 2) {
++                err = "MTP front check needs resident INT8 KV and max_t >= 2";
++                return false;
++            }
++            const auto shape = shapes_of(*g_);
++            auto image = [&](std::vector<uint8_t>& data) {
++                const std::pair<const void*, int64_t> pools[] = {{st_.k_q, shape.head_dim}, {st_.v_q, shape.head_dim},
++                    {st_.k_scale, shape.head_dim / 64 * 2}, {st_.v_scale, shape.head_dim / 64 * 2}};
++                for (const auto& [pool, width] : pools)
++                    for (int64_t cell = p; cell <= p + a; ++cell)
++                        for (int64_t head = 0; head < shape.n_head_kv; ++head) {
++                            const auto offset = ((cell / shape.page_size * shape.n_head_kv + head) * shape.page_size +
++                                                 cell % shape.page_size) * width;
++                            const size_t old = data.size();
++                            data.resize(old + (size_t) width);
++                            if (cudaMemcpy(data.data() + old, (const uint8_t*) pool + offset,
++                                           (size_t) width, cudaMemcpyDeviceToHost) != cudaSuccess) return false;
++                        }
++                return true;
++            };
++            std::vector<uint8_t> before, after;
++            if (!image(before)) { err = "MTP front check read failed"; return false; }
++            std::vector<int32_t> reference((size_t) max_t_);
++            max_drafts_ = 1;
++            const bool ok = draft(T, tokens, p, a, reference.data(), err);
++            max_drafts_ = 0;
++            if (!ok) return false;
++            if (!image(after) || before != after) { err = "MTP front-only KV differs from full draft"; return false; }
++            std::fprintf(stderr, "mtp front-only check OK: cells %lld..%lld, %zu bytes\n",
++                         (long long) p, (long long) (p + a), before.size());
++        }
++        for (int j = 0; j < max_t_ - 1; ++j) { drafts[j] = 0; if (probs) probs[j] = 0; }
++        if (n_drafts) *n_drafts = 0;
++        ms_draft += ms_since(start);
++        ++rounds;
++        return true;
++    }
+     // #783 PR-i (stuchapin909): the round runs for the cells up to the accepted row a (T = a + 1): the K/V of the rejected
+     // rows is not caught up - no later read reaches a cell past the one being drafted and the next round writes it first
+     if (!mtp_catchup_all()) T = a + 1;
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index f0d27a6..40952df 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -81,6 +81,7 @@
+ #include "strata/program/draft_kv_plan.hpp"
+ #include "strata/program/message_boundary.hpp"
+ #include "strata/spec/draft_policy.hpp"
++#include "strata/spec/mtp_budget.hpp"
+ #include "strata/spec/draft_source.hpp"
+ #include "strata/spec/suffix_drafter.hpp"
+ #include "strata/program/batch_groups.hpp"
+@@ -765,6 +766,7 @@ struct Options {
+     int suffix_draft = 3;
+     /// The MTP's own window cap (0 = --spec): with --spec 6 --mtp-max-t 4 the long windows come from suffix matches.
+     int mtp_max_t = 0;
++    bool mtp_adaptive = false;
+     /// --lookup-chain K (opt-in, 0 = off): prompt lookup CHAINED after the MTP's proposal.  The suffix drafter matches
+     /// the context followed by the MTP's drafts and appends up to K of the tokens that followed that match to the same
+     /// verify window (the window grows to at most 8).  Greedy verification keeps the output; its own counts are kept.
+@@ -918,6 +920,7 @@ void usage() {
+                  "  --suffix-draft N     prompt lookup: draft from an earlier repeat of the last N+ tokens of context\n"
+                  "                       when it pays (default 3; 0 = MTP only)\n"
+                  "  --mtp-max-t M        cap the MTP's windows at M tokens (0 = --spec; longer ones come from suffixes)\n"
++                 "  --mtp-adaptive       single-request MTP: select window by measured tokens/ms; needs --suffix-draft 0\n"
+                  "  --spec N             the MTP drafter's verify window: how many tokens it proposes per check (setup\n"
+                  "                       writes 4; --suffix-draft lets it grow by 2, up to 8, where a repeat is likely)\n"
+                  "  --spec-min-p P       how sure the draft layer must be to extend a verify window by another guess\n"
+@@ -2630,6 +2633,7 @@ int main(int argc, char** argv) {
+         else if (a == "--pipeline-windows") o.pipeline_windows = std::max(0, std::min(2, std::atoi(next("--pipeline-windows"))));
+         else if (a == "--suffix-draft") o.suffix_draft = std::max(0, std::atoi(next("--suffix-draft")));
+         else if (a == "--mtp-max-t") o.mtp_max_t = std::max(0, std::atoi(next("--mtp-max-t")));
++        else if (a == "--mtp-adaptive") o.mtp_adaptive = true;
+         else if (a == "--lookup-chain") o.lookup_chain = std::clamp(std::atoi(next("--lookup-chain")), 0, 7);
+         else if (a == "--lookup-chain-min") o.lookup_chain_min = std::max(3, std::atoi(next("--lookup-chain-min")));
+         else if (a == "--mtp-hnorm") {
+@@ -3131,6 +3135,27 @@ int main(int argc, char** argv) {
+     // Prompt lookup (the suffix drafter, on by default): the MTP keeps its --spec windows and a lookup window may be
+     // up to 2 tokens longer; the draft policy (strata/spec/draft_policy.hpp) takes one only where it pays. Code
+     // edits +6-11%, ordinary text unchanged (bench/results/2026-09-27-spec). --suffix-draft 0 turns it off.
++    if (o.mtp_adaptive && [] {
++        const char* v = std::getenv("STRATA_SPEC_PROB");
++        return v != nullptr && std::atoi(v) != 0;
++    }()) {
++        std::fprintf(stderr, "strata: --mtp-adaptive uses exact-match verification; STRATA_SPEC_PROB is not supported\n");
++        return 2;
++    }
++#if defined(STRATA_GPU_METAL)
++    if (o.mtp_adaptive) {
++        std::fprintf(stderr, "strata: --mtp-adaptive currently needs the CUDA/HIP engine\n");
++        return 2;
++    }
++#endif
++    if (o.mtp_adaptive && (o.mtp.empty() || o.spec < 2 || o.spec > 8 || o.batch != 0 ||
++        !o.layer_split.empty() || o.peer_device >= 0 || o.pipeline_windows >= 2 ||
++        o.suffix_draft != 0 || o.lookup_chain != 0 || o.spec_min_p != 0 ||
++        o.expert_cache_remote[0] > 0 || o.expert_cache_remote[1] > 0 || o.expert_cache_remote[2] > 0)) {
++        std::fprintf(stderr, "strata: --mtp-adaptive needs single-GPU --mtp, --spec 2..8, --suffix-draft 0, "
++                             "no lookup chain, batch, pipeline or spec-min-p override\n");
++        return 2;
++    }
+     if (o.suffix_draft > 0 && o.spec >= 2 && o.mtp_max_t == 0) {
+         o.mtp_max_t = o.spec;
+         o.spec = std::min(o.spec + 2, 8);   // kVerifyMaxT
+@@ -10940,6 +10965,7 @@ int main(int argc, char** argv) {
+         int64_t rounds = 0;
+         const int S = o.spec;
+         const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, S) : S;   // the MTP's windows; suffixes go up to S
++        strata::spec::MtpBudget mtp_budget(S_mtp);   // online costs/acceptance persist across serial requests
+         if (use_mtp && S_mtp < S) mtp.set_max_drafts(S_mtp - 1);
+         // --pipeline-windows 2 loads the drafter with 8 rows: the serial loop's chain keeps its own length
+         else if (use_mtp && mtp.max_t() > S_mtp) mtp.set_max_drafts(S_mtp - 1);
+@@ -12125,6 +12151,11 @@ int main(int argc, char** argv) {
+                     // unknown keys are skipped: the ids start at the first token without '='
+                 }
+             }
++            if (o.mtp_adaptive && req_spec_min_p != 0) {
++                std::printf("ERR --mtp-adaptive does not accept a spec_min_p override\n");
++                std::fflush(stdout);
++                continue;
++            }
+             strata::prefill::Prefill::set_pipe_request(req_pipe);   // every request sets it: none carries over
+             std::vector<float> req_bias;
+             std::string bias_error;
+@@ -13929,6 +13960,9 @@ int main(int argc, char** argv) {
+                 extra_sources_reset();
+                 for (int64_t t : ids) { const int32_t t32 = (int32_t) t; extra_sources_append(&t32, 1); }
+             }
++            if (o.mtp_adaptive) mtp_budget.begin_request();
++            int mtp_planned_t = 1;
++            double mtp_prepared_ms = 0;
+             bool first_window = true;
+             int64_t produced_n = 0, sfx_windows = 0, sfx_drafts = 0, sfx_ok = 0;
+             int64_t chain_windows = 0, chain_drafts = 0, chain_ok = 0;   // --lookup-chain's own counts
+@@ -13943,6 +13977,10 @@ int main(int argc, char** argv) {
+             consumed.reserve((size_t) (n + max_new + S));
+             for (int64_t i = 0; i < p; ++i) consumed.push_back((int32_t) ids[(size_t) i]);
+             const char* finish = "length";
++            if (o.mtp_adaptive && (!ver.capture_all(err) || !mtp.prepare_adaptive(err))) {
++                std::printf("ERR preparing MTP budget graphs: %s\n", err.c_str());
++                return 1;
++            }
+             const Clock::time_point d0 = Clock::now();
+             // STRATA_DECODE_TIMING=1: where a request's decode time goes (one line per request)
+             static const bool dec_timing = std::getenv("STRATA_DECODE_TIMING") != nullptr;
+@@ -14626,7 +14664,7 @@ int main(int argc, char** argv) {
+                 }
+             }
+             while (!pl_ran && !cancelled && produced_n < max_new) {
+-                int T = use_mtp ? S_mtp : 1;   // no --mtp: one token a round unless a lookup draft fires
++                int T = use_mtp ? (o.mtp_adaptive ? mtp_planned_t : S_mtp) : 1;
+                 if (use_mtp && req_spec_min_p > 0.0) {
+                     T = 1;
+                     while (T < S_mtp && dprob[(size_t) T - 1] >= (float) req_spec_min_p) ++T;
+@@ -14909,12 +14947,23 @@ int main(int argc, char** argv) {
+                 // commit, outv[a] is its row 0) - the drafts extend it on the device as the verify rows will
+                 if (use_mtp && hist_n > 0 && mtp.coupled() && !eos && produced_n < max_new)
+                     mtp.set_draft_history(consumed.data(), (int64_t) consumed.size(), outv[(size_t) a]);
++                if (o.mtp_adaptive) {
++                    if (timed_round && !eos)
++                        mtp_budget.observe(T, a, std::chrono::duration<double, std::milli>(tw2 - round0).count(),
++                                           mtp_prepared_ms);
++                    if (!eos && produced_n < max_new) {
++                        const int cap = (int) std::min<int64_t>({S_mtp, max_new - produced_n, o.max_context - (p + a + 1)});
++                        mtp_planned_t = mtp_budget.choose(std::max(1, cap));
++                        mtp.set_max_drafts(mtp_planned_t - 1);
++                    }
++                }
+                 const bool drafted = !use_mtp || eos || produced_n >= max_new ||
+                                      mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p);
+                 {
+                     const Clock::time_point tw3 = Clock::now();
+                     auto msd = [](Clock::time_point a0, Clock::time_point b0) { return std::chrono::duration<double, std::milli>(b0 - a0).count(); };
+                     dt_run += msd(tw0, tw1); dt_commit += msd(tw1, tw2); dt_draft += msd(tw2, tw3);
++                    if (o.mtp_adaptive) mtp_prepared_ms = msd(tw2, tw3);
+                     ++dec_windows; dec_T += merged ? 1 : T;   // a merged window's prompt rows are not decode rows
+                 }
+                 pcie_auto_step(req_pcie_frac);   // the default share, refined from the CPU pool's speed (PcieAuto); a request's own share is left alone
+@@ -14943,6 +14992,7 @@ int main(int argc, char** argv) {
+                 p += a + 1;
+             }
+             const double decode_ms = std::chrono::duration<double, std::milli>(Clock::now() - d0).count();
++            if (o.mtp_adaptive) std::fprintf(stderr, "%s\n", mtp_budget.report().c_str());
+             // the last commit (set_commit_async): the session is complete before anything reads or copies it
+             if (!ver.wait_commit(err)) {
+                 std::printf("ERR %s\n", err.c_str());
+@@ -16086,6 +16136,10 @@ int main(int argc, char** argv) {
+             ms_adapt += std::chrono::duration<double, std::milli>(Clock::now() - ta).count();
+             return true;
+         };
++        if (o.mtp_adaptive && (!ver.capture_all(err) || !mtp.prepare_adaptive(err))) {
++            std::fprintf(stderr, "strata: preparing MTP budget graphs: %s\n", err.c_str());
++            return 1;
++        }
+         int64_t p = spec_pos;
+         int32_t x = (int32_t) tok;
+         std::vector<int32_t> drafts((size_t) o.spec, 0);
+@@ -16094,6 +16148,13 @@ int main(int argc, char** argv) {
+         // plan v0.3 P6: with a native pack the first window is the last prompt token alone (it produces the first
+         // generated token and the MTP's first cell); otherwise the token loop already did that.
+         bool first_window = native_pack;
++        const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, o.spec) : o.spec;
++        strata::spec::MtpBudget mtp_budget(S_mtp);
++        if (o.mtp_adaptive) mtp_budget.begin_request();
++        int mtp_planned_t = 1;
++        double mtp_prepared_ms = 0;
++        if (o.mtp_adaptive) mtp.set_max_drafts(0);
++        const auto initial_draft_start = Clock::now();
+         if (use_mtp && !first_window &&
+             !mtp.draft_first(o.spec, ss.R, x, p - 1, drafts.data(), err, dprob.data(), (float) o.spec_min_p)) {
+             std::fprintf(stderr, "strata generate: %s\n", err.c_str());
+@@ -16109,8 +16170,9 @@ int main(int argc, char** argv) {
+         std::vector<float> hash_rows;
+         std::vector<int64_t> accepted_hist((size_t) o.spec, 0);
+         int64_t rounds = 0, drafts_total = 0, drafts_ok = 0, corrupt_counter = 0;
+-        const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, o.spec) : o.spec;
+-        if (use_mtp && S_mtp < o.spec) mtp.set_max_drafts(S_mtp - 1);
++        if (o.mtp_adaptive && !first_window)
++            mtp_prepared_ms = std::chrono::duration<double, std::milli>(Clock::now() - initial_draft_start).count();
++        if (!o.mtp_adaptive && use_mtp && S_mtp < o.spec) mtp.set_max_drafts(S_mtp - 1);
+         strata::spec::SuffixDrafter sfx(std::max(1, o.suffix_draft), 64, (size_t) o.max_context + 4096);
+         strata::spec::DraftPolicy policy(o.spec);   // MTP or lookup window (see draft_policy.hpp)
+         std::vector<int32_t> sbuf((size_t) o.spec, 0);
+@@ -16132,7 +16194,7 @@ int main(int argc, char** argv) {
+         const int64_t misses0 = drive.d.multi_misses, entries0 = drive.d.multi_entries;
+         while ((int64_t) produced.size() < max_new) {
+             const Clock::time_point t0 = Clock::now();
+-            int T = S_mtp;
++            int T = o.mtp_adaptive ? mtp_planned_t : S_mtp;
+             if (use_mtp && o.spec_min_p > 0.0) {
+                 T = 1;
+                 while (T < S_mtp && dprob[(size_t) T - 1] >= (float) o.spec_min_p) ++T;
+@@ -16262,13 +16324,24 @@ int main(int argc, char** argv) {
+                 eos = o.stop_eos && std::find(o.eos_ids.begin(), o.eos_ids.end(), (int64_t) outv[(size_t) i]) != o.eos_ids.end();
+                 if (!follow.empty()) { follow_differ += fdiff[(size_t) i]; ++follow_emitted; }
+             }
++            if (o.mtp_adaptive && timed_round && !eos)
++                mtp_budget.observe(T, a, std::chrono::duration<double, std::milli>(Clock::now() - t0).count(),
++                                   mtp_prepared_ms);
+             if (eos) {
+                 if (adapt_thr.joinable()) adapt_thr.join();
+                 total_ms += std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
+                 break;
+             }
++            if (o.mtp_adaptive && (int64_t) produced.size() < max_new) {
++                const int cap = (int) std::min<int64_t>({S_mtp, max_new - (int64_t) produced.size(), o.max_context - (p + a + 1)});
++                mtp_planned_t = mtp_budget.choose(std::max(1, cap));
++                mtp.set_max_drafts(mtp_planned_t - 1);
++            }
++            const auto draft_start = Clock::now();
+             const bool drafted = !use_mtp || (int64_t) produced.size() >= max_new ||
+                                  mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) o.spec_min_p);
++            if (o.mtp_adaptive)
++                mtp_prepared_ms = std::chrono::duration<double, std::milli>(Clock::now() - draft_start).count();
+             if (adapt_thr.joinable()) adapt_thr.join();
+             if (!adapt_ok) return 1;
+             if (!drafted) {
+@@ -16291,6 +16364,7 @@ int main(int argc, char** argv) {
+             return 1;
+         }
+         if (hashes != nullptr) std::fclose(hashes);
++        if (o.mtp_adaptive) std::fprintf(stderr, "%s\n", mtp_budget.report().c_str());
+         std::printf("%-24s %lld rounds of %d, drafts accepted %lld of %lld (%.3f), %.2f tokens per round\n",
+                     "speculation", (long long) rounds, o.spec, (long long) drafts_ok, (long long) drafts_total,
+                     drafts_total > 0 ? (double) drafts_ok / (double) drafts_total : 0.0,
+diff --git a/strata_control/draft_layer.py b/strata_control/draft_layer.py
+index f96866e..3360c6f 100644
+--- a/strata_control/draft_layer.py
++++ b/strata_control/draft_layer.py
+@@ -23,7 +23,7 @@ from __future__ import annotations
+ from typing import Any
+ 
+ #: engine options that exist only because of the draft layer: flag -> takes a value
+-MTP_FLAGS = {"--mtp": True, "--spec-min-p": True, "--batch-mtp": False}
++MTP_FLAGS = {"--mtp": True, "--spec-min-p": True, "--batch-mtp": False, "--mtp-adaptive": False}
+ 
+ 
+ def is_off(cfg: dict[str, Any] | None) -> bool:
+diff --git a/tools/autoround_pack.py b/tools/autoround_pack.py
+index 73445ce..ee1eedc 100644
+--- a/tools/autoround_pack.py
++++ b/tools/autoround_pack.py
+@@ -19,6 +19,8 @@ import re
+ import subprocess
+ import sys
+ import time
++import shutil
++import tempfile
+ 
+ import numpy as np
+ 
+@@ -274,6 +276,100 @@ def verify(ck, count):
+     return out
+ 
+ 
++def extract_bf16_mtp(ck, folder):
++    """Losslessly fuse local per-expert BF16 tensors into mtp_pack's input ABI."""
++    folder = Path(folder)
++    folder.mkdir(parents=True, exist_ok=True)
++    manifest = []
++    prefix = "mtp.layers.0.mlp.experts."
++    experts = {f"{prefix}{e}.{role}_proj.weight"
++               for e in range(ck.experts) for role in ("gate", "up", "down")}
++    actual = {k for k in ck.meta if k.startswith("mtp.") and ".experts." in k}
++    if actual != experts:
++        raise ValueError("MTP must contain one complete layer of separate BF16 experts")
++    dense = sorted(k for k in ck.meta if k.startswith("mtp.") and ".experts." not in k)
++    if not dense or any(ck.dtype(k) != "BF16" for k in dense + sorted(experts)):
++        raise ValueError("local MTP tensors must all be BF16")
++    for name in dense:
++        blob = ck.raw(name).tobytes()
++        filename = name + ".bin"
++        (folder / filename).write_bytes(blob)
++        manifest.append({"name": name, "dtype": "BF16", "shape": ck.shape(name),
++                         "file": filename, "sha256": hashlib.sha256(blob).hexdigest()})
++    for suffix, roles in (("gate_up_proj", ("gate", "up")), ("down_proj", ("down",))):
++        name = prefix + suffix
++        filename = name + ".bin"
++        digest = hashlib.sha256()
++        rows, cols = (2 * ck.n_ff, ck.n_embd) if suffix == "gate_up_proj" else (ck.n_embd, ck.n_ff)
++        with (folder / filename).open("wb") as f:
++            for e in range(ck.experts):
++                for role in roles:
++                    key = f"{prefix}{e}.{role}_proj.weight"
++                    expected = [ck.n_embd, ck.n_ff] if role == "down" else [ck.n_ff, ck.n_embd]
++                    if ck.shape(key) != expected:
++                        raise ValueError("unexpected MTP shape: " + key)
++                    blob = ck.raw(key).tobytes()
++                    if len(blob) != expected[0] * expected[1] * 2:
++                        raise ValueError("truncated BF16 MTP tensor: " + key)
++                    f.write(blob)
++                    digest.update(blob)
++        manifest.append({"name": name, "dtype": "BF16", "shape": [ck.experts, rows, cols],
++                         "file": filename, "sha256": digest.hexdigest()})
++        print("MTP fused:", name, [ck.experts, rows, cols], flush=True)
++    (folder / "mtp-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
++    return manifest
++
++
++def check_mtp(ck, out):
++    directory = out / "mtp"
++    if not (directory / "ready.json").is_file():
++        raise ValueError("MTP cache missing; run autoround_pack.py mtp with the same --model and --out first")
++    ready = json.loads((directory / "ready.json").read_text())
++    if ready.get("recipe") != 1 or ready.get("source") != ck.inventory():
++        raise ValueError("MTP cache does not match the checkpoint or preparation recipe")
++    if set(ready.get("files", {})) != {"experts.bin", "dense.bin", "dense.txt", "draft_vocab.bin"}:
++        raise ValueError("incomplete MTP runtime manifest")
++    for name, info in ready["files"].items():
++        st = (directory / name).stat()
++        if st.st_size != info["bytes"] or st.st_mtime_ns != info["mtime_ns"]:
++            raise ValueError("MTP runtime file changed: " + name)
++    return directory
++
++
++def prepare_mtp(ck, out):
++    if (ck.n_embd, ck.n_ff, ck.experts) != (2560, 640, 512):
++        raise ValueError("the current MTP runtime requires hidden=2560, FF=640, experts=512")
++    if (out / "mtp").exists():
++        check_mtp(ck, out)
++        return
++    identity = ck.inventory()
++    with tempfile.TemporaryDirectory(prefix=".mtp-", dir=out) as temporary:
++        stage = Path(temporary)
++        manifest = extract_bf16_mtp(ck, stage / "src")
++        gguf = stage / "mtp-q2_0.gguf"
++        subprocess.run([sys.executable, str(HERE / "mtp_pack.py"), "--src", str(stage / "src"),
++                        "--experts", "q2_0", "--out", str(gguf)], check=True)
++        runtime = stage / "rt"
++        subprocess.run([sys.executable, str(HERE / "mtp_rt.py"), "--gguf", str(gguf),
++                        "--out", str(runtime)], check=True)
++        shutil.copy2(HERE.parent / "data" / "draft_vocab.bin", runtime / "draft_vocab.bin")
++        shutil.copy2(stage / "src" / "mtp-manifest.json", runtime / "source-tensors.json")
++        shutil.copy2(str(gguf) + ".report.json", runtime / "quantization-report.json")
++        if ck.inventory() != identity:
++            raise ValueError("checkpoint changed while preparing MTP")
++        files = {}
++        for name in ("experts.bin", "dense.bin", "dense.txt", "draft_vocab.bin"):
++            path = runtime / name
++            st = path.stat()
++            files[name] = {"bytes": st.st_size, "mtime_ns": st.st_mtime_ns,
++                           "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
++        (runtime / "ready.json").write_text(json.dumps({"recipe": 1, "source": identity,
++            "draft_experts": "q2_0", "draft_projections": "q8_0", "source_tensors": len(manifest),
++            "main_weights_modified": False, "files": files}, indent=2) + "\n")
++        runtime.rename(out / "mtp")
++    print("Prepared independent MTP cache:", out / "mtp", flush=True)
++
++
+ def run_model(ck, out, a):
+     (out / "generation.json").unlink(missing_ok=True)
+     from transformers import AutoTokenizer
+@@ -304,6 +400,13 @@ def run_model(ck, out, a):
+            "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",
+            "--kv", "int8", "--suffix-draft", "0", "--adapt-every", "0",
+            "--ple-io", "direct", "--ple-row-cache", "65536"]
++    if a.mtp_mode != "off":
++        runtime = check_mtp(ck, out)
++        cmd[cmd.index("--spec") + 1] = str(a.mtp_max_t)
++        cmd[cmd.index("--mtp-max-t") + 1] = str(a.mtp_max_t)
++        cmd += ["--mtp", str(runtime)]
++        if a.mtp_mode == "adaptive":
++            cmd += ["--mtp-adaptive"]
+     (out / "run-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
+     print("Starting AutoRound model;", len(ids), "prompt tokens", flush=True)
+     with (out / "engine.stderr.log").open("w") as stderr:
+@@ -325,6 +428,12 @@ def run_model(ck, out, a):
+     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
+               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode,
+               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
++    if a.mtp_mode != "off":
++        report.update(mtp_mode=a.mtp_mode, mtp_max_t=a.mtp_max_t)
++    budget = re.search(r"^mtp budget:.*$", errors, re.MULTILINE)
++    if budget:
++        report["mtp_budget"] = budget.group(0)
++        print(budget.group(0), flush=True)
+     completed = out / "generation.json.tmp"
+     completed.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+     completed.replace(out / "generation.json")
+@@ -334,7 +443,7 @@ def run_model(ck, out, a):
+ 
+ def main():
+     ap = argparse.ArgumentParser(description=__doc__)
+-    ap.add_argument("command", choices=["verify", "convert", "ple", "pack", "prepare", "run"])
++    ap.add_argument("command", choices=["verify", "convert", "ple", "pack", "mtp", "prepare", "run"])
+     ap.add_argument("--model", required=True)
+     ap.add_argument("--out", required=True)
+     ap.add_argument("--llama", default=str(HERE.parent / "third_party" / "llama.cpp"))
+@@ -345,11 +454,15 @@ def main():
+     ap.add_argument("--max-new", type=int, default=32)
+     ap.add_argument("--context", type=int, default=512)
+     ap.add_argument("--pool-workers", type=int, default=12)
++    ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="off")
++    ap.add_argument("--mtp-max-t", type=int, default=5, help="verification cap, including the real token (2..8)")
+     a = ap.parse_args()
+     if not 1 <= a.workers <= 16 or a.verify_experts < 1:
+         ap.error("workers must be 1..16 and verify-experts positive")
+     if a.max_new < 1 or a.context < 1 or a.pool_workers < 1:
+         ap.error("max-new, context and pool-workers must be positive")
++    if not 2 <= a.mtp_max_t <= 8:
++        ap.error("mtp-max-t must be 2..8")
+     converter_path(a.llama)
+     ck = AutoRoundCheckpoint(Path(a.model).resolve())
+     out = Path(a.out).resolve()
+@@ -375,6 +488,8 @@ def main():
+         (out / "dense.done").write_text("BF16/F32 projections; experts and PLE excluded\n")
+     if a.command in ("pack", "prepare"):
+         pack_experts(ck, out / "dense.gguf", out / "pack", a.workers)
++    if a.command == "mtp" or (a.command == "prepare" and a.mtp_mode != "off"):
++        prepare_mtp(ck, out)
+     print("AutoRound importer completed:", a.command, out, flush=True)
+     return 0
+ 
+diff --git a/tools/test_autoround_pack.py b/tools/test_autoround_pack.py
+index bc8392e..dc76fa4 100644
+--- a/tools/test_autoround_pack.py
++++ b/tools/test_autoround_pack.py
+@@ -3,9 +3,11 @@ import sys
+ import unittest
+ from pathlib import Path
+ import numpy as np
++import hashlib
++import tempfile
+ 
+ sys.path.insert(0, str(Path(__file__).resolve().parent))
+-from autoround_pack import q4_0_reblock, decode_gptq_reference, decode_q4_0_reference
++from autoround_pack import q4_0_reblock, decode_gptq_reference, decode_q4_0_reference, extract_bf16_mtp
+ 
+ 
+ class AutoRoundPackingTests(unittest.TestCase):
+@@ -47,5 +49,52 @@ class AutoRoundPackingTests(unittest.TestCase):
+             q4_0_reblock(w.astype(np.int16), z, s)
+ 
+ 
++class LocalMtpTests(unittest.TestCase):
++    def fixture(self):
++        class Checkpoint:
++            experts, n_embd, n_ff = 3, 64, 32
++            meta = {}
++            def dtype(self, name): return 'BF16'
++            def shape(self, name): return list(self.meta[name].shape)
++            def raw(self, name): return self.meta[name].view(np.uint8).reshape(-1)
++        ck = Checkpoint()
++        ck.meta = {'mtp.pre_fc_norm_embedding.weight': np.arange(64, dtype=np.uint16)}
++        for e in range(3):
++            for i, role in enumerate(('gate', 'up', 'down')):
++                shape = (64, 32) if role == 'down' else (32, 64)
++                ck.meta[f'mtp.layers.0.mlp.experts.{e}.{role}_proj.weight'] = np.full(shape, e * 10 + i, np.uint16)
++        return ck
++
++    def test_exact_expert_fusion(self):
++        ck = self.fixture()
++        with tempfile.TemporaryDirectory() as directory:
++            rows = extract_bf16_mtp(ck, Path(directory))
++            self.assertEqual(len(rows), 3)
++            for record in rows:
++                data = (Path(directory) / record['file']).read_bytes()
++                self.assertEqual(hashlib.sha256(data).hexdigest(), record['sha256'])
++                if record['name'].endswith('gate_up_proj'):
++                    actual = np.frombuffer(data, '<u2').reshape(3, 64, 64)
++                    for e in range(3):
++                        np.testing.assert_array_equal(actual[e, :32], ck.meta[f'mtp.layers.0.mlp.experts.{e}.gate_proj.weight'])
++                        np.testing.assert_array_equal(actual[e, 32:], ck.meta[f'mtp.layers.0.mlp.experts.{e}.up_proj.weight'])
++                elif record['name'].endswith('down_proj'):
++                    actual = np.frombuffer(data, '<u2').reshape(3, 64, 32)
++                    for e in range(3):
++                        np.testing.assert_array_equal(actual[e], ck.meta[f'mtp.layers.0.mlp.experts.{e}.down_proj.weight'])
++
++    def test_missing_or_wrong_shape_rejected(self):
++        ck = self.fixture()
++        del ck.meta['mtp.layers.0.mlp.experts.2.down_proj.weight']
++        with tempfile.TemporaryDirectory() as directory:
++            with self.assertRaisesRegex(ValueError, 'complete layer'):
++                extract_bf16_mtp(ck, Path(directory))
++        ck = self.fixture()
++        ck.meta['mtp.layers.0.mlp.experts.1.up_proj.weight'] = np.zeros((64, 32), np.uint16)
++        with tempfile.TemporaryDirectory() as directory:
++            with self.assertRaisesRegex(ValueError, 'unexpected MTP shape'):
++                extract_bf16_mtp(ck, Path(directory))
++
++
+ if __name__ == '__main__':
+     unittest.main()
+diff --git a/include/strata/spec/mtp_budget.hpp b/include/strata/spec/mtp_budget.hpp
+new file mode 100644
+index 0000000..7633e5c
+--- /dev/null
++++ b/include/strata/spec/mtp_budget.hpp
+@@ -0,0 +1,131 @@
++#pragma once
++
++#include <algorithm>
++#include <array>
++#include <cmath>
++#include <sstream>
++#include <stdexcept>
++#include <string>
++
++namespace strata::spec {
++
++// DeepInfer-style acceptance/latency selection for one sequence, using observed
++// acceptance rather than a model-specific confidence head.
++// Decisions use COMPLETED rounds only:
++// no current draft token or its confidence can influence its own verification.
++// An observed cost pairs a window's verifier/commit with the draft that BUILT
++// that window, not the possibly different draft length prepared afterwards.
++class MtpBudget {
++public:
++    static constexpr int kMaxT = 8;
++    explicit MtpBudget(int cap) : cap_(std::clamp(cap, 1, kMaxT)) {}
++
++    void begin_request() {
++        // Keep the hardware cost curve, but do not price a new language/task
++        // solely from the previous request's acceptance distribution.
++        for (int j = 1; j <= cap_; ++j) {
++            prefix_ok_[j] *= .1;
++            prefix_n_[j] *= .1;
++            auto& s = sizes_[j];
++            if (s.samples > 0) {
++                const double prior = cost_ms(j);
++                s.cost.fill(0);
++                s.cost[0] = prior;
++                s.samples = 1;
++                s.next = 1;
++            }
++        }
++        request_seen_.fill(false);
++        request_trials_.fill(0);
++        request_probes_ = true;
++    }
++
++    int choose(int cap) const {
++        cap = std::clamp(cap, 1, cap_);
++        // Measure each size; its first observation may include graph capture.
++        int probe = 0;
++        for (int t = 1; t <= cap; ++t)
++            if (sizes_[t].samples < 3 && (!probe || sizes_[t].samples < sizes_[probe].samples ||
++                (sizes_[t].samples == sizes_[probe].samples && request_trials_[t] < request_trials_[probe]))) probe = t;
++        if (probe) return probe;
++        if (request_probes_)
++            for (int t = 2; t <= cap; ++t)
++                if (!request_seen_[t]) return t;
++        for (int t = 1; t <= cap; ++t)
++            if (rounds_ - sizes_[t].last > 128) return t;
++        int best = 1;
++        double score = expected_tokens(1) / cost_ms(1);
++        for (int t = 2; t <= cap; ++t) {
++            // A few unlucky probes must not permanently price out a profitable
++            // size. The bounded optimism decays with this request's trials;
++            // it affects exploration, never the reported empirical expectation.
++            const double bonus = request_probes_ ? .35 * (t - 1) / std::sqrt(std::max(1, request_trials_[t])) : 0;
++            const double value = std::min<double>(t, expected_tokens(t) + bonus) / cost_ms(t);
++            if (value > score * 1.03) { best = t; score = value; }
++        }
++        return best;
++    }
++
++    void observe(int t, int accepted, double verify_ms, double draft_ms) {
++        if (t < 1 || t > cap_ || accepted < 0 || accepted >= t ||
++            !std::isfinite(verify_ms) || !std::isfinite(draft_ms) ||
++            !std::isfinite(verify_ms + draft_ms) || verify_ms <= 0 || draft_ms < 0)
++            throw std::invalid_argument("invalid MTP budget observation");
++        auto& s = sizes_[t];
++        request_seen_[t] = true;
++        ++request_trials_[t];
++        if (s.observations++ > 0) {
++            s.cost[s.next] = verify_ms + draft_ms;
++            s.next = (s.next + 1) % int(s.cost.size());
++            s.samples = std::min(s.samples + 1, int(s.cost.size()));
++        }
++        s.last = ++rounds_;
++        for (int j = 1; j < t; ++j) {
++            prefix_ok_[j] = .95 * prefix_ok_[j] + (accepted >= j ? 1.0 : 0.0);
++            prefix_n_[j] = .95 * prefix_n_[j] + 1.0;
++        }
++    }
++
++    double cost_ms(int t) const {
++        auto sorted = sizes_.at(t).cost;
++        const int n = sizes_.at(t).samples;
++        if (!n) return 0;
++        std::sort(sorted.begin(), sorted.begin() + n);
++        return n % 2 ? sorted[n / 2] : .5 * (sorted[n / 2 - 1] + sorted[n / 2]);
++    }
++
++    double expected_tokens(int t) const {
++        double tokens = 1, previous = 1;
++        for (int j = 1; j < t; ++j) {
++            const double rate = prefix_n_[j] > 0 ? prefix_ok_[j] / prefix_n_[j] : 0;
++            previous = std::min(previous, rate);
++            tokens += previous;
++        }
++        return tokens;
++    }
++
++    std::string report() const {
++        std::ostringstream out;
++        out << "mtp budget: " << rounds_ << " observations;";
++        for (int t = 1; t <= cap_; ++t)
++            out << " T" << t << '=' << sizes_[t].observations << "@" << cost_ms(t)
++                << "ms/" << expected_tokens(t) << "tok";
++        return out.str();
++    }
++
++private:
++    struct Size {
++        std::array<double, 9> cost{};
++        int samples = 0, next = 0;
++        long long observations = 0, last = 0;
++    };
++    int cap_;
++    long long rounds_ = 0;
++    std::array<Size, kMaxT + 1> sizes_{};
++    std::array<double, kMaxT + 1> prefix_ok_{}, prefix_n_{};
++    std::array<bool, kMaxT + 1> request_seen_{};
++    std::array<int, kMaxT + 1> request_trials_{};
++    bool request_probes_ = false;
++};
++
++} // namespace strata::spec
+diff --git a/src/spec/mtp_budget_test.cpp b/src/spec/mtp_budget_test.cpp
+new file mode 100644
+index 0000000..22be56e
+--- /dev/null
++++ b/src/spec/mtp_budget_test.cpp
+@@ -0,0 +1,68 @@
++#include "strata/spec/mtp_budget.hpp"
++#include <cstdio>
++#include <limits>
++#include <stdexcept>
++
++using strata::spec::MtpBudget;
++static void check(bool ok, const char* what) {
++    if (!ok) throw std::runtime_error(what);
++}
++int main() {
++    try {
++        MtpBudget fast(5), rejected(5), interior(5);
++        for (int t = 1; t <= 5; ++t) for (int r = 0; r < 12; ++r) {
++            fast.observe(t, t - 1, 9 + t, .2 * (t - 1));
++            rejected.observe(t, 0, 9 + t, 2 * (t - 1));
++            interior.observe(t, t - 1, t <= 2 ? 10 + t : 100 * t, 0);
++        }
++        check(fast.choose(5) == 5, "cheap, accepted drafts should use the full window");
++        check(rejected.choose(5) == 1, "rejected drafts must fall back to one real token");
++        check(interior.choose(5) == 2, "expensive longer windows should select an interior optimum");
++        MtpBudget expensive_draft(3);
++        for (int t = 1; t <= 3; ++t) for (int r = 0; r < 8; ++r)
++            expensive_draft.observe(t, t - 1, 10, 100 * (t - 1));
++        check(expensive_draft.choose(3) == 1, "include draft generation, not only verifier time");
++        check(fast.choose(2) == 2 && fast.choose(1) == 1, "respect output/context tail caps");
++        MtpBudget cold(4);
++        int seen[5] = {};
++        for (int i = 0; i < 16; ++i) {
++            int t = cold.choose(4); ++seen[t];
++            cold.observe(t, t - 1, i == 0 ? 1e6 : 10 + t, 0);
++        }
++        for (int t = 1; t <= 4; ++t) check(seen[t] == 4, "every size needs measured warmup");
++        check(cold.cost_ms(1) == 11, "discard first capture cost");
++        bool probed = false;
++        for (int i = 0; i < 160; ++i) {
++            const int t = rejected.choose(5);
++            probed |= t > 1;
++            rejected.observe(t, 0, 9 + t, 2 * (t - 1));
++        }
++        check(probed, "remeasure stale sizes after workload changes");
++        MtpBudget bad_request = rejected;
++        bad_request.begin_request();
++        for (int i = 0; i < 10; ++i) {
++            const int t = bad_request.choose(5);
++            bad_request.observe(t, 0, 9 + t, 2 * (t - 1));
++        }
++        check(bad_request.choose(5) == 1, "exploration also falls back after a new rejected task");
++        rejected.begin_request();
++        int fresh[6] = {};
++        for (int i = 0; i < 10; ++i) {
++            const int t = rejected.choose(5);
++            ++fresh[t];
++            rejected.observe(t, t - 1, 9 + t, 0);
++        }
++        for (int t = 1; t <= 5; ++t)
++            check(fresh[t] == 2, "new request refreshes each size from the retained cost prior");
++        check(rejected.expected_tokens(2) > 1.5, "new request acceptance overrides the previous rejected task");
++        bool threw = false;
++        try { cold.observe(2, 2, 10, 0); } catch (const std::invalid_argument&) { threw = true; }
++        check(threw, "reject impossible acceptance counts");
++        threw = false;
++        try { cold.observe(1, 0, std::numeric_limits<double>::quiet_NaN(), 0); }
++        catch (const std::invalid_argument&) { threw = true; }
++        check(threw, "reject nonfinite runtime samples");
++        std::puts("mtp_budget_test PASS: fallback, optimum, warmup, tail, drift, invalid input");
++        return 0;
++    } catch (const std::exception& e) { std::fprintf(stderr, "%s\n", e.what()); return 1; }
++}

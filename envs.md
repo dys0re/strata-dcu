@@ -94,7 +94,7 @@ PY
 | `/root/group_data` | 平台团队共享数据目录 |
 | `/root/public_data` | 平台公共共享数据目录，平台说明为只读 |
 
-持久化数据优先放入 `/root/private_data`。NFS 显示的 PB 级容量是共享存储容量，不等于个人账号配额；本次未核实账号存储配额。
+模型、转换缓存等大文件必须放入 `/root/private_data`。平台保存环境时要求镜像层不超过 15GB；`df` 显示的底层剩余空间不代表镜像层配额。NFS 显示的 PB 级容量是共享存储容量，不等于个人账号配额；本次未核实账号存储配额。
 
 ## 对外联网
 
@@ -211,7 +211,8 @@ os.environ["HF_ENDPOINT"] = "https://alpha.hf-mirror.com"
 /root/strata-dcu/Strata/                  修改后的源码
 /root/strata-dcu/llama.cpp/               固定提交的转换/量化依赖
 /root/strata-dcu/build-gfx936/strata      已编译的引擎
-/root/strata-dcu/autoround/              约 82GiB、可重建的运行缓存
+/root/private_data/strata-dcu/autoround/ 持久化运行缓存，含 MTP 约 83GiB
+/root/strata-dcu/autoround/              指向上述持久化目录的软链接
 /root/strata-dcu/autoround/dense.gguf    约 9.9GB 的非专家权重
 /root/strata-dcu/autoround/pack/         专家、索引、tokenizer 等
 /root/strata-dcu/autoround/ple.gguf      引用原始 PLE 的小描述文件
@@ -237,11 +238,13 @@ source /opt/hyhal/env.sh
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4
 python3 /root/strata-dcu/Strata/tools/autoround_pack.py prepare \
   --model /root/private_data/Qwen3.8-F \
-  --out /root/strata-dcu/autoround \
+  --out /root/private_data/strata-dcu/autoround \
   --llama /root/strata-dcu/llama.cpp --workers 4
 ~~~
 
-准备过程会记录源文件大小、修改时间和配置/索引哈希；源清单改变时拒绝复用缓存。专家打包使用临时文件并按层记录进度，成功后发布完成标记。缓存位于容器系统盘，源模型位于个人存储。
+准备过程会记录源文件大小、修改时间和配置/索引哈希；源清单改变时拒绝复用缓存。专家打包使用临时文件并按层记录进度，成功后发布完成标记。运行缓存及源模型均位于个人持久化存储；启动脚本仍可通过原缓存路径的软链接访问。
+
+2026-10-22 修正了此前将缓存放在系统盘的问题：迁移 28 个文件、88,593,893,750 字节，完整 rsync 内容校验通过后删除系统盘副本。迁移后 `/root/strata-dcu` 为 939MiB，`/root` 的本地文件占用为 998MiB（均不跟随持久化挂载及缓存软链接）。持久盘只保留整秒修改时间，因此在核对四个 MTP 运行文件 SHA-256 不变后更新了 `ready.json` 的时间字段；checkpoint inventory 和 MTP 缓存检查均通过。迁移记录位于 `/root/private_data/strata-dcu/storage-migration.json`。未重新运行推理性能测试；此前性能数值对应迁移前的缓存存储位置。
 
 ### 验证结果与范围
 

@@ -1,0 +1,5 @@
+PASS: 24 MTP requests/first-logit arrays match off; EOS feedback, boundary, KV, STOP, RNG, guards and default verified
+off {'story': 34.01, 'chinese': 34.85, 'code': 35.88}
+fixed2 {'story': 36.54, 'chinese': 40.43, 'code': 45.67}
+fixed3 {'story': 34.07, 'chinese': 39.65, 'code': 49.97}
+adaptive {'story': 35.92, 'chinese': 40.72, 'code': 50.31}

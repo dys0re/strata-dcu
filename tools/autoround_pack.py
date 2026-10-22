@@ -19,6 +19,8 @@ import re
 import subprocess
 import sys
 import time
+import shutil
+import tempfile
 
 import numpy as np
 
@@ -274,6 +276,100 @@ def verify(ck, count):
     return out
 
 
+def extract_bf16_mtp(ck, folder):
+    """Losslessly fuse local per-expert BF16 tensors into mtp_pack's input ABI."""
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    manifest = []
+    prefix = "mtp.layers.0.mlp.experts."
+    experts = {f"{prefix}{e}.{role}_proj.weight"
+               for e in range(ck.experts) for role in ("gate", "up", "down")}
+    actual = {k for k in ck.meta if k.startswith("mtp.") and ".experts." in k}
+    if actual != experts:
+        raise ValueError("MTP must contain one complete layer of separate BF16 experts")
+    dense = sorted(k for k in ck.meta if k.startswith("mtp.") and ".experts." not in k)
+    if not dense or any(ck.dtype(k) != "BF16" for k in dense + sorted(experts)):
+        raise ValueError("local MTP tensors must all be BF16")
+    for name in dense:
+        blob = ck.raw(name).tobytes()
+        filename = name + ".bin"
+        (folder / filename).write_bytes(blob)
+        manifest.append({"name": name, "dtype": "BF16", "shape": ck.shape(name),
+                         "file": filename, "sha256": hashlib.sha256(blob).hexdigest()})
+    for suffix, roles in (("gate_up_proj", ("gate", "up")), ("down_proj", ("down",))):
+        name = prefix + suffix
+        filename = name + ".bin"
+        digest = hashlib.sha256()
+        rows, cols = (2 * ck.n_ff, ck.n_embd) if suffix == "gate_up_proj" else (ck.n_embd, ck.n_ff)
+        with (folder / filename).open("wb") as f:
+            for e in range(ck.experts):
+                for role in roles:
+                    key = f"{prefix}{e}.{role}_proj.weight"
+                    expected = [ck.n_embd, ck.n_ff] if role == "down" else [ck.n_ff, ck.n_embd]
+                    if ck.shape(key) != expected:
+                        raise ValueError("unexpected MTP shape: " + key)
+                    blob = ck.raw(key).tobytes()
+                    if len(blob) != expected[0] * expected[1] * 2:
+                        raise ValueError("truncated BF16 MTP tensor: " + key)
+                    f.write(blob)
+                    digest.update(blob)
+        manifest.append({"name": name, "dtype": "BF16", "shape": [ck.experts, rows, cols],
+                         "file": filename, "sha256": digest.hexdigest()})
+        print("MTP fused:", name, [ck.experts, rows, cols], flush=True)
+    (folder / "mtp-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    return manifest
+
+
+def check_mtp(ck, out):
+    directory = out / "mtp"
+    if not (directory / "ready.json").is_file():
+        raise ValueError("MTP cache missing; run autoround_pack.py mtp with the same --model and --out first")
+    ready = json.loads((directory / "ready.json").read_text())
+    if ready.get("recipe") != 1 or ready.get("source") != ck.inventory():
+        raise ValueError("MTP cache does not match the checkpoint or preparation recipe")
+    if set(ready.get("files", {})) != {"experts.bin", "dense.bin", "dense.txt", "draft_vocab.bin"}:
+        raise ValueError("incomplete MTP runtime manifest")
+    for name, info in ready["files"].items():
+        st = (directory / name).stat()
+        if st.st_size != info["bytes"] or st.st_mtime_ns != info["mtime_ns"]:
+            raise ValueError("MTP runtime file changed: " + name)
+    return directory
+
+
+def prepare_mtp(ck, out):
+    if (ck.n_embd, ck.n_ff, ck.experts) != (2560, 640, 512):
+        raise ValueError("the current MTP runtime requires hidden=2560, FF=640, experts=512")
+    if (out / "mtp").exists():
+        check_mtp(ck, out)
+        return
+    identity = ck.inventory()
+    with tempfile.TemporaryDirectory(prefix=".mtp-", dir=out) as temporary:
+        stage = Path(temporary)
+        manifest = extract_bf16_mtp(ck, stage / "src")
+        gguf = stage / "mtp-q2_0.gguf"
+        subprocess.run([sys.executable, str(HERE / "mtp_pack.py"), "--src", str(stage / "src"),
+                        "--experts", "q2_0", "--out", str(gguf)], check=True)
+        runtime = stage / "rt"
+        subprocess.run([sys.executable, str(HERE / "mtp_rt.py"), "--gguf", str(gguf),
+                        "--out", str(runtime)], check=True)
+        shutil.copy2(HERE.parent / "data" / "draft_vocab.bin", runtime / "draft_vocab.bin")
+        shutil.copy2(stage / "src" / "mtp-manifest.json", runtime / "source-tensors.json")
+        shutil.copy2(str(gguf) + ".report.json", runtime / "quantization-report.json")
+        if ck.inventory() != identity:
+            raise ValueError("checkpoint changed while preparing MTP")
+        files = {}
+        for name in ("experts.bin", "dense.bin", "dense.txt", "draft_vocab.bin"):
+            path = runtime / name
+            st = path.stat()
+            files[name] = {"bytes": st.st_size, "mtime_ns": st.st_mtime_ns,
+                           "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        (runtime / "ready.json").write_text(json.dumps({"recipe": 1, "source": identity,
+            "draft_experts": "q2_0", "draft_projections": "q8_0", "source_tensors": len(manifest),
+            "main_weights_modified": False, "files": files}, indent=2) + "\n")
+        runtime.rename(out / "mtp")
+    print("Prepared independent MTP cache:", out / "mtp", flush=True)
+
+
 def run_model(ck, out, a):
     (out / "generation.json").unlink(missing_ok=True)
     from transformers import AutoTokenizer
@@ -304,6 +400,13 @@ def run_model(ck, out, a):
            "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",
            "--kv", "int8", "--suffix-draft", "0", "--adapt-every", "0",
            "--ple-io", "direct", "--ple-row-cache", "65536"]
+    if a.mtp_mode != "off":
+        runtime = check_mtp(ck, out)
+        cmd[cmd.index("--spec") + 1] = str(a.mtp_max_t)
+        cmd[cmd.index("--mtp-max-t") + 1] = str(a.mtp_max_t)
+        cmd += ["--mtp", str(runtime)]
+        if a.mtp_mode == "adaptive":
+            cmd += ["--mtp-adaptive"]
     (out / "run-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
     print("Starting AutoRound model;", len(ids), "prompt tokens", flush=True)
     with (out / "engine.stderr.log").open("w") as stderr:
@@ -325,6 +428,12 @@ def run_model(ck, out, a):
     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode,
               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
+    if a.mtp_mode != "off":
+        report.update(mtp_mode=a.mtp_mode, mtp_max_t=a.mtp_max_t)
+    budget = re.search(r"^mtp budget:.*$", errors, re.MULTILINE)
+    if budget:
+        report["mtp_budget"] = budget.group(0)
+        print(budget.group(0), flush=True)
     completed = out / "generation.json.tmp"
     completed.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     completed.replace(out / "generation.json")
@@ -334,7 +443,7 @@ def run_model(ck, out, a):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("command", choices=["verify", "convert", "ple", "pack", "prepare", "run"])
+    ap.add_argument("command", choices=["verify", "convert", "ple", "pack", "mtp", "prepare", "run"])
     ap.add_argument("--model", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--llama", default=str(HERE.parent / "third_party" / "llama.cpp"))
@@ -345,11 +454,15 @@ def main():
     ap.add_argument("--max-new", type=int, default=32)
     ap.add_argument("--context", type=int, default=512)
     ap.add_argument("--pool-workers", type=int, default=12)
+    ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="off")
+    ap.add_argument("--mtp-max-t", type=int, default=5, help="verification cap, including the real token (2..8)")
     a = ap.parse_args()
     if not 1 <= a.workers <= 16 or a.verify_experts < 1:
         ap.error("workers must be 1..16 and verify-experts positive")
     if a.max_new < 1 or a.context < 1 or a.pool_workers < 1:
         ap.error("max-new, context and pool-workers must be positive")
+    if not 2 <= a.mtp_max_t <= 8:
+        ap.error("mtp-max-t must be 2..8")
     converter_path(a.llama)
     ck = AutoRoundCheckpoint(Path(a.model).resolve())
     out = Path(a.out).resolve()
@@ -375,6 +488,8 @@ def main():
         (out / "dense.done").write_text("BF16/F32 projections; experts and PLE excluded\n")
     if a.command in ("pack", "prepare"):
         pack_experts(ck, out / "dense.gguf", out / "pack", a.workers)
+    if a.command == "mtp" or (a.command == "prepare" and a.mtp_mode != "off"):
+        prepare_mtp(ck, out)
     print("AutoRound importer completed:", a.command, out, flush=True)
     return 0
 

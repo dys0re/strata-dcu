@@ -1,0 +1,216 @@
+{
+  "matched_cache_slots": 19000,
+  "max_context": 512,
+  "bs": 1,
+  "greedy_tps": {
+    "off": {
+      "story": 34.01044226860278,
+      "chinese": 34.847474238732424,
+      "code": 35.87544493960032
+    },
+    "fixed2": {
+      "story": 36.54375972477981,
+      "chinese": 40.428925632886404,
+      "code": 45.6653585444167
+    },
+    "fixed3": {
+      "story": 34.067469558852885,
+      "chinese": 39.65180756482141,
+      "code": 49.974622262132506
+    },
+    "adaptive": {
+      "story": 35.91923783867211,
+      "chinese": 40.72088695181892,
+      "code": 50.311498928915356
+    }
+  },
+  "seeded_sample_tps": {
+    "off": 33.50083752093802,
+    "fixed2": 36.082764841856005,
+    "fixed3": 31.33721784262841,
+    "adaptive": 34.436373419424264
+  },
+  "target_equivalence": [
+    {
+      "mode": "fixed2",
+      "case": "warmup",
+      "tokens": 128
+    },
+    {
+      "mode": "fixed2",
+      "case": "ok",
+      "tokens": 2
+    },
+    {
+      "mode": "fixed2",
+      "case": "arithmetic",
+      "tokens": 2
+    },
+    {
+      "mode": "fixed2",
+      "case": "capital",
+      "tokens": 2
+    },
+    {
+      "mode": "fixed2",
+      "case": "story",
+      "tokens": 256
+    },
+    {
+      "mode": "fixed2",
+      "case": "chinese",
+      "tokens": 256
+    },
+    {
+      "mode": "fixed2",
+      "case": "code",
+      "tokens": 256
+    },
+    {
+      "mode": "fixed2",
+      "case": "sample",
+      "tokens": 64
+    },
+    {
+      "mode": "fixed3",
+      "case": "warmup",
+      "tokens": 128
+    },
+    {
+      "mode": "fixed3",
+      "case": "ok",
+      "tokens": 2
+    },
+    {
+      "mode": "fixed3",
+      "case": "arithmetic",
+      "tokens": 2
+    },
+    {
+      "mode": "fixed3",
+      "case": "capital",
+      "tokens": 2
+    },
+    {
+      "mode": "fixed3",
+      "case": "story",
+      "tokens": 256
+    },
+    {
+      "mode": "fixed3",
+      "case": "chinese",
+      "tokens": 256
+    },
+    {
+      "mode": "fixed3",
+      "case": "code",
+      "tokens": 256
+    },
+    {
+      "mode": "fixed3",
+      "case": "sample",
+      "tokens": 64
+    },
+    {
+      "mode": "adaptive",
+      "case": "warmup",
+      "tokens": 128
+    },
+    {
+      "mode": "adaptive",
+      "case": "ok",
+      "tokens": 2
+    },
+    {
+      "mode": "adaptive",
+      "case": "arithmetic",
+      "tokens": 2
+    },
+    {
+      "mode": "adaptive",
+      "case": "capital",
+      "tokens": 2
+    },
+    {
+      "mode": "adaptive",
+      "case": "story",
+      "tokens": 256
+    },
+    {
+      "mode": "adaptive",
+      "case": "chinese",
+      "tokens": 256
+    },
+    {
+      "mode": "adaptive",
+      "case": "code",
+      "tokens": 256
+    },
+    {
+      "mode": "adaptive",
+      "case": "sample",
+      "tokens": 64
+    }
+  ],
+  "short_answers": {
+    "off": {
+      "ok": "OK",
+      "arithmetic": "4",
+      "capital": "北京"
+    },
+    "fixed2": {
+      "ok": "OK",
+      "arithmetic": "4",
+      "capital": "北京"
+    },
+    "fixed3": {
+      "ok": "OK",
+      "arithmetic": "4",
+      "capital": "北京"
+    },
+    "adaptive": {
+      "ok": "OK",
+      "arithmetic": "4",
+      "capital": "北京"
+    }
+  },
+  "limits": [
+    "one measured request per workload/mode after warmup",
+    "fixed4/fixed5 are archived exploratory runs, not mixed into the final timing table",
+    "native INT8 KV on one gfx936 only; no new full-model quality benchmark"
+  ],
+  "first_logits_bit_identical": true,
+  "matched_requests": 24,
+  "eos_feedback_censored": true,
+  "context_tail_passed": true,
+  "front_only_kv_checks": [
+    [
+      "41",
+      "41",
+      "1056"
+    ],
+    [
+      "49",
+      "49",
+      "1056"
+    ],
+    [
+      "58",
+      "58",
+      "1056"
+    ],
+    [
+      "64",
+      "65",
+      "2112"
+    ],
+    [
+      "135",
+      "135",
+      "1056"
+    ]
+  ],
+  "protocol_passed": true,
+  "window_cap8_passed": true,
+  "default_matches_6ec15a8": true
+}

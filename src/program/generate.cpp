@@ -81,6 +81,7 @@
 #include "strata/program/draft_kv_plan.hpp"
 #include "strata/program/message_boundary.hpp"
 #include "strata/spec/draft_policy.hpp"
+#include "strata/spec/mtp_budget.hpp"
 #include "strata/spec/draft_source.hpp"
 #include "strata/spec/suffix_drafter.hpp"
 #include "strata/program/batch_groups.hpp"
@@ -765,6 +766,7 @@ struct Options {
     int suffix_draft = 3;
     /// The MTP's own window cap (0 = --spec): with --spec 6 --mtp-max-t 4 the long windows come from suffix matches.
     int mtp_max_t = 0;
+    bool mtp_adaptive = false;
     /// --lookup-chain K (opt-in, 0 = off): prompt lookup CHAINED after the MTP's proposal.  The suffix drafter matches
     /// the context followed by the MTP's drafts and appends up to K of the tokens that followed that match to the same
     /// verify window (the window grows to at most 8).  Greedy verification keeps the output; its own counts are kept.
@@ -918,6 +920,7 @@ void usage() {
                  "  --suffix-draft N     prompt lookup: draft from an earlier repeat of the last N+ tokens of context\n"
                  "                       when it pays (default 3; 0 = MTP only)\n"
                  "  --mtp-max-t M        cap the MTP's windows at M tokens (0 = --spec; longer ones come from suffixes)\n"
+                 "  --mtp-adaptive       single-request MTP: select window by measured tokens/ms; needs --suffix-draft 0\n"
                  "  --spec N             the MTP drafter's verify window: how many tokens it proposes per check (setup\n"
                  "                       writes 4; --suffix-draft lets it grow by 2, up to 8, where a repeat is likely)\n"
                  "  --spec-min-p P       how sure the draft layer must be to extend a verify window by another guess\n"
@@ -2630,6 +2633,7 @@ int main(int argc, char** argv) {
         else if (a == "--pipeline-windows") o.pipeline_windows = std::max(0, std::min(2, std::atoi(next("--pipeline-windows"))));
         else if (a == "--suffix-draft") o.suffix_draft = std::max(0, std::atoi(next("--suffix-draft")));
         else if (a == "--mtp-max-t") o.mtp_max_t = std::max(0, std::atoi(next("--mtp-max-t")));
+        else if (a == "--mtp-adaptive") o.mtp_adaptive = true;
         else if (a == "--lookup-chain") o.lookup_chain = std::clamp(std::atoi(next("--lookup-chain")), 0, 7);
         else if (a == "--lookup-chain-min") o.lookup_chain_min = std::max(3, std::atoi(next("--lookup-chain-min")));
         else if (a == "--mtp-hnorm") {
@@ -3131,6 +3135,27 @@ int main(int argc, char** argv) {
     // Prompt lookup (the suffix drafter, on by default): the MTP keeps its --spec windows and a lookup window may be
     // up to 2 tokens longer; the draft policy (strata/spec/draft_policy.hpp) takes one only where it pays. Code
     // edits +6-11%, ordinary text unchanged (bench/results/2026-09-27-spec). --suffix-draft 0 turns it off.
+    if (o.mtp_adaptive && [] {
+        const char* v = std::getenv("STRATA_SPEC_PROB");
+        return v != nullptr && std::atoi(v) != 0;
+    }()) {
+        std::fprintf(stderr, "strata: --mtp-adaptive uses exact-match verification; STRATA_SPEC_PROB is not supported\n");
+        return 2;
+    }
+#if defined(STRATA_GPU_METAL)
+    if (o.mtp_adaptive) {
+        std::fprintf(stderr, "strata: --mtp-adaptive currently needs the CUDA/HIP engine\n");
+        return 2;
+    }
+#endif
+    if (o.mtp_adaptive && (o.mtp.empty() || o.spec < 2 || o.spec > 8 || o.batch != 0 ||
+        !o.layer_split.empty() || o.peer_device >= 0 || o.pipeline_windows >= 2 ||
+        o.suffix_draft != 0 || o.lookup_chain != 0 || o.spec_min_p != 0 ||
+        o.expert_cache_remote[0] > 0 || o.expert_cache_remote[1] > 0 || o.expert_cache_remote[2] > 0)) {
+        std::fprintf(stderr, "strata: --mtp-adaptive needs single-GPU --mtp, --spec 2..8, --suffix-draft 0, "
+                             "no lookup chain, batch, pipeline or spec-min-p override\n");
+        return 2;
+    }
     if (o.suffix_draft > 0 && o.spec >= 2 && o.mtp_max_t == 0) {
         o.mtp_max_t = o.spec;
         o.spec = std::min(o.spec + 2, 8);   // kVerifyMaxT
@@ -10940,6 +10965,7 @@ int main(int argc, char** argv) {
         int64_t rounds = 0;
         const int S = o.spec;
         const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, S) : S;   // the MTP's windows; suffixes go up to S
+        strata::spec::MtpBudget mtp_budget(S_mtp);   // online costs/acceptance persist across serial requests
         if (use_mtp && S_mtp < S) mtp.set_max_drafts(S_mtp - 1);
         // --pipeline-windows 2 loads the drafter with 8 rows: the serial loop's chain keeps its own length
         else if (use_mtp && mtp.max_t() > S_mtp) mtp.set_max_drafts(S_mtp - 1);
@@ -12124,6 +12150,11 @@ int main(int argc, char** argv) {
                     }
                     // unknown keys are skipped: the ids start at the first token without '='
                 }
+            }
+            if (o.mtp_adaptive && req_spec_min_p != 0) {
+                std::printf("ERR --mtp-adaptive does not accept a spec_min_p override\n");
+                std::fflush(stdout);
+                continue;
             }
             strata::prefill::Prefill::set_pipe_request(req_pipe);   // every request sets it: none carries over
             std::vector<float> req_bias;
@@ -13929,6 +13960,9 @@ int main(int argc, char** argv) {
                 extra_sources_reset();
                 for (int64_t t : ids) { const int32_t t32 = (int32_t) t; extra_sources_append(&t32, 1); }
             }
+            if (o.mtp_adaptive) mtp_budget.begin_request();
+            int mtp_planned_t = 1;
+            double mtp_prepared_ms = 0;
             bool first_window = true;
             int64_t produced_n = 0, sfx_windows = 0, sfx_drafts = 0, sfx_ok = 0;
             int64_t chain_windows = 0, chain_drafts = 0, chain_ok = 0;   // --lookup-chain's own counts
@@ -13943,6 +13977,10 @@ int main(int argc, char** argv) {
             consumed.reserve((size_t) (n + max_new + S));
             for (int64_t i = 0; i < p; ++i) consumed.push_back((int32_t) ids[(size_t) i]);
             const char* finish = "length";
+            if (o.mtp_adaptive && (!ver.capture_all(err) || !mtp.prepare_adaptive(err))) {
+                std::printf("ERR preparing MTP budget graphs: %s\n", err.c_str());
+                return 1;
+            }
             const Clock::time_point d0 = Clock::now();
             // STRATA_DECODE_TIMING=1: where a request's decode time goes (one line per request)
             static const bool dec_timing = std::getenv("STRATA_DECODE_TIMING") != nullptr;
@@ -14626,7 +14664,7 @@ int main(int argc, char** argv) {
                 }
             }
             while (!pl_ran && !cancelled && produced_n < max_new) {
-                int T = use_mtp ? S_mtp : 1;   // no --mtp: one token a round unless a lookup draft fires
+                int T = use_mtp ? (o.mtp_adaptive ? mtp_planned_t : S_mtp) : 1;
                 if (use_mtp && req_spec_min_p > 0.0) {
                     T = 1;
                     while (T < S_mtp && dprob[(size_t) T - 1] >= (float) req_spec_min_p) ++T;
@@ -14909,12 +14947,23 @@ int main(int argc, char** argv) {
                 // commit, outv[a] is its row 0) - the drafts extend it on the device as the verify rows will
                 if (use_mtp && hist_n > 0 && mtp.coupled() && !eos && produced_n < max_new)
                     mtp.set_draft_history(consumed.data(), (int64_t) consumed.size(), outv[(size_t) a]);
+                if (o.mtp_adaptive) {
+                    if (timed_round && !eos)
+                        mtp_budget.observe(T, a, std::chrono::duration<double, std::milli>(tw2 - round0).count(),
+                                           mtp_prepared_ms);
+                    if (!eos && produced_n < max_new) {
+                        const int cap = (int) std::min<int64_t>({S_mtp, max_new - produced_n, o.max_context - (p + a + 1)});
+                        mtp_planned_t = mtp_budget.choose(std::max(1, cap));
+                        mtp.set_max_drafts(mtp_planned_t - 1);
+                    }
+                }
                 const bool drafted = !use_mtp || eos || produced_n >= max_new ||
                                      mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p);
                 {
                     const Clock::time_point tw3 = Clock::now();
                     auto msd = [](Clock::time_point a0, Clock::time_point b0) { return std::chrono::duration<double, std::milli>(b0 - a0).count(); };
                     dt_run += msd(tw0, tw1); dt_commit += msd(tw1, tw2); dt_draft += msd(tw2, tw3);
+                    if (o.mtp_adaptive) mtp_prepared_ms = msd(tw2, tw3);
                     ++dec_windows; dec_T += merged ? 1 : T;   // a merged window's prompt rows are not decode rows
                 }
                 pcie_auto_step(req_pcie_frac);   // the default share, refined from the CPU pool's speed (PcieAuto); a request's own share is left alone
@@ -14943,6 +14992,7 @@ int main(int argc, char** argv) {
                 p += a + 1;
             }
             const double decode_ms = std::chrono::duration<double, std::milli>(Clock::now() - d0).count();
+            if (o.mtp_adaptive) std::fprintf(stderr, "%s\n", mtp_budget.report().c_str());
             // the last commit (set_commit_async): the session is complete before anything reads or copies it
             if (!ver.wait_commit(err)) {
                 std::printf("ERR %s\n", err.c_str());
@@ -16086,6 +16136,10 @@ int main(int argc, char** argv) {
             ms_adapt += std::chrono::duration<double, std::milli>(Clock::now() - ta).count();
             return true;
         };
+        if (o.mtp_adaptive && (!ver.capture_all(err) || !mtp.prepare_adaptive(err))) {
+            std::fprintf(stderr, "strata: preparing MTP budget graphs: %s\n", err.c_str());
+            return 1;
+        }
         int64_t p = spec_pos;
         int32_t x = (int32_t) tok;
         std::vector<int32_t> drafts((size_t) o.spec, 0);
@@ -16094,6 +16148,13 @@ int main(int argc, char** argv) {
         // plan v0.3 P6: with a native pack the first window is the last prompt token alone (it produces the first
         // generated token and the MTP's first cell); otherwise the token loop already did that.
         bool first_window = native_pack;
+        const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, o.spec) : o.spec;
+        strata::spec::MtpBudget mtp_budget(S_mtp);
+        if (o.mtp_adaptive) mtp_budget.begin_request();
+        int mtp_planned_t = 1;
+        double mtp_prepared_ms = 0;
+        if (o.mtp_adaptive) mtp.set_max_drafts(0);
+        const auto initial_draft_start = Clock::now();
         if (use_mtp && !first_window &&
             !mtp.draft_first(o.spec, ss.R, x, p - 1, drafts.data(), err, dprob.data(), (float) o.spec_min_p)) {
             std::fprintf(stderr, "strata generate: %s\n", err.c_str());
@@ -16109,8 +16170,9 @@ int main(int argc, char** argv) {
         std::vector<float> hash_rows;
         std::vector<int64_t> accepted_hist((size_t) o.spec, 0);
         int64_t rounds = 0, drafts_total = 0, drafts_ok = 0, corrupt_counter = 0;
-        const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, o.spec) : o.spec;
-        if (use_mtp && S_mtp < o.spec) mtp.set_max_drafts(S_mtp - 1);
+        if (o.mtp_adaptive && !first_window)
+            mtp_prepared_ms = std::chrono::duration<double, std::milli>(Clock::now() - initial_draft_start).count();
+        if (!o.mtp_adaptive && use_mtp && S_mtp < o.spec) mtp.set_max_drafts(S_mtp - 1);
         strata::spec::SuffixDrafter sfx(std::max(1, o.suffix_draft), 64, (size_t) o.max_context + 4096);
         strata::spec::DraftPolicy policy(o.spec);   // MTP or lookup window (see draft_policy.hpp)
         std::vector<int32_t> sbuf((size_t) o.spec, 0);
@@ -16132,7 +16194,7 @@ int main(int argc, char** argv) {
         const int64_t misses0 = drive.d.multi_misses, entries0 = drive.d.multi_entries;
         while ((int64_t) produced.size() < max_new) {
             const Clock::time_point t0 = Clock::now();
-            int T = S_mtp;
+            int T = o.mtp_adaptive ? mtp_planned_t : S_mtp;
             if (use_mtp && o.spec_min_p > 0.0) {
                 T = 1;
                 while (T < S_mtp && dprob[(size_t) T - 1] >= (float) o.spec_min_p) ++T;
@@ -16262,13 +16324,24 @@ int main(int argc, char** argv) {
                 eos = o.stop_eos && std::find(o.eos_ids.begin(), o.eos_ids.end(), (int64_t) outv[(size_t) i]) != o.eos_ids.end();
                 if (!follow.empty()) { follow_differ += fdiff[(size_t) i]; ++follow_emitted; }
             }
+            if (o.mtp_adaptive && timed_round && !eos)
+                mtp_budget.observe(T, a, std::chrono::duration<double, std::milli>(Clock::now() - t0).count(),
+                                   mtp_prepared_ms);
             if (eos) {
                 if (adapt_thr.joinable()) adapt_thr.join();
                 total_ms += std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
                 break;
             }
+            if (o.mtp_adaptive && (int64_t) produced.size() < max_new) {
+                const int cap = (int) std::min<int64_t>({S_mtp, max_new - (int64_t) produced.size(), o.max_context - (p + a + 1)});
+                mtp_planned_t = mtp_budget.choose(std::max(1, cap));
+                mtp.set_max_drafts(mtp_planned_t - 1);
+            }
+            const auto draft_start = Clock::now();
             const bool drafted = !use_mtp || (int64_t) produced.size() >= max_new ||
                                  mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) o.spec_min_p);
+            if (o.mtp_adaptive)
+                mtp_prepared_ms = std::chrono::duration<double, std::milli>(Clock::now() - draft_start).count();
             if (adapt_thr.joinable()) adapt_thr.join();
             if (!adapt_ok) return 1;
             if (!drafted) {
@@ -16291,6 +16364,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         if (hashes != nullptr) std::fclose(hashes);
+        if (o.mtp_adaptive) std::fprintf(stderr, "%s\n", mtp_budget.report().c_str());
         std::printf("%-24s %lld rounds of %d, drafts accepted %lld of %lld (%.3f), %.2f tokens per round\n",
                     "speculation", (long long) rounds, o.spec, (long long) drafts_ok, (long long) drafts_total,
                     drafts_total > 0 ? (double) drafts_ok / (double) drafts_total : 0.0,

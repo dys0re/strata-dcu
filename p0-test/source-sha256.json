@@ -1,0 +1,13 @@
+{
+  "CMakeLists.txt": "5c7d378f9791ccf1e6d6aa327c4d9249177c457c549d998907a170a965131568",
+  "include/strata/core/mtp.hpp": "f0b089ea777210460ef23ecd531b43c120fe01dfa2721a7d54eb987562f80e9f",
+  "include/strata/spec/mtp_budget.hpp": "e38ff6d2470679adea33005c99673ff129920205c5b8f6d0c36bad86c5b8f581",
+  "src/core/mtp.cpp": "26ff001c4d7022d5be0bb08fe8f8a3926878e06243d85a0a85e8b32ede77ab92",
+  "src/program/generate.cpp": "1dcd6c49d65a5a7642d492fed4843b44208ed5fcfaad1be3c0778ce689cf15ba",
+  "src/spec/mtp_budget_test.cpp": "482ac42fb65fd90bca228b3beb858c8d858fce9e1ffe2ac5b003b4d70d42aae4",
+  "tools/autoround_pack.py": "43d35b0f196231b5ee6e90fbbcd8dac0f7c011fcfd53cd972b5379b0ab87d48d",
+  "tools/test_autoround_pack.py": "e652d60742511410a35c8c1f487ac3316063151b95c8d0e1276e50b682d9a434",
+  "strata_control/draft_layer.py": "f0dc140af47389d2c2f52efa85a34ba47dd1016eb220081c30ce4c7262cd0707",
+  "serve/test_draft_layer.py": "70fd83ad8076fffc8745d040249230ee083e523803f637d5a32b9876ad83cdf4",
+  "strata-test/run-autoround.sh": "482bc3cd853902b2273615d6a1263723ab8a596cfc30fac02cde5242eb185506"
+}

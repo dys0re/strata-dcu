@@ -1,0 +1,209 @@
+{
+  "protocol": [
+    {
+      "case": "cancel",
+      "result": {
+        "ids": [
+          4413,
+          220,
+          22,
+          18,
+          19,
+          11,
+          22471,
+          328
+        ],
+        "done": "DONE 8 30 581.4 368.1 cancel 3 6 0 4539 5280 509 0 0.0 30 0 chunk=0 experts_streamed=0",
+        "text": "Unit 734, designated \""
+      }
+    },
+    {
+      "case": "recovery",
+      "result": {
+        "ids": [
+          3793,
+          248046
+        ],
+        "done": "DONE 2 17 262.7 93.5 stop 0 0 0 878 960 82 0 0.0 17 0 chunk=0 experts_streamed=0",
+        "text": "OK"
+      }
+    },
+    {
+      "case": "invalid_request",
+      "result": "ERR --mtp-adaptive does not accept a spec_min_p override"
+    },
+    {
+      "case": "seeded_repeat",
+      "results": [
+        {
+          "ids": [
+            760,
+            22979,
+            995,
+            874,
+            2478,
+            3133,
+            13,
+            271,
+            2064,
+            10641,
+            383,
+            279,
+            10841,
+            2741,
+            91187,
+            1898,
+            314,
+            3851,
+            4897,
+            725,
+            24279,
+            11,
+            1141,
+            34844,
+            70848,
+            83491,
+            3195,
+            310,
+            279,
+            1829,
+            314,
+            2235,
+            17299,
+            11,
+            1141,
+            8720,
+            3460,
+            41423,
+            1040,
+            264,
+            30581,
+            14367,
+            2634,
+            13,
+            1690,
+            2250,
+            21116,
+            11,
+            279,
+            1208,
+            314,
+            17739,
+            68507,
+            995,
+            11693,
+            424,
+            13,
+            2302,
+            32306,
+            639,
+            539,
+            279,
+            6797,
+            11
+          ],
+          "done": "DONE 64 25 361.8 2028.2 length 28 53 0 31217 42720 7269 0 0.0 25 0 chunk=0 experts_streamed=0",
+          "text": "The compass had no business working.\n\nIt lay on the rough-hewn table of Elara’s workshop, its brass casing tarnished to the color of old teeth, its glass face cracked like a dried riverbed. For three generations, the people of Oakhaven had ignored it. They navigated by the sun,"
+        },
+        {
+          "ids": [
+            760,
+            22979,
+            995,
+            874,
+            2478,
+            3133,
+            13,
+            271,
+            2064,
+            10641,
+            383,
+            279,
+            10841,
+            2741,
+            91187,
+            1898,
+            314,
+            3851,
+            4897,
+            725,
+            24279,
+            11,
+            1141,
+            34844,
+            70848,
+            83491,
+            3195,
+            310,
+            279,
+            1829,
+            314,
+            2235,
+            17299,
+            11,
+            1141,
+            8720,
+            3460,
+            41423,
+            1040,
+            264,
+            30581,
+            14367,
+            2634,
+            13,
+            1690,
+            2250,
+            21116,
+            11,
+            279,
+            1208,
+            314,
+            17739,
+            68507,
+            995,
+            11693,
+            424,
+            13,
+            2302,
+            32306,
+            639,
+            539,
+            279,
+            6797,
+            11
+          ],
+          "done": "DONE 64 25 350.7 1813.1 length 27 47 0 29532 40320 7279 0 0.0 25 0 chunk=0 experts_streamed=0",
+          "text": "The compass had no business working.\n\nIt lay on the rough-hewn table of Elara’s workshop, its brass casing tarnished to the color of old teeth, its glass face cracked like a dried riverbed. For three generations, the people of Oakhaven had ignored it. They navigated by the sun,"
+        }
+      ]
+    },
+    {
+      "case": "one_token_limit",
+      "result": {
+        "ids": [
+          3793
+        ],
+        "done": "DONE 1 17 263.2 49.1 length 0 0 0 453 480 27 0 0.0 17 0 chunk=0 experts_streamed=0",
+        "text": "OK"
+      }
+    }
+  ],
+  "invalid_options": [
+    {
+      "case": "probabilistic",
+      "exit": 2,
+      "stderr": "strata generate: memory guard: limit 59.0 GiB (source: cgroup), current 8.0 GiB, reclaimable cache credited 0.5 GiB; available 51.5 GiB (MemAvailable 451.9 GiB), floor 2560 MiB\nstrata: --mtp-adaptive uses exact-match verification; STRATA_SPEC_PROB is not supported\n"
+    },
+    {
+      "case": "lookup",
+      "exit": 2,
+      "stderr": "strata generate: memory guard: limit 59.0 GiB (source: cgroup), current 8.0 GiB, reclaimable cache credited 0.5 GiB; available 51.5 GiB (MemAvailable 451.9 GiB), floor 2560 MiB\nstrata: --mtp-adaptive needs single-GPU --mtp, --spec 2..8, --suffix-draft 0, no lookup chain, batch, pipeline or spec-min-p override\n"
+    },
+    {
+      "case": "missing_mtp",
+      "exit": 2,
+      "stderr": "strata generate: memory guard: limit 59.0 GiB (source: cgroup), current 8.0 GiB, reclaimable cache credited 0.5 GiB; available 51.5 GiB (MemAvailable 451.9 GiB), floor 2560 MiB\nstrata: --mtp-adaptive needs single-GPU --mtp, --spec 2..8, --suffix-draft 0, no lookup chain, batch, pipeline or spec-min-p override\n"
+    }
+  ],
+  "engine_exit": 0
+}

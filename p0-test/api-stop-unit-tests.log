@@ -1,0 +1,79 @@
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:495: ResourceWarning: unclosed file <_io.TextIOWrapper name='/proc/stat' mode='r' encoding='UTF-8'>
+  f = [int(x) for x in open("/proc/stat").readline().split()[1:]]
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:478: ResourceWarning: unclosed file <_io.TextIOWrapper name='/proc/cpuinfo' mode='r' encoding='utf-8'>
+  return line.split(":", 1)[1].strip()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu11/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu9/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu7/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu5/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu3/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu1/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu10/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu8/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu6/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu4/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu2/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/dry/data/strara-dcu/Strata/serve/telemetry.py:458: ResourceWarning: unclosed file <_io.TextIOWrapper name='/sys/devices/system/cpu/cpu0/topology/physical_package_id' mode='r' encoding='utf-8'>
+  packages.add(open(f, encoding="utf-8").read().strip())
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+[strata] done: 36 tokens in 0 s (95930.7 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (37181.7 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (99600.9 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (37900.3 tok/s) (stop, cancel=False)
+.[strata] 400 invalid request: stop takes at most 4 strings
+[strata] 400 invalid request: stop must be a string or a list of strings
+[strata] 400 invalid request: stop_sequences must be a list of strings
+[strata] 400 invalid request: stop_sequences must be a list of strings
+.[strata] done: 19 tokens in 0 s (126696.0 tok/s) (stop, cancel=False)
+[strata] done: 19 tokens in 0 s (48830.7 tok/s) (stop, cancel=False)
+[strata] done: 19 tokens in 0 s (123745.0 tok/s) (stop, cancel=False)
+[strata] done: 19 tokens in 0 s (43099.9 tok/s) (stop, cancel=False)
+..[strata] done: 36 tokens in 0 s (115263.3 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (84401.9 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (113701.0 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (35942.6 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (38706.7 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (34410.9 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (111353.2 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (124275.7 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (112014.1 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (39579.3 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (34418.7 tok/s) (stop, cancel=False)
+[strata] done: 36 tokens in 0 s (34356.1 tok/s) (stop, cancel=False)
+.[strata] done: 29 tokens in 0 s (104050.3 tok/s) (stop, cancel=False)
+.[strata] done: 24 tokens in 0 s (118846.9 tok/s) (stop, cancel=False)
+[strata] done: 24 tokens in 0 s (40459.5 tok/s) (stop, cancel=False)
+[strata] done: 24 tokens in 0 s (102717.6 tok/s) (stop, cancel=False)
+[strata] done: 24 tokens in 0 s (40057.0 tok/s) (stop, cancel=False)
+./home/dry/data/strara-dcu/Strata/serve/telemetry.py:522: ResourceWarning: unclosed file <_io.TextIOWrapper name='/proc/meminfo' mode='r' encoding='UTF-8'>
+  info = dict(line.split(":", 1) for line in open("/proc/meminfo"))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.646s
+
+OK
