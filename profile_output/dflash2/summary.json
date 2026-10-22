@@ -1,0 +1,402 @@
+{
+  "standard": "all GPU model weights <= 50% of physical VRAM",
+  "runs": {
+    "graph-main": {
+      "weights": {
+        "pack": 1538035200,
+        "dense": 5819596800,
+        "head": 1271398400,
+        "experts": 22947840000,
+        "mtp": 0,
+        "weights": 34054400000,
+        "total": 68702699520,
+        "limit": 34351349760,
+        "fraction": 0.49567776,
+        "device_used": 36440113152,
+        "external_draft": 2477529600
+      },
+      "workloads": {
+        "story": {
+          "median_tps": 24.21880173694219,
+          "min_tps": 23.10323355022697,
+          "max_tps": 24.38350684357409,
+          "tps": [
+            23.10323355022697,
+            24.21880173694219,
+            24.38350684357409
+          ],
+          "requests": 3
+        },
+        "chinese": {
+          "median_tps": 30.233958877091872,
+          "min_tps": 28.176765175279293,
+          "max_tps": 30.24824831921355,
+          "tps": [
+            28.176765175279293,
+            30.233958877091872,
+            30.24824831921355
+          ],
+          "requests": 3
+        },
+        "code": {
+          "median_tps": 41.86084539285422,
+          "min_tps": 39.032125268727036,
+          "max_tps": 42.18227355863501,
+          "tps": [
+            39.032125268727036,
+            41.86084539285422,
+            42.18227355863501
+          ],
+          "requests": 3
+        }
+      },
+      "worker": {
+        "weight_bytes": 2477529600,
+        "calls": 1002,
+        "graphs": 12,
+        "graphed_calls": 984,
+        "median_graphed_draft_ms": 7.350472966209054,
+        "proposal_count_histogram": {
+          "1": 7,
+          "2": 0,
+          "3": 995
+        }
+      },
+      "protocol": {
+        "cancel": "DONE 9 42 884.2 339.9 cancel 5 9 0 2736 6240 2061 0 0.0 42 0 chunk=0 experts_streamed=0",
+        "recovery": "DONE 2 17 340.7 135.8 stop 1 3 0 1128 2400 795 0 0.0 17 0 chunk=0 experts_streamed=0",
+        "seed_repeat": true,
+        "one_token_limit": true,
+        "context_tail": true
+      }
+    },
+    "adaptive-main": {
+      "weights": {
+        "pack": 1538035200,
+        "dense": 5819596800,
+        "head": 1271398400,
+        "experts": 22947840000,
+        "mtp": 0,
+        "weights": 34054400000,
+        "total": 68702699520,
+        "limit": 34351349760,
+        "fraction": 0.49567776,
+        "device_used": 36440113152,
+        "external_draft": 2477529600
+      },
+      "workloads": {
+        "story": {
+          "median_tps": 27.25375803772942,
+          "min_tps": 27.0893737698673,
+          "max_tps": 28.47291736180625,
+          "tps": [
+            27.25375803772942,
+            28.47291736180625,
+            27.0893737698673
+          ],
+          "requests": 3,
+          "change_vs_mtp_pct": -7.535238257462851
+        },
+        "chinese": {
+          "median_tps": 31.929356299188047,
+          "min_tps": 30.59821908802964,
+          "max_tps": 32.08020050125313,
+          "tps": [
+            30.59821908802964,
+            31.929356299188047,
+            32.08020050125313
+          ],
+          "requests": 3,
+          "change_vs_mtp_pct": -14.895793057859485
+        },
+        "code": {
+          "median_tps": 41.81435081586985,
+          "min_tps": 40.450645472213886,
+          "max_tps": 42.4734126391585,
+          "tps": [
+            40.450645472213886,
+            41.81435081586985,
+            42.4734126391585
+          ],
+          "requests": 3,
+          "change_vs_mtp_pct": 9.297159564216063
+        }
+      },
+      "worker": {
+        "weight_bytes": 2477529600,
+        "calls": 1249,
+        "graphs": 12,
+        "graphed_calls": 1231,
+        "median_graphed_draft_ms": 7.158772088587284,
+        "proposal_count_histogram": {
+          "1": 865,
+          "2": 156,
+          "3": 228
+        }
+      },
+      "protocol": {
+        "cancel": "DONE 9 42 867.0 320.7 cancel 4 5 0 2087 4800 1937 0 0.0 42 0 chunk=0 experts_streamed=0",
+        "recovery": "DONE 2 17 340.9 101.7 stop 1 1 0 762 1440 628 0 0.0 17 0 chunk=0 experts_streamed=0",
+        "seed_repeat": true,
+        "one_token_limit": true,
+        "context_tail": true
+      }
+    },
+    "mtp-final": {
+      "weights": {
+        "pack": 1538035200,
+        "dense": 5819596800,
+        "head": 1271398400,
+        "experts": 23500800000,
+        "mtp": 1368138752,
+        "weights": 33497969152,
+        "total": 68702699520,
+        "limit": 34351349760,
+        "fraction": 0.48757865,
+        "device_used": 34770780160,
+        "external_draft": 0
+      },
+      "workloads": {
+        "story": {
+          "median_tps": 29.474750731111982,
+          "min_tps": 29.196081338457855,
+          "max_tps": 29.54346120112634,
+          "tps": [
+            29.474750731111982,
+            29.196081338457855,
+            29.54346120112634
+          ],
+          "requests": 3
+        },
+        "chinese": {
+          "median_tps": 37.51795292669344,
+          "min_tps": 37.103600208707746,
+          "max_tps": 37.53335483681787,
+          "tps": [
+            37.103600208707746,
+            37.53335483681787,
+            37.51795292669344
+          ],
+          "requests": 3
+        },
+        "code": {
+          "median_tps": 38.257490846596426,
+          "min_tps": 38.036937432209555,
+          "max_tps": 38.59141341051616,
+          "tps": [
+            38.036937432209555,
+            38.59141341051616,
+            38.257490846596426
+          ],
+          "requests": 3
+        }
+      }
+    }
+  },
+  "target_equivalence": [
+    {
+      "run": "graph-main",
+      "case": "warmup",
+      "tokens": 128,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "story-0",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "story-1",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "story-2",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "chinese-0",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "chinese-1",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "chinese-2",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "code-0",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "code-1",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "code-2",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "ok",
+      "tokens": 2,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "arithmetic",
+      "tokens": 2,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "capital",
+      "tokens": 2,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "sample-0",
+      "tokens": 64,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "sample-1",
+      "tokens": 64,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "one_token",
+      "tokens": 1,
+      "identical": true
+    },
+    {
+      "run": "graph-main",
+      "case": "context_tail",
+      "tokens": 3,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "warmup",
+      "tokens": 128,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "story-0",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "story-1",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "story-2",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "chinese-0",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "chinese-1",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "chinese-2",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "code-0",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "code-1",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "code-2",
+      "tokens": 256,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "ok",
+      "tokens": 2,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "arithmetic",
+      "tokens": 2,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "capital",
+      "tokens": 2,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "sample-0",
+      "tokens": 64,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "sample-1",
+      "tokens": 64,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "one_token",
+      "tokens": 1,
+      "identical": true
+    },
+    {
+      "run": "adaptive-main",
+      "case": "context_tail",
+      "tokens": 3,
+      "identical": true
+    }
+  ]
+}

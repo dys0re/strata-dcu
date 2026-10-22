@@ -1,0 +1,56 @@
+{
+  "timestamp_utc": "2026-10-22T08:32:32.609086+00:00",
+  "engine_sha256": "7b6c0e2c05a187a4fa97ab54652d618769910404cf8b91bd16e6854ec553793f",
+  "source_sha256": {
+    "CMakeLists.txt": "f3ba37b1dd13f7b5f580eabdba30587d4846c040d62c6f8c17762266149ccf7b",
+    "src/program/generate.cpp": "1a270cf8da6dd5850fb4dff1029e1e65696d78ef08919d0bda86a1de14d60607",
+    "src/core/verify.cpp": "4a9f0c69890cec5897c7416bf1290c1f2fca92cd98c937a1f511613fc0bf7433",
+    "src/prefill/prefill.cpp": "b82bda291d3998035d4079e23b9217ef60f92b1517fd85e31f96423d11e5e702",
+    "include/strata/core/dflash_bridge.hpp": "38c91753f118d1ae8504526cd8560e6f7f2b1fcbbc05aebfa193f090ab781215",
+    "include/strata/core/verify.hpp": "f709d3231ea673e3eea161062529a656149e29fa554325a6574e39a0093915bf",
+    "include/strata/prefill/prefill.hpp": "8ffaed8a7f18762ad669e44fb275115ec429ffa6e65894ed24b9206c9585ab29",
+    "src/kernels/cuda/native_mmvq.cu": "b9aebb5ced120776b6ce133046f2274bb6f4c125601dc5298b1aa734d473e93c",
+    "include/strata/kernels/native_mmvq.hpp": "0520eae7c16152297246738e1d61ccb3c4946ddffc4efc030b45c8105c6e4dd1",
+    "src/core/mtp.cpp": "540534277f886f9c9173ccdd4506c008841f2f0f6bfe6a50dff6885ed3203e71",
+    "include/strata/core/mtp.hpp": "3bd1add95fe0d10883e3f40fdc16dbbef42b591c9ca063bd640653a26a3db443",
+    "tools/dflash2_worker.py": "00cb1b7afc97b6e4cb5748e26d737b083db76ad6db94e498bc908584370f8efb",
+    "tools/strata_dflash2.py": "15a75e60e21dbe7b2cde3444072184da816576872effb9cfff280c87fec2ad73",
+    "third_party/dflash/model.py": "f55b7fe0a4c0b3073e0f9cdce547cce29f4b8e2168c4d2818760007c43b7651e",
+    "third_party/dflash/LICENSE": "6fd2aebd899c0b48ea9abb845aef043c6dadff00a6726a10a1bc32db528a5422",
+    "third_party/dflash/VERSION": "fd6b24c6a65078f4701beb667f679a5e150e28ed82dffb44acdfff8af87c2131",
+    "tools/autoround_pack.py": "67730f3dfa3796560b64c61749da57274c0a2abca62ee570f501b9cc800780f9",
+    "tools/download_dflash2.py": "48f5aefa67fa24f59028b2f652335e9bd8d51f73b32489e43ad95b3dfecfaddc"
+  },
+  "default_engine_before": "/root/private_data/strata-dcu/weight50/strata",
+  "default_engine_after": "/root/private_data/strata-dcu/dflash2/strata-final",
+  "default_drafter": "adaptive MTP; DFlash2 requires --dflash2",
+  "weight50_engine_preserved": "/root/private_data/strata-dcu/weight50/strata",
+  "p1_engine_preserved": "/root/private_data/strata-dcu/weight50/strata-p1-before-budget",
+  "download_manifest": {
+    "repo": "incoai/Qwen3.8-Flash-Next-DFlash2",
+    "revision": "a22a1744e85c17364dcc54a6a420af7135d4c7f6",
+    "files": {
+      "config.json": {
+        "bytes": 1236,
+        "sha256": "2409575986f9ea24d455343eb469c0e6940def5edab1d1be503bb8eb4cc3b1b9",
+        "source": "verified existing"
+      },
+      "model.safetensors": {
+        "bytes": 1206140008,
+        "sha256": "d6723f2a359eaf33ec0c95f22ae8edda896774020c552296a85e1913b4d3186f",
+        "source": "modelscope"
+      }
+    }
+  },
+  "checkpoint_load_sha256_verified_by_workers": true,
+  "checkpoint_size": 1206140008,
+  "cli_passed": true,
+  "remaining_inference_processes": [],
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n",
+  "system_root_usage": "954M\t/root",
+  "limitations": [
+    "HIP/gfx936, BS=1, context <=512 only",
+    "Only the recorded request set, not a full quality benchmark",
+    "GPU device-used snapshots are not peak memory measurements"
+  ]
+}

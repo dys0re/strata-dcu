@@ -1,0 +1,108 @@
+{
+  "inline-control": {
+    "engine_driver_exit": 0,
+    "recorded_requests": 17,
+    "mismatched_cases": [],
+    "all_17_requests_match": true,
+    "performance": {
+      "story": {
+        "median": 33.01862456792034,
+        "min": 32.964202935874326,
+        "max": 33.062120625080716,
+        "samples": [
+          33.062120625080716,
+          33.01862456792034,
+          32.964202935874326
+        ],
+        "relative_to_primary_p1_percent": -10.952468280211114
+      },
+      "chinese": {
+        "median": 37.86926228901939,
+        "min": 36.988340003756626,
+        "max": 38.070877266035126,
+        "samples": [
+          36.988340003756626,
+          38.070877266035126,
+          37.86926228901939
+        ],
+        "relative_to_primary_p1_percent": -8.403890406189818
+      },
+      "code": {
+        "median": 47.22288834369408,
+        "min": 46.738356489511254,
+        "max": 48.350237029482315,
+        "samples": [
+          46.738356489511254,
+          47.22288834369408,
+          48.350237029482315
+        ],
+        "relative_to_primary_p1_percent": -2.7163540451060397
+      }
+    }
+  },
+  "fusion-qdedup": {
+    "engine_driver_exit": 0,
+    "recorded_requests": 17,
+    "mismatched_cases": [],
+    "all_17_requests_match": true,
+    "performance": {
+      "story": {
+        "median": 32.162824298008665,
+        "min": 32.066136406338074,
+        "max": 33.02714418412633,
+        "samples": [
+          33.02714418412633,
+          32.162824298008665,
+          32.066136406338074
+        ],
+        "relative_to_same_inline_control_percent": -2.591871348702812,
+        "relative_to_primary_p1_percent": -13.26046574158337
+      },
+      "chinese": {
+        "median": 38.4101786973548,
+        "min": 37.584602058344224,
+        "max": 38.64559274187461,
+        "samples": [
+          38.4101786973548,
+          37.584602058344224,
+          38.64559274187461
+        ],
+        "relative_to_same_inline_control_percent": 1.4283785203079047,
+        "relative_to_primary_p1_percent": -7.095551251314147
+      },
+      "code": {
+        "median": 49.35130029109556,
+        "min": 44.927256453905684,
+        "max": 49.39319685890139,
+        "samples": [
+          44.927256453905684,
+          49.39319685890139,
+          49.35130029109556
+        ],
+        "relative_to_same_inline_control_percent": 4.5071617218977345,
+        "relative_to_primary_p1_percent": 1.668377207039451
+      }
+    }
+  },
+  "fusion-qfuse": {
+    "engine_driver_exit": 0,
+    "recorded_requests": 17,
+    "mismatched_cases": [
+      "warmup",
+      "story-0",
+      "chinese-0",
+      "code-0",
+      "story-1",
+      "chinese-1",
+      "code-1",
+      "story-2",
+      "chinese-2",
+      "code-2",
+      "sample-0",
+      "sample-1",
+      "context_tail"
+    ],
+    "all_17_requests_match": false,
+    "performance": {}
+  }
+}

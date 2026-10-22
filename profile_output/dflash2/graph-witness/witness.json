@@ -1,0 +1,76 @@
+{
+  "seed": 1729,
+  "draft_ids": [
+    [
+      553,
+      393,
+      85
+    ],
+    [
+      553,
+      393,
+      85
+    ]
+  ],
+  "finite_forward": true,
+  "repeat_equal": true,
+  "incremental_cache_equal": true,
+  "incremental_ids": [
+    198,
+    12,
+    220
+  ],
+  "weight_bytes": 2477529600,
+  "torch": "2.9.0",
+  "hip": "6.3.26093",
+  "device": "BW",
+  "graphs": 12,
+  "timings": [
+    {
+      "pos": 4,
+      "k": 3,
+      "context_rows": 4,
+      "prep_ms": 12.823997996747494,
+      "model_ms": 1.2242449447512627,
+      "head_selector_ms": 16.488944180309772,
+      "draft_ms": 30.53718712180853,
+      "graph": true
+    },
+    {
+      "pos": 4,
+      "k": 3,
+      "context_rows": 4,
+      "prep_ms": 0.3807120956480503,
+      "model_ms": 1.1662649922072887,
+      "head_selector_ms": 5.5891647934913635,
+      "draft_ms": 7.136141881346703,
+      "graph": true
+    },
+    {
+      "pos": 5,
+      "k": 3,
+      "context_rows": 1,
+      "prep_ms": 2.3599807173013687,
+      "model_ms": 1.4004460535943508,
+      "head_selector_ms": 5.381894297897816,
+      "draft_ms": 9.142321068793535,
+      "graph": true
+    },
+    {
+      "pos": 5,
+      "k": 3,
+      "context_rows": 5,
+      "prep_ms": 0.265760812908411,
+      "model_ms": 14.592945110052824,
+      "head_selector_ms": 2.7918717823922634,
+      "draft_ms": 17.6505777053535,
+      "graph": false
+    }
+  ],
+  "totals": {
+    "calls": 4,
+    "draft_ms": 64.46622777730227,
+    "feature_rows": 0,
+    "resets": 0
+  }
+}

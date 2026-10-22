@@ -370,6 +370,51 @@ def prepare_mtp(ck, out):
     print("Prepared independent MTP cache:", out / "mtp", flush=True)
 
 
+def run_serve_once(cmd, env, stderr, ids, max_new):
+    """Adapt one raw --serve request to this entry point's output-ID contract."""
+    lines, generated = [], []
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                         stderr=stderr, text=True, env=env, bufsize=1)
+    def read():
+        line = p.stdout.readline()
+        if line:
+            lines.append(line)
+        return line
+    try:
+        while True:
+            line = read()
+            if not line or line.startswith("ERR "):
+                raise RuntimeError("DFlash2 engine exited before READY")
+            if line.startswith("READY "):
+                break
+        p.stdin.write(f"GEN {max_new} ckpt=0 temperature=0 " + ",".join(map(str, ids)) + "\n")
+        p.stdin.flush()
+        while True:
+            line = read()
+            if not line or line.startswith("ERR "):
+                raise RuntimeError("DFlash2 generation failed; see engine logs")
+            if line.startswith("T "):
+                generated.append(int(line.split()[1]))
+            if line.startswith("DONE "):
+                fields = line.split()
+                if int(fields[1]) != len(generated) or int(fields[8]) != 0:
+                    raise RuntimeError("DFlash2 DONE/token count or nonfinite status mismatch")
+                break
+        p.stdin.write("QUIT\n"); p.stdin.flush()
+        lines.append(p.stdout.read())
+        code = p.wait(timeout=30)
+        # Preserve raw serve output and normalize actual emitted IDs for the existing report reader.
+        lines.append("\noutput : " + " ".join(map(str, generated)) + "\n")
+        return subprocess.CompletedProcess(cmd, code, "".join(lines))
+    finally:
+        if p.poll() is None:
+            p.terminate()
+            try:
+                p.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                p.kill(); p.wait()
+
+
 def run_model(ck, out, a):
     (out / "generation.json").unlink(missing_ok=True)
     from transformers import AutoTokenizer
@@ -396,21 +441,38 @@ def run_model(ck, out, a):
            # Run only the real token, rather than verifying an unused zero draft.
            "--max-context", str(a.context), "--prefill", "32", "--spec", "2", "--mtp-max-t", "1",
            "--expert-profile", str(HERE.parent / "data" / "expert-profile.bin"),
-           "--expert-cache", "auto", "--mmap-experts", "--resident-cpu-experts",
+           "--expert-cache", str(a.expert_cache if a.expert_cache is not None else (8300 if a.dflash2 else 8500)), "--mmap-experts", "--resident-cpu-experts",
            "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",
            "--kv", "int8", "--suffix-draft", "0", "--adapt-every", "0",
            "--ple-io", "direct", "--ple-row-cache", "65536"]
-    if a.mtp_mode != "off":
+    if a.mtp_mode != "off" and not a.dflash2:
         runtime = check_mtp(ck, out)
         cmd[cmd.index("--spec") + 1] = str(a.mtp_max_t)
         cmd[cmd.index("--mtp-max-t") + 1] = str(a.mtp_max_t)
         cmd += ["--mtp", str(runtime)]
         if a.mtp_mode == "adaptive":
             cmd += ["--mtp-adaptive"]
-    (out / "run-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
+    native_cmd = list(cmd)
+    if a.dflash2:
+        cmd[cmd.index("--spec") + 1] = "4"
+        cmd[cmd.index("--mtp-max-t") + 1] = "4"
+        cmd += ["--serve", "--prompt-cache", "0", "--conversation-cache-mib", "0", "--pcie-frac", "0", "--adapt-swaps", "0"]
+        cmd = [sys.executable, str(HERE / "strata_dflash2.py"), "--checkpoint", str(Path(a.dflash2).resolve()),
+               "--model", str(ck.dir), "--stats-file", str(out / "dflash2-worker.json"), "--graph", "--adaptive", "--"] + cmd
+    (out / "run-command.json").write_text(json.dumps(native_cmd, indent=2) + "\n")
+    if a.dflash2:
+        (out / "dflash2-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
     print("Starting AutoRound model;", len(ids), "prompt tokens", flush=True)
+    env = dict(os.environ, STRATA_MAX_WEIGHT_VRAM_FRACTION="0.5")
+    if a.dflash2:
+        env.update(STRATA_ROUTE_TAIL_SKIP="0", STRATA_QFUSE="0", STRATA_VERIFY_QDEDUP="0", STRATA_QFUSE_HC="0")
+        env.setdefault("STRATA_BF16_Q8_VEC4", "1")
+        env.setdefault("STRATA_BF16_Q8_COLS", "4")
     with (out / "engine.stderr.log").open("w") as stderr:
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr, text=True)
+        if a.dflash2:
+            result = run_serve_once(cmd, env, stderr, ids, a.max_new)
+        else:
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr, text=True, env=env)
     (out / "engine.stdout.log").write_text(result.stdout)
     print(result.stdout, end="", flush=True)
     if result.returncode:
@@ -419,6 +481,15 @@ def run_model(ck, out, a):
     errors = (out / "engine.stderr.log").read_text()
     if "larger than launch bounds" in errors or "Launch params" in errors:
         raise RuntimeError("DTK rejected a kernel launch; generated text is invalid (see engine.stderr.log)")
+    usage_lines = re.findall(r"^strata weight usage:.*$", errors, re.MULTILINE)
+    if not usage_lines:
+        raise RuntimeError("engine did not report/enforce the 50% weight VRAM budget; rebuild the engine")
+    usage = {k: float(v) if "." in v else int(v)
+             for k, v in re.findall(r"(\w+)=([0-9.]+)", usage_lines[-1])}
+    if usage["limit"] != usage["total"] // 2 or usage["weights"] > usage["limit"]:
+        raise RuntimeError("engine weights exceed the 50% weight VRAM budget")
+    if a.dflash2 and usage.get("external_draft", 0) <= 0:
+        raise RuntimeError("engine did not account DFlash2 GPU weights")
     match = re.search(r"^output\s*:(.*)$", result.stdout, re.MULTILINE)
     if not match:
         raise RuntimeError("engine returned no output token ids")
@@ -426,9 +497,12 @@ def run_model(ck, out, a):
     raw_text = tokenizer.decode(generated, skip_special_tokens=False)
     decoded = tokenizer.decode(generated, skip_special_tokens=True)
     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
-              "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode,
+              "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
-    if a.mtp_mode != "off":
+    if a.dflash2:
+        report.update(draft_method="dflash2", draft_graph=True, draft_adaptive=True,
+                      draft_worker=json.loads((out / "dflash2-worker.json").read_text()))
+    elif a.mtp_mode != "off":
         report.update(mtp_mode=a.mtp_mode, mtp_max_t=a.mtp_max_t)
     budget = re.search(r"^mtp budget:.*$", errors, re.MULTILINE)
     if budget:
@@ -454,15 +528,21 @@ def main():
     ap.add_argument("--max-new", type=int, default=32)
     ap.add_argument("--context", type=int, default=512)
     ap.add_argument("--pool-workers", type=int, default=12)
-    ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="off")
+    ap.add_argument("--expert-cache", type=int, default=None, help="fixed GPU expert slots; still subject to the 50% total weight budget")
+    ap.add_argument("--dflash2", help="experimental trained DFlash2 directory; replaces MTP, enables graphs/adaptive drafting; context <=512")
+    ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="adaptive")
     ap.add_argument("--mtp-max-t", type=int, default=5, help="verification cap, including the real token (2..8)")
     a = ap.parse_args()
     if not 1 <= a.workers <= 16 or a.verify_experts < 1:
         ap.error("workers must be 1..16 and verify-experts positive")
     if a.max_new < 1 or a.context < 1 or a.pool_workers < 1:
         ap.error("max-new, context and pool-workers must be positive")
+    if a.expert_cache is not None and a.expert_cache < 1:
+        ap.error("expert-cache must be positive")
     if not 2 <= a.mtp_max_t <= 8:
         ap.error("mtp-max-t must be 2..8")
+    if a.dflash2 and a.context > 512:
+        ap.error("DFlash2 prototype supports context <=512")
     converter_path(a.llama)
     ck = AutoRoundCheckpoint(Path(a.model).resolve())
     out = Path(a.out).resolve()

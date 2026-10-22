@@ -1,0 +1,14 @@
+device 0: BW (gfx936:sramecc+:xnack-)
+  compute capability  9.3   (sm_93)
+  multiprocessors     80
+  VRAM total / free   63.984 GiB (68702699520 B) / 63.670 GiB (68365058048 B)
+  driver / runtime    60326113 / 60326113
+
+memory plan  --max-context 20480
+  KV + indexer keys   0.267387 GB
+  recurrent state     0.000000 GB  (GDN recurrence + conv history, NOT evictable)
+  expert cache        5.675613 GB  (4105 slots of 1,382,400 B)
+  VRAM pool           5.943000 GB
+  expert arena (DRAM) 0.000000 GB
+  card free           63.670 GiB (68365058048 B)
+  plan + KV vs free   FITS

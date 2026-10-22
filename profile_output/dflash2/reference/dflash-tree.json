@@ -1,0 +1,116 @@
+{
+  "sha": "07ebd93db9f472af339b644bb70221ad8428328a",
+  "url": "https://api.github.com/repos/z-lab/dflash/git/trees/07ebd93db9f472af339b644bb70221ad8428328a",
+  "tree": [
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "6b72959ef3126c1fe3304fe333e679fa10c9d222",
+      "url": "https://api.github.com/repos/z-lab/dflash/git/trees/6b72959ef3126c1fe3304fe333e679fa10c9d222"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3b5db677173503a42315b6f2180f1d50b3c76dd9",
+      "url": "https://api.github.com/repos/z-lab/dflash/git/trees/3b5db677173503a42315b6f2180f1d50b3c76dd9"
+    },
+    {
+      "path": ".github/workflows/package.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e124c977e7ddc94ef2c124f74b1870f502e034ff",
+      "size": 1023,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/e124c977e7ddc94ef2c124f74b1870f502e034ff"
+    },
+    {
+      "path": ".github/workflows/publish-pypi.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "360363022a181b8ea742ddb096bfc45f29b0bba4",
+      "size": 1690,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/360363022a181b8ea742ddb096bfc45f29b0bba4"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d245c2837c6cb0e4c8f3468974002f544b8966b1",
+      "size": 85,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/d245c2837c6cb0e4c8f3468974002f544b8966b1"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b934ad81806abbd40b1d7f0f089411dc3d750cf7",
+      "size": 1062,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/b934ad81806abbd40b1d7f0f089411dc3d750cf7"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e84d215cee572291cccb95cfb070c0b169aee909",
+      "size": 6005,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/e84d215cee572291cccb95cfb070c0b169aee909"
+    },
+    {
+      "path": "dflash",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "fe0af441f3ca3aaca80125d19ea28404e0a57820",
+      "url": "https://api.github.com/repos/z-lab/dflash/git/trees/fe0af441f3ca3aaca80125d19ea28404e0a57820"
+    },
+    {
+      "path": "dflash/__init__.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2bd1d77e4e97f047998c2198884f49c5271433d",
+      "size": 864,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/c2bd1d77e4e97f047998c2198884f49c5271433d"
+    },
+    {
+      "path": "dflash/benchmark.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3de324cce533922282df940d4917e65911469b6a",
+      "size": 15023,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/3de324cce533922282df940d4917e65911469b6a"
+    },
+    {
+      "path": "dflash/cli.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "16b5bd22a6be76b2e4cbf3443fc49b08e5ac3420",
+      "size": 4690,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/16b5bd22a6be76b2e4cbf3443fc49b08e5ac3420"
+    },
+    {
+      "path": "dflash/model.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7821d66a7b932b4e0f15381a39f76ba1d7eceb8a",
+      "size": 25722,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/7821d66a7b932b4e0f15381a39f76ba1d7eceb8a"
+    },
+    {
+      "path": "dflash/model_mlx.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8983c4d3aafa8f6e1667e355a92d3f0a25e506ff",
+      "size": 35272,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/8983c4d3aafa8f6e1667e355a92d3f0a25e506ff"
+    },
+    {
+      "path": "pyproject.toml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6828dc76e8fe88ef0c822386abdb3c3dc531df0",
+      "size": 1782,
+      "url": "https://api.github.com/repos/z-lab/dflash/git/blobs/a6828dc76e8fe88ef0c822386abdb3c3dc531df0"
+    }
+  ],
+  "truncated": false
+}

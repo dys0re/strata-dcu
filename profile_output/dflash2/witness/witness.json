@@ -1,0 +1,27 @@
+{
+  "seed": 1729,
+  "draft_ids": [
+    [
+      553,
+      393,
+      85
+    ],
+    [
+      553,
+      393,
+      85
+    ]
+  ],
+  "finite_forward": true,
+  "repeat_equal": true,
+  "weight_bytes": 2477529600,
+  "torch": "2.9.0",
+  "hip": "6.3.26093",
+  "device": "BW",
+  "totals": {
+    "calls": 2,
+    "draft_ms": 4213.158761616796,
+    "feature_rows": 0,
+    "resets": 0
+  }
+}

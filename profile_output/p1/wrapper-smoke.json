@@ -1,0 +1,11 @@
+{
+  "engine_exit": 0,
+  "generated_tokens": 64,
+  "mtp_mode": "adaptive",
+  "mtp_budget": "mtp budget: 36 observations; T1=5@31.0307ms/1tok T2=19@39.7206ms/1.75197tok T3=4@57.1904ms/2.09813tok T4=4@67.9366ms/2.23926tok T5=4@85.305ms/2.23926tok",
+  "engine_path": "/root/private_data/strata-dcu/p1/build/strata",
+  "persistent_engine": "/root/private_data/strata-dcu/p1/build/strata",
+  "expert_cache": "auto",
+  "primary_prefix_match": true,
+  "note": "wrapper uses automatic expert cache, separate from the matched 19000-slot primary comparison"
+}

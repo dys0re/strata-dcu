@@ -1,3 +1,4 @@
+#include "strata/core/dflash_bridge.hpp"
 // include/strata/core/verify.hpp - plan v0.3 P6: the speculative VERIFY window.
 //
 // T tokens at consecutive positions p0 .. p0+T-1 - the last accepted token and T-1 drafts - go through all 48
@@ -77,8 +78,10 @@ struct VerifyHits {
 };
 
 class Verifier {
+    DflashFeatures dflash_features_;
 public:
     Verifier() = default;
+    bool copy_dflash_features(int rows, std::vector<float>& out, std::string& err) const { return dflash_features_.read(rows,out,err); }
     ~Verifier();
     Verifier(const Verifier&) = delete;
     Verifier& operator=(const Verifier&) = delete;

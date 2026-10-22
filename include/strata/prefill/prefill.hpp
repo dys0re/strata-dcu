@@ -1,3 +1,4 @@
+#include "strata/core/dflash_bridge.hpp"
 // include/strata/prefill/prefill.hpp - plan v0.3 P5: batched prompt processing.
 //
 // The prompt's positions [pos0, pos0 + n) are processed in chunks of `chunk` tokens through all 48 layers, leaving
@@ -53,6 +54,7 @@ void warm_gemm_libraries(int device);
 
 class Prefill {
 public:
+    bool copy_dflash_features(int rows, std::vector<float>& out, std::string& err) const { return dflash_features_.read(rows,out,err); }
     /// E-9: the draft layer's K/V for prompt cells [cell0, cell0 + n) from their final residual rows `R_rows`
     /// (device) and `next_tokens` (host: the token at cell+1), in batches through this path's GEMMs and its idle
     /// scratch - call it from on_chunk.  false with `err` empty: not applicable here (a ring or hybrid K/V, another
@@ -276,6 +278,7 @@ private:
 
     bool carve(std::size_t T, void* alloc);   // the device buffers of a chunk (prefill.cpp's Alloc)
     void release();                          // the destructor's cleanup (also `reset`'s)
+    core::DflashFeatures dflash_features_;
     struct Impl;
     std::unique_ptr<Impl> impl_;
     PrefillStats stats_;

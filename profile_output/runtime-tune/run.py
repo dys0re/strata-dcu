@@ -1,0 +1,107 @@
+"""Tune the deployed Qwen runtime: automatic GPU capacity, reserve and expert adaptation."""
+import argparse,json,os,subprocess,time
+from pathlib import Path
+
+ap=argparse.ArgumentParser(__doc__)
+ap.add_argument('--engine',required=True)
+ap.add_argument('--out',required=True)
+ap.add_argument('--reserve',type=int,default=1024)
+ap.add_argument('--adapt-every',type=int,default=0)
+ap.add_argument('--adapt-swaps',type=int,default=0)
+ap.add_argument('--save-profile')
+ap.add_argument('--cols',type=int,choices=[0,2,4],default=0)
+ap.add_argument('--mode',default='adaptive')
+ap.add_argument('--repeat',type=int,default=3)
+ap.add_argument('--checks',action='store_true')
+ap.add_argument('--profile',action='store_true')
+ap.add_argument('--dump-logits',action='store_true')
+ap.add_argument('--shared-stream',choices=['default','off','on'],default='default')
+ap.add_argument('--fuse',choices=['off','qfuse','qdedup','both','hc'],default='off')
+a=ap.parse_args()
+assert a.mode in ['off','adaptive']+[f'fixed{i}' for i in range(2,9)]
+out=Path(a.out);out.mkdir(parents=True,exist_ok=False)
+root=Path('/root/strata-dcu'); cache=root/'autoround'
+cmd=json.loads((cache/'run-command.json').read_text());cmd[0]=a.engine
+for flag,n in [('--mtp',2),('--mtp-adaptive',1)]:
+ if flag in cmd:
+  i=cmd.index(flag);del cmd[i:i+n]
+for flag,value in [('--spec','8' if a.mode=='fixed8' else '5'),('--mtp-max-t','1' if a.mode=='off' else ('5' if a.mode=='adaptive' else a.mode[5:])),('--expert-cache','auto'),('--vram-reserve-mib',str(a.reserve)),('--adapt-every',str(a.adapt_every))]:
+ cmd[cmd.index(flag)+1]=value
+if a.mode!='off':cmd+=['--mtp',str(cache/'mtp')]
+if a.mode=='adaptive':cmd+=['--mtp-adaptive']
+if a.mode.startswith('fixed'):
+ t=int(a.mode[5:]);cmd[cmd.index('--spec')+1]=str(max(5,t))
+cmd+=['--serve','--prompt-cache','0','--conversation-cache-mib','0','--pcie-frac','0','--adapt-swaps',str(a.adapt_swaps)]
+if a.save_profile:cmd+=['--expert-profile-save',a.save_profile,'--expert-profile-save-every','0']
+env=os.environ.copy()
+for key in ['STRATA_VERIFY_PROFILE','STRATA_DECODE_TIMING','STRATA_DUMP_FIRST_LOGITS','STRATA_SPEC_PROB','STRATA_MTP_FRONT_CHECK','STRATA_SH_STREAM']:
+ env.pop(key,None)
+settings=dict(STRATA_BF16_Q8_VEC4='1',STRATA_BF16_Q8_COLS=str(a.cols),STRATA_ROUTE_TAIL_SKIP='0',STRATA_SPEC_COUPLED='1',
+ STRATA_QFUSE=str(int(a.fuse in ['qfuse','both'])),STRATA_VERIFY_QDEDUP=str(int(a.fuse in ['qdedup','both'])),STRATA_QFUSE_HC=str(int(a.fuse=='hc')))
+if a.shared_stream!='default':settings['STRATA_SH_STREAM']=str(int(a.shared_stream=='on'))
+env.update(settings)
+if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRATA_SPEC_DEPTH='1')
+if a.checks and (a.profile or a.dump_logits):env['STRATA_DUMP_FIRST_LOGITS']=str(out/'logits.f32')
+(out/'command.json').write_text(json.dumps(dict(command=cmd,overrides=settings,profile=a.profile,checks=a.checks,dump_logits='STRATA_DUMP_FIRST_LOGITS' in env),indent=2)+'\n')
+from transformers import AutoTokenizer
+tok=AutoTokenizer.from_pretrained('/root/private_data/Qwen3.8-F',local_files_only=True)
+tok.chat_template=Path('/root/private_data/Qwen3.8-F/chat_template.jinja').read_text()
+story='Write a detailed 800-word story about a robot exploring an abandoned observatory. Begin the story immediately and continue with rich descriptions and dialogue.'
+workloads=[('story',story),('chinese','请详细解释大语言模型的 prefill 和 decode 阶段有什么区别，以及它们各自的性能瓶颈。请分段说明并举例。'),('code','Write a Python LRU cache class using OrderedDict. Include get and put methods, explain their complexity, and give a usage example.')]
+cases=[('warmup',story,128,None,0)]
+for rep in range(a.repeat):cases += [(name+f'-{rep}',prompt,256,None,0) for name,prompt in workloads]
+if a.checks:
+ cases += [('ok','Reply with exactly OK.',16,'OK',0),('arithmetic','What is 2+2? Answer only the number.',16,'4',0),('capital','中国的首都是哪座城市？只回答城市名称。',16,'北京',0)]
+ cases += [(f'sample-{i}','Write a short story about a lost compass and a mountain village.',64,None,.7) for i in range(2)]
+ cases += [('one_token','Reply with exactly OK.',1,None,0),('context_tail','Continue a long story for several paragraphs.',3,None,0)]
+records=[]
+with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
+ p=subprocess.Popen(cmd,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=err,text=True,bufsize=1)
+ def line():
+  s=p.stdout.readline()
+  if not s:raise RuntimeError(f'engine EOF: {p.poll()}')
+  stdout.write(s);stdout.flush()
+  if s.startswith('ERR '):raise RuntimeError(s)
+  return s.strip()
+ def send(s):p.stdin.write(s);p.stdin.flush()
+ def finish(stop=False):
+  ids=[];sent=False
+  while True:
+   s=line()
+   if s.startswith('T '):
+    ids.append(int(s.split()[1]))
+    if stop and len(ids)>=8 and not sent:send('STOP\n');sent=True
+   if s.startswith('DONE '):return ids,s
+ def gen(prompt,n,temperature=0,tail=False):
+  ids=tok.apply_chat_template([{'role':'user','content':prompt}],tokenize=True,add_generation_prompt=True,enable_thinking=False)
+  if tail:ids=ids[:3]+[tok.encode(' word',add_special_tokens=False)[0]]*(501-len(ids))+ids[3:]
+  assert len(ids)+n<=512
+  sampling=f'temperature={temperature} top_p=0.9 top_k=20 seed=1729' if temperature else 'temperature=0'
+  return ids,f'GEN {n} ckpt=0 {sampling} '+','.join(map(str,ids))+'\n'
+ try:
+  while not line().startswith('READY '):pass
+  print('READY',a.mode,a.cols,a.fuse,flush=True)
+  for name,prompt,n,expected,temperature in cases:
+   prompt_ids,request=gen(prompt,n,temperature,name=='context_tail')
+   (out/(name+'.request.txt')).write_text(request)
+   started=time.monotonic();send(request);ids,done=finish();fields=done.split()
+   text=tok.decode(ids,skip_special_tokens=True)
+   assert int(fields[1])==len(ids) and int(fields[2])==len(prompt_ids) and len(ids)<=n and int(fields[8])==0
+   assert fields[5] in ['length','stop']
+   if expected is not None:assert text.strip()==expected,(name,text)
+   records.append(dict(case=name,prompt_ids=prompt_ids,generated_ids=ids,text=text,done=done,
+    decode_ms=float(fields[4]),decode_tps=1000*len(ids)/float(fields[4]),wall_s=time.monotonic()-started))
+   (out/'results.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
+   print('DONE',name,len(ids),round(records[-1]['decode_tps'],2),flush=True)
+  if a.checks:
+   assert records[-4]['generated_ids']==records[-3]['generated_ids'],'seed repeat'
+   assert len(records[-2]['generated_ids'])==1 and len(records[-1]['generated_ids'])<=3
+   _,request=gen(story,256);send(request);ids,done=finish(stop=True);assert done.split()[5]=='cancel'
+   _,request=gen('Reply with exactly OK.',16);send(request);ids,recovery=finish();assert tok.decode(ids,skip_special_tokens=True).strip()=='OK'
+   (out/'protocol.json').write_text(json.dumps(dict(cancel=done,recovery=recovery,seed_repeat=True,one_token_limit=True,context_tail=True),indent=2)+'\n')
+  send('QUIT\n');p.wait(timeout=30);assert p.returncode==0
+ finally:
+  if p.poll() is None:p.kill();p.wait()
+errors=(out/'stderr.log').read_text()
+assert not any(s in errors for s in ['Launch params','larger than launch bounds','invalid device function','out of memory'])
+print('PASS',flush=True)

@@ -1,0 +1,13 @@
+READY adaptive 0 off
+DONE warmup 128 18.67
+DONE story-0 256 21.1
+DONE chinese-0 256 24.4
+DONE code-0 256 31.59
+DONE ok 2 11.72
+DONE arithmetic 2 12.8
+DONE capital 2 18.15
+DONE sample-0 64 21.08
+DONE sample-1 64 21.55
+DONE one_token 1 4.25
+DONE context_tail 3 13.45
+PASS

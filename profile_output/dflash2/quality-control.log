@@ -1,0 +1,7 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 22947840000, 'mtp': 0, 'weights': 31576870400, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.45961615, 'device_used': 32824623104, 'external_draft': 0}
+READY off 4 off
+DONE ok 2 17.73
+DONE arithmetic 2 30.58
+DONE capital 2 27.97
+DONE story-short 64 26.91
+PASS

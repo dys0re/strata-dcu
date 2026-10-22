@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 static void check(cudaError_t e) {
@@ -20,7 +21,10 @@ int main() {
         cudaStream_t stream;
         check(cudaStreamCreate(&stream));
         int cases = 0;
-        for (int k : {32, 64, 640, 2560, 6144}) for (int n : {1, 5, 33}) for (int t : {1, 2, 3, 8}) {
+        std::vector<std::pair<int, int>> shapes;
+        for (int k : {32, 64, 640, 2560, 6144}) for (int n : {1, 5, 33}) shapes.emplace_back(k, n);
+        shapes.emplace_back(2560, 6145);   // eligible multi-column dispatch with a partial final row block
+        for (auto [k, n] : shapes) for (int t : {1, 2, 3, 4, 5, 6, 7, 8}) {
             ++cases;
             std::vector<uint16_t> w(size_t(k) * n);
             std::vector<float> x(size_t(k) * t), got(size_t(n) * t);
@@ -40,6 +44,16 @@ int main() {
             native_mmvq(30, dw, dq, static_cast<float*>(dy), k, n, t, stream);
             check(cudaStreamSynchronize(stream));
             check(cudaMemcpy(got.data(), dy, got.size() * 4, cudaMemcpyDeviceToHost));
+            // The single-column dispatch remains the independent vec4 path.
+            // Compare ALL columns, including partial tiles, bit for bit.
+            for (int col = 0; col < t; ++col)
+                native_mmvq(30, dw, static_cast<const uint8_t*>(dq) + size_t(col) * native_q8_1_bytes(k, 1),
+                            static_cast<float*>(dy) + size_t(col) * n, k, n, 1, stream);
+            check(cudaStreamSynchronize(stream));
+            std::vector<float> single(got.size());
+            check(cudaMemcpy(single.data(), dy, single.size() * 4, cudaMemcpyDeviceToHost));
+            if (std::memcmp(single.data(), got.data(), got.size() * 4) != 0)
+                throw std::runtime_error("BF16 multi-column projection differs from single-column dispatch");
             std::vector<uint8_t> q(qb);
             check(cudaMemcpy(q.data(), dq, qb, cudaMemcpyDeviceToHost));
             for (int col = 0; col < t; ++col) for (int row = 0; row < n; ++row) {
@@ -74,7 +88,7 @@ int main() {
             check(cudaFree(dy)); check(cudaFree(dq)); check(cudaFree(dx)); check(cudaFree(dw));
         }
         check(cudaStreamDestroy(stream));
-        std::printf("bf16_q8_mmvq_parity OK: %d shapes, all outputs finite and within summation tolerance\n", cases);
+        std::printf("bf16_q8_mmvq_parity OK: %d shapes, bitwise single-column parity and host summation tolerance\n", cases);
         return 0;
     } catch (const std::exception& e) { std::fprintf(stderr, "%s\n", e.what()); return 1; }
 }

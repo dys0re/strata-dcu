@@ -1,0 +1,3 @@
+https://github.com/z-lab/dflash
+07ebd93db9f472af339b644bb70221ad8428328a
+model.py is the unmodified upstream reference; only the IPC/cache adapter is local.

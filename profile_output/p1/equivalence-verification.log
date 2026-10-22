@@ -1,0 +1,1 @@
+PASS: final adaptive and fixed T=8 each match 11 P0 requests and 13 first-token-logit arrays; STOP, recovery, seed and limits pass

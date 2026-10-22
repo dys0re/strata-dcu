@@ -1350,6 +1350,7 @@ void warm_gemm_libraries(int device) {
 bool Prefill::init(const core::WeightTable& wt, const core::ModelGeometry& g, core::SessionState& ss,
                    core::ExpertSource* src, const core::ExpertCache* cache, const int32_t* host_res, int64_t chunk,
                    void* stream, std::string& err, void* borrow, uint64_t borrow_bytes, bool borrow_spill) {
+    if (!dflash_features_.init((int) chunk, (int) g.n_embd, (int) g.hc, err)) return false;
     Impl& m = *impl_;
 #if defined(STRATA_GPU_METAL)
     (void) wt; (void) src; (void) cache; (void) host_res; (void) stream; (void) borrow;
@@ -3059,6 +3060,7 @@ bool Prefill::run_impl(const int64_t* tokens, int64_t n, int64_t pos0, std::stri
                              (long long) p0, (long long) layer, what, ms, cudaGetErrorString(a), cudaGetErrorString(b));
         };
         for (int64_t l = LB; l < LE; ++l) {
+            dflash_features_.capture((int) l-1, m.R, (int) T, 0, m.cs);
             core::progress_beat();   // the serve watchdog: a prompt chunk of 8192 tokens is still moving
             if (l > LB) pf_step("reading the prompt (batched, step sync): the experts and the rest of layer", l - 1);
             core::progress_at("reading the prompt (batched): layer", l, p0);   // #251: a stall names layer and chunk

@@ -1,0 +1,8 @@
+{
+  "exit_code": 2,
+  "rejected_before_generation": true,
+  "rejected_before_resident_ram_allocation": true,
+  "diagnostic": [
+    "strata generate: requested weights exceed the weight VRAM budget: limit=34351349760 bytes, nonexpert_upper=10003607296 bytes, expert_slots=19000 (max 8806)"
+  ]
+}

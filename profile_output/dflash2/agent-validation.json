@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-22",
+  "method": "fresh subagent executed compute ledger SSH witness verbatim once",
+  "exit_code": 0,
+  "sentinel": "WITNESS DFLASH2",
+  "finite_forward": true,
+  "repeat_equal": true,
+  "incremental_cache_equal": true,
+  "draft_ids": [[553,393,85],[553,393,85]],
+  "weight_bytes": 2477529600,
+  "graphs": 12,
+  "behavioral_documentation_divergence": [],
+  "notes": "Nonfatal ROCm, TF32/deprecation, attention warnings. No environment changes or agent edits."
+}

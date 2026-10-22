@@ -1,3 +1,4 @@
+#include "strata/core/dflash_bridge.hpp"
 #include "strata/core/logit_bias.hpp"
 // src/program/generate.cpp - P2.S6: `strata generate`.
 //
@@ -5453,6 +5454,14 @@ int main(int argc, char** argv) {
                      (unsigned long long) native_head.weight_bytes(),
                      std::chrono::duration<double>(std::chrono::steady_clock::now() - head_t0).count());
     }
+    strata::core::DflashBridge dflash;
+    if (strata::core::dflash_enabled() && (!o.serve || multi_gpu || !o.mtp.empty() || o.mtp_adaptive ||
+        o.pipeline_windows > 0 || o.suffix_draft > 0 || o.lookup_chain > 0 || o.prompt_cache != 0 ||
+        o.batch != 0 || o.max_context > 512)) {
+        std::fprintf(stderr, "DFlash2 IPC requires solo --serve, context <=512, --prompt-cache 0, without MTP, pipeline or lookup drafting\n");
+        return 2;
+    }
+    if (!dflash.init(err)) { std::fprintf(stderr,"%s\n",err.c_str());return 2; }
     std::vector<float> logits((size_t) n_vocab);
     mem_mark("the native head");
     float* d_logits = nullptr;
@@ -6058,6 +6067,62 @@ int main(int argc, char** argv) {
             o.expert_cache = (int) fit;
         }
     }
+    // Test/deployment weight budget: distinct from free-memory reserves for KV and workspaces.
+    // Account owned allocations, including the draft head; never count a host-mapped embedding as VRAM.
+    uint64_t weight_vram_limit = 0, weight_vram_total = 0;
+    const uint64_t fixed_weight_bytes = pool_bytes + native_dense.weight_bytes() + native_head.weight_bytes() + dflash.weight_bytes();
+    if (const char* setting = std::getenv("STRATA_MAX_WEIGHT_VRAM_FRACTION")) {
+        char* end = nullptr;
+        const double fraction = std::strtod(setting, &end);
+        if (end == setting || *end || !std::isfinite(fraction) || fraction <= 0 || fraction > 1) {
+            std::fprintf(stderr, "strata generate: STRATA_MAX_WEIGHT_VRAM_FRACTION must be in (0,1]\n");
+            return 2;
+        }
+        if (!native_pack || multi_gpu || hc_q8 || !slot_mtp.empty() || o.pipeline_windows > 0 ||
+            o.vram_elastic || std::any_of(o.expert_cache_remote.begin(), o.expert_cache_remote.end(),
+                                        [](int n) { return n != 0; })) {
+            std::fprintf(stderr, "strata generate: weight budget currently requires a single-GPU native pack, "
+                                 "without HC Q8 copies, batch drafters, pipeline windows, remote caches or elastic VRAM\n");
+            return 2;
+        }
+        size_t free_b = 0, total_b = 0;
+        if (cudaMemGetInfo(&free_b, &total_b) != cudaSuccess || total_b == 0) return 1;
+        weight_vram_total = total_b;
+        weight_vram_limit = (uint64_t) (fraction * (double) total_b);
+        // bind_bytes includes logits and token maps too: conservative until the actual head is bound below.
+        const uint64_t other = fixed_weight_bytes + mtp.weight_bytes() +
+            (o.mtp.empty() ? 0 : mtp.bind_bytes(native_head.row_bytes(), n_vocab));
+        const uint64_t stride = (strata::kernels::cpu::expert_layout().max_blob + 255) / 256 * 256;
+        const int64_t fit = other <= weight_vram_limit ? (int64_t) ((weight_vram_limit - other) / stride) : -1;
+        if (fit < 0 || (!auto_cache && o.expert_cache > fit)) {
+            std::fprintf(stderr, "strata generate: requested weights exceed the weight VRAM budget: "
+                                 "limit=%llu bytes, nonexpert_upper=%llu bytes, expert_slots=%d (max %lld)\n",
+                         (unsigned long long) weight_vram_limit, (unsigned long long) other,
+                         o.expert_cache, (long long) fit);
+            return 2;
+        }
+        if (auto_cache) o.expert_cache = (int) std::min<int64_t>(o.expert_cache, fit);
+        std::fprintf(stderr, "strata weight budget: total=%llu limit=%llu fraction=%.6f expert_slots=%d\n",
+                     (unsigned long long) total_b, (unsigned long long) weight_vram_limit, fraction, o.expert_cache);
+    }
+    auto check_weight_budget = [&]() -> bool {
+        if (!weight_vram_limit) return true;
+        const uint64_t expert_b = (uint64_t) xcache.full_bytes();
+        const uint64_t mtp_b = mtp.weight_bytes();
+        const uint64_t weights = fixed_weight_bytes + expert_b + mtp_b;
+        size_t free_b = 0, total_b = 0;
+        if (cudaMemGetInfo(&free_b, &total_b) != cudaSuccess) return false;
+        std::fprintf(stderr, "strata weight usage: pack=%llu dense=%llu head=%llu experts=%llu mtp=%llu "
+                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu external_draft=%llu\n",
+                     (unsigned long long) pool_bytes, (unsigned long long) native_dense.weight_bytes(),
+                     (unsigned long long) native_head.weight_bytes(), (unsigned long long) expert_b,
+                     (unsigned long long) mtp_b, (unsigned long long) weights,
+                     (unsigned long long) weight_vram_total, (unsigned long long) weight_vram_limit,
+                     (double) weights / weight_vram_total, (unsigned long long) (total_b - free_b), (unsigned long long) dflash.weight_bytes());
+        if (weights <= weight_vram_limit) return true;
+        std::fprintf(stderr, "strata generate: weight VRAM budget exceeded; refusing generation\n");
+        return false;
+    };
     // plan v0.3 P6: a native pack's blobs differ per layer, so the same VRAM holds more experts than slots of
     // the largest blob would. The shared cache below sizes slots in profile order.
     // #369: that list does not match --expert-cache-per-layer. A range is layer * quota + n, so a size cut for
@@ -9047,6 +9112,7 @@ int main(int argc, char** argv) {
         const strata::core::PoolMultiFn win_pool_fn = n_stages > 1 ? &drive_pool_split : &drive_pool_multi;
         void* const win_pool_user = n_stages > 1 ? (void*) &split_drive : (void*) &drive;
         mem_mark("the verifier and the drafter's binding");
+        if (!check_weight_budget()) return 2;
         ver.set_split(o.spec_split);
         // auto: the copy kernel for every pack.  DMA (the native packs' default until 0.1.13) has the host call
         // cudaMemcpyAsync + cudaLaunchHostFunc inside a verify window while the GPU spins on the flag they raise;
@@ -9666,6 +9732,10 @@ int main(int argc, char** argv) {
         sp.on_chunk = [&](const float* R_rows, int64_t T, int64_t p0, std::string& e) -> bool {
             std::vector<int32_t> nxt((size_t) T);
             for (int64_t t = 0; t < T; ++t) nxt[(size_t) t] = (int32_t) cur[(size_t) (p0 + t + 1)];
+            if (dflash.enabled()) {
+                std::vector<float> features;
+                if (!sp.copy_dflash_features((int)T,features,e) || !dflash.append(features,(int)T,p0,e)) return false;
+            }
             // E-9: batched through the prompt path when it can (a layer split: only with STRATA_SPLIT_MTP_BATCH=1)
             bool batched = false;
             const strata::program::draft_kv::Plan dkv = strata::program::draft_kv::plan(
@@ -12823,6 +12893,9 @@ int main(int argc, char** argv) {
             tr("request", n, geni ? 1 : 0);
             req_times = ReqTimes{};
             if (use_mtp) mtp.set_prompt_len(n);
+            if (dflash.enabled() && (resume != 0 || !dflash.reset(err))) {
+                std::printf("ERR DFlash2 needs an uncached prompt: %s\n",err.c_str());return 2;
+            }
             const int64_t read_from = reread_to > 0 ? 0 : resume;
             conversations.limit_reuse(read_from);
             pp_total = n;
@@ -13019,6 +13092,10 @@ int main(int argc, char** argv) {
                     if (logpos != nullptr && !ver.window_logprobs(nxt.data(), T, q, logpos_extra, logpos, e))
                         return false;
                     if (!ver.commit(T, e) || (use_mtp && !mtp.prefill(ver.final_R_all(), nxt.data(), T, q, e))) return false;
+                    if (dflash.enabled()) {
+                        std::vector<float> features;
+                        if (!ver.copy_dflash_features(T,features,e) || !dflash.append(features,T,q,e)) return false;
+                    }
                     q += T;
                     pp_reached = q;   // #471
                     pp_exact = true;
@@ -13962,6 +14039,7 @@ int main(int argc, char** argv) {
             }
             if (o.mtp_adaptive) mtp_budget.begin_request();
             int mtp_planned_t = 1;
+            int dflash_t = 1;
             double mtp_prepared_ms = 0;
             bool first_window = true;
             int64_t produced_n = 0, sfx_windows = 0, sfx_drafts = 0, sfx_ok = 0;
@@ -14664,7 +14742,8 @@ int main(int argc, char** argv) {
                 }
             }
             while (!pl_ran && !cancelled && produced_n < max_new) {
-                int T = use_mtp ? (o.mtp_adaptive ? mtp_planned_t : S_mtp) : 1;
+                int T = dflash.enabled() ? dflash_t : use_mtp ? (o.mtp_adaptive ? mtp_planned_t : S_mtp) : 1;
+                if (dflash.enabled()) T = (int)std::min<int64_t>({T,max_new-produced_n,o.max_context-p});
                 if (use_mtp && req_spec_min_p > 0.0) {
                     T = 1;
                     while (T < S_mtp && dprob[(size_t) T - 1] >= (float) req_spec_min_p) ++T;
@@ -14957,8 +15036,16 @@ int main(int argc, char** argv) {
                         mtp.set_max_drafts(mtp_planned_t - 1);
                     }
                 }
-                const bool drafted = !use_mtp || eos || produced_n >= max_new ||
-                                     mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p);
+                bool drafted = !use_mtp || eos || produced_n >= max_new ||
+                               mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p);
+                if (dflash.enabled() && drafted && !eos && produced_n < max_new) {
+                    std::vector<float> features;
+                    int got=0;
+                    const int cap=(int)std::min<int64_t>({S,max_new-produced_n,o.max_context-(p+a+1)});
+                    drafted=ver.copy_dflash_features(a+1,features,err) && dflash.append(features,a+1,p,err);
+                    if (drafted && cap>1) drafted=dflash.draft(p+a+1,outv[(size_t)a],cap-1,drafts.data(),got,err);
+                    dflash_t=got+1;
+                }
                 {
                     const Clock::time_point tw3 = Clock::now();
                     auto msd = [](Clock::time_point a0, Clock::time_point b0) { return std::chrono::duration<double, std::milli>(b0 - a0).count(); };
@@ -15923,6 +16010,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         mem_mark("the verifier and the drafter's binding");
+        if (!check_weight_budget()) return 2;
         ver.set_sampling(sp);   // the CLI's own sampling (until 0.1.19 this loop was always greedy); no penalties here
         if (use_mtp) mtp.set_draft_sampling(sp);   // STRATA_SPEC_COUPLED=1: sampled drafts (a no-op otherwise)
         ver.set_split(o.spec_split);

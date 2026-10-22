@@ -1,0 +1,20 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 22947840000, 'mtp': 0, 'weights': 34054400000, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.49567776, 'device_used': 36440113152, 'external_draft': 2477529600}
+READY dflash 4 off
+DONE warmup 128 21.33
+DONE story-0 256 23.1
+DONE chinese-0 256 28.18
+DONE code-0 256 39.03
+DONE story-1 256 24.22
+DONE chinese-1 256 30.23
+DONE code-1 256 41.86
+DONE story-2 256 24.38
+DONE chinese-2 256 30.25
+DONE code-2 256 42.18
+DONE ok 2 14.62
+DONE arithmetic 2 14.96
+DONE capital 2 12.84
+DONE sample-0 64 19.84
+DONE sample-1 64 21.22
+DONE one_token 1 35.59
+DONE context_tail 3 16.99
+PASS

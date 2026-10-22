@@ -1,6 +1,8 @@
 # SCNet DCU 开发环境
 
-最后实测：2026-10-21。本文记录远程实例的配置、环境加载和联网测试结果；未包含登录密码或代理认证凭据。
+当前速度测试遵循[GPU 权重占用不超过 50% 的标准](docs/DCU_TEST_STANDARD.md)。主模型、输出头和 MTP 一起计入；此前满显存/19,000 专家配置的速度保留为历史记录。
+
+最后更新：2026-10-22。本文记录远程实例的配置、环境加载和联网测试结果；未包含登录密码或代理认证凭据。
 
 ## 连接
 
@@ -297,3 +299,34 @@ python3 /root/strata-dcu/Strata/tools/autoround_pack.py prepare \
 新旧内核各 60 种形状的独立 CPU double 参考检查通过；三个短问答均正确。六个提示的首 token KL 为 3.05e-5–4.80e-4，未完成全面质量或长上下文评测。关闭路由预取没有稳定收益；关闭共享专家跨流反而变慢，均保留原默认。
 
 完整方法、结果、验证边界和文件清单：[decode 优化报告](profile_output/dcu-decode-optimization.md)。
+
+
+### P1：增强 MTP 下的多列权重复用（2026-10-22）
+
+远程入口已选择持久盘 `/root/private_data/strata-dcu/p1/build/strata`。`STRATA_BF16_Q8_COLS=4` 为 gfx936 的大 BF16 投影复用验证列的权重读取；单列和小矩阵保留原路径，不重新转换权重。测试双方始终开启 `--mtp-mode adaptive`，固定 19,000 专家槽、INT8 KV、512 上下文、12 workers，旧/新/新/旧交错，每个方案两次启动、每种工作负载六个 256-token 请求。
+
+英文、中文、代码 decode 中位数分别由 34.97/40.17/46.46 提升至 37.08/41.34/48.54 token/s（+6.04%/+2.92%/+4.49%）。54 个主对照请求的输出一致。自适应与固定 T=8 的独立检查各有 11 个请求及 13 组首 token logits 与 P0 一致，STOP/恢复、seed、单 token 和合法边界检查通过。
+
+量化去重需要关闭共享跨流，在本组英文/中文上没有净收益；QFUSE 出现非等价输出，因此二者均保持关闭。适用范围、原始数据、开关与回退方法见 [P1 报告](docs/P1_BF16_MULTICOL.md)。
+
+
+### GPU 权重 ≤50% 的新测试标准（2026-10-22）
+
+后续速度测试统一采用[当前标准](docs/DCU_TEST_STANDARD.md)，主模型 pack、dense、输出头、GPU 专家和 MTP 合计不得超过物理总显存的一半。启动入口和报告均强制核验。当前正式入口选择持久盘 `/root/private_data/strata-dcu/weight50/strata`，默认固定 8,500 个 GPU 主模型专家、16,076 个 RAM 专家（41.394 GiB），增强 MTP adaptive 开启，VEC4/COLS=4。
+
+实测 GPU 权重 33,497,969,152 字节 = 31.197 GiB，占 63.984 GiB 显存的 **48.758%**，低于 31.992 GiB 上限，包含全部 MTP 权重。初始化设备总占用 32.383 GiB；其中权重之外的 1.185 GiB 含 KV/状态/工作区/驱动等，不能当作单独的 KV 用量或峰值。
+
+两次独立启动、每类六次 256-token 生成，BS=1、512 上下文、INT8 KV、12 workers，decode 中位数：**英文 29.48、中文 37.66、代码 38.51 token/s**。短问答、seed、上下文边界、STOP/恢复通过，没有 OOM。旧 19,000 专家配置被新预算拒绝；测试后推理进程均已退出。完整账单、范围和原始材料见[重测报告](profile_output/weight50/README.md)。旧满显存结果仅保留历史条件。
+
+
+### DFlash2 实验接入（2026-10-22）
+
+已接入 `incoai/Qwen3.8-Flash-Next-DFlash2`，权重通过 ModelScope 下载到持久盘 `/root/private_data/strata-dcu/dflash2/checkpoint`，1,206,140,008 字节，SHA-256 与 HF 发布值一致。HF Mirror 大文件传输过慢后切换；ModelScope 有效传输阶段约 23 MiB/s。没有把大权重或构建放进系统盘，结束时 `/root` 本地占用 954MiB。
+
+正式引擎链接已选用 `/root/private_data/strata-dcu/dflash2/strata-final`，旧 weight50 二进制仍保留。默认草稿方法继续为增强 MTP；用 `bash /root/strata-dcu/run-autoround.sh --dflash2 /root/private_data/strata-dcu/dflash2/checkpoint --prompt 'Reply with exactly OK.' --max-new 16` 显式启用 DFlash2 graph＋自适应候选数。入口禁用 route-tail-skip 和未验证融合；单次生成入口已实际返回 OK。
+
+DFlash2 目前为独立 PyTorch 草稿进程＋Strata 验证器，支持单卡、BS=1、文本、上下文最多 512。主模型 GPU 专家固定 8,300，其余 16,276 在 RAM，全部 GPU 权重 **31.715631 GiB / 49.5678%**（包含草稿输出头副本）。MTP 基线为 8,500 个 GPU 专家、权重 48.758%。
+
+各类三次 256-token 生成的中位数：增强 MTP 英文/中文/代码 **29.47 / 37.52 / 38.26 TPS**；自适应 DFlash2 **27.25 / 31.93 / 41.81 TPS**，分别 **−7.54% / −14.90% / +9.30%**。只在本轮代码任务观察到收益，保留显式开关。
+
+34 个请求、5,140 个输出 token IDs 与同一 8,300 专家布局的逐 token 参考一致；采样、STOP/恢复、单 token 和上下文边界通过，没有 OOM。增强 MTP 的 10 个回归请求与此前 weight50 输出一致。fresh agent 原样复跑真实草稿 witness 通过。测试及草稿进程均已退出。实现、范围、原始数据见 [接入文档](docs/DFLASH2_IPC.md) 和 [测试报告](profile_output/dflash2/README.md)。

@@ -1,0 +1,92 @@
+{
+  "model": "/root/private_data/Qwen3.8-F",
+  "files": [
+    {
+      "name": "model-00001-of-00017.safetensors",
+      "size": 2899311784,
+      "mtime_ns": 1792570883000000000
+    },
+    {
+      "name": "model-00003-of-00017.safetensors",
+      "size": 5370548192,
+      "mtime_ns": 1792570948000000000
+    },
+    {
+      "name": "model-00004-of-00017.safetensors",
+      "size": 5370910416,
+      "mtime_ns": 1792570949000000000
+    },
+    {
+      "name": "model-00005-of-00017.safetensors",
+      "size": 5370140704,
+      "mtime_ns": 1792570944000000000
+    },
+    {
+      "name": "model-00006-of-00017.safetensors",
+      "size": 5370205184,
+      "mtime_ns": 1792571022000000000
+    },
+    {
+      "name": "model-00007-of-00017.safetensors",
+      "size": 5370927288,
+      "mtime_ns": 1792571124000000000
+    },
+    {
+      "name": "model-00008-of-00017.safetensors",
+      "size": 5344445352,
+      "mtime_ns": 1792571110000000000
+    },
+    {
+      "name": "model-00009-of-00017.safetensors",
+      "size": 5370355648,
+      "mtime_ns": 1792571107000000000
+    },
+    {
+      "name": "model-00010-of-00017.safetensors",
+      "size": 5370927288,
+      "mtime_ns": 1792571208000000000
+    },
+    {
+      "name": "model-00011-of-00017.safetensors",
+      "size": 5324173744,
+      "mtime_ns": 1792571254000000000
+    },
+    {
+      "name": "model-00012-of-00017.safetensors",
+      "size": 5370438520,
+      "mtime_ns": 1792571278000000000
+    },
+    {
+      "name": "model-00013-of-00017.safetensors",
+      "size": 5370927288,
+      "mtime_ns": 1792571330000000000
+    },
+    {
+      "name": "model-00014-of-00017.safetensors",
+      "size": 5342689856,
+      "mtime_ns": 1792571397000000000
+    },
+    {
+      "name": "model-00015-of-00017.safetensors",
+      "size": 5050474736,
+      "mtime_ns": 1792571393000000000
+    },
+    {
+      "name": "model-00016-of-00017.safetensors",
+      "size": 102400512256,
+      "mtime_ns": 1792574477000000000
+    },
+    {
+      "name": "model-00017-of-00017.safetensors",
+      "size": 1284526608,
+      "mtime_ns": 1792571377000000000
+    },
+    {
+      "name": "model_extra_tensors.safetensors",
+      "size": 5214492152,
+      "mtime_ns": 1792571616000000000
+    }
+  ],
+  "config_sha256": "0fabfa21fab8bfe69f02234f7ae8df4ed91b785fca2e22011c1230f6a07e5329",
+  "index_sha256": "35e503b758cf5441886042d315c48dfba70f947611816cbb90e02d4d5c5e58ff"
+}

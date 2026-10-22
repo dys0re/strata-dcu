@@ -1,0 +1,13 @@
+READY fixed8 4 off
+DONE warmup 128 13.49
+DONE story-0 256 15.04
+DONE chinese-0 256 21.13
+DONE code-0 256 33.75
+DONE ok 2 9.12
+DONE arithmetic 2 10.47
+DONE capital 2 8.62
+DONE sample-0 64 13.45
+DONE sample-1 64 14.56
+DONE one_token 1 14.9
+DONE context_tail 3 9.79
+PASS

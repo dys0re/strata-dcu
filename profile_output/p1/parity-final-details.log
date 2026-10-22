@@ -1,0 +1,51 @@
+Start testing: Oct 22 12:39 CST
+----------------------------------------------------------
+75/152 Testing: bf16_q8_mmvq_parity
+75/152 Test: bf16_q8_mmvq_parity
+Command: "/root/private_data/strata-dcu/p1/build/bf16_q8_mmvq_parity"
+Directory: /root/private_data/strata-dcu/p1/build
+"bf16_q8_mmvq_parity" start time: Oct 22 12:39 CST
+Output:
+----------------------------------------------------------
+bf16_q8_mmvq_parity OK: 128 shapes, bitwise single-column parity and host summation tolerance
+<end of output>
+Test time =   6.48 sec
+----------------------------------------------------------
+Test Passed.
+"bf16_q8_mmvq_parity" end time: Oct 22 12:39 CST
+"bf16_q8_mmvq_parity" time elapsed: 00:00:06
+----------------------------------------------------------
+
+76/152 Testing: bf16_q8_mmvq_cols2_parity
+76/152 Test: bf16_q8_mmvq_cols2_parity
+Command: "/root/private_data/strata-dcu/p1/build/bf16_q8_mmvq_parity"
+Directory: /root/private_data/strata-dcu/p1/build
+"bf16_q8_mmvq_cols2_parity" start time: Oct 22 12:39 CST
+Output:
+----------------------------------------------------------
+bf16_q8_mmvq_parity OK: 128 shapes, bitwise single-column parity and host summation tolerance
+<end of output>
+Test time =   6.21 sec
+----------------------------------------------------------
+Test Passed.
+"bf16_q8_mmvq_cols2_parity" end time: Oct 22 12:39 CST
+"bf16_q8_mmvq_cols2_parity" time elapsed: 00:00:06
+----------------------------------------------------------
+
+77/152 Testing: bf16_q8_mmvq_cols4_parity
+77/152 Test: bf16_q8_mmvq_cols4_parity
+Command: "/root/private_data/strata-dcu/p1/build/bf16_q8_mmvq_parity"
+Directory: /root/private_data/strata-dcu/p1/build
+"bf16_q8_mmvq_cols4_parity" start time: Oct 22 12:39 CST
+Output:
+----------------------------------------------------------
+bf16_q8_mmvq_parity OK: 128 shapes, bitwise single-column parity and host summation tolerance
+<end of output>
+Test time =   6.44 sec
+----------------------------------------------------------
+Test Passed.
+"bf16_q8_mmvq_cols4_parity" end time: Oct 22 12:39 CST
+"bf16_q8_mmvq_cols4_parity" time elapsed: 00:00:06
+----------------------------------------------------------
+
+End testing: Oct 22 12:39 CST

@@ -1,0 +1,101 @@
+{
+  "standard": "DCU GPU weight allocations <= 50% physical VRAM",
+  "gpu_experts": 8500,
+  "ram_experts": 16076,
+  "enhanced_mtp": "adaptive",
+  "runs": [
+    "run1",
+    "run2"
+  ],
+  "workloads": {
+    "story": {
+      "requests": 6,
+      "tokens_per_request": 256,
+      "decode_tps": [
+        29.768480295824272,
+        29.36352270511453,
+        29.52642384258725,
+        29.440176641059846,
+        29.400955531054755,
+        29.779215038503594
+      ],
+      "median_tps": 29.48330024182355,
+      "min_tps": 29.36352270511453,
+      "max_tps": 29.779215038503594,
+      "identical_output_ids": true
+    },
+    "chinese": {
+      "requests": 6,
+      "tokens_per_request": 256,
+      "decode_tps": [
+        36.588677519402005,
+        38.026202430112,
+        37.22228684424799,
+        37.759225935868315,
+        37.555379514714076,
+        38.492188792157215
+      ],
+      "median_tps": 37.657302725291196,
+      "min_tps": 36.588677519402005,
+      "max_tps": 38.492188792157215,
+      "identical_output_ids": true
+    },
+    "code": {
+      "requests": 6,
+      "tokens_per_request": 256,
+      "decode_tps": [
+        37.50421189879723,
+        37.774826619448135,
+        39.96939842932755,
+        36.590246412440685,
+        39.24694916293616,
+        40.051315748302514
+      ],
+      "median_tps": 38.51088789119215,
+      "min_tps": 36.590246412440685,
+      "max_tps": 40.051315748302514,
+      "identical_output_ids": true
+    }
+  },
+  "weight_usage": [
+    {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33497969152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48757865,
+      "device_used": 34770780160
+    },
+    {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33497969152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48757865,
+      "device_used": 34770780160
+    }
+  ],
+  "checks": {
+    "cancel": "DONE 8 42 874.5 305.9 cancel 3 6 0 2323 5280 2015 0 0.0 42 0 chunk=0 experts_streamed=0",
+    "recovery": "DONE 2 17 319.2 64.4 stop 0 0 0 561 960 399 0 0.0 17 0 chunk=0 experts_streamed=0",
+    "seed_repeat": true,
+    "one_token_limit": true,
+    "context_tail": true
+  },
+  "over_budget": {
+    "exit_code": 2,
+    "rejected_before_generation": true,
+    "rejected_before_resident_ram_allocation": true,
+    "diagnostic": [
+      "strata generate: requested weights exceed the weight VRAM budget: limit=34351349760 bytes, nonexpert_upper=10003607296 bytes, expert_slots=19000 (max 8806)"
+    ]
+  }
+}

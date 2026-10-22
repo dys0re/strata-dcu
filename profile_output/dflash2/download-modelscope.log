@@ -1,0 +1,67 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+################################################SCNet####################################################
+
+                    [0;31m尊敬的用户您好，欢迎使用超算互联网Notebook容器实例，尽情探索吧！[0m
+
+Notebook使用概览：
+1. 依赖库下载加速：您可以通过工具面板-切换下载源更换国内Pip/Conda/Apt源，提升库类下载速度；
+2. 开发环境自动保存：您可以在关机时保存开发环境以便下次使用。保存文件大小限 15G 以内，否则可能导致系统性能降低甚至保存失败。
+3. 您在容器环境内创建的文件在文件管理中可能无法进行编辑修改，您可以使用chown命令赋权。
+目录说明：
+╔════════════════════╦══════════════════════════════════════════════════════════╦══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║ 目录           ║ 名称                                                 ║ 说明                                                                                                     ║
+╠════════════════════╬══════════════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║ /                  ║ 系统盘                                             ║ 可存放依赖包、代码等小文件，随镜像一起保存。                     ║
+╠════════════════════╬══════════════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║ /root/private_data ║ 用户个人数据(/public/home/ddd5432)           ║ 当前用户下存储的文件，不受实例开关机和镜像保存的影响。 ║
+╠════════════════════╬══════════════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║ /root/group_data   ║ 平台团队数据(/public/share/ddd5432)          ║ 团队共享资源，不受实例开关机和镜像保存的影响。                 ║
+╠════════════════════╬══════════════════════════════════════════════════════════╬══════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║ /root/public_data  ║ 平台共享数据(/public/SothisAI/sharingCenter) ║ 平台内用户共享的深度学习资产，仅支持读取。                         ║
+╚════════════════════╩══════════════════════════════════════════════════════════╩══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+CPU ：15核
+内存：59GB
+DCU ：异构加速卡BW 64GB，1
+
+#########################################################################################################
+DOWNLOAD modelscope model.safetensors resume_bytes 3145728
+PROGRESS modelscope model.safetensors 36700160 / 1206140008 MiB/s 7.92
+PROGRESS modelscope model.safetensors 70254592 / 1206140008 MiB/s 11.99
+PROGRESS modelscope model.safetensors 103809024 / 1206140008 MiB/s 14.73
+PROGRESS modelscope model.safetensors 137363456 / 1206140008 MiB/s 16.45
+PROGRESS modelscope model.safetensors 170917888 / 1206140008 MiB/s 17.24
+PROGRESS modelscope model.safetensors 204472320 / 1206140008 MiB/s 18.52
+PROGRESS modelscope model.safetensors 238026752 / 1206140008 MiB/s 19.58
+PROGRESS modelscope model.safetensors 271581184 / 1206140008 MiB/s 20.33
+PROGRESS modelscope model.safetensors 305135616 / 1206140008 MiB/s 21.04
+PROGRESS modelscope model.safetensors 338690048 / 1206140008 MiB/s 21.61
+PROGRESS modelscope model.safetensors 372244480 / 1206140008 MiB/s 22.19
+PROGRESS modelscope model.safetensors 405798912 / 1206140008 MiB/s 22.49
+PROGRESS modelscope model.safetensors 439353344 / 1206140008 MiB/s 22.51
+PROGRESS modelscope model.safetensors 472907776 / 1206140008 MiB/s 22.84
+PROGRESS modelscope model.safetensors 506462208 / 1206140008 MiB/s 23.12
+PROGRESS modelscope model.safetensors 540016640 / 1206140008 MiB/s 23.3
+PROGRESS modelscope model.safetensors 573571072 / 1206140008 MiB/s 23.45
+PROGRESS modelscope model.safetensors 607125504 / 1206140008 MiB/s 23.57
+PROGRESS modelscope model.safetensors 640679936 / 1206140008 MiB/s 23.42
+PROGRESS modelscope model.safetensors 674234368 / 1206140008 MiB/s 23.19
+PROGRESS modelscope model.safetensors 707788800 / 1206140008 MiB/s 23.08
+PROGRESS modelscope model.safetensors 741343232 / 1206140008 MiB/s 23.07
+PROGRESS modelscope model.safetensors 774897664 / 1206140008 MiB/s 22.93
+PROGRESS modelscope model.safetensors 808452096 / 1206140008 MiB/s 22.94
+PROGRESS modelscope model.safetensors 842006528 / 1206140008 MiB/s 23.06
+PROGRESS modelscope model.safetensors 875560960 / 1206140008 MiB/s 23.02
+PROGRESS modelscope model.safetensors 909115392 / 1206140008 MiB/s 23.0
+PROGRESS modelscope model.safetensors 942669824 / 1206140008 MiB/s 22.99
+PROGRESS modelscope model.safetensors 976224256 / 1206140008 MiB/s 23.06
+PROGRESS modelscope model.safetensors 1009778688 / 1206140008 MiB/s 23.04
+PROGRESS modelscope model.safetensors 1043333120 / 1206140008 MiB/s 23.06
+PROGRESS modelscope model.safetensors 1076887552 / 1206140008 MiB/s 23.23
+PROGRESS modelscope model.safetensors 1110441984 / 1206140008 MiB/s 23.33
+PROGRESS modelscope model.safetensors 1143996416 / 1206140008 MiB/s 23.48
+PROGRESS modelscope model.safetensors 1177550848 / 1206140008 MiB/s 23.61
+VERIFIED model.safetensors 1206140008
+DOWNLOAD COMPLETE

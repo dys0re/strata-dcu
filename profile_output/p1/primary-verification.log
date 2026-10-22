@@ -1,0 +1,4 @@
+PASS: 54 requests match P0 adaptive output; all primary runs use adaptive MTP, matched cache and no profiling/logit dumps
+story 34.97 -> 37.08 +6.04%
+chinese 40.17 -> 41.34 +2.92%
+code 46.46 -> 48.54 +4.49%

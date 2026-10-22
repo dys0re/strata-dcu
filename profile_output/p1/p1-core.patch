@@ -1,0 +1,270 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2f0efd1..8c459bd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1225,6 +1225,16 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
+   target_include_directories(bf16_q8_mmvq_parity PRIVATE ${_strata_gpu_include_directories})
+   target_link_libraries(bf16_q8_mmvq_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+   add_test(NAME bf16_q8_mmvq_parity COMMAND bf16_q8_mmvq_parity)
++  add_executable(bf16_q8_mmvq_bench src/kernels/bf16_q8_mmvq_bench.cpp)
++  target_include_directories(bf16_q8_mmvq_bench PRIVATE ${_strata_gpu_include_directories})
++  target_link_libraries(bf16_q8_mmvq_bench PRIVATE strata_kernels ${_strata_gpu_runtime_target})
++  if(STRATA_HIP_GFX906)
++    foreach(_cols 2 4)
++      add_test(NAME bf16_q8_mmvq_cols${_cols}_parity COMMAND bf16_q8_mmvq_parity)
++      set_tests_properties(bf16_q8_mmvq_cols${_cols}_parity PROPERTIES
++        ENVIRONMENT "STRATA_BF16_Q8_VEC4=1;STRATA_BF16_Q8_COLS=${_cols}")
++    endforeach()
++  endif()
+ 
+   # the V100 fusion work: every fused kernel against its unfused pipeline, bitwise, and the before/after
+   # CUDA-event timings at decode shapes (`--bench`).  It is a .cu because it carries the unfused reference
+diff --git a/include/strata/kernels/native_mmvq.hpp b/include/strata/kernels/native_mmvq.hpp
+index e8a8119..b236196 100644
+--- a/include/strata/kernels/native_mmvq.hpp
++++ b/include/strata/kernels/native_mmvq.hpp
+@@ -25,6 +25,12 @@ namespace strata::kernels {
+ // BF16 (type 30) also keeps its original two-byte weights, with n_in a
+ // multiple of 32. Its native projection consumes the same Q8_1 activations;
+ // the prompt path converts BF16 weights to its FP16 compute scratch.
++// gfx936: STRATA_BF16_Q8_VEC4=1 enables the measured vec4 layout. Opt-in
++// STRATA_BF16_Q8_COLS=2 / 4 shares weight loads across that many verification
++// columns, bitwise equal to vec4 single-column calls. Unset / 0 keeps the old
++// dispatch; ncols == 1 always keeps it. Set environment before graph capture.
++// Reuse currently requires n_in >= 2048, n_out >= 2048 and at least 24 MiB of
++// weights; smaller matrices retain the measured faster original dispatch.
+ // Input floats must be finite, and their block scales/sums representable in FP16.
+ std::size_t native_q8_1_bytes(int n_in, int ncols = 1);
+ 
+diff --git a/src/kernels/bf16_q8_mmvq_parity.cpp b/src/kernels/bf16_q8_mmvq_parity.cpp
+index 8e2711e..8a7e548 100644
+--- a/src/kernels/bf16_q8_mmvq_parity.cpp
++++ b/src/kernels/bf16_q8_mmvq_parity.cpp
+@@ -9,6 +9,7 @@
+ #include <cstdio>
+ #include <cstring>
+ #include <stdexcept>
++#include <utility>
+ #include <vector>
+ 
+ static void check(cudaError_t e) {
+@@ -20,7 +21,10 @@ int main() {
+         cudaStream_t stream;
+         check(cudaStreamCreate(&stream));
+         int cases = 0;
+-        for (int k : {32, 64, 640, 2560, 6144}) for (int n : {1, 5, 33}) for (int t : {1, 2, 3, 8}) {
++        std::vector<std::pair<int, int>> shapes;
++        for (int k : {32, 64, 640, 2560, 6144}) for (int n : {1, 5, 33}) shapes.emplace_back(k, n);
++        shapes.emplace_back(2560, 6145);   // eligible multi-column dispatch with a partial final row block
++        for (auto [k, n] : shapes) for (int t : {1, 2, 3, 4, 5, 6, 7, 8}) {
+             ++cases;
+             std::vector<uint16_t> w(size_t(k) * n);
+             std::vector<float> x(size_t(k) * t), got(size_t(n) * t);
+@@ -40,6 +44,16 @@ int main() {
+             native_mmvq(30, dw, dq, static_cast<float*>(dy), k, n, t, stream);
+             check(cudaStreamSynchronize(stream));
+             check(cudaMemcpy(got.data(), dy, got.size() * 4, cudaMemcpyDeviceToHost));
++            // The single-column dispatch remains the independent vec4 path.
++            // Compare ALL columns, including partial tiles, bit for bit.
++            for (int col = 0; col < t; ++col)
++                native_mmvq(30, dw, static_cast<const uint8_t*>(dq) + size_t(col) * native_q8_1_bytes(k, 1),
++                            static_cast<float*>(dy) + size_t(col) * n, k, n, 1, stream);
++            check(cudaStreamSynchronize(stream));
++            std::vector<float> single(got.size());
++            check(cudaMemcpy(single.data(), dy, single.size() * 4, cudaMemcpyDeviceToHost));
++            if (std::memcmp(single.data(), got.data(), got.size() * 4) != 0)
++                throw std::runtime_error("BF16 multi-column projection differs from single-column dispatch");
+             std::vector<uint8_t> q(qb);
+             check(cudaMemcpy(q.data(), dq, qb, cudaMemcpyDeviceToHost));
+             for (int col = 0; col < t; ++col) for (int row = 0; row < n; ++row) {
+@@ -74,7 +88,7 @@ int main() {
+             check(cudaFree(dy)); check(cudaFree(dq)); check(cudaFree(dx)); check(cudaFree(dw));
+         }
+         check(cudaStreamDestroy(stream));
+-        std::printf("bf16_q8_mmvq_parity OK: %d shapes, all outputs finite and within summation tolerance\n", cases);
++        std::printf("bf16_q8_mmvq_parity OK: %d shapes, bitwise single-column parity and host summation tolerance\n", cases);
+         return 0;
+     } catch (const std::exception& e) { std::fprintf(stderr, "%s\n", e.what()); return 1; }
+ }
+diff --git a/src/kernels/cuda/native_mmvq.cu b/src/kernels/cuda/native_mmvq.cu
+index d72400d..95b621a 100644
+--- a/src/kernels/cuda/native_mmvq.cu
++++ b/src/kernels/cuda/native_mmvq.cu
+@@ -137,6 +137,78 @@ bool bf16_q81_vec4_on() {
+     }
+     return enabled;
+ }
++
++// Share each weight load across a small tile of verification columns. Each
++// column keeps vec4's four accumulators, FMA order and lane reduction exactly.
++// No repack, allocation or host synchronization; safe inside captured graphs.
++template<int Lanes, int Columns>
++__global__ __launch_bounds__(256) void bf16_q81_vec4_multi_kernel(const uint16_t* __restrict__ w,
++        const Q81Block* __restrict__ x, float* __restrict__ y, int n_in, int n_out, int ncols) {
++    const int lane = threadIdx.x % Lanes;
++    const int row = int(blockIdx.x) * (256 / Lanes) + int(threadIdx.x) / Lanes;
++    if (row >= n_out) return;
++    const int col0 = int(blockIdx.y) * Columns;
++    float sums[Columns][4] = {};
++    for (int i = lane * 4; i < n_in; i += Lanes * 4) {
++        unsigned long long bits;
++        __builtin_memcpy(&bits, w + size_t(row) * n_in + i, sizeof bits);
++        float weights[4];
++#pragma unroll
++        for (int j = 0; j < 4; ++j)
++            weights[j] = __uint_as_float(uint32_t((bits >> (j * 16)) & 65535u) << 16);
++#pragma unroll
++        for (int c = 0; c < Columns; ++c) {
++            if (col0 + c >= ncols) continue;
++            const Q81Block& a = x[size_t(col0 + c) * (n_in / 32) + i / 32];
++            uint32_t codes;
++            __builtin_memcpy(&codes, a.qs + i % 32, sizeof codes);
++            const float scale = __half2float(__low2half(a.ds));
++#pragma unroll
++            for (int j = 0; j < 4; ++j)
++                sums[c][j] = __fmaf_rn(weights[j], scale * float(static_cast<int8_t>(codes >> (j * 8))),
++                                       sums[c][j]);
++        }
++    }
++#pragma unroll
++    for (int c = 0; c < Columns; ++c) {
++        if (col0 + c >= ncols) continue;
++        float sum = (sums[c][0] + sums[c][1]) + (sums[c][2] + sums[c][3]);
++        for (int off = Lanes / 2; off > 0; off >>= 1)
++            sum += __shfl_down_sync(0xffffffffu, sum, off, Lanes);
++        if (lane == 0) y[size_t(col0 + c) * n_out + row] = sum;
++    }
++}
++
++int bf16_q81_columns() {
++    static const int columns = [] {
++        const char* v = std::getenv("STRATA_BF16_Q8_COLS");
++        const int n = v ? std::atoi(v) : 0;
++        return n == 2 || n == 4 ? n : 0;
++    }();
++    return columns;
++}
++
++template<int Lanes>
++void bf16_q81_vec4_launch(const void* weights, const void* x, float* y,
++                          int n_in, int n_out, int ncols, cudaStream_t stream) {
++    const auto* w = static_cast<const uint16_t*>(weights);
++    const auto* a = static_cast<const Q81Block*>(x);
++    const unsigned rows = (n_out + 256 / Lanes - 1) / (256 / Lanes);
++    const int tile = bf16_q81_columns();
++    // Small/cache-resident matrices lose occupancy without saving much memory
++    // traffic. Keep their measured faster one-column-per-block dispatch.
++    const bool reuse = n_in >= 2048 && n_out >= 2048 && size_t(n_in) * n_out * 2 >= 24u * 1024u * 1024u;
++    if (ncols > 1 && tile && reuse) {
++        if (tile == 2 || ncols == 2)
++            bf16_q81_vec4_multi_kernel<Lanes, 2><<<dim3(rows, (ncols + 1) / 2), 256, 0, stream>>>(
++                w, a, y, n_in, n_out, ncols);
++        else
++            bf16_q81_vec4_multi_kernel<Lanes, 4><<<dim3(rows, (ncols + 3) / 4), 256, 0, stream>>>(
++                w, a, y, n_in, n_out, ncols);
++    } else {
++        bf16_q81_vec4_kernel<Lanes><<<dim3(rows, ncols), 256, 0, stream>>>(w, a, y, n_in, n_out);
++    }
++}
+ #endif
+ struct Q20Block {
+     half d;
+@@ -2997,11 +3069,9 @@ void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float*
+ #if defined(STRATA_HIP_GFX906)
+         if (bf16_q81_vec4_on()) {
+             if (n_in >= 1024)
+-                bf16_q81_vec4_kernel<64><<<dim3((n_out + 3) / 4, ncols), 256, 0, (cudaStream_t) stream>>>(
+-                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
++                bf16_q81_vec4_launch<64>(weights, x_q8_1, y, n_in, n_out, ncols, (cudaStream_t) stream);
+             else
+-                bf16_q81_vec4_kernel<32><<<dim3((n_out + 7) / 8, ncols), 256, 0, (cudaStream_t) stream>>>(
+-                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
++                bf16_q81_vec4_launch<32>(weights, x_q8_1, y, n_in, n_out, ncols, (cudaStream_t) stream);
+             launch_check();
+             break;
+         }
+diff --git a/src/kernels/bf16_q8_mmvq_bench.cpp b/src/kernels/bf16_q8_mmvq_bench.cpp
+new file mode 100644
+index 0000000..ac516ea
+--- /dev/null
++++ b/src/kernels/bf16_q8_mmvq_bench.cpp
+@@ -0,0 +1,79 @@
++// Standalone production-dispatch diagnostic. GPU graph timings are kernel-only;
++// these are not model TPS. All columns must match separate vec4 calls bitwise.
++#include "strata/kernels/native_mmvq.hpp"
++#include <cuda_runtime.h>
++#include <algorithm>
++#include <cmath>
++#include <cstdio>
++#include <cstdint>
++#include <cstring>
++#include <stdexcept>
++#include <utility>
++#include <vector>
++
++static void ck(cudaError_t e) {
++    if (e != cudaSuccess) throw std::runtime_error(cudaGetErrorString(e));
++}
++int main() {
++    using namespace strata::kernels;
++    try {
++        cudaStream_t stream;
++        cudaEvent_t start, end;
++        ck(cudaStreamCreate(&stream)); ck(cudaEventCreate(&start)); ck(cudaEventCreate(&end));
++        std::puts("n_in,n_out,columns,median_us,min_us,max_us,bitwise,guard");
++        for (auto [k,n] : {std::pair{2560,248320}, {2560,10240}, {2560,6144},
++                           {2560,512}, {6144,2560}, {640,2560}, {32,5},
++                           {2560,640}, {2560,6145}, {1024,12288}, {2560,2560}, {2560,12288}}) {
++            std::vector<uint16_t> w(size_t(k)*n);
++            for (size_t i=0;i<w.size();++i)
++                w[i] = uint16_t(0x3b00u + ((i*131u+i/67u)%1536u)) | uint16_t((i&1u)<<15);
++            std::vector<float> x(size_t(k)*8);
++            for (size_t i=0;i<x.size();++i) x[i]=std::cos(float(i)*.17f);
++            void *dw=nullptr,*dq=nullptr; float *dx=nullptr,*dy=nullptr,*ref=nullptr;
++            ck(cudaMalloc(&dw,w.size()*2)); ck(cudaMalloc((void**)&dx,x.size()*4));
++            ck(cudaMalloc(&dq,native_q8_1_bytes(k,8)));
++            ck(cudaMalloc((void**)&dy,(size_t(n)*8+16)*4));
++            ck(cudaMalloc((void**)&ref,size_t(n)*8*4));
++            ck(cudaMemcpy(dw,w.data(),w.size()*2,cudaMemcpyHostToDevice));
++            ck(cudaMemcpy(dx,x.data(),x.size()*4,cudaMemcpyHostToDevice));
++            native_quantize_q8_1(dx,dq,k,8,stream);
++            for (int c=0;c<8;++c)
++                native_mmvq(30,dw,(uint8_t*)dq+size_t(c)*native_q8_1_bytes(k,1),ref+size_t(c)*n,k,n,1,stream);
++            ck(cudaStreamSynchronize(stream));
++            for (int t=1;t<=8;++t) {
++                ck(cudaMemset(dy,0xa5,(size_t(n)*8+16)*4));
++                native_mmvq(30,dw,dq,dy,k,n,t,stream);
++                ck(cudaStreamSynchronize(stream));
++                cudaGraph_t graph; cudaGraphExec_t exec;
++                constexpr int calls=16;
++                ck(cudaStreamBeginCapture(stream,cudaStreamCaptureModeGlobal));
++                for (int i=0;i<calls;++i) native_mmvq(30,dw,dq,dy,k,n,t,stream);
++                ck(cudaStreamEndCapture(stream,&graph));
++                ck(cudaGraphInstantiate(&exec,graph,nullptr,nullptr,0));
++                ck(cudaGraphLaunch(exec,stream)); ck(cudaStreamSynchronize(stream));
++                std::vector<float> times;
++                for (int sample=0;sample<7;++sample) {
++                    ck(cudaEventRecord(start,stream)); ck(cudaGraphLaunch(exec,stream));
++                    ck(cudaEventRecord(end,stream)); ck(cudaEventSynchronize(end));
++                    float ms=0; ck(cudaEventElapsedTime(&ms,start,end)); times.push_back(ms*1000/calls);
++                }
++                std::sort(times.begin(),times.end());
++                std::vector<uint32_t> got(size_t(n)*t+16),expected(size_t(n)*t);
++                ck(cudaMemcpy(got.data(),dy,got.size()*4,cudaMemcpyDeviceToHost));
++                ck(cudaMemcpy(expected.data(),ref,expected.size()*4,cudaMemcpyDeviceToHost));
++                if(std::memcmp(got.data(),expected.data(),expected.size()*4))
++                    throw std::runtime_error("multi-column vs single-column mismatch");
++                for(size_t i=expected.size();i<got.size();++i)
++                    if(got[i]!=0xa5a5a5a5u) throw std::runtime_error("output guard overwritten");
++                for(auto bits:expected) { float f; std::memcpy(&f,&bits,4);
++                    if(!std::isfinite(f)) throw std::runtime_error("nonfinite output"); }
++                std::printf("%d,%d,%d,%.3f,%.3f,%.3f,1,1\n",k,n,t,times[3],times.front(),times.back());
++                std::fflush(stdout);
++                ck(cudaGraphExecDestroy(exec)); ck(cudaGraphDestroy(graph));
++            }
++            ck(cudaFree(ref)); ck(cudaFree(dy)); ck(cudaFree(dq)); ck(cudaFree(dx)); ck(cudaFree(dw));
++        }
++        ck(cudaEventDestroy(end)); ck(cudaEventDestroy(start)); ck(cudaStreamDestroy(stream));
++        return 0;
++    } catch (const std::exception& e) { std::fprintf(stderr,"%s\n",e.what()); return 1; }
++}

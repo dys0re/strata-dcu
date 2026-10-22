@@ -1,0 +1,3 @@
+PASS: source hashes, checkpoint inventory, MTP SHA-256 and cache validation; no running inference; P1 selected atomically
+engine 48f710e8e467aa6544d9f22faad187d7c189be2e0822e2edead2b749d1035ed6
+954M	/root

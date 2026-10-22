@@ -71,6 +71,8 @@ public:
     int32_t top2(int j) const { return j >= 0 && j < (int) top2_.size() ? top2_[(size_t) j] : -1; }
     int max_t() const { return max_t_; }
     uint64_t vram_bytes() const { return vram_; }
+    /// Owned GPU weight allocations only (including the subset head and optional Q4 copies).
+    uint64_t weight_bytes() const { return weight_bytes_; }
     /// The draft layer's K/V state (read-only: --serve's STRATA_STATE_HASH check hashes it)
     const QsaState& kv_state() const { return st_; }
     /// KV streaming: refill the ring of the drafter's window from its host copy for a sequence that continues at
@@ -235,6 +237,7 @@ private:
     float chain_prob_[8] = {};
     int64_t n_vocab_ = 0;
     uint64_t vram_ = 0;
+    uint64_t weight_bytes_ = 0;
     cudaStream_t cs_ = nullptr;
     cudaGraphExec_t prefill_exec_[9] = {};
     cudaGraphExec_t prefill_dev_exec_[9] = {};

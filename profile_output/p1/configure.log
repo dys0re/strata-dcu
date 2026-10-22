@@ -1,0 +1,41 @@
+-- The CXX compiler identification is Clang 17.0.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/dtk/llvm/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- The HIP compiler identification is Clang 17.0.0
+-- Detecting HIP compiler ABI info
+-- Detecting HIP compiler ABI info - done
+-- Check for working HIP compiler: /opt/dtk/llvm/bin/clang++ - skipped
+-- Detecting HIP compile features
+-- Detecting HIP compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HIP_CLANG_SUPPORTS_PARALLEL_JOBS
+-- Performing Test HIP_CLANG_SUPPORTS_PARALLEL_JOBS - Success
+-- Strata: HIP (gfx906 compat) enabled, arch gfx936
+-- strata: pack/full/experts.bin absent - the expert arena load test is NOT registered
+-- Performing Test STRATA_HAVE_AVXVNNI_INTRINSICS
+-- Performing Test STRATA_HAVE_AVXVNNI_INTRINSICS - Success
+-- The C compiler identification is Clang 17.0.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /opt/dtk/llvm/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /opt/dtk/llvm/bin/clang
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- ggml version: 0.24.0
+-- ggml commit:  unknown
+-- trellis MMQ (Gyro prompts): overlay on the pinned ggml-cuda in /root/private_data/strata-dcu/p1/build/ggml-tq-overlay
+-- Configuring done (67.0s)
+-- Generating done (48.3s)
+-- Build files have been written to: /root/private_data/strata-dcu/p1/build

@@ -1,0 +1,24 @@
+{
+  "timestamp_utc": "2026-10-22T07:25:13.668092+00:00",
+  "engine_sha256": "07f55bdc54abae0f3a1078068095ae69cfeb61a270870e4c3db7d107b7e3a214",
+  "historical_p1_sha256": "48f710e8e467aa6544d9f22faad187d7c189be2e0822e2edead2b749d1035ed6",
+  "source_sha256": {
+    "CMakeLists.txt": "f3ba37b1dd13f7b5f580eabdba30587d4846c040d62c6f8c17762266149ccf7b",
+    "src/program/generate.cpp": "8376e6c4d80a8e263ff47a5ceb94398e38c613fd0add3bbef52c5c866090e038",
+    "src/core/mtp.cpp": "540534277f886f9c9173ccdd4506c008841f2f0f6bfe6a50dff6885ed3203e71",
+    "include/strata/core/mtp.hpp": "3bd1add95fe0d10883e3f40fdc16dbbef42b591c9ca063bd640653a26a3db443",
+    "src/kernels/cuda/native_mmvq.cu": "b9aebb5ced120776b6ce133046f2274bb6f4c125601dc5298b1aa734d473e93c",
+    "include/strata/kernels/native_mmvq.hpp": "0520eae7c16152297246738e1d61ccb3c4946ddffc4efc030b45c8105c6e4dd1",
+    "tools/autoround_pack.py": "5f9ae2e5490e1e316d7bbb4d2d49a08644a5b5e7f125935fa84fbbda16e22901",
+    "strata-test/run-autoround.sh": "0d5f4d7d0be12422719e3e91935f85851da29efcb45ee522d73cc4e0f1a83de8"
+  },
+  "inference_processes": [],
+  "selected_engine": "/root/private_data/strata-dcu/weight50/strata",
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n",
+  "system_root_usage": "954M\t/root",
+  "limitations": [
+    "Only HIP/gfx936 built and executed; CUDA/SYCL not built",
+    "Device-used snapshot is at initialization, not a peak GPU memory measurement",
+    "This is BS=1 short-context decode speed, not a full model quality evaluation"
+  ]
+}

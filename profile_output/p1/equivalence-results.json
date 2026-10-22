@@ -1,0 +1,12 @@
+{
+  "final-checks": {
+    "matched_requests": 11,
+    "first_token_logit_arrays_bit_identical": 13,
+    "stop_recovery_seed_limits": true
+  },
+  "fixed8-checks": {
+    "matched_requests": 11,
+    "first_token_logit_arrays_bit_identical": 13,
+    "stop_recovery_seed_limits": true
+  }
+}

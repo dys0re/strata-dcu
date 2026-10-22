@@ -214,6 +214,7 @@ bool MtpDrafter::make_q4_dense(const std::vector<uint8_t>& blob, std::string& er
     if (cudaMalloc((void**) &dense4_, (size_t) total) != cudaSuccess) { err = "mtp: the Q4_0 projections do not fit"; return false; }
     cudaMemcpy(dense4_, host.data(), (size_t) total, cudaMemcpyHostToDevice);
     vram_ += total;
+    weight_bytes_ += total;
     std::fprintf(stderr, "strata mtp: --mtp-q4: %zu projections as Q4_0 (%.1f MiB)\n", plan.size(), (double) total / 1048576.0);
     return true;
 #else
@@ -306,6 +307,7 @@ bool MtpDrafter::load(const std::string& rt_dir, const ModelGeometry& g, Session
         }
         cudaMemcpy(dense_, blob.data(), blob.size(), cudaMemcpyHostToDevice);
         vram_ += blob.size();
+        weight_bytes_ += blob.size();
         if (q4_ && !make_q4_dense(blob, err)) return false;
     }
     // ---- the 512 routed experts, one blob each
@@ -331,6 +333,7 @@ bool MtpDrafter::load(const std::string& rt_dir, const ModelGeometry& g, Session
             off += n;
         }
         vram_ += bytes;
+        weight_bytes_ += bytes;
     }
     const char* required[] = {"fc_embedding.weight", "fc_hidden.weight", "self_attn.q_proj.weight", "self_attn.k_proj.weight",
                               "self_attn.v_proj.weight", "self_attn.o_proj.weight", "mlp.shared_expert.gate_proj.weight",
@@ -735,6 +738,7 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
             }
             cudaDeviceSynchronize();
             vram_ += (uint64_t) (n_dvocab_ * row_bytes) + raw.size();
+            weight_bytes_ += (uint64_t) (n_dvocab_ * row_bytes);
             std::fprintf(stderr, "strata mtp: draft head over %lld tokens (%.1f MiB)\n", (long long) n_dvocab_,
                          (double) (n_dvocab_ * row_bytes) / 1048576.0);
             dhead_type_ = head->type();

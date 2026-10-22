@@ -1,0 +1,8 @@
+inline-control exit 0 all 17 requests match True
+{'story': 33.02, 'chinese': 37.87, 'code': 47.22}
+fusion-qdedup exit 0 all 17 requests match True
+{'story': 32.16, 'chinese': 38.41, 'code': 49.35}
+fusion-qfuse exit 0 all 17 requests match False
+{}
+MISMATCHES ['warmup', 'story-0', 'chinese-0', 'code-0', 'story-1', 'chinese-1', 'code-1', 'story-2', 'chinese-2', 'code-2', 'sample-0', 'sample-1', 'context_tail']
+Exploratory variants: one engine startup and three requests per workload; not ABBA replications

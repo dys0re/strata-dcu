@@ -1225,6 +1225,16 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
   target_include_directories(bf16_q8_mmvq_parity PRIVATE ${_strata_gpu_include_directories})
   target_link_libraries(bf16_q8_mmvq_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
   add_test(NAME bf16_q8_mmvq_parity COMMAND bf16_q8_mmvq_parity)
+  add_executable(bf16_q8_mmvq_bench src/kernels/bf16_q8_mmvq_bench.cpp)
+  target_include_directories(bf16_q8_mmvq_bench PRIVATE ${_strata_gpu_include_directories})
+  target_link_libraries(bf16_q8_mmvq_bench PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+  if(STRATA_HIP_GFX906)
+    foreach(_cols 2 4)
+      add_test(NAME bf16_q8_mmvq_cols${_cols}_parity COMMAND bf16_q8_mmvq_parity)
+      set_tests_properties(bf16_q8_mmvq_cols${_cols}_parity PROPERTIES
+        ENVIRONMENT "STRATA_BF16_Q8_VEC4=1;STRATA_BF16_Q8_COLS=${_cols}")
+    endforeach()
+  endif()
 
   # the V100 fusion work: every fused kernel against its unfused pipeline, bitwise, and the before/after
   # CUDA-event timings at decode shapes (`--bench`).  It is a .cu because it carries the unfused reference

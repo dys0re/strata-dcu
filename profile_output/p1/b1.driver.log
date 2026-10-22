@@ -1,0 +1,12 @@
+READY adaptive 4 off
+DONE warmup 128 30.98
+DONE story-0 256 38.17
+DONE chinese-0 256 42.53
+DONE code-0 256 48.49
+DONE story-1 256 37.99
+DONE chinese-1 256 41.91
+DONE code-1 256 51.38
+DONE story-2 256 36.7
+DONE chinese-2 256 41.4
+DONE code-2 256 48.59
+PASS

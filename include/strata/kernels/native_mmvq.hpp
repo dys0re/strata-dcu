@@ -25,6 +25,12 @@ namespace strata::kernels {
 // BF16 (type 30) also keeps its original two-byte weights, with n_in a
 // multiple of 32. Its native projection consumes the same Q8_1 activations;
 // the prompt path converts BF16 weights to its FP16 compute scratch.
+// gfx936: STRATA_BF16_Q8_VEC4=1 enables the measured vec4 layout. Opt-in
+// STRATA_BF16_Q8_COLS=2 / 4 shares weight loads across that many verification
+// columns, bitwise equal to vec4 single-column calls. Unset / 0 keeps the old
+// dispatch; ncols == 1 always keeps it. Set environment before graph capture.
+// Reuse currently requires n_in >= 2048, n_out >= 2048 and at least 24 MiB of
+// weights; smaller matrices retain the measured faster original dispatch.
 // Input floats must be finite, and their block scales/sums representable in FP16.
 std::size_t native_q8_1_bytes(int n_in, int ncols = 1);
 

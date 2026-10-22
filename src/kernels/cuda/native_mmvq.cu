@@ -137,6 +137,78 @@ bool bf16_q81_vec4_on() {
     }
     return enabled;
 }
+
+// Share each weight load across a small tile of verification columns. Each
+// column keeps vec4's four accumulators, FMA order and lane reduction exactly.
+// No repack, allocation or host synchronization; safe inside captured graphs.
+template<int Lanes, int Columns>
+__global__ __launch_bounds__(256) void bf16_q81_vec4_multi_kernel(const uint16_t* __restrict__ w,
+        const Q81Block* __restrict__ x, float* __restrict__ y, int n_in, int n_out, int ncols) {
+    const int lane = threadIdx.x % Lanes;
+    const int row = int(blockIdx.x) * (256 / Lanes) + int(threadIdx.x) / Lanes;
+    if (row >= n_out) return;
+    const int col0 = int(blockIdx.y) * Columns;
+    float sums[Columns][4] = {};
+    for (int i = lane * 4; i < n_in; i += Lanes * 4) {
+        unsigned long long bits;
+        __builtin_memcpy(&bits, w + size_t(row) * n_in + i, sizeof bits);
+        float weights[4];
+#pragma unroll
+        for (int j = 0; j < 4; ++j)
+            weights[j] = __uint_as_float(uint32_t((bits >> (j * 16)) & 65535u) << 16);
+#pragma unroll
+        for (int c = 0; c < Columns; ++c) {
+            if (col0 + c >= ncols) continue;
+            const Q81Block& a = x[size_t(col0 + c) * (n_in / 32) + i / 32];
+            uint32_t codes;
+            __builtin_memcpy(&codes, a.qs + i % 32, sizeof codes);
+            const float scale = __half2float(__low2half(a.ds));
+#pragma unroll
+            for (int j = 0; j < 4; ++j)
+                sums[c][j] = __fmaf_rn(weights[j], scale * float(static_cast<int8_t>(codes >> (j * 8))),
+                                       sums[c][j]);
+        }
+    }
+#pragma unroll
+    for (int c = 0; c < Columns; ++c) {
+        if (col0 + c >= ncols) continue;
+        float sum = (sums[c][0] + sums[c][1]) + (sums[c][2] + sums[c][3]);
+        for (int off = Lanes / 2; off > 0; off >>= 1)
+            sum += __shfl_down_sync(0xffffffffu, sum, off, Lanes);
+        if (lane == 0) y[size_t(col0 + c) * n_out + row] = sum;
+    }
+}
+
+int bf16_q81_columns() {
+    static const int columns = [] {
+        const char* v = std::getenv("STRATA_BF16_Q8_COLS");
+        const int n = v ? std::atoi(v) : 0;
+        return n == 2 || n == 4 ? n : 0;
+    }();
+    return columns;
+}
+
+template<int Lanes>
+void bf16_q81_vec4_launch(const void* weights, const void* x, float* y,
+                          int n_in, int n_out, int ncols, cudaStream_t stream) {
+    const auto* w = static_cast<const uint16_t*>(weights);
+    const auto* a = static_cast<const Q81Block*>(x);
+    const unsigned rows = (n_out + 256 / Lanes - 1) / (256 / Lanes);
+    const int tile = bf16_q81_columns();
+    // Small/cache-resident matrices lose occupancy without saving much memory
+    // traffic. Keep their measured faster one-column-per-block dispatch.
+    const bool reuse = n_in >= 2048 && n_out >= 2048 && size_t(n_in) * n_out * 2 >= 24u * 1024u * 1024u;
+    if (ncols > 1 && tile && reuse) {
+        if (tile == 2 || ncols == 2)
+            bf16_q81_vec4_multi_kernel<Lanes, 2><<<dim3(rows, (ncols + 1) / 2), 256, 0, stream>>>(
+                w, a, y, n_in, n_out, ncols);
+        else
+            bf16_q81_vec4_multi_kernel<Lanes, 4><<<dim3(rows, (ncols + 3) / 4), 256, 0, stream>>>(
+                w, a, y, n_in, n_out, ncols);
+    } else {
+        bf16_q81_vec4_kernel<Lanes><<<dim3(rows, ncols), 256, 0, stream>>>(w, a, y, n_in, n_out);
+    }
+}
 #endif
 struct Q20Block {
     half d;
@@ -2997,11 +3069,9 @@ void native_mmvq(int ggml_type, const void* weights, const void* x_q8_1, float* 
 #if defined(STRATA_HIP_GFX906)
         if (bf16_q81_vec4_on()) {
             if (n_in >= 1024)
-                bf16_q81_vec4_kernel<64><<<dim3((n_out + 3) / 4, ncols), 256, 0, (cudaStream_t) stream>>>(
-                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
+                bf16_q81_vec4_launch<64>(weights, x_q8_1, y, n_in, n_out, ncols, (cudaStream_t) stream);
             else
-                bf16_q81_vec4_kernel<32><<<dim3((n_out + 7) / 8, ncols), 256, 0, (cudaStream_t) stream>>>(
-                    static_cast<const uint16_t*>(weights), static_cast<const Q81Block*>(x_q8_1), y, n_in, n_out);
+                bf16_q81_vec4_launch<32>(weights, x_q8_1, y, n_in, n_out, ncols, (cudaStream_t) stream);
             launch_check();
             break;
         }

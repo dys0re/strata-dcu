@@ -1,0 +1,7 @@
+{
+  "base_commit": "089c5b4dc9cde355374bb9f0c85c1b854234552c",
+  "sha256": "ca74eaf5cc11ac3bde01ff38af1d7bed67b37d5ec58d289cf0692e821554c1dd",
+  "bytes": 124413,
+  "isolated_index_apply_check": true,
+  "scope": "combined source changes: preceding P1 + weight-budget changes and current DFlash2 integration"
+}

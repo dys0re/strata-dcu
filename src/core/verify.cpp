@@ -673,6 +673,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     hits_ = hits;
     head_ = head;
     max_t_ = max_t;
+    if (!dflash_features_.init(max_t, (int) g.n_embd, (int) g.hc, err)) return false;
     sampling_.greedy = true;      // a fresh verifier samples greedily until set_sampling says otherwise
     sampling_.temperature = 0.0f;
 #if defined(STRATA_GPU_METAL)
@@ -1283,7 +1284,8 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             return fused_gr_read_multi(fa, n, xn_ + (size_t) tb * HC * N, cs, (prof_on_ && grp == 0) ? prof_ : nullptr,
                                 (int) (l * kProfPer + (half == 0 ? 27 : 30)));
         };
-        const bool q8_attn = gr_read_group(0, pending, inj2_, inj_);   // true: xq_ holds mixed's q8_1 (STRATA_QFUSE)
+        const bool q8_attn = gr_read_group(0, pending, inj2_, inj_);
+        dflash_features_.capture((int) l-1, Rt(tb), n, tb, cs);   // true: xq_ holds mixed's q8_1 (STRATA_QFUSE)
         {   // measurement only: STRATA_DUMMY_NODES=k adds k empty kernel nodes per layer (what one node costs in a window)
             static const int dummy = [] { const char* e = std::getenv("STRATA_DUMMY_NODES"); return e != nullptr ? std::atoi(e) : 0; }();
             for (int d = 0; d < dummy; ++d) gpu_noop(cs);

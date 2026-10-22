@@ -1,0 +1,222 @@
+diff --git a/include/strata/core/mtp.hpp b/include/strata/core/mtp.hpp
+index 7321ed5..a8f5199 100644
+--- a/include/strata/core/mtp.hpp
++++ b/include/strata/core/mtp.hpp
+@@ -71,6 +71,8 @@ public:
+     int32_t top2(int j) const { return j >= 0 && j < (int) top2_.size() ? top2_[(size_t) j] : -1; }
+     int max_t() const { return max_t_; }
+     uint64_t vram_bytes() const { return vram_; }
++    /// Owned GPU weight allocations only (including the subset head and optional Q4 copies).
++    uint64_t weight_bytes() const { return weight_bytes_; }
+     /// The draft layer's K/V state (read-only: --serve's STRATA_STATE_HASH check hashes it)
+     const QsaState& kv_state() const { return st_; }
+     /// KV streaming: refill the ring of the drafter's window from its host copy for a sequence that continues at
+@@ -235,6 +237,7 @@ private:
+     float chain_prob_[8] = {};
+     int64_t n_vocab_ = 0;
+     uint64_t vram_ = 0;
++    uint64_t weight_bytes_ = 0;
+     cudaStream_t cs_ = nullptr;
+     cudaGraphExec_t prefill_exec_[9] = {};
+     cudaGraphExec_t prefill_dev_exec_[9] = {};
+diff --git a/src/core/mtp.cpp b/src/core/mtp.cpp
+index ef5b1ad..6c3ad85 100644
+--- a/src/core/mtp.cpp
++++ b/src/core/mtp.cpp
+@@ -214,6 +214,7 @@ bool MtpDrafter::make_q4_dense(const std::vector<uint8_t>& blob, std::string& er
+     if (cudaMalloc((void**) &dense4_, (size_t) total) != cudaSuccess) { err = "mtp: the Q4_0 projections do not fit"; return false; }
+     cudaMemcpy(dense4_, host.data(), (size_t) total, cudaMemcpyHostToDevice);
+     vram_ += total;
++    weight_bytes_ += total;
+     std::fprintf(stderr, "strata mtp: --mtp-q4: %zu projections as Q4_0 (%.1f MiB)\n", plan.size(), (double) total / 1048576.0);
+     return true;
+ #else
+@@ -306,6 +307,7 @@ bool MtpDrafter::load(const std::string& rt_dir, const ModelGeometry& g, Session
+         }
+         cudaMemcpy(dense_, blob.data(), blob.size(), cudaMemcpyHostToDevice);
+         vram_ += blob.size();
++        weight_bytes_ += blob.size();
+         if (q4_ && !make_q4_dense(blob, err)) return false;
+     }
+     // ---- the 512 routed experts, one blob each
+@@ -331,6 +333,7 @@ bool MtpDrafter::load(const std::string& rt_dir, const ModelGeometry& g, Session
+             off += n;
+         }
+         vram_ += bytes;
++        weight_bytes_ += bytes;
+     }
+     const char* required[] = {"fc_embedding.weight", "fc_hidden.weight", "self_attn.q_proj.weight", "self_attn.k_proj.weight",
+                               "self_attn.v_proj.weight", "self_attn.o_proj.weight", "mlp.shared_expert.gate_proj.weight",
+@@ -735,6 +738,7 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
+             }
+             cudaDeviceSynchronize();
+             vram_ += (uint64_t) (n_dvocab_ * row_bytes) + raw.size();
++            weight_bytes_ += (uint64_t) (n_dvocab_ * row_bytes);
+             std::fprintf(stderr, "strata mtp: draft head over %lld tokens (%.1f MiB)\n", (long long) n_dvocab_,
+                          (double) (n_dvocab_ * row_bytes) / 1048576.0);
+             dhead_type_ = head->type();
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index 40952df..0548590 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -6058,6 +6058,62 @@ int main(int argc, char** argv) {
+             o.expert_cache = (int) fit;
+         }
+     }
++    // Test/deployment weight budget: distinct from free-memory reserves for KV and workspaces.
++    // Account owned allocations, including the draft head; never count a host-mapped embedding as VRAM.
++    uint64_t weight_vram_limit = 0, weight_vram_total = 0;
++    const uint64_t fixed_weight_bytes = pool_bytes + native_dense.weight_bytes() + native_head.weight_bytes();
++    if (const char* setting = std::getenv("STRATA_MAX_WEIGHT_VRAM_FRACTION")) {
++        char* end = nullptr;
++        const double fraction = std::strtod(setting, &end);
++        if (end == setting || *end || !std::isfinite(fraction) || fraction <= 0 || fraction > 1) {
++            std::fprintf(stderr, "strata generate: STRATA_MAX_WEIGHT_VRAM_FRACTION must be in (0,1]\n");
++            return 2;
++        }
++        if (!native_pack || multi_gpu || hc_q8 || !slot_mtp.empty() || o.pipeline_windows > 0 ||
++            o.vram_elastic || std::any_of(o.expert_cache_remote.begin(), o.expert_cache_remote.end(),
++                                        [](int n) { return n != 0; })) {
++            std::fprintf(stderr, "strata generate: weight budget currently requires a single-GPU native pack, "
++                                 "without HC Q8 copies, batch drafters, pipeline windows, remote caches or elastic VRAM\n");
++            return 2;
++        }
++        size_t free_b = 0, total_b = 0;
++        if (cudaMemGetInfo(&free_b, &total_b) != cudaSuccess || total_b == 0) return 1;
++        weight_vram_total = total_b;
++        weight_vram_limit = (uint64_t) (fraction * (double) total_b);
++        // bind_bytes includes logits and token maps too: conservative until the actual head is bound below.
++        const uint64_t other = fixed_weight_bytes + mtp.weight_bytes() +
++            (o.mtp.empty() ? 0 : mtp.bind_bytes(native_head.row_bytes(), n_vocab));
++        const uint64_t stride = (strata::kernels::cpu::expert_layout().max_blob + 255) / 256 * 256;
++        const int64_t fit = other <= weight_vram_limit ? (int64_t) ((weight_vram_limit - other) / stride) : -1;
++        if (fit < 0 || (!auto_cache && o.expert_cache > fit)) {
++            std::fprintf(stderr, "strata generate: requested weights exceed the weight VRAM budget: "
++                                 "limit=%llu bytes, nonexpert_upper=%llu bytes, expert_slots=%d (max %lld)\n",
++                         (unsigned long long) weight_vram_limit, (unsigned long long) other,
++                         o.expert_cache, (long long) fit);
++            return 2;
++        }
++        if (auto_cache) o.expert_cache = (int) std::min<int64_t>(o.expert_cache, fit);
++        std::fprintf(stderr, "strata weight budget: total=%llu limit=%llu fraction=%.6f expert_slots=%d\n",
++                     (unsigned long long) total_b, (unsigned long long) weight_vram_limit, fraction, o.expert_cache);
++    }
++    auto check_weight_budget = [&]() -> bool {
++        if (!weight_vram_limit) return true;
++        const uint64_t expert_b = (uint64_t) xcache.full_bytes();
++        const uint64_t mtp_b = mtp.weight_bytes();
++        const uint64_t weights = fixed_weight_bytes + expert_b + mtp_b;
++        size_t free_b = 0, total_b = 0;
++        if (cudaMemGetInfo(&free_b, &total_b) != cudaSuccess) return false;
++        std::fprintf(stderr, "strata weight usage: pack=%llu dense=%llu head=%llu experts=%llu mtp=%llu "
++                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu\n",
++                     (unsigned long long) pool_bytes, (unsigned long long) native_dense.weight_bytes(),
++                     (unsigned long long) native_head.weight_bytes(), (unsigned long long) expert_b,
++                     (unsigned long long) mtp_b, (unsigned long long) weights,
++                     (unsigned long long) weight_vram_total, (unsigned long long) weight_vram_limit,
++                     (double) weights / weight_vram_total, (unsigned long long) (total_b - free_b));
++        if (weights <= weight_vram_limit) return true;
++        std::fprintf(stderr, "strata generate: weight VRAM budget exceeded; refusing generation\n");
++        return false;
++    };
+     // plan v0.3 P6: a native pack's blobs differ per layer, so the same VRAM holds more experts than slots of
+     // the largest blob would. The shared cache below sizes slots in profile order.
+     // #369: that list does not match --expert-cache-per-layer. A range is layer * quota + n, so a size cut for
+@@ -9047,6 +9103,7 @@ int main(int argc, char** argv) {
+         const strata::core::PoolMultiFn win_pool_fn = n_stages > 1 ? &drive_pool_split : &drive_pool_multi;
+         void* const win_pool_user = n_stages > 1 ? (void*) &split_drive : (void*) &drive;
+         mem_mark("the verifier and the drafter's binding");
++        if (!check_weight_budget()) return 2;
+         ver.set_split(o.spec_split);
+         // auto: the copy kernel for every pack.  DMA (the native packs' default until 0.1.13) has the host call
+         // cudaMemcpyAsync + cudaLaunchHostFunc inside a verify window while the GPU spins on the flag they raise;
+@@ -15923,6 +15980,7 @@ int main(int argc, char** argv) {
+             return 1;
+         }
+         mem_mark("the verifier and the drafter's binding");
++        if (!check_weight_budget()) return 2;
+         ver.set_sampling(sp);   // the CLI's own sampling (until 0.1.19 this loop was always greedy); no penalties here
+         if (use_mtp) mtp.set_draft_sampling(sp);   // STRATA_SPEC_COUPLED=1: sampled drafts (a no-op otherwise)
+         ver.set_split(o.spec_split);
+diff --git a/strata-test/run-autoround.sh b/strata-test/run-autoround.sh
+index affe6d7..b34e5d2 100644
+--- a/strata-test/run-autoround.sh
++++ b/strata-test/run-autoround.sh
+@@ -7,8 +7,11 @@ export MKL_NUM_THREADS="${MKL_NUM_THREADS:-4}"
+ export TOKENIZERS_PARALLELISM=false
+ # gfx936-only BF16/Q8_1 fast path; set to 0 for the original FP32 sum order.
+ export STRATA_BF16_Q8_VEC4="${STRATA_BF16_Q8_VEC4:-1}"
++# Subsequent Qwen speed tests: all GPU model weights together <= 50% of physical VRAM.
++export STRATA_MAX_WEIGHT_VRAM_FRACTION=0.5
++export STRATA_BF16_Q8_COLS="${STRATA_BF16_Q8_COLS:-4}"
+ exec python3 /root/strata-dcu/Strata/tools/autoround_pack.py run \
+   --model /root/private_data/Qwen3.8-F \
+   --out /root/strata-dcu/autoround \
+   --llama /root/strata-dcu/llama.cpp \
+-  --engine /root/strata-dcu/build-gfx936/strata "$@"
++  --engine /root/strata-dcu/build-gfx936/strata --mtp-mode adaptive "$@"
+diff --git a/tools/autoround_pack.py b/tools/autoround_pack.py
+index ee1eedc..ee9799f 100644
+--- a/tools/autoround_pack.py
++++ b/tools/autoround_pack.py
+@@ -396,7 +396,7 @@ def run_model(ck, out, a):
+            # Run only the real token, rather than verifying an unused zero draft.
+            "--max-context", str(a.context), "--prefill", "32", "--spec", "2", "--mtp-max-t", "1",
+            "--expert-profile", str(HERE.parent / "data" / "expert-profile.bin"),
+-           "--expert-cache", "auto", "--mmap-experts", "--resident-cpu-experts",
++           "--expert-cache", str(a.expert_cache), "--mmap-experts", "--resident-cpu-experts",
+            "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",
+            "--kv", "int8", "--suffix-draft", "0", "--adapt-every", "0",
+            "--ple-io", "direct", "--ple-row-cache", "65536"]
+@@ -409,8 +409,9 @@ def run_model(ck, out, a):
+             cmd += ["--mtp-adaptive"]
+     (out / "run-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
+     print("Starting AutoRound model;", len(ids), "prompt tokens", flush=True)
++    env = dict(os.environ, STRATA_MAX_WEIGHT_VRAM_FRACTION="0.5")
+     with (out / "engine.stderr.log").open("w") as stderr:
+-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr, text=True)
++        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr, text=True, env=env)
+     (out / "engine.stdout.log").write_text(result.stdout)
+     print(result.stdout, end="", flush=True)
+     if result.returncode:
+@@ -419,6 +420,13 @@ def run_model(ck, out, a):
+     errors = (out / "engine.stderr.log").read_text()
+     if "larger than launch bounds" in errors or "Launch params" in errors:
+         raise RuntimeError("DTK rejected a kernel launch; generated text is invalid (see engine.stderr.log)")
++    usage_lines = re.findall(r"^strata weight usage:.*$", errors, re.MULTILINE)
++    if not usage_lines:
++        raise RuntimeError("engine did not report/enforce the 50% weight VRAM budget; rebuild the engine")
++    usage = {k: float(v) if "." in v else int(v)
++             for k, v in re.findall(r"(\w+)=([0-9.]+)", usage_lines[-1])}
++    if usage["limit"] != usage["total"] // 2 or usage["weights"] > usage["limit"]:
++        raise RuntimeError("engine weights exceed the 50% weight VRAM budget")
+     match = re.search(r"^output\s*:(.*)$", result.stdout, re.MULTILINE)
+     if not match:
+         raise RuntimeError("engine returned no output token ids")
+@@ -426,7 +434,7 @@ def run_model(ck, out, a):
+     raw_text = tokenizer.decode(generated, skip_special_tokens=False)
+     decoded = tokenizer.decode(generated, skip_special_tokens=True)
+     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
+-              "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode,
++              "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
+               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
+     if a.mtp_mode != "off":
+         report.update(mtp_mode=a.mtp_mode, mtp_max_t=a.mtp_max_t)
+@@ -454,13 +462,16 @@ def main():
+     ap.add_argument("--max-new", type=int, default=32)
+     ap.add_argument("--context", type=int, default=512)
+     ap.add_argument("--pool-workers", type=int, default=12)
+-    ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="off")
++    ap.add_argument("--expert-cache", type=int, default=8500, help="fixed GPU expert slots; still subject to the 50% total weight budget")
++    ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="adaptive")
+     ap.add_argument("--mtp-max-t", type=int, default=5, help="verification cap, including the real token (2..8)")
+     a = ap.parse_args()
+     if not 1 <= a.workers <= 16 or a.verify_experts < 1:
+         ap.error("workers must be 1..16 and verify-experts positive")
+     if a.max_new < 1 or a.context < 1 or a.pool_workers < 1:
+         ap.error("max-new, context and pool-workers must be positive")
++    if a.expert_cache < 1:
++        ap.error("expert-cache must be positive")
+     if not 2 <= a.mtp_max_t <= 8:
+         ap.error("mtp-max-t must be 2..8")
+     converter_path(a.llama)
