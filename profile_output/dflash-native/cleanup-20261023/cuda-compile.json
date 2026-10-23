@@ -1,0 +1,7 @@
+{
+  "command": "/usr/local/cuda/bin/nvcc -ccbin /usr/bin/g++-15 -std=c++17 -arch=sm_80 -Iinclude -c src/prefill/dflash.cu -o /tmp/strata-dflash-clean-cuda.o",
+  "exit_code": 0,
+  "object_bytes": 442824,
+  "object_sha256": "6e186bdc15e38984039255f5245bbbed0d11bab32adcc3a098438c2b94d105fc",
+  "scope": "New CUDA translation unit only; HIP full build and runtime QA are separate."
+}

@@ -81,6 +81,7 @@ class Verifier {
     DflashFeatures dflash_features_;
 public:
     Verifier() = default;
+    const DflashFeatures& dflash_features() const { return dflash_features_; }
     bool copy_dflash_features(int rows, std::vector<float>& out, std::string& err) const { return dflash_features_.read(rows,out,err); }
     ~Verifier();
     Verifier(const Verifier&) = delete;

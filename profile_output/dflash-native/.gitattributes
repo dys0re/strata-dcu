@@ -1,0 +1,4 @@
+# Preserve the bytes of captured outputs and the historical source snapshot.
+*.ids -whitespace
+*.log -whitespace
+*.patch -whitespace

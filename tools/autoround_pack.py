@@ -454,11 +454,30 @@ def run_model(ck, out, a):
             cmd += ["--mtp-adaptive"]
     native_cmd = list(cmd)
     if a.dflash2:
-        cmd[cmd.index("--spec") + 1] = "4"
-        cmd[cmd.index("--mtp-max-t") + 1] = "4"
+        cmd[cmd.index("--spec") + 1] = str(a.dflash_max_t)
+        cmd[cmd.index("--mtp-max-t") + 1] = str(a.dflash_max_t)
         cmd += ["--serve", "--prompt-cache", "0", "--conversation-cache-mib", "0", "--pcie-frac", "0", "--adapt-swaps", "0"]
-        cmd = [sys.executable, str(HERE / "strata_dflash2.py"), "--checkpoint", str(Path(a.dflash2).resolve()),
-               "--model", str(ck.dir), "--stats-file", str(out / "dflash2-worker.json"), "--graph", "--adaptive", "--"] + cmd
+        native_cmd = list(cmd)
+        if a.dflash_backend == "native":
+            from dflash2_pack import prepare, WEIGHT_SHA
+            draft_pack = out / "dflash2-native"
+            receipt = draft_pack / "receipt.json"
+            ready = receipt.is_file() and (draft_pack / "manifest.txt").is_file() and (draft_pack / "weights.bin").is_file()
+            if ready:
+                ready = (json.loads(receipt.read_text()).get("checkpoint_sha256") == WEIGHT_SHA and
+                         (draft_pack / "weights.bin").stat().st_size == 1206131200)
+            if not ready:
+                prepare(a.dflash2, draft_pack)
+            cmd += ["--dflash2", str(draft_pack)]
+            if not a.dflash_fixed:
+                cmd += ["--dflash-adaptive"]
+            if a.dflash_eager:
+                cmd += ["--dflash-eager"]
+            native_cmd = list(cmd)
+        else:
+            cmd = [sys.executable, str(HERE / "strata_dflash2.py"), "--checkpoint", str(Path(a.dflash2).resolve()),
+                   "--model", str(ck.dir), "--stats-file", str(out / "dflash2-worker.json")]+(
+                   [] if a.dflash_eager else ["--graph"])+([] if a.dflash_fixed else ["--adaptive"])+["--"]+cmd
     (out / "run-command.json").write_text(json.dumps(native_cmd, indent=2) + "\n")
     if a.dflash2:
         (out / "dflash2-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
@@ -488,7 +507,7 @@ def run_model(ck, out, a):
              for k, v in re.findall(r"(\w+)=([0-9.]+)", usage_lines[-1])}
     if usage["limit"] != usage["total"] // 2 or usage["weights"] > usage["limit"]:
         raise RuntimeError("engine weights exceed the 50% weight VRAM budget")
-    if a.dflash2 and usage.get("external_draft", 0) <= 0:
+    if a.dflash2 and usage.get("external_draft", 0) + usage.get("native_draft", 0) <= 0:
         raise RuntimeError("engine did not account DFlash2 GPU weights")
     match = re.search(r"^output\s*:(.*)$", result.stdout, re.MULTILINE)
     if not match:
@@ -500,8 +519,11 @@ def run_model(ck, out, a):
               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
     if a.dflash2:
-        report.update(draft_method="dflash2", draft_graph=True, draft_adaptive=True,
-                      draft_worker=json.loads((out / "dflash2-worker.json").read_text()))
+        report.update(draft_method="dflash2", draft_backend=a.dflash_backend,
+                      draft_graph=not a.dflash_eager, draft_adaptive=not a.dflash_fixed,
+                      draft_max_t=a.dflash_max_t)
+        if a.dflash_backend == "ipc":
+            report["draft_worker"] = json.loads((out / "dflash2-worker.json").read_text())
     elif a.mtp_mode != "off":
         report.update(mtp_mode=a.mtp_mode, mtp_max_t=a.mtp_max_t)
     budget = re.search(r"^mtp budget:.*$", errors, re.MULTILINE)
@@ -529,7 +551,11 @@ def main():
     ap.add_argument("--context", type=int, default=512)
     ap.add_argument("--pool-workers", type=int, default=12)
     ap.add_argument("--expert-cache", type=int, default=None, help="fixed GPU expert slots; still subject to the 50% total weight budget")
-    ap.add_argument("--dflash2", help="experimental trained DFlash2 directory; replaces MTP, enables graphs/adaptive drafting; context <=512")
+    ap.add_argument("--dflash2", help="trained Flash-Next DFlash2 checkpoint; native GPU execution with shared target head/embedding")
+    ap.add_argument("--dflash-backend", choices=["native", "ipc"], default="native")
+    ap.add_argument("--dflash-max-t", type=int, choices=range(2,9), default=8, help="anchor plus 1..7 draft proposals")
+    ap.add_argument("--dflash-fixed", action="store_true", help="always use the full requested draft window")
+    ap.add_argument("--dflash-eager", action="store_true", help="disable draft GPU graphs for diagnostics")
     ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="adaptive")
     ap.add_argument("--mtp-max-t", type=int, default=5, help="verification cap, including the real token (2..8)")
     a = ap.parse_args()
@@ -541,8 +567,8 @@ def main():
         ap.error("expert-cache must be positive")
     if not 2 <= a.mtp_max_t <= 8:
         ap.error("mtp-max-t must be 2..8")
-    if a.dflash2 and a.context > 512:
-        ap.error("DFlash2 prototype supports context <=512")
+    if a.dflash2 and a.dflash_backend == "ipc" and (a.context > 512 or (not a.dflash_eager and a.dflash_max_t > 4)):
+        ap.error("DFlash2 IPC supports context <=512 and graph --dflash-max-t <=4; use native for full windows")
     converter_path(a.llama)
     ck = AutoRoundCheckpoint(Path(a.model).resolve())
     out = Path(a.out).resolve()

@@ -1,0 +1,153 @@
+{
+  "qa": {
+    "qa-full": {
+      "requests": 13,
+      "output_tokens": 195,
+      "exact_target_matches": {
+        "ok": true,
+        "arithmetic": true,
+        "multiply": true,
+        "sum": true,
+        "capital": true,
+        "uppercase": true,
+        "sort-json": true,
+        "json": true,
+        "code-function": true,
+        "sample-0": true,
+        "sample-1": true,
+        "one_token": true,
+        "context_tail": true
+      },
+      "protocol": {
+        "cancel": "DONE 9 42 816.3 688.5 cancel 5 21 0 5428 12000 2977 0 0.0 42 0 chunk=0 experts_streamed=0",
+        "recovery": "DONE 2 17 289.6 220.3 stop 1 7 0 1891 4320 963 0 0.0 17 0 chunk=0 experts_streamed=0",
+        "seed_repeat": true,
+        "one_token_limit": true,
+        "context_tail": true
+      }
+    },
+    "qa-adaptive": {
+      "requests": 14,
+      "output_tokens": 198,
+      "exact_target_matches": {
+        "ok": true,
+        "arithmetic": true,
+        "multiply": true,
+        "sum": true,
+        "capital": true,
+        "uppercase": true,
+        "sort-json": true,
+        "json": true,
+        "code-function": true,
+        "multi-turn": true,
+        "sample-0": true,
+        "sample-1": true,
+        "one_token": true,
+        "context_tail": true
+      },
+      "protocol": {
+        "cancel": "DONE 9 42 817.3 377.0 cancel 4 6 0 2330 5280 2037 0 0.0 42 0 chunk=0 experts_streamed=0",
+        "recovery": "DONE 2 17 290.6 101.4 stop 1 1 0 762 1440 628 0 0.0 17 0 chunk=0 experts_streamed=0",
+        "seed_repeat": true,
+        "one_token_limit": true,
+        "context_tail": true
+      }
+    }
+  },
+  "long_context": {
+    "prompt_tokens": 2100,
+    "answers": [
+      "ORBIT",
+      "OK"
+    ],
+    "request_recovery": true
+  },
+  "weights": {
+    "qa-full": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32783001600,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47717196,
+      "device_used": 34296823808,
+      "external_draft": 0,
+      "native_draft": 1206131200
+    },
+    "qa-reference": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 31576870400,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.45961615,
+      "device_used": 32847691776,
+      "external_draft": 0,
+      "native_draft": 0
+    },
+    "qa-adaptive": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32783001600,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47717196,
+      "device_used": 34296823808,
+      "external_draft": 0,
+      "native_draft": 1206131200
+    },
+    "qa-long": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32783001600,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47717196,
+      "device_used": 34347155456,
+      "external_draft": 0,
+      "native_draft": 1206131200
+    },
+    "bench-native": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32783001600,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47717196,
+      "device_used": 34296823808,
+      "external_draft": 0,
+      "native_draft": 1206131200
+    }
+  },
+  "speed_smoke": {
+    "story-0": 22.26067599412179,
+    "chinese-0": 24.326969676812407,
+    "code-0": 33.055716960423524
+  },
+  "speed_repeats_per_workload": 1,
+  "speed_output_equivalence": {
+    "warmup": true,
+    "story-0": true,
+    "chinese-0": true,
+    "code-0": true
+  },
+  "eager_graph_equal": true,
+  "cache_reset_incremental_equal": true,
+  "pytorch_hidden_relative_l2_max": 0.06955859810113907,
+  "pytorch_draft_parity_claimed": false
+}

@@ -1,0 +1,1393 @@
+[0/2] Re-checking globbed directories...
+[1/6] Building CXX object CMakeFiles/dflash_native_witness.dir/src/prefill/dflash_witness.cpp.o
+[2/6] Building HIP object CMakeFiles/strata_prefill.dir/src/prefill/dflash.cu.o
+In file included from /root/strata-dcu/Strata/src/prefill/dflash.cu:5:
+/root/strata-dcu/Strata/include/strata/prefill/gemm.hpp:64:46: warning: void function is missing a return statement [-Wreturn-type]
+    void set_f16_io(bool on) { f16_io_ = on; }
+                                             ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:30:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:43:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:46:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:49:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:94:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:104:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:129:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:130:130: warning: void function is missing a return statement [-Wreturn-type]
+__global__ void widen(const uint16_t* x,float* y,int n) {int i=blockIdx.x*blockDim.x+threadIdx.x;if(i<n)y[i]=f32_from_bf16(x[i]);}
+                                                                                                                                 ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:153:19: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    ~Impl(){if(cs)cudaStreamSynchronize(cs);for(auto g:graphs)if(g)cudaGraphExecDestroy(g);
+                  ^~~~~~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:153:68: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    ~Impl(){if(cs)cudaStreamSynchronize(cs);for(auto g:graphs)if(g)cudaGraphExecDestroy(g);
+                                                                   ^~~~~~~~~~~~~~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:151:30: note: expanded from macro 'cudaGraphExecDestroy'
+#define cudaGraphExecDestroy hipGraphExecDestroy
+                             ^~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:154:32: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        for(auto a:allocations)cudaFree(a);if(cs)cudaStreamDestroy(cs);
+                               ^~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:154:50: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        for(auto a:allocations)cudaFree(a);if(cs)cudaStreamDestroy(cs);
+                                                 ^~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:133:27: note: expanded from macro 'cudaStreamDestroy'
+#define cudaStreamDestroy hipStreamDestroy
+                          ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:164:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:165:123: warning: void function is missing a return statement [-Wreturn-type]
+    void norm(const uint16_t* in,const uint16_t* w,uint16_t* dst,int rows,int cols){rms<<<rows,256,0,cs>>>(in,w,dst,cols);}
+                                                                                                                          ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:170:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:175:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:207:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:275:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(p.position,&zero,8,cudaMemcpyHostToDevice);cudaMemcpy(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:275:59: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(p.position,&zero,8,cudaMemcpyHostToDevice);cudaMemcpy(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice);
+                                                          ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:276:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemsetAsync(p.x,0,8*H*2,p.cs);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:113:25: note: expanded from macro 'cudaMemsetAsync'
+#define cudaMemsetAsync hipMemsetAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:277:27: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    for(auto& l:p.layers){cudaMemsetAsync(l.kc,0,size_t(RING)*KV*2,p.cs);cudaMemsetAsync(l.vc,0,size_t(RING)*KV*2,p.cs);}
+                          ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:113:25: note: expanded from macro 'cudaMemsetAsync'
+#define cudaMemsetAsync hipMemsetAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:277:74: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    for(auto& l:p.layers){cudaMemsetAsync(l.kc,0,size_t(RING)*KV*2,p.cs);cudaMemsetAsync(l.vc,0,size_t(RING)*KV*2,p.cs);}
+                                                                         ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:113:25: note: expanded from macro 'cudaMemsetAsync'
+#define cudaMemsetAsync hipMemsetAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:284:80: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        auto status=cudaGraphInstantiate(&p.graphs[count],g,nullptr,nullptr,0);cudaGraphDestroy(g);
+                                                                               ^~~~~~~~~~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:150:26: note: expanded from macro 'cudaGraphDestroy'
+#define cudaGraphDestroy hipGraphDestroy
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:312:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaMemcpyAsync(p.position,&at,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.feat,host.data(),n*5*H*2,cudaMemcpyHostToDevice,p.cs);
+        ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:312:71: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaMemcpyAsync(p.position,&at,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.feat,host.data(),n*5*H*2,cudaMemcpyHostToDevice,p.cs);
+                                                                      ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:319:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(p.position,&pos,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice,p.cs);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:319:68: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(p.position,&pos,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice,p.cs);
+                                                                   ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:323:16: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    if(p.graph)cudaGraphLaunch(p.graphs[count],p.cs);else p.forward(count);
+               ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:148:25: note: expanded from macro 'cudaGraphLaunch'
+#define cudaGraphLaunch hipGraphLaunch
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:324:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(ids,p.tokens,count*4,cudaMemcpyDeviceToHost,p.cs);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:332:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(out,p.tmp,rows*H*4,cudaMemcpyDeviceToHost,p.cs);return check(cudaStreamSynchronize(p.cs),"hidden witness",err);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+31 warnings generated when compiling for gfx936.
+In file included from /root/strata-dcu/Strata/src/prefill/dflash.cu:5:
+/root/strata-dcu/Strata/include/strata/prefill/gemm.hpp:64:46: warning: void function is missing a return statement [-Wreturn-type]
+    void set_f16_io(bool on) { f16_io_ = on; }
+                                             ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:30:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:43:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:46:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:49:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:94:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:104:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:129:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:130:130: warning: void function is missing a return statement [-Wreturn-type]
+__global__ void widen(const uint16_t* x,float* y,int n) {int i=blockIdx.x*blockDim.x+threadIdx.x;if(i<n)y[i]=f32_from_bf16(x[i]);}
+                                                                                                                                 ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:153:19: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    ~Impl(){if(cs)cudaStreamSynchronize(cs);for(auto g:graphs)if(g)cudaGraphExecDestroy(g);
+                  ^~~~~~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:153:68: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    ~Impl(){if(cs)cudaStreamSynchronize(cs);for(auto g:graphs)if(g)cudaGraphExecDestroy(g);
+                                                                   ^~~~~~~~~~~~~~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:151:30: note: expanded from macro 'cudaGraphExecDestroy'
+#define cudaGraphExecDestroy hipGraphExecDestroy
+                             ^~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:154:32: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        for(auto a:allocations)cudaFree(a);if(cs)cudaStreamDestroy(cs);
+                               ^~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:154:50: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        for(auto a:allocations)cudaFree(a);if(cs)cudaStreamDestroy(cs);
+                                                 ^~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:133:27: note: expanded from macro 'cudaStreamDestroy'
+#define cudaStreamDestroy hipStreamDestroy
+                          ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:164:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:165:123: warning: void function is missing a return statement [-Wreturn-type]
+    void norm(const uint16_t* in,const uint16_t* w,uint16_t* dst,int rows,int cols){rms<<<rows,256,0,cs>>>(in,w,dst,cols);}
+                                                                                                                          ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:170:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:175:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:207:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/prefill/dflash.cu:275:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(p.position,&zero,8,cudaMemcpyHostToDevice);cudaMemcpy(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:275:59: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(p.position,&zero,8,cudaMemcpyHostToDevice);cudaMemcpy(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice);
+                                                          ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:276:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemsetAsync(p.x,0,8*H*2,p.cs);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:113:25: note: expanded from macro 'cudaMemsetAsync'
+#define cudaMemsetAsync hipMemsetAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:277:27: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    for(auto& l:p.layers){cudaMemsetAsync(l.kc,0,size_t(RING)*KV*2,p.cs);cudaMemsetAsync(l.vc,0,size_t(RING)*KV*2,p.cs);}
+                          ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:113:25: note: expanded from macro 'cudaMemsetAsync'
+#define cudaMemsetAsync hipMemsetAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:277:74: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    for(auto& l:p.layers){cudaMemsetAsync(l.kc,0,size_t(RING)*KV*2,p.cs);cudaMemsetAsync(l.vc,0,size_t(RING)*KV*2,p.cs);}
+                                                                         ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:113:25: note: expanded from macro 'cudaMemsetAsync'
+#define cudaMemsetAsync hipMemsetAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:284:80: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        auto status=cudaGraphInstantiate(&p.graphs[count],g,nullptr,nullptr,0);cudaGraphDestroy(g);
+                                                                               ^~~~~~~~~~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:150:26: note: expanded from macro 'cudaGraphDestroy'
+#define cudaGraphDestroy hipGraphDestroy
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:312:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaMemcpyAsync(p.position,&at,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.feat,host.data(),n*5*H*2,cudaMemcpyHostToDevice,p.cs);
+        ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:312:71: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaMemcpyAsync(p.position,&at,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.feat,host.data(),n*5*H*2,cudaMemcpyHostToDevice,p.cs);
+                                                                      ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:319:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(p.position,&pos,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice,p.cs);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:319:68: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(p.position,&pos,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice,p.cs);
+                                                                   ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:323:16: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    if(p.graph)cudaGraphLaunch(p.graphs[count],p.cs);else p.forward(count);
+               ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:148:25: note: expanded from macro 'cudaGraphLaunch'
+#define cudaGraphLaunch hipGraphLaunch
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:324:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(ids,p.tokens,count*4,cudaMemcpyDeviceToHost,p.cs);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/prefill/dflash.cu:332:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(out,p.tmp,rows*H*4,cudaMemcpyDeviceToHost,p.cs);return check(cudaStreamSynchronize(p.cs),"hidden witness",err);
+    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+31 warnings generated when compiling for host.
+[3/6] Linking HIP static library libstrata_prefill.a
+[4/6] Linking HIP executable dflash_native_witness
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]
+[5/6] Building CXX object CMakeFiles/strata.dir/src/program/generate.cpp.o
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:1:
+/root/strata-dcu/Strata/include/strata/core/dflash_bridge.hpp:32:36: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    ~DflashFeatures() { if (data_) cudaFree(data_); }
+                                   ^~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:1:
+/root/strata-dcu/Strata/include/strata/core/dflash_bridge.hpp:35:22: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        if (data_) { cudaFree(data_); data_ = nullptr; }
+                     ^~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:1:
+/root/strata-dcu/Strata/include/strata/core/dflash_bridge.hpp:46:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpyAsync(data_ + ((size_t) j * cap_ + row0) * hc_ * n_, residual,
+            ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:26:
+/root/strata-dcu/Strata/include/strata/core/remote_expert_opt.hpp:30:38: warning: void function is missing a return statement [-Wreturn-type]
+    void end() { weights_ = nullptr; }
+                                     ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:27:
+/root/strata-dcu/Strata/include/strata/core/expert_cache.hpp:124:91: warning: void function is missing a return statement [-Wreturn-type]
+    void set_segment_bytes(int64_t seg_bytes) { seg_req_ = seg_bytes > 0 ? seg_bytes : 0; }
+                                                                                          ^
+/root/strata-dcu/Strata/include/strata/core/expert_cache.hpp:129:66: warning: void function is missing a return statement [-Wreturn-type]
+    void set_slot_guard(int64_t g) { guard_req_ = g > 0 ? g : 0; }
+                                                                 ^
+/root/strata-dcu/Strata/include/strata/core/expert_cache.hpp:165:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/expert_cache.hpp:183:62: warning: void function is missing a return statement [-Wreturn-type]
+    void set_per_layer_admission(bool on) { per_layer_ = on; }
+                                                             ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:28:
+In file included from /root/strata-dcu/Strata/include/strata/core/conversation_snapshot.hpp:3:
+In file included from /root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:5:
+In file included from /root/strata-dcu/Strata/include/strata/core/conversation_buffer.hpp:3:
+/root/strata-dcu/Strata/include/strata/core/progress.hpp:44:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/core/progress.hpp:59:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/core/progress.hpp:61:89: warning: void function is missing a return statement [-Wreturn-type]
+inline void progress_beat() { progress().beats.fetch_add(1, std::memory_order_relaxed); }
+                                                                                        ^
+/root/strata-dcu/Strata/include/strata/core/progress.hpp:62:89: warning: void function is missing a return statement [-Wreturn-type]
+inline void progress_tick() { progress().ticks.fetch_add(1, std::memory_order_relaxed); }
+                                                                                        ^
+/root/strata-dcu/Strata/include/strata/core/progress.hpp:68:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:28:
+In file included from /root/strata-dcu/Strata/include/strata/core/conversation_snapshot.hpp:3:
+In file included from /root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:5:
+/root/strata-dcu/Strata/include/strata/core/conversation_buffer.hpp:94:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/conversation_buffer.hpp:95:42: warning: void function is missing a return statement [-Wreturn-type]
+    void pop_back() { resize(size_ - 1); }
+                                         ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:28:
+In file included from /root/strata-dcu/Strata/include/strata/core/conversation_snapshot.hpp:3:
+/root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:237:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:242:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:307:78: warning: void function is missing a return statement [-Wreturn-type]
+    void guard(uint64_t serial) { guarded_ = serial; guard_blocked_ = false; }
+                                                                             ^
+/root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:308:36: warning: void function is missing a return statement [-Wreturn-type]
+    void unguard() { guarded_ = 0; }
+                                   ^
+/root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:311:40: warning: void function is missing a return statement [-Wreturn-type]
+    void count_borrow() { ++borrowed_; }
+                                       ^
+/root/strata-dcu/Strata/include/strata/core/conversation_cache.hpp:437:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:28:
+In file included from /root/strata-dcu/Strata/include/strata/core/conversation_snapshot.hpp:6:
+In file included from /root/strata-dcu/Strata/include/strata/core/session.hpp:19:
+/root/strata-dcu/Strata/include/strata/kernels/cpu/pool.hpp:234:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:32:
+In file included from /root/strata-dcu/Strata/include/strata/core/coupled_draft.hpp:39:
+/root/strata-dcu/Strata/include/strata/kernels/sampler.hpp:103:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:32:
+/root/strata-dcu/Strata/include/strata/core/coupled_draft.hpp:83:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:33:
+In file included from /root/strata-dcu/Strata/include/strata/core/expert_source.hpp:26:
+/root/strata-dcu/Strata/include/strata/core/exchange_storage.hpp:179:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:33:
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:310:65: warning: void function is missing a return statement [-Wreturn-type]
+    void set_depth(int d) { depth_ = d < 1 ? 1 : d > 4 ? 4 : d; }
+                                                                ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:316:79: warning: void function is missing a return statement [-Wreturn-type]
+    void stats_window_start() { gen_.fetch_add(1, std::memory_order_relaxed); }
+                                                                              ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:399:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:419:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:453:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:708:64: warning: void function is missing a return statement [-Wreturn-type]
+    void set_gguf(const std::string& native) { gguf_ = native; }
+                                                               ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:745:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:781:99: warning: void function is missing a return statement [-Wreturn-type]
+    void prepare_overrides() { if (override_.empty()) override_.assign((size_t) blobs_, nullptr); }
+                                                                                                  ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:799:97: warning: void function is missing a return statement [-Wreturn-type]
+    void set_foresight_swap(ForesightSwap* fs) { fs_swap_.store(fs, std::memory_order_release); }
+                                                                                                ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:841:69: warning: void function is missing a return statement [-Wreturn-type]
+    void set_fetch_threads(int n) { fetch_threads_ = n < 1 ? 1 : n; }
+                                                                    ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:945:60: warning: void function is missing a return statement [-Wreturn-type]
+    void set_io_stats(bool on) { io_stats_ = on || io_pf_; }
+                                                           ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:1253:13: warning: 'reads' overrides a member function but is not marked 'override' [-Winconsistent-missing-override]
+    int64_t reads() const { return reads_.load(std::memory_order_relaxed); }
+            ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:193:21: note: overridden virtual function is here
+    virtual int64_t reads() const { return 0; }
+                    ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:1244:64: warning: void function is missing a return statement [-Wreturn-type]
+    void set_gguf(const std::string& native) { gguf_ = native; }
+                                                               ^
+/root/strata-dcu/Strata/include/strata/core/expert_source.hpp:1271:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:36:
+/root/strata-dcu/Strata/include/strata/core/pin_budget.hpp:179:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:38:
+/root/strata-dcu/Strata/include/strata/core/on_device.hpp:17:38: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    ~OnDevice() { if (previous >= 0) cudaSetDevice(previous); }
+                                     ^~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:85:23: note: expanded from macro 'cudaSetDevice'
+#define cudaSetDevice hipSetDevice
+                      ^~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:47:
+/root/strata-dcu/Strata/include/strata/platform/aux_cpus.hpp:213:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/platform/aux_cpus.hpp:240:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:61:
+In file included from /root/strata-dcu/Strata/include/strata/kernels/native_qsa_indexer.hpp:3:
+/root/strata-dcu/Strata/include/strata/kernels/rope_scaling.hpp:100:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/kernels/rope_scaling.hpp:162:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:64:
+/root/strata-dcu/Strata/include/strata/kernels/kv_q4.hpp:42:121: warning: void function is missing a return statement [-Wreturn-type]
+inline void fwht256_inplace_cuda(float* data, int64_t n_rows, void* stream) { fwht256_cuda(data, data, n_rows, stream); }
+                                                                                                                        ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:67:
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:89:75: warning: void function is missing a return statement [-Wreturn-type]
+    void set_remote_expert_opt(RemoteExpertOpt* opt) { remote_opt_ = opt; } // before init/capture
+                                                                          ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:137:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:151:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:161:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:168:101: warning: void function is missing a return statement [-Wreturn-type]
+    void set_head_sampling(bool on) { head_sampling_ = on; if (next_) next_->set_head_sampling(on); }
+                                                                                                    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:179:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:182:61: warning: void function is missing a return statement [-Wreturn-type]
+    void set_handoff_rows(int rows) { handoff_rows_ = rows; }
+                                                            ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:193:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:196:92: warning: void function is missing a return statement [-Wreturn-type]
+    void set_next(Verifier* next, void* next_user) { next_ = next; next_user_ = next_user; }
+                                                                                           ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:230:68: warning: void function is missing a return statement [-Wreturn-type]
+    void set_batch_graph_limit(size_t n) { batch_graph_limit_ = n; }
+                                                                   ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:248:89: warning: void function is missing a return statement [-Wreturn-type]
+    void set_external_serve(bool on) { ext_serve_.store(on, std::memory_order_release); }
+                                                                                        ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:255:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:276:56: warning: void function is missing a return statement [-Wreturn-type]
+    void set_stream(cudaStream_t s) { ext_stream_ = s; }
+                                                       ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:285:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:336:44: warning: void function is missing a return statement [-Wreturn-type]
+    void set_split(bool on) { split_ = on; }
+                                           ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:341:60: warning: void function is missing a return statement [-Wreturn-type]
+    void set_pcie_mode(int mode) { sink_.pcie_mode = mode; }
+                                                           ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:345:113: warning: void function is missing a return statement [-Wreturn-type]
+    void set_pre_launch(std::function<bool(cudaStream_t cs, std::string& err)> f) { pre_launch_ = std::move(f); }
+                                                                                                                ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:352:61: warning: void function is missing a return statement [-Wreturn-type]
+    void set_pcie_balance(PcieModel* model) { bal_ = model; }
+                                                            ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:356:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/verify.hpp:401:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:51:51: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        if (cudaGetDevice(&cur) != cudaSuccess) { cudaGetLastError(); return nullptr; }
+                                                  ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:58:63: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (cudaEventSynchronize(sl.ev) != cudaSuccess) { cudaGetLastError(); return nullptr; }
+                                                              ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:61:25: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (sl.p) { cudaFreeHost(sl.p); sl.p = nullptr; sl.cap = 0; }   // idle: its last copy was waited for above
+                        ^~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:64:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaGetLastError();
+                ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:71:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetLastError();
+            ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:91:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();                // no event: the copy is waited for here instead
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:123:51: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        if (cudaGetDevice(&cur) != cudaSuccess) { cudaGetLastError(); return false; }
+                                                  ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:130:67: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (cudaEventSynchronize(sl.ev) != cudaSuccess) { cudaGetLastError(); return false; }
+                                                                  ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:133:29: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (sl.p) { cudaFreeHost(sl.p); sl.p = nullptr; sl.cap = 0; }
+                            ^~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:136:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaGetLastError();
+                    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:143:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaGetLastError();
+                ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:153:38: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (sl.pending && sl.ev) cudaEventSynchronize(sl.ev);
+                                     ^~~~~~~~~~~~~~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:146:30: note: expanded from macro 'cudaEventSynchronize'
+#define cudaEventSynchronize hipEventSynchronize
+                             ^~~~~~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:154:24: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (sl.ev) cudaEventDestroy(sl.ev);
+                       ^~~~~~~~~~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:143:26: note: expanded from macro 'cudaEventDestroy'
+#define cudaEventDestroy hipEventDestroy
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:155:23: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (sl.p) cudaFreeHost(sl.p);
+                      ^~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:158:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+In file included from /root/strata-dcu/Strata/include/strata/core/mtp.hpp:23:
+/root/strata-dcu/Strata/include/strata/core/pinned_ring.hpp:162:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:68:
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:49:55: warning: void function is missing a return statement [-Wreturn-type]
+    void set_prompt_len(int64_t n) { prompt_len_ = n; }
+                                                      ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:55:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:57:51: warning: void function is missing a return statement [-Wreturn-type]
+    void set_max_drafts(int k) { max_drafts_ = k; }
+                                                  ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:60:62: warning: void function is missing a return statement [-Wreturn-type]
+    void set_hnorm_per_stream(bool on) { hnorm_stream_ = on; }
+                                                             ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:65:70: warning: void function is missing a return statement [-Wreturn-type]
+    void set_q4(bool proj, bool head) { q4_ = proj; q4_head_ = head; }
+                                                                     ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:68:74: warning: void function is missing a return statement [-Wreturn-type]
+    void set_draft_vocab(const std::string& path) { dvocab_path_ = path; }
+                                                                         ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:87:70: warning: void function is missing a return statement [-Wreturn-type]
+    void set_window_R(const float* window_R) { window_R_ = window_R; }
+                                                                     ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:124:58: warning: void function is missing a return statement [-Wreturn-type]
+    void set_ple_session(SessionState* s) { ple_ss_ = s; }
+                                                         ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:137:55: warning: void function is missing a return statement [-Wreturn-type]
+    void set_force_capture(bool on) { force_on_ = on; }
+                                                      ^
+/root/strata-dcu/Strata/include/strata/core/mtp.hpp:139:59: warning: void function is missing a return statement [-Wreturn-type]
+    void set_source_R(const float* rows) { src_R_ = rows; }
+                                                          ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:69:
+/root/strata-dcu/Strata/include/strata/prefill/prefill.hpp:225:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:85:
+/root/strata-dcu/Strata/include/strata/spec/mtp_budget.hpp:41:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:86:
+In file included from /root/strata-dcu/Strata/include/strata/spec/draft_source.hpp:12:
+/root/strata-dcu/Strata/include/strata/spec/suffix_drafter.hpp:28:53: warning: void function is missing a return statement [-Wreturn-type]
+    void append(int32_t token) { append(&token, 1); }
+                                                    ^
+In file included from /root/strata-dcu/Strata/src/program/generate.cpp:96:
+/root/strata-dcu/Strata/include/strata/artifact/gguf_reader.hpp:457:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/program/generate.cpp:316:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1060:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1074:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1077:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1162:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1187:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1405:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1484:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/program/generate.cpp:1491:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemGetInfo(&free_b, &total_b);
+    ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:1594:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFreeHost(p);
+            ^~~~~~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:1621:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/program/generate.cpp:1623:68: warning: void function is missing a return statement [-Wreturn-type]
+    void wait() const { while (!idle()) std::this_thread::yield(); }
+                                                                   ^
+/root/strata-dcu/Strata/src/program/generate.cpp:1762:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/program/generate.cpp:1817:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/program/generate.cpp:1992:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaFreeHost(h);
+        ^~~~~~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:1996:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpyAsync(d, h, kBytes, cudaMemcpyHostToDevice);   // warmup: context up, copy engine primed
+    ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:2016:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaEventRecord(ev[0]);
+        ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:2018:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpyAsync(d, h, kBytes, cudaMemcpyHostToDevice);
+            ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:2019:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaEventRecord(ev[b + 1]);
+            ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:2024:36: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    for (int i = 0; i < n_ev; ++i) cudaEventDestroy(ev[i]);
+                                   ^~~~~~~~~~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:143:26: note: expanded from macro 'cudaEventDestroy'
+#define cudaEventDestroy hipEventDestroy
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:2038:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(d);
+    ^~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:2039:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFreeHost(h);
+    ^~~~~~~~~~~~ ~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:2170:82: warning: void function is missing a return statement [-Wreturn-type]
+    void mark(double ms_run, int64_t jobs) { mark_ms = ms_run; mark_jobs = jobs; }
+                                                                                 ^
+/root/strata-dcu/Strata/src/program/generate.cpp:2924:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:3003:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:3048:77: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    if (cudaGetDeviceProperties(&prop, d) != cudaSuccess) { cudaGetLastError(); own = false; break; }
+                                                                            ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:3070:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:3484:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetLastError();
+            ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:3824:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:3832:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaGetLastError();
+                ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:3842:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaMemGetInfo(&free_b, &total_b);
+        ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:4173:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&fb, &tb);
+            ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:4178:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetDeviceProperties(&dp, 0);
+            ^~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:87:33: note: expanded from macro 'cudaGetDeviceProperties'
+#define cudaGetDeviceProperties hipGetDeviceProperties
+                                ^~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:4288:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetLastError();
+            ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:4290:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&free_b, &total_b);
+            ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:4360:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&fb, &tb);
+            ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:4550:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceGetAttribute(&sms, cudaDevAttrMultiProcessorCount, dev);
+            ^~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:96:32: note: expanded from macro 'cudaDeviceGetAttribute'
+#define cudaDeviceGetAttribute strata_device_get_attribute
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:4552:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetLastError();
+            ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5134:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&before, &total_b);
+            ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5137:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&fb, &tb);
+            ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5229:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaMemGetInfo(&fb, &tb);
+        ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5364:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaGetLastError();
+                    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5365:41: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    if (buf != nullptr) cudaFree(buf);
+                                        ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5367:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaMemGetInfo(&fb, &tb);
+                    ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5377:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceSynchronize();
+            ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5379:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&fb, &tb);
+            ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5451:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaMemGetInfo(&fb, &tb);
+                ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:5560:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        if (!named) cudaGetLastError();
+                    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:6323:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemset(xcache.device_slot(0), 0, (size_t) xcache.bytes());
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:6324:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceSynchronize();
+            ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:6477:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&fb, &tb);
+            ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:6564:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&fb, &tb);
+            ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:7211:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaFree(d_next);
+        ^~~~~~~~ ~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:7967:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaMemcpyAsync(xcache.device_slot((int32_t) s), b, (size_t) lay.blob_bytes(l), cudaMemcpyHostToDevice,
+                ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:108:25: note: expanded from macro 'cudaMemcpyAsync'
+#define cudaMemcpyAsync hipMemcpyAsync
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:8639:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&free_b, &total_b);
+            ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:8729:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaMemGetInfo(&fb, &tb);
+                    ^~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:8845:28: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    res_put(d_res);
+                    ~~~~~~~^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:8848:28: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    res_put(st->d_res);
+                    ~~~~~~~^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:9178:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaGetLastError();
+                    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:9190:25: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                        cudaGetLastError();
+                        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:9250:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaStreamSynchronize(stage_ver_p(st, 0).stream());
+                ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:9253:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaStreamSynchronize(mtp.stream());
+            ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:9851:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetDevice(&main_dev);
+            ^~~~~~~~~~~~~ ~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:9982:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaEventCreateWithFlags(&adapt_ev, cudaEventDisableTiming);
+        ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:142:34: note: expanded from macro 'cudaEventCreateWithFlags'
+#define cudaEventCreateWithFlags hipEventCreateWithFlags
+                                 ^~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10063:23: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (wait) cudaEventSynchronize(adapt_ev);
+                      ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:146:30: note: expanded from macro 'cudaEventSynchronize'
+#define cudaEventSynchronize hipEventSynchronize
+                             ^~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10067:31: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    if (wait) cudaEventSynchronize(st->adapt_ev);
+                              ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:146:30: note: expanded from macro 'cudaEventSynchronize'
+#define cudaEventSynchronize hipEventSynchronize
+                             ^~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10149:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaStreamSynchronize(ver.stream());   // the patches landed (the verifier streams do not block the read)
+            ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10152:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaStreamSynchronize(st->ver.stream());
+                ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10179:39: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (pairs != nullptr) cudaFreeHost(pairs);
+                                      ^~~~~~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10273:25: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                        cudaLaunchHostFunc(adapt_stream, [](void* p) { std::this_thread::sleep_for(std::chrono::microseconds(*(int*) p)); }, &slow_arg);
+                        ^~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:140:28: note: expanded from macro 'cudaLaunchHostFunc'
+#define cudaLaunchHostFunc hipLaunchHostFunc
+                           ^~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10313:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaStreamSynchronize(adapt_stream);   // no callback: wait here, the gate opens at once
+                    ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10327:33: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (!swaps.empty()) cudaEventRecord(adapt_ev, adapt_stream);
+                                ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10335:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaEventRecord(st->adapt_ev, st->adapt_stream);
+                    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10689:35: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                        res_upload();
+                        ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:10707:36: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    else res_upload();
+                         ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:10752:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceSynchronize();
+            ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10757:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaDeviceSynchronize();
+                ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10771:44: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (a_res_dirty) res_upload();
+                                 ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:10890:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&free_b, &total_b);
+            ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:10951:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&free_b, &total_b);
+            ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:11126:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&free_b, &total_b);
+            ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:11147:27: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                res_upload();
+                ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:11180:27: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                res_upload();
+                ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:11183:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemGetInfo(&free_b, &total_b);
+            ^~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:106:24: note: expanded from macro 'cudaMemGetInfo'
+#define cudaMemGetInfo hipMemGetInfo
+                       ^~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:11804:30: warning: unused variable 'w' [-Wunused-variable]
+                const double w = (double) bt_windows, wall = std::chrono::duration<double, std::milli>(Clock::now() - bt_start).count();
+                             ^
+/root/strata-dcu/Strata/src/program/generate.cpp:12343:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaDeviceSynchronize();
+                ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:12351:25: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                        cudaDeviceSynchronize();
+                        ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:12834:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaStreamSynchronize(main_stream);
+                ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:12838:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaStreamSynchronize(st->stream);
+                    ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:12858:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaStreamSynchronize(main_stream);
+                    ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:12862:25: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                        cudaStreamSynchronize(st->stream);
+                        ^~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:13038:29: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                            cudaStreamWaitEvent(v.stream(), pl_mtp_ev[l1 & 1], 0);
+                            ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:136:29: note: expanded from macro 'cudaStreamWaitEvent'
+#define cudaStreamWaitEvent hipStreamWaitEvent
+                            ^~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:13054:33: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                                cudaEventRecord(pl_mtp_ev[f1 & 1], mtp.stream());
+                                ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:13201:44: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (n_parts > 0) res_upload();
+                                 ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:13287:36: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (any) res_upload();
+                         ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:14171:29: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                           (cudaStreamQuery(sn.side), true);
+                            ^~~~~~~~~~~~~~~ ~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:135:25: note: expanded from macro 'cudaStreamQuery'
+#define cudaStreamQuery hipStreamQuery
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:14272:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaEventCreateWithFlags(&fence_ev[(size_t) st], cudaEventDisableTiming);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:142:34: note: expanded from macro 'cudaEventCreateWithFlags'
+#define cudaEventCreateWithFlags hipEventCreateWithFlags
+                                 ^~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:14273:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaEventCreateWithFlags(&exch_ev[(size_t) st], cudaEventDisableTiming);
+                    ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:142:34: note: expanded from macro 'cudaEventCreateWithFlags'
+#define cudaEventCreateWithFlags hipEventCreateWithFlags
+                                 ^~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:14278:25: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                        cudaEventRecord(ev[(size_t) st], pl_stream[(size_t) st]);
+                        ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:14322:31: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    res_upload();
+                    ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:14725:57: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                for (cudaEvent_t ev : fence_ev) if (ev) cudaEventDestroy(ev);
+                                                        ^~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:143:26: note: expanded from macro 'cudaEventDestroy'
+#define cudaEventDestroy hipEventDestroy
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:14726:56: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                for (cudaEvent_t ev : exch_ev) if (ev) cudaEventDestroy(ev);
+                                                       ^~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:143:26: note: expanded from macro 'cudaEventDestroy'
+#define cudaEventDestroy hipEventDestroy
+                         ^~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:14832:35: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                        res_upload();
+                        ~~~~~~~~~~^~
+/root/strata-dcu/Strata/src/program/generate.cpp:14959:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaMemcpy(d_hist, hist_stage.data(), (size_t) T * (size_t) hist_n * sizeof(int32_t),
+                    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:15667:65: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (!kvg_ensure(n_prompt + o.max_new + 64, [] { cudaDeviceSynchronize(); })) return 1;
+                                                                ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:15673:24: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                res_put(d_res);
+                ~~~~~~~^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:15706:61: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (!kvg_ensure(n_prompt + o.max_new + 64, [] { cudaDeviceSynchronize(); })) return 1;
+                                                            ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:15735:20: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            res_put(d_res);
+            ~~~~~~~^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:15761:57: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        if (!kvg_ensure(n_prompt + o.max_new + 64, [] { cudaDeviceSynchronize(); })) return 1;
+                                                        ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:15843:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(final_r_host.data(), ss.R, final_r_host.size() * sizeof(float), cudaMemcpyDeviceToHost);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16077:39: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                if (pairs != nullptr) cudaFreeHost(pairs);
+                                      ^~~~~~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16099:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaStreamSynchronize(cs);   // the patch landed
+                ^~~~~~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16118:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaEventCreateWithFlags(&adapt_ev, cudaEventDisableTiming);
+        ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:142:34: note: expanded from macro 'cudaEventCreateWithFlags'
+#define cudaEventCreateWithFlags hipEventCreateWithFlags
+                                 ^~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16124:23: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (wait) cudaEventSynchronize(adapt_ev);
+                      ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:146:30: note: expanded from macro 'cudaEventSynchronize'
+#define cudaEventSynchronize hipEventSynchronize
+                             ^~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16241:33: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (!swaps.empty()) cudaEventRecord(adapt_ev, adapt_stream);
+                                ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16382:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaMemcpy(hash_rows.data(), ver.final_R_all(), n_floats * sizeof(float), cudaMemcpyDeviceToHost);
+                ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16582:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaFreeHost(layer_stage);
+        ^~~~~~~~~~~~ ~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16588:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaFreeHost(half_stage);
+        ^~~~~~~~~~~~ ~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:127:22: note: expanded from macro 'cudaFreeHost'
+#define cudaFreeHost hipHostFree
+                     ^~~~~~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16754:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(d_next);
+    ^~~~~~~~ ~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16755:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(d_logits);
+    ^~~~~~~~ ~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16756:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(d_emb);
+    ^~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16757:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(d_parts);
+    ^~~~~~~~ ~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16758:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(sbuf);
+    ^~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:16759:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(arena);
+    ^~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/strata-dcu/Strata/src/program/generate.cpp:1757:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/program/generate.cpp:9707:31: note: in instantiation of function template specialization '(anonymous namespace)::CheckpointPool::erase_if<(lambda at /root/strata-dcu/Strata/src/program/generate.cpp:9705:28)>' requested here
+                    ckpt_pool.erase_if(checks, old);
+                              ^
+/root/strata-dcu/Strata/src/program/generate.cpp:1757:5: warning: void function is missing a return statement [-Wreturn-type]
+    }
+    ^
+/root/strata-dcu/Strata/src/program/generate.cpp:12815:27: note: in instantiation of function template specialization '(anonymous namespace)::CheckpointPool::erase_if<(lambda at /root/strata-dcu/Strata/src/program/generate.cpp:12811:29)>' requested here
+                ckpt_pool.erase_if(checks, off_path);
+                          ^
+222 warnings generated.
+[6/6] Linking HIP executable strata
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]

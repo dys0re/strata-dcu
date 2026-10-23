@@ -1,0 +1,9 @@
+{
+  "agent": "/root/validate_native_entry",
+  "verbatim_invocation": true,
+  "exit_code": 0,
+  "answer": "OK",
+  "doc_divergence": false,
+  "checked_generation_fields": true,
+  "scope": "Public entry invocation and post-run inspection; no full-lifetime process trace"
+}

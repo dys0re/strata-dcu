@@ -1,5 +1,7 @@
 # Qwen3.8-F 的 DFlash2 实验接入
 
+本文记录第一版 IPC 实现及其历史测量。当前 `--dflash2` 入口默认使用 [原生 DFlash2](DFLASH2_NATIVE.md)；复现本文入口时需额外传 `--dflash-backend ipc --dflash-max-t 4`。
+
 这是供单请求验证的 Linux IPC 实现。主模型、CPU 专家、PLE、采样和拒绝回滚仍由 Strata 执行；独立 PyTorch 进程运行已训练的 DFlash2，并通过 socket 返回候选。功能由 `tools/strata_dflash2.py` 显式启用，原启动入口继续使用增强 MTP。
 
 权重使用 [Inco AI 的 Qwen3.8-Flash-Next-DFlash2](https://huggingface.co/incoai/Qwen3.8-Flash-Next-DFlash2)，HF revision `a22a1744e85c17364dcc54a6a420af7135d4c7f6`。ModelScope 同名仓库的权重 SHA-256 为 `d6723f2a359eaf33ec0c95f22ae8edda896774020c552296a85e1913b4d3186f`，与 HF 发布值一致。经 ModelScope 下载并校验（HF Mirror 大文件传输过慢后切换），使用 `tools/download_dflash2.py`，缓存均位于远程 `/root/private_data/strata-dcu/dflash2/`。下载依次支持 HF Mirror、ModelScope；网络异常日志隐藏可能包含代理认证的异常字符串。

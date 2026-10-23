@@ -1,0 +1,1402 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8c459bd..81a141a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -704,13 +704,15 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
+   # what composes them into a token.  No tokenizer - the prompt arrives as ids - because Gate C1 compares logits
+   # against llama.cpp on the SAME ids and a tokenizer on one side of that comparison is a second variable.
+   # plan v0.3 P5: batched prompt processing (tensor-core GEMMs through cuBLAS).
+-  add_library(strata_prefill STATIC src/prefill/gemm.cu src/prefill/kernels.cu src/prefill/prefill.cpp)
++  add_library(strata_prefill STATIC src/prefill/gemm.cu src/prefill/kernels.cu src/prefill/prefill.cpp src/prefill/dflash.cu)
+   if(STRATA_ENABLE_HIP)
+     # #313: the RDNA3 WMMA GEMMs include hip_runtime.h: AMD builds only (a CUDA build never sees this file)
+     target_sources(strata_prefill PRIVATE src/prefill/wmma_gemm.cu)
+   endif()
+   target_include_directories(strata_prefill PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${_strata_gpu_include_directories})
+   target_link_libraries(strata_prefill PUBLIC strata_engine ${_strata_gpu_blas_target} ${_strata_gpu_runtime_target})
++  add_executable(dflash_native_witness src/prefill/dflash_witness.cpp)
++  target_link_libraries(dflash_native_witness PRIVATE strata_prefill)
+   if(STRATA_ENABLE_CUDA)
+     # v100/gdn-chunk: the chunked Volta GDN prompt recurrence.  The dispatch (src/prefill/kernels.cu) is
+     # Volta-only (cc 7.0) and gated on STRATA_EXPERIMENTAL_SM60; the path itself stays opt-in (STRATA_GDN_CHUNK).
+diff --git a/docs/DCU_TEST_STANDARD.md b/docs/DCU_TEST_STANDARD.md
+index 87aa89f..3428653 100644
+--- a/docs/DCU_TEST_STANDARD.md
++++ b/docs/DCU_TEST_STANDARD.md
+@@ -15,3 +15,5 @@ KV、状态、激活、临时工作区、运行时读取行、计算图、索引
+ 本轮已完成重测：[权重账单、六次中位数和原始材料](../profile_output/weight50/README.md)。英文/中文/代码为 29.48 / 37.66 / 38.51 token/s；全部权重占显存 48.758%。
+ 
+ DFlash2 等外部草稿进程的 GPU 权重也必须计入同一个预算，不能只统计 Strata 进程。当前 [DFlash2 实验](DFLASH2_IPC.md) 使用 8,300 个主模型 GPU 专家以容纳额外草稿输出头副本，全部权重 49.5678%；原增强 MTP 基线仍为 8,500 个专家。两者没有进行专家数扫描。
++
++[原生 DFlash2](DFLASH2_NATIVE.md) 继续固定 8300 个 GPU 主模型专家，复用主模型输出头。草稿参数独立计为 `native_draft`，全部 GPU 权重 32783001600 字节，占显存 47.717196%；`external_draft=0`。预算包含两类草稿字段，不能因草稿改为进程内执行而漏计。节省的重复头空间不用于专家数扫描。
+diff --git a/docs/DFLASH2_IPC.md b/docs/DFLASH2_IPC.md
+index faa94d5..c20fdc6 100644
+--- a/docs/DFLASH2_IPC.md
++++ b/docs/DFLASH2_IPC.md
+@@ -1,5 +1,7 @@
+ # Qwen3.8-F 的 DFlash2 实验接入
+ 
++本文记录第一版 IPC 实现及其历史测量。当前 `--dflash2` 入口默认使用 [原生 DFlash2](DFLASH2_NATIVE.md)；复现本文入口时需额外传 `--dflash-backend ipc --dflash-max-t 4`。
++
+ 这是供单请求验证的 Linux IPC 实现。主模型、CPU 专家、PLE、采样和拒绝回滚仍由 Strata 执行；独立 PyTorch 进程运行已训练的 DFlash2，并通过 socket 返回候选。功能由 `tools/strata_dflash2.py` 显式启用，原启动入口继续使用增强 MTP。
+ 
+ 权重使用 [Inco AI 的 Qwen3.8-Flash-Next-DFlash2](https://huggingface.co/incoai/Qwen3.8-Flash-Next-DFlash2)，HF revision `a22a1744e85c17364dcc54a6a420af7135d4c7f6`。ModelScope 同名仓库的权重 SHA-256 为 `d6723f2a359eaf33ec0c95f22ae8edda896774020c552296a85e1913b4d3186f`，与 HF 发布值一致。经 ModelScope 下载并校验（HF Mirror 大文件传输过慢后切换），使用 `tools/download_dflash2.py`，缓存均位于远程 `/root/private_data/strata-dcu/dflash2/`。下载依次支持 HF Mirror、ModelScope；网络异常日志隐藏可能包含代理认证的异常字符串。
+diff --git a/envs.md b/envs.md
+index c041bd5..cc7364b 100644
+--- a/envs.md
++++ b/envs.md
+@@ -319,7 +319,9 @@ python3 /root/strata-dcu/Strata/tools/autoround_pack.py prepare \
+ 两次独立启动、每类六次 256-token 生成，BS=1、512 上下文、INT8 KV、12 workers，decode 中位数：**英文 29.48、中文 37.66、代码 38.51 token/s**。短问答、seed、上下文边界、STOP/恢复通过，没有 OOM。旧 19,000 专家配置被新预算拒绝；测试后推理进程均已退出。完整账单、范围和原始材料见[重测报告](profile_output/weight50/README.md)。旧满显存结果仅保留历史条件。
+ 
+ 
+-### DFlash2 实验接入（2026-10-22）
++### DFlash2 IPC 接入记录（2026-10-22，历史）
++
++以下是首次 IPC 接入时的环境和结果；当前原生入口见下一节。
+ 
+ 已接入 `incoai/Qwen3.8-Flash-Next-DFlash2`，权重通过 ModelScope 下载到持久盘 `/root/private_data/strata-dcu/dflash2/checkpoint`，1,206,140,008 字节，SHA-256 与 HF 发布值一致。HF Mirror 大文件传输过慢后切换；ModelScope 有效传输阶段约 23 MiB/s。没有把大权重或构建放进系统盘，结束时 `/root` 本地占用 954MiB。
+ 
+@@ -330,3 +332,16 @@ DFlash2 目前为独立 PyTorch 草稿进程＋Strata 验证器，支持单卡
+ 各类三次 256-token 生成的中位数：增强 MTP 英文/中文/代码 **29.47 / 37.52 / 38.26 TPS**；自适应 DFlash2 **27.25 / 31.93 / 41.81 TPS**，分别 **−7.54% / −14.90% / +9.30%**。只在本轮代码任务观察到收益，保留显式开关。
+ 
+ 34 个请求、5,140 个输出 token IDs 与同一 8,300 专家布局的逐 token 参考一致；采样、STOP/恢复、单 token 和上下文边界通过，没有 OOM。增强 MTP 的 10 个回归请求与此前 weight50 输出一致。fresh agent 原样复跑真实草稿 witness 通过。测试及草稿进程均已退出。实现、范围、原始数据见 [接入文档](docs/DFLASH2_IPC.md) 和 [测试报告](profile_output/dflash2/README.md)。
++
++
++### 原生 DFlash2（2026-10-22）
++
++已补齐 Strata 内的原生 CUDA/HIP 草稿路径：完整五层网络、动态因果卷积、top-16 选择器、1–7 候选、七个 GPU graph、按已完成轮次成本选窗，以及 2048 滑动窗口的环形 K/V。特征在 GPU 取 HC 均值并直接注入草稿，复用已有 BF16 输出头和主机映射 embedding，不启动 PyTorch 草稿进程。`--dflash2` 默认使用该路径，未传该开关时默认仍是增强 MTP。
++
++正式二进制 `/root/private_data/strata-dcu/dflash-native/strata-final`，SHA-256 `2aba1cff1291d1af0479188e50050a7b78ff4b619fd90ab5f0e155e4e8f5c42d`，`/root/strata-dcu/build-gfx936/strata` 已指向它。原 IPC、weight50 二进制均保留。草稿原始权重不变，原生派生包在 `/root/private_data/strata-dcu/dflash-native/pack`，标准 AutoRound 缓存通过 `dflash2-native` 符号链接复用它。运行时 Python/DTK/PyTorch 环境未更换。
++
++固定 8300 GPU 专家、16276 RAM 专家，GPU 草稿参数 1206131200 字节，全部 GPU 权重 **32783001600 字节 / 47.717196%**。省去 1271398400 字节重复输出头，未增加专家数；PLE 仍在磁盘。
++
++验收先看 QA：固定七候选的 13 个请求、自适应的 14 个请求，最终 token IDs 全部与关闭草稿的逐 token 参考一致。覆盖问答、算术、格式/JSON、生成 Python 函数的执行、多轮消息、采样复现、单 token、上下文尾部及 STOP/恢复。2100-token 提示越过草稿窗口后返回 ORBIT，后续请求返回 OK。graph/eager、重复/重置、增量/完整重算的独立缓存检查通过。草稿隐藏状态与 PyTorch 的差异仍记录为诊断，未声称两种实现数值等价。
++
++原生自适应、最大七候选，每类单次 256-token 生成的速度记录：英文 **22.26**、中文 **24.33**、代码 **33.06 TPS**。四个请求（包括预热）的最终输出与此前逐 token 参考一致。本轮没有超过增强 MTP；该单轮记录不作统计显著性结论。只验证了 HIP/gfx936 的实际运行，CUDA 对新增 `.cu` 做了编译检查，完整 CUDA 引擎与其他后端未运行验证。实现与范围见 [原生文档](docs/DFLASH2_NATIVE.md)，原始结果见 [验收记录](profile_output/dflash-native/README.md)。
+diff --git a/include/strata/core/dflash_bridge.hpp b/include/strata/core/dflash_bridge.hpp
+index d854f1a..880a249 100644
+--- a/include/strata/core/dflash_bridge.hpp
++++ b/include/strata/core/dflash_bridge.hpp
+@@ -8,19 +8,27 @@
+ #include <vector>
+ #include <cerrno>
+ #include <cstring>
++#include <memory>
++#if !defined(STRATA_GPU_METAL)
++#include "strata/core/dflash_native.hpp"
++#endif
+ #if defined(__linux__)
+ #include <sys/socket.h>
+ #include <poll.h>
+ #include <unistd.h>
+ #endif
+ namespace strata::core {
+-inline bool dflash_enabled() { return std::getenv("STRATA_DFLASH_FD") != nullptr; }
++class NativeHead;
++class NativeEmbed;
++inline bool dflash_enabled() { return std::getenv("STRATA_DFLASH_FD") != nullptr || std::getenv("STRATA_DFLASH_NATIVE") != nullptr; }
+ // Captures only the five completed-layer residual means expected by this checkpoint.
+ // Copies inside captured graphs; reducing on the host keeps this prototype backend-independent.
+ class DflashFeatures {
+     float* data_ = nullptr;
+     int cap_ = 0, n_ = 0, hc_ = 0;
+ public:
++    const float* device_data() const { return data_; }
++    int capacity() const { return cap_; }
+     ~DflashFeatures() { if (data_) cudaFree(data_); }
+     bool init(int cap, int n, int hc, std::string& err) {
+         if (!dflash_enabled()) return true;
+@@ -60,6 +68,9 @@ public:
+ class DflashBridge {
+     int fd_=-1;
+     uint64_t weights_=0;
++#if !defined(STRATA_GPU_METAL)
++    std::unique_ptr<DflashNative> native_;
++#endif
+     static constexpr int64_t magic=0x44464c32;
+     bool transfer(void* p, size_t n, bool write, std::string& err) {
+ #if defined(__linux__)
+@@ -88,6 +99,17 @@ class DflashBridge {
+         return r[1]==0||transfer(ids,(size_t)r[1]*4,false,err);
+     }
+ public:
++    bool init_native(const std::string& dir,const NativeHead& head,const NativeEmbed& embed,
++                     int max_context,bool graph,bool adaptive,std::string& err) {
++#if !defined(STRATA_GPU_METAL)
++        native_.reset(new DflashNative);
++        if(!native_->load(dir,head,embed,max_context,graph,adaptive,err))return false;
++        weights_=native_->weight_bytes();return true;
++#else
++        (void)dir;(void)head;(void)embed;(void)max_context;(void)graph;(void)adaptive;
++        err="Native DFlash2 currently requires CUDA/HIP";return false;
++#endif
++    }
+     bool init(std::string& err) {
+         const char* e=std::getenv("STRATA_DFLASH_FD");if(!e)return true;
+         char* end=nullptr;long n=std::strtol(e,&end,10);
+@@ -97,14 +119,36 @@ public:
+         if(!transfer(hello,sizeof hello,false,err)||hello[0]!=(uint64_t)magic||!hello[1]) { err="DFlash2: invalid worker weight handshake";return false; }
+         weights_=hello[1];return true;
+     }
+-    bool enabled() const { return fd_>=0; }
++    bool native() const {
++#if !defined(STRATA_GPU_METAL)
++        return native_ != nullptr;
++#else
++        return false;
++#endif
++    }
++    bool enabled() const { return native() || fd_>=0; }
+     uint64_t weight_bytes() const { return weights_; }
+-    bool reset(std::string& err) { return !enabled()||command(0,0,0,0,0,nullptr,nullptr,nullptr,err); }
++    bool reset(std::string& err) {
++#if !defined(STRATA_GPU_METAL)
++        if(native_)return native_->reset(err);
++#endif
++        return !enabled()||command(0,0,0,0,0,nullptr,nullptr,nullptr,err);
++    }
++    bool append(const DflashFeatures& source,int rows,int64_t pos,std::string& err) {
++#if !defined(STRATA_GPU_METAL)
++        if(native_)return native_->append(source.device_data(),source.capacity(),rows,pos,err);
++#endif
++        std::vector<float> features;
++        return source.read(rows,features,err)&&append(features,rows,pos,err);
++    }
+     bool append(const std::vector<float>& features,int rows,int64_t pos,std::string& err) {
+         if(features.size()!=(size_t)rows*12800) {err="DFlash2: feature size mismatch";return false;}
+         return command(1,rows,pos,0,0,features.data(),nullptr,nullptr,err);
+     }
+     bool draft(int64_t pos,int anchor,int k,int32_t* ids,int& got,std::string& err) {
++#if !defined(STRATA_GPU_METAL)
++        if(native_)return native_->draft(pos,anchor,k,ids,got,err);
++#endif
+         return command(2,0,pos,anchor,k,nullptr,ids,&got,err);
+     }
+ };
+diff --git a/include/strata/core/verify.hpp b/include/strata/core/verify.hpp
+index 7b77fd4..c208fea 100644
+--- a/include/strata/core/verify.hpp
++++ b/include/strata/core/verify.hpp
+@@ -81,6 +81,7 @@ class Verifier {
+     DflashFeatures dflash_features_;
+ public:
+     Verifier() = default;
++    const DflashFeatures& dflash_features() const { return dflash_features_; }
+     bool copy_dflash_features(int rows, std::vector<float>& out, std::string& err) const { return dflash_features_.read(rows,out,err); }
+     ~Verifier();
+     Verifier(const Verifier&) = delete;
+diff --git a/include/strata/prefill/prefill.hpp b/include/strata/prefill/prefill.hpp
+index 93fb9fd..a077901 100644
+--- a/include/strata/prefill/prefill.hpp
++++ b/include/strata/prefill/prefill.hpp
+@@ -55,6 +55,7 @@ void warm_gemm_libraries(int device);
+ class Prefill {
+ public:
+     bool copy_dflash_features(int rows, std::vector<float>& out, std::string& err) const { return dflash_features_.read(rows,out,err); }
++    const strata::core::DflashFeatures& dflash_features() const { return dflash_features_; }
+     /// E-9: the draft layer's K/V for prompt cells [cell0, cell0 + n) from their final residual rows `R_rows`
+     /// (device) and `next_tokens` (host: the token at cell+1), in batches through this path's GEMMs and its idle
+     /// scratch - call it from on_chunk.  false with `err` empty: not applicable here (a ring or hybrid K/V, another
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index 06ad37e..256b622 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -768,6 +768,9 @@ struct Options {
+     /// The MTP's own window cap (0 = --spec): with --spec 6 --mtp-max-t 4 the long windows come from suffix matches.
+     int mtp_max_t = 0;
+     bool mtp_adaptive = false;
++    std::string dflash2;
++    bool dflash_adaptive = false;
++    bool dflash_graph = true;
+     /// --lookup-chain K (opt-in, 0 = off): prompt lookup CHAINED after the MTP's proposal.  The suffix drafter matches
+     /// the context followed by the MTP's drafts and appends up to K of the tokens that followed that match to the same
+     /// verify window (the window grows to at most 8).  Greedy verification keeps the output; its own counts are kept.
+@@ -922,6 +925,9 @@ void usage() {
+                  "                       when it pays (default 3; 0 = MTP only)\n"
+                  "  --mtp-max-t M        cap the MTP's windows at M tokens (0 = --spec; longer ones come from suffixes)\n"
+                  "  --mtp-adaptive       single-request MTP: select window by measured tokens/ms; needs --suffix-draft 0\n"
++                 "  --dflash2 DIR        native Flash-Next DFlash2 pack (tools/dflash2_pack.py); shares BF16 target head\n"
++                 "  --dflash-adaptive    select 1..(--spec - 1) draft proposals using completed-round cost\n"
++                 "  --dflash-eager       disable DFlash GPU graphs (diagnostic)\n"
+                  "  --spec N             the MTP drafter's verify window: how many tokens it proposes per check (setup\n"
+                  "                       writes 4; --suffix-draft lets it grow by 2, up to 8, where a repeat is likely)\n"
+                  "  --spec-min-p P       how sure the draft layer must be to extend a verify window by another guess\n"
+@@ -2583,6 +2589,9 @@ int main(int argc, char** argv) {
+         else if (a == "--spec-corrupt") o.spec_corrupt = std::atoi(next("--spec-corrupt"));
+         else if (a == "--spec-follow") o.spec_follow = next("--spec-follow");
+         else if (a == "--window-hashes") o.window_hashes = next("--window-hashes");
++        else if (a == "--dflash2") o.dflash2 = next("--dflash2");
++        else if (a == "--dflash-adaptive") o.dflash_adaptive = true;
++        else if (a == "--dflash-eager") o.dflash_graph = false;
+         else if (a == "--mtp") o.mtp = next("--mtp");
+         else if (a == "--mtp-window") o.mtp_window = std::atoll(next("--mtp-window"));
+         else if (a == "--pcie-frac") o.pcie_frac = std::atof(next("--pcie-frac"));
+@@ -3136,6 +3145,19 @@ int main(int argc, char** argv) {
+     // Prompt lookup (the suffix drafter, on by default): the MTP keeps its --spec windows and a lookup window may be
+     // up to 2 tokens longer; the draft policy (strata/spec/draft_policy.hpp) takes one only where it pays. Code
+     // edits +6-11%, ordinary text unchanged (bench/results/2026-09-27-spec). --suffix-draft 0 turns it off.
++    if (!o.dflash2.empty()) {
++        if (std::getenv("STRATA_DFLASH_FD") || !o.mtp.empty() || o.mtp_adaptive || o.prefill_head_alias ||
++            o.spec < 2 || o.spec > 8 || o.max_context > 262144) {
++            std::fprintf(stderr,"strata: --dflash2 requires --spec 2..8, context <=262144, no MTP/IPC/head alias\n");return 2;
++        }
++#if defined(_WIN32)
++        _putenv_s("STRATA_DFLASH_NATIVE", "1");
++#else
++        setenv("STRATA_DFLASH_NATIVE", "1", 1);
++#endif
++    } else if (o.dflash_adaptive || !o.dflash_graph) {
++        std::fprintf(stderr,"strata: DFlash graph/adaptive options require --dflash2\n");return 2;
++    }
+     if (o.mtp_adaptive && [] {
+         const char* v = std::getenv("STRATA_SPEC_PROB");
+         return v != nullptr && std::atoi(v) != 0;
+@@ -5457,11 +5479,13 @@ int main(int argc, char** argv) {
+     strata::core::DflashBridge dflash;
+     if (strata::core::dflash_enabled() && (!o.serve || multi_gpu || !o.mtp.empty() || o.mtp_adaptive ||
+         o.pipeline_windows > 0 || o.suffix_draft > 0 || o.lookup_chain > 0 || o.prompt_cache != 0 ||
+-        o.batch != 0 || o.max_context > 512)) {
+-        std::fprintf(stderr, "DFlash2 IPC requires solo --serve, context <=512, --prompt-cache 0, without MTP, pipeline or lookup drafting\n");
++        o.batch != 0 || (o.dflash2.empty() && o.max_context > 512))) {
++        std::fprintf(stderr, "DFlash2 requires solo --serve, --prompt-cache 0, without MTP, pipeline or lookup drafting (IPC context <=512)\n");
+         return 2;
+     }
+-    if (!dflash.init(err)) { std::fprintf(stderr,"%s\n",err.c_str());return 2; }
++    if ((!o.dflash2.empty() && !dflash.init_native(o.dflash2,native_head,native_embed,(int)o.max_context,
++                                                o.dflash_graph,o.dflash_adaptive,err)) ||
++        (o.dflash2.empty() && !dflash.init(err))) { std::fprintf(stderr,"%s\n",err.c_str());return 2; }
+     std::vector<float> logits((size_t) n_vocab);
+     mem_mark("the native head");
+     float* d_logits = nullptr;
+@@ -6113,12 +6137,14 @@ int main(int argc, char** argv) {
+         size_t free_b = 0, total_b = 0;
+         if (cudaMemGetInfo(&free_b, &total_b) != cudaSuccess) return false;
+         std::fprintf(stderr, "strata weight usage: pack=%llu dense=%llu head=%llu experts=%llu mtp=%llu "
+-                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu external_draft=%llu\n",
++                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu external_draft=%llu native_draft=%llu\n",
+                      (unsigned long long) pool_bytes, (unsigned long long) native_dense.weight_bytes(),
+                      (unsigned long long) native_head.weight_bytes(), (unsigned long long) expert_b,
+                      (unsigned long long) mtp_b, (unsigned long long) weights,
+                      (unsigned long long) weight_vram_total, (unsigned long long) weight_vram_limit,
+-                     (double) weights / weight_vram_total, (unsigned long long) (total_b - free_b), (unsigned long long) dflash.weight_bytes());
++                     (double) weights / weight_vram_total, (unsigned long long) (total_b - free_b),
++                     (unsigned long long)(dflash.native()?0:dflash.weight_bytes()),
++                     (unsigned long long)(dflash.native()?dflash.weight_bytes():0));
+         if (weights <= weight_vram_limit) return true;
+         std::fprintf(stderr, "strata generate: weight VRAM budget exceeded; refusing generation\n");
+         return false;
+@@ -9733,8 +9759,7 @@ int main(int argc, char** argv) {
+             std::vector<int32_t> nxt((size_t) T);
+             for (int64_t t = 0; t < T; ++t) nxt[(size_t) t] = (int32_t) cur[(size_t) (p0 + t + 1)];
+             if (dflash.enabled()) {
+-                std::vector<float> features;
+-                if (!sp.copy_dflash_features((int)T,features,e) || !dflash.append(features,(int)T,p0,e)) return false;
++                if (!dflash.append(sp.dflash_features(),(int)T,p0,e)) return false;
+             }
+             // E-9: batched through the prompt path when it can (a layer split: only with STRATA_SPLIT_MTP_BATCH=1)
+             bool batched = false;
+@@ -13093,8 +13118,7 @@ int main(int argc, char** argv) {
+                         return false;
+                     if (!ver.commit(T, e) || (use_mtp && !mtp.prefill(ver.final_R_all(), nxt.data(), T, q, e))) return false;
+                     if (dflash.enabled()) {
+-                        std::vector<float> features;
+-                        if (!ver.copy_dflash_features(T,features,e) || !dflash.append(features,T,q,e)) return false;
++                        if (!dflash.append(ver.dflash_features(),T,q,e)) return false;
+                     }
+                     q += T;
+                     pp_reached = q;   // #471
+@@ -15039,10 +15063,9 @@ int main(int argc, char** argv) {
+                 bool drafted = !use_mtp || eos || produced_n >= max_new ||
+                                mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p);
+                 if (dflash.enabled() && drafted && !eos && produced_n < max_new) {
+-                    std::vector<float> features;
+                     int got=0;
+                     const int cap=(int)std::min<int64_t>({S,max_new-produced_n,o.max_context-(p+a+1)});
+-                    drafted=ver.copy_dflash_features(a+1,features,err) && dflash.append(features,a+1,p,err);
++                    drafted=dflash.append(ver.dflash_features(),a+1,p,err);
+                     if (drafted && cap>1) drafted=dflash.draft(p+a+1,outv[(size_t)a],cap-1,drafts.data(),got,err);
+                     dflash_t=got+1;
+                 }
+diff --git a/tools/autoround_pack.py b/tools/autoround_pack.py
+index 90264d9..b9e04ec 100644
+--- a/tools/autoround_pack.py
++++ b/tools/autoround_pack.py
+@@ -454,11 +454,30 @@ def run_model(ck, out, a):
+             cmd += ["--mtp-adaptive"]
+     native_cmd = list(cmd)
+     if a.dflash2:
+-        cmd[cmd.index("--spec") + 1] = "4"
+-        cmd[cmd.index("--mtp-max-t") + 1] = "4"
++        cmd[cmd.index("--spec") + 1] = str(a.dflash_max_t)
++        cmd[cmd.index("--mtp-max-t") + 1] = str(a.dflash_max_t)
+         cmd += ["--serve", "--prompt-cache", "0", "--conversation-cache-mib", "0", "--pcie-frac", "0", "--adapt-swaps", "0"]
+-        cmd = [sys.executable, str(HERE / "strata_dflash2.py"), "--checkpoint", str(Path(a.dflash2).resolve()),
+-               "--model", str(ck.dir), "--stats-file", str(out / "dflash2-worker.json"), "--graph", "--adaptive", "--"] + cmd
++        native_cmd = list(cmd)
++        if a.dflash_backend == "native":
++            from dflash2_pack import prepare, WEIGHT_SHA
++            draft_pack = out / "dflash2-native"
++            receipt = draft_pack / "receipt.json"
++            ready = receipt.is_file() and (draft_pack / "manifest.txt").is_file() and (draft_pack / "weights.bin").is_file()
++            if ready:
++                ready = (json.loads(receipt.read_text()).get("checkpoint_sha256") == WEIGHT_SHA and
++                         (draft_pack / "weights.bin").stat().st_size == 1206131200)
++            if not ready:
++                prepare(a.dflash2, draft_pack)
++            cmd += ["--dflash2", str(draft_pack)]
++            if not a.dflash_fixed:
++                cmd += ["--dflash-adaptive"]
++            if a.dflash_eager:
++                cmd += ["--dflash-eager"]
++            native_cmd = list(cmd)
++        else:
++            cmd = [sys.executable, str(HERE / "strata_dflash2.py"), "--checkpoint", str(Path(a.dflash2).resolve()),
++                   "--model", str(ck.dir), "--stats-file", str(out / "dflash2-worker.json")]+(
++                   [] if a.dflash_eager else ["--graph"])+([] if a.dflash_fixed else ["--adaptive"])+["--"]+cmd
+     (out / "run-command.json").write_text(json.dumps(native_cmd, indent=2) + "\n")
+     if a.dflash2:
+         (out / "dflash2-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
+@@ -488,7 +507,7 @@ def run_model(ck, out, a):
+              for k, v in re.findall(r"(\w+)=([0-9.]+)", usage_lines[-1])}
+     if usage["limit"] != usage["total"] // 2 or usage["weights"] > usage["limit"]:
+         raise RuntimeError("engine weights exceed the 50% weight VRAM budget")
+-    if a.dflash2 and usage.get("external_draft", 0) <= 0:
++    if a.dflash2 and usage.get("external_draft", 0) + usage.get("native_draft", 0) <= 0:
+         raise RuntimeError("engine did not account DFlash2 GPU weights")
+     match = re.search(r"^output\s*:(.*)$", result.stdout, re.MULTILINE)
+     if not match:
+@@ -500,8 +519,11 @@ def run_model(ck, out, a):
+               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
+               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
+     if a.dflash2:
+-        report.update(draft_method="dflash2", draft_graph=True, draft_adaptive=True,
+-                      draft_worker=json.loads((out / "dflash2-worker.json").read_text()))
++        report.update(draft_method="dflash2", draft_backend=a.dflash_backend,
++                      draft_graph=not a.dflash_eager, draft_adaptive=not a.dflash_fixed,
++                      draft_max_t=a.dflash_max_t)
++        if a.dflash_backend == "ipc":
++            report["draft_worker"] = json.loads((out / "dflash2-worker.json").read_text())
+     elif a.mtp_mode != "off":
+         report.update(mtp_mode=a.mtp_mode, mtp_max_t=a.mtp_max_t)
+     budget = re.search(r"^mtp budget:.*$", errors, re.MULTILINE)
+@@ -529,7 +551,11 @@ def main():
+     ap.add_argument("--context", type=int, default=512)
+     ap.add_argument("--pool-workers", type=int, default=12)
+     ap.add_argument("--expert-cache", type=int, default=None, help="fixed GPU expert slots; still subject to the 50% total weight budget")
+-    ap.add_argument("--dflash2", help="experimental trained DFlash2 directory; replaces MTP, enables graphs/adaptive drafting; context <=512")
++    ap.add_argument("--dflash2", help="trained Flash-Next DFlash2 checkpoint; native GPU execution with shared target head/embedding")
++    ap.add_argument("--dflash-backend", choices=["native", "ipc"], default="native")
++    ap.add_argument("--dflash-max-t", type=int, choices=range(2,9), default=8, help="anchor plus 1..7 draft proposals")
++    ap.add_argument("--dflash-fixed", action="store_true", help="always use the full requested draft window")
++    ap.add_argument("--dflash-eager", action="store_true", help="disable draft GPU graphs for diagnostics")
+     ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="adaptive")
+     ap.add_argument("--mtp-max-t", type=int, default=5, help="verification cap, including the real token (2..8)")
+     a = ap.parse_args()
+@@ -541,8 +567,8 @@ def main():
+         ap.error("expert-cache must be positive")
+     if not 2 <= a.mtp_max_t <= 8:
+         ap.error("mtp-max-t must be 2..8")
+-    if a.dflash2 and a.context > 512:
+-        ap.error("DFlash2 prototype supports context <=512")
++    if a.dflash2 and a.dflash_backend == "ipc" and (a.context > 512 or (not a.dflash_eager and a.dflash_max_t > 4)):
++        ap.error("DFlash2 IPC supports context <=512 and graph --dflash-max-t <=4; use native for full windows")
+     converter_path(a.llama)
+     ck = AutoRoundCheckpoint(Path(a.model).resolve())
+     out = Path(a.out).resolve()
+diff --git a/docs/DFLASH2_NATIVE.md b/docs/DFLASH2_NATIVE.md
+new file mode 100644
+index 0000000..fd913cf
+--- /dev/null
++++ b/docs/DFLASH2_NATIVE.md
+@@ -0,0 +1,58 @@
++# Qwen3.8-F 原生 DFlash2
++
++`--dflash2` 现在可在 Strata 内执行已训练的 Flash-Next DFlash2，不需要独立 Python 草稿进程。Python 入口只负责准备文件、分词和发请求。未开启 DFlash2 时，AutoRound 入口继续使用增强 MTP。
++
++## 执行流程
++
++使用 `incoai/Qwen3.8-Flash-Next-DFlash2` 的固定版本，原始权重 SHA-256 为 `d6723f2a359eaf33ec0c95f22ae8edda896774020c552296a85e1913b4d3186f`。`tools/dflash2_pack.py` 检查配置、大小和源 SHA，按张量原样保存 BF16 数据及 manifest；不量化、不改主模型、不复制 embedding 或输出头。派生文件必须保存在持久盘。
++
++主模型完成的第 `[5,15,25,35,45]` 层四路 HC 残差在 GPU 上取均值，拼接为 12800 维特征。草稿的输入投影、归一化、逐层 K/V 注入均在 GPU 执行。短提示词经过 verifier 的路径和批量 prefill 路径都提供这些特征，不经过主机或 socket。
++
++原生网络包含完整的五层 GQA Transformer、attention/MLP 两侧的动态因果卷积、SwiGLU、RoPE、BF16 输出投影和 top-16 候选选择器。草稿直接借用目标模型已有的 BF16 输出头和主机映射 embedding。每个已知 anchor 后最多起草七个候选，主模型的验证宽度为 2–8。
++
++每层草稿 K/V 使用 2056 行环形缓冲区：2048 的滑动窗口加最多八行临时候选。位置采用绝对位置，attention 只访问当前块和滑动窗口内的已提交上下文。新的已提交特征覆盖相应位置，拒绝的 noise 行不会成为后续上下文。每个新请求逻辑清空缓存；主模型 GDN、QSA、卷积和 PLE 状态仍由原验证器提交、回滚。
++
++为 1–7 个候选分别捕获 GPU graph，共七个。上下文位置和 anchor 为动态设备输入，图不依赖 512 的固定上下文长度。`--dflash-eager` 可关闭图执行。`--dflash-adaptive` 根据已经完成轮次的提交 token 数和墙钟耗时选择下一轮候选数；没有使用 DSpark confidence head。
++
++主模型仍按请求采样参数和位置 RNG 做精确匹配验证。草稿本身使用 greedy 候选。尚未接入基于草稿概率的 p/q 拒绝采样。
++
++## 使用
++
++已准备 AutoRound 环境的远程机器可直接运行：
++
++```bash
++bash /root/strata-dcu/run-autoround.sh \
++  --dflash2 /root/private_data/strata-dcu/dflash2/checkpoint \
++  --prompt 'Reply with exactly OK.' --max-new 16
++```
++
++该入口默认选择 native、graph、自适应窗口、最大验证宽度 8，主模型 GPU 专家固定为 8300，不扫描专家数。`--dflash-fixed` 固定使用最大窗口；`--dflash-max-t 4` 可限制为一个 anchor 加三个候选。
++
++自行准备原生草稿包：
++
++```bash
++python3 tools/dflash2_pack.py \
++  --checkpoint /root/private_data/strata-dcu/dflash2/checkpoint \
++  --out /root/private_data/strata-dcu/dflash-native/pack
++```
++
++原生引擎在已有主模型参数后添加：
++
++```text
++--dflash2 /root/private_data/strata-dcu/dflash-native/pack
++--dflash-adaptive --spec 8 --mtp-max-t 8
++--serve --prompt-cache 0 --conversation-cache-mib 0
++--suffix-draft 0 --adapt-every 0 --pcie-frac 0 --adapt-swaps 0
++```
++
++不得同时开启 MTP、lookup drafting、批量请求、窗口流水或输出头借用。当前原生草稿只接受该固定 checkpoint 和 BF16 目标 head/embedding。位置上限为 checkpoint 的 262144；实际验证过的上下文范围以测试报告为准，不能将接口上限当作已测试上限。HIP/gfx936 是运行验证平台。
++
++旧的独立 PyTorch 路径保留为显式诊断入口：`--dflash-backend ipc --dflash-max-t 4`，其上下文仍限制为 512，见 [IPC 实现](DFLASH2_IPC.md)。
++
++## 验收与权重
++
++验收以端到端 QA 为主：问答答案、JSON、生成代码的执行、多轮消息、固定种子采样、取消恢复、边界和最终目标输出。草稿自身与 PyTorch 的隐藏状态距离及候选差异单独记录，不要求两个后端的草稿逐位相同，也不据此声称算子数值等价。
++
++在固定 8300 GPU 专家下，原生草稿 GPU 参数为 1206131200 字节，复用已有 1271398400 字节目标头。全部 GPU 权重合计 32783001600 字节，占物理显存 47.717196%，满足 [50% 标准](DCU_TEST_STANDARD.md)。相对 IPC 路径省去 1271398400 字节的重复输出头；未将省下的空间用于增加专家数。KV、工作区、图和激活单独计量，PLE 保留在磁盘。
++
++功能 QA 驱动是 `tools/bench_dflash2_native.py --qa-only`；完整候选、增量缓存、重置、环形缓存和 graph/eager 的独立诊断使用 `tools/test_dflash2_native.py`。测试数据保存在远程 `/root/private_data/strata-dcu/dflash-native/`，小型结果归档于 `profile_output/dflash-native/`。
+diff --git a/include/strata/core/dflash_native.hpp b/include/strata/core/dflash_native.hpp
+new file mode 100644
+index 0000000..3999b16
+--- /dev/null
++++ b/include/strata/core/dflash_native.hpp
+@@ -0,0 +1,31 @@
++#pragma once
++#include <cstdint>
++#include <memory>
++#include <string>
++
++namespace strata::core {
++class NativeHead;
++class NativeEmbed;
++
++// Owns only the trained draft parameters and state. The target owns embedding/head.
++class DflashNative {
++public:
++    DflashNative();
++    ~DflashNative();
++    DflashNative(const DflashNative&) = delete;
++    DflashNative& operator=(const DflashNative&) = delete;
++    bool load(const std::string& dir, const NativeHead& head, const NativeEmbed& embed,
++              int max_context, bool graph, bool adaptive, std::string& err);
++    bool reset(std::string& err);
++    // Source layout [5, source_capacity, 4, 2560], FP32, from captured target graphs.
++    bool append(const float* source, int source_capacity, int rows, int64_t pos, std::string& err);
++    bool draft(int64_t pos, int anchor, int cap, int32_t* ids, int& got, std::string& err);
++    uint64_t weight_bytes() const;
++    // Standalone real-weight witness: packed FP32 [rows,12800], with the same forward/cache path.
++    bool append_host(const float* features, int rows, int64_t pos, std::string& err);
++    bool hidden(float* out, int rows, std::string& err) const;
++private:
++    struct Impl;
++    std::unique_ptr<Impl> p_;
++};
++} // namespace strata::core
+diff --git a/src/prefill/dflash.cu b/src/prefill/dflash.cu
+new file mode 100644
+index 0000000..df77e5d
+--- /dev/null
++++ b/src/prefill/dflash.cu
+@@ -0,0 +1,342 @@
++// Native execution of the pinned upstream DFlash2 network. See third_party/dflash/VERSION.
++// Its trained operators (including BF16 rounding boundaries) follow model.py; no Python runtime.
++#include "strata/core/dflash_native.hpp"
++#include "strata/core/native_head.hpp"
++#include "strata/prefill/gemm.hpp"
++#include "strata/kernels/bf16_bits.hpp"
++#include <cuda_runtime.h>
++#include <algorithm>
++#include <array>
++#include <chrono>
++#include <cmath>
++#include <cstdio>
++#include <fstream>
++#include <map>
++#include <sstream>
++#include <stdexcept>
++#include <vector>
++
++namespace strata::core {
++namespace {
++using strata::kernels::bf16_from_f32;
++using strata::kernels::f32_from_bf16;
++constexpr int H=2560, Q=4096, KV=1024, D=128, FF=7680, V=248320;
++constexpr int RANK=256, TOP=16, WINDOW=2048, RING=WINDOW+8, CHUNK=32;
++using Clock=std::chrono::steady_clock;
++__device__ float bf(float x) { return f32_from_bf16(bf16_from_f32(x)); }
++
++__global__ void cast16(const float* x,uint16_t* y,int n) {
++    int i=blockIdx.x*blockDim.x+threadIdx.x;if(i<n)y[i]=bf16_from_f32(x[i]);
++}
++__global__ void features16(const float* x,uint16_t* y,int cap,int row0,int rows) {
++    int i=blockIdx.x*blockDim.x+threadIdx.x;if(i>=rows*5*H)return;
++    int c=i%H,j=(i/H)%5,t=i/(5*H);float s=0;
++    for(int h=0;h<4;++h)s+=x[((size_t(j)*cap+row0+t)*4+h)*H+c];
++    y[i]=bf16_from_f32(s*.25f);
++}
++__global__ void rms(const uint16_t* x,const uint16_t* w,uint16_t* y,int cols) {
++    __shared__ float a[256];int t=blockIdx.x,l=threadIdx.x;float s=0;
++    for(int c=l;c<cols;c+=256){float v=f32_from_bf16(x[t*cols+c]);s+=v*v;}
++    a[l]=s;__syncthreads();for(int n=128;n;n>>=1){if(l<n)a[l]+=a[l+n];__syncthreads();}
++    float r=rsqrtf(a[0]/cols+1e-6f);
++    for(int c=l;c<cols;c+=256)y[t*cols+c]=bf16_from_f32(bf(f32_from_bf16(x[t*cols+c])*r)*f32_from_bf16(w[c]));
++}
++__global__ void add(const uint16_t* a,const uint16_t* b,uint16_t* out,int n) {
++    int i=blockIdx.x*blockDim.x+threadIdx.x;if(i<n)out[i]=bf16_from_f32(f32_from_bf16(a[i])+f32_from_bf16(b[i]));
++}
++__global__ void swiglu(const uint16_t* g,const uint16_t* u,uint16_t* out,int n) {
++    int i=blockIdx.x*blockDim.x+threadIdx.x;if(i<n){float v=f32_from_bf16(g[i]);out[i]=bf16_from_f32(bf(v/(1+expf(-v)))*f32_from_bf16(u[i]));}
++}
++// One projection produces both the input and output convolution filters. Each offset has
++// distinct BF16 mul/add/addcmul rounding, as in _grouped_dynamic_convolve.
++__global__ void conv(const uint16_t* x,const uint16_t* dyn,const uint16_t* base,
++                     uint16_t* out,int rows,int side) {
++    int i=blockIdx.x*blockDim.x+threadIdx.x;if(i>=rows*H)return;
++    int t=i/H,c=i%H;float acc=0;
++    for(int o=0;o<2;++o){float v=t>=o?f32_from_bf16(x[(t-o)*H+c]):0;
++        float b=f32_from_bf16(base[(side*2+o)*H+c]);
++        float d=f32_from_bf16(dyn[t*640+side*320+o*160+c/16]);
++        acc=bf(acc+bf(b*v));acc=bf(fmaf(d,v,acc));
++    }out[i]=bf16_from_f32(acc);
++}
++// RoPE is applied after Q/K head RMSNorm. cos/sin and each product are BF16.
++__global__ void rope(const uint16_t* x,uint16_t* y,int rows,int width,
++                     const int64_t* position,int offset) {
++    int i=blockIdx.x*blockDim.x+threadIdx.x;if(i>=rows*width)return;
++    int c=i%D,t=i/width,base=i-c;
++    float theta=float(*position+offset+t)*powf(10000.f,-float((c%64)*2)/128.f);
++    float cs=bf(cosf(theta)),sn=bf(sinf(theta));
++    float a=f32_from_bf16(x[i]),b=f32_from_bf16(x[base+(c+64)%128]);if(c<64)b=-b;
++    y[i]=bf16_from_f32(bf(a*cs)+bf(b*sn));
++}
++__global__ void write_kv(const uint16_t* k,const uint16_t* v,uint16_t* kc,uint16_t* vc,
++                         int rows,const int64_t* position,int offset) {
++    int i=blockIdx.x*blockDim.x+threadIdx.x;if(i>=rows*KV)return;
++    int t=i/KV,c=i%KV;int slot=int((*position+offset+t)%RING);
++    kc[slot*KV+c]=k[i];vc[slot*KV+c]=v[i];
++}
++// Small-query GQA with the checkpoint's symmetric noncausal sliding window.
++// Cache slots are absolute-position modulo RING; no stale/ephemeral row is visible.
++__global__ void attention(const uint16_t* q,const uint16_t* kc,const uint16_t* vc,
++                          uint16_t* out,int rows,const int64_t* position) {
++    __shared__ float scores[RING],reduce[256];int l=threadIdx.x,h=blockIdx.x%32,t=blockIdx.x/32;
++    int64_t qp=*position+t,lo=max(int64_t(0),qp-WINDOW+1),hi=*position+rows;
++    int n=int(hi-lo),kh=h/4;float largest=-INFINITY;
++    for(int j=l;j<n;j+=256){int slot=int((lo+j)%RING);float s=0;
++        for(int d=0;d<D;++d)s+=f32_from_bf16(q[t*Q+h*D+d])*f32_from_bf16(kc[slot*KV+kh*D+d]);
++        scores[j]=s*(1.f/sqrtf(float(D)));largest=fmaxf(largest,scores[j]);
++    }
++    reduce[l]=largest;__syncthreads();for(int k=128;k;k>>=1){if(l<k)reduce[l]=fmaxf(reduce[l],reduce[l+k]);__syncthreads();}
++    float m=reduce[0],sum=0;for(int j=l;j<n;j+=256){scores[j]=expf(scores[j]-m);sum+=scores[j];}
++    reduce[l]=sum;__syncthreads();for(int k=128;k;k>>=1){if(l<k)reduce[l]+=reduce[l+k];__syncthreads();}
++    if(l<D){float s=0;for(int j=0;j<n;++j){int slot=int((lo+j)%RING);s+=scores[j]*f32_from_bf16(vc[slot*KV+kh*D+l]);}
++        out[t*Q+h*D+l]=bf16_from_f32(s/reduce[0]);}
++}
++// Exact top-16 over BF16 head logits; each block contributes 16 local candidates.
++__global__ void top_parts(const uint16_t* logits,float* scores,int32_t* ids,int parts) {
++    __shared__ float val[256];__shared__ int idx[256];int l=threadIdx.x,t=blockIdx.y;
++    int i=blockIdx.x*256+l;float v=i<V?f32_from_bf16(logits[t*V+i]):-INFINITY;
++    for(int k=0;k<TOP;++k){val[l]=v;idx[l]=i;__syncthreads();
++        for(int s=128;s;s>>=1){if(l<s&&(val[l+s]>val[l]||(val[l+s]==val[l]&&idx[l+s]<idx[l]))){val[l]=val[l+s];idx[l]=idx[l+s];}__syncthreads();}
++        if(l==0){int p=(t*parts+blockIdx.x)*TOP+k;scores[p]=val[0];ids[p]=idx[0];}
++        if(i==idx[0])v=-INFINITY;__syncthreads();
++    }
++}
++__global__ void top_merge(const float* scores,const int32_t* ids,float* best,int32_t* candidates,int parts) {
++    // Parallel merge: each lane sorts its small partition, then the block emits 16 winners.
++    __shared__ float values[256];__shared__ int indices[256];
++    int t=blockIdx.x,l=threadIdx.x;float s[TOP];int ix[TOP];
++    for(int k=0;k<TOP;++k){s[k]=-INFINITY;ix[k]=-1;}
++    for(int j=l;j<parts*TOP;j+=256){float v=scores[t*parts*TOP+j];int id=ids[t*parts*TOP+j];
++        for(int k=0;k<TOP;++k)if(v>s[k]||(v==s[k]&&id<ix[k])){
++            for(int z=TOP-1;z>k;--z){s[z]=s[z-1];ix[z]=ix[z-1];}s[k]=v;ix[k]=id;break;}
++    }
++    for(int k=0;k<TOP;++k){values[l]=s[0];indices[l]=ix[0];__syncthreads();
++        for(int step=128;step;step>>=1){if(l<step&&(values[l+step]>values[l]||
++            (values[l+step]==values[l]&&indices[l+step]<indices[l]))){values[l]=values[l+step];indices[l]=indices[l+step];}__syncthreads();}
++        if(l==0){best[t*TOP+k]=values[0];candidates[t*TOP+k]=indices[0];}
++        if(ix[0]==indices[0]){for(int z=0;z<TOP-1;++z){s[z]=s[z+1];ix[z]=ix[z+1];}s[TOP-1]=-INFINITY;ix[TOP-1]=-1;}
++        __syncthreads();
++    }
++}
++__global__ void select_path(const uint16_t* hidden,const float* unary,const int32_t* candidates,
++                           const uint16_t* pred,const uint16_t* succ,const int32_t* anchor,
++                           int32_t* out,int rows) {
++    __shared__ float partial[256];__shared__ float scores[TOP];__shared__ int previous;
++    int l=threadIdx.x;if(l==0)previous=*anchor;__syncthreads();
++    for(int t=0;t<rows;++t){for(int k=0;k<TOP;++k){int id=candidates[t*TOP+k];
++            // The codebook product and einsum output are BF16 in the reference selector.
++            bool valid=id>=0&&id<V&&previous>=0&&previous<V;
++            float v=valid?bf(f32_from_bf16(pred[previous*RANK+l])*f32_from_bf16(hidden[t*RANK+l])):0;
++            partial[l]=valid?v*f32_from_bf16(succ[id*RANK+l]):0;__syncthreads();
++            for(int s=128;s;s>>=1){if(l<s)partial[l]+=partial[l+s];__syncthreads();}
++            if(l==0)scores[k]=valid?bf(unary[t*TOP+k]+bf(partial[0])):-INFINITY;__syncthreads();
++        }
++        if(l==0){int best=0;for(int k=1;k<TOP;++k)if(scores[k]>scores[best])best=k;previous=candidates[t*TOP+best];out[t]=previous;}__syncthreads();
++    }
++}
++__global__ void widen(const uint16_t* x,float* y,int n) {int i=blockIdx.x*blockDim.x+threadIdx.x;if(i<n)y[i]=f32_from_bf16(x[i]);}
++bool check(cudaError_t e,const char* what,std::string& err){if(e==cudaSuccess)return true;err=std::string("DFlash2: ")+what+": "+cudaGetErrorString(e);return false;}
++}
++
++struct DflashNative::Impl {
++    struct Tensor {uint64_t off,bytes;std::vector<int> dims;};
++    struct Layer {const uint16_t *ln1,*ln2,*q,*k,*v,*o,*qn,*kn,*gate,*up,*down,*acp,*acb,*mcp,*mcb;uint16_t *kc,*vc;};
++    std::map<std::string,Tensor> tensors;
++    std::vector<void*> allocations;
++    std::array<Layer,5> layers{};
++    uint16_t *weights=nullptr,*feat=nullptr,*ctx=nullptr,*normed=nullptr,*x=nullptr,*ln=nullptr,*cv=nullptr,*proj=nullptr;
++    uint16_t *q=nullptr,*qr=nullptr,*k=nullptr,*kr=nullptr,*v=nullptr,*att=nullptr,*out=nullptr,*gate=nullptr,*up=nullptr,*dyn=nullptr;
++    uint16_t *logits=nullptr,*selector=nullptr;
++    float *tmp=nullptr,*embedf=nullptr,*partscores=nullptr,*best=nullptr;
++    int32_t *partids=nullptr,*candidates=nullptr,*tokens=nullptr,*anchor_dev=nullptr;
++    int64_t* position=nullptr;
++    const NativeHead* head=nullptr;const NativeEmbed* embed=nullptr;
++    uint64_t bytes=0;int max_context=0;int64_t received=0;cudaStream_t cs=nullptr;
++    strata::prefill::Gemm gemm;
++    cudaGraphExec_t graphs[8]={};bool graph=true,adaptive=false;
++    Clock::time_point last_start;int last_k=0,rounds=0;
++    std::array<std::vector<std::pair<int,double>>,8> samples;
++    uint64_t calls=0,feature_rows=0;double elapsed_ms=0;
++    ~Impl(){if(cs)cudaStreamSynchronize(cs);for(auto g:graphs)if(g)cudaGraphExecDestroy(g);
++        for(auto a:allocations)cudaFree(a);if(cs)cudaStreamDestroy(cs);
++        if(calls)std::fprintf(stderr,"strata dflash native: calls=%llu feature_rows=%llu draft_ms=%.3f graphs=%d\n",
++            (unsigned long long)calls,(unsigned long long)feature_rows,elapsed_ms,graph?7:0);}
++    template<class T> bool alloc(T*& ptr,size_t n,std::string& err){if(!check(cudaMalloc((void**)&ptr,n*sizeof(T)),"allocate",err))return false;allocations.push_back(ptr);return true;}
++    const uint16_t* weight(const std::string& name,std::initializer_list<int> shape){
++        auto i=tensors.find(name);if(i==tensors.end()||i->second.dims!=std::vector<int>(shape))throw std::runtime_error("DFlash2: missing/invalid tensor "+name);
++        return weights+i->second.off/2;
++    }
++    void linear(const uint16_t* in,const uint16_t* w,uint16_t* dst,int rows,int n,int k){
++        gemm.bf16(in,w,tmp,rows,n,k);cast16<<<(rows*n+255)/256,256,0,cs>>>(tmp,dst,rows*n);
++    }
++    void norm(const uint16_t* in,const uint16_t* w,uint16_t* dst,int rows,int cols){rms<<<rows,256,0,cs>>>(in,w,dst,cols);}
++    void inject(Layer& l,const uint16_t* in,int rows,int offset){
++        linear(in,l.k,k,rows,KV,H);linear(in,l.v,v,rows,KV,H);
++        norm(k,l.kn,kr,rows*8,D);rope<<<(rows*KV+255)/256,256,0,cs>>>(kr,k,rows,KV,position,offset);
++        write_kv<<<(rows*KV+255)/256,256,0,cs>>>(k,v,l.kc,l.vc,rows,position,offset);
++    }
++    void append_project(int rows){
++        linear(feat,weight("fc.weight",{H,5*H}),ctx,rows,H,5*H);
++        norm(ctx,weight("hidden_norm.weight",{H}),normed,rows,H);
++        for(auto& l:layers)inject(l,normed,rows,0);
++    }
++    void forward(int count){
++        const int rows=count+1;
++        for(auto& l:layers){
++            norm(x,l.ln1,ln,rows,H);
++            linear(ln,l.acp,dyn,rows,640,H);
++            conv<<<(rows*H+255)/256,256,0,cs>>>(ln,dyn,l.acb,cv,rows,0);
++            linear(cv,l.q,q,rows,Q,H);norm(q,l.qn,qr,rows*32,D);
++            rope<<<(rows*Q+255)/256,256,0,cs>>>(qr,q,rows,Q,position,0);
++            inject(l,cv,rows,0);
++            attention<<<rows*32,256,0,cs>>>(q,l.kc,l.vc,att,rows,position);
++            linear(att,l.o,proj,rows,H,Q);
++            conv<<<(rows*H+255)/256,256,0,cs>>>(proj,dyn,l.acb,out,rows,1);
++            add<<<(rows*H+255)/256,256,0,cs>>>(x,out,x,rows*H);
++            norm(x,l.ln2,ln,rows,H);
++            linear(ln,l.mcp,dyn,rows,640,H);
++            conv<<<(rows*H+255)/256,256,0,cs>>>(ln,dyn,l.mcb,cv,rows,0);
++            linear(cv,l.gate,gate,rows,FF,H);linear(cv,l.up,up,rows,FF,H);
++            swiglu<<<(rows*FF+255)/256,256,0,cs>>>(gate,up,gate,rows*FF);
++            linear(gate,l.down,proj,rows,H,FF);
++            conv<<<(rows*H+255)/256,256,0,cs>>>(proj,dyn,l.mcb,out,rows,1);
++            add<<<(rows*H+255)/256,256,0,cs>>>(x,out,x,rows*H);
++        }
++        norm(x,weight("norm.weight",{H}),ln,rows,H);
++        linear(ln+H,(const uint16_t*)head->weights(),logits,count,V,H);
++        linear(ln+H,weight("candidate_selector.hidden_projection.weight",{RANK,H}),selector,count,RANK,H);
++        int parts=(V+255)/256;
++        top_parts<<<dim3(parts,count),256,0,cs>>>(logits,partscores,partids,parts);
++        top_merge<<<count,256,0,cs>>>(partscores,partids,best,candidates,parts);
++        select_path<<<1,256,0,cs>>>(selector,best,candidates,
++            weight("candidate_selector.predecessor_codebook",{V,RANK}),
++            weight("candidate_selector.successor_codebook",{V,RANK}),anchor_dev,tokens,count);
++    }
++    int choose(int cap){
++        if(!adaptive)return cap;
++        for(int k=1;k<=cap;++k)if(samples[k].size()<2)return k;
++        if(rounds%32==0)return 1+(rounds/32)%cap;
++        int bestk=1;double bestscore=0;
++        for(int k=1;k<=cap;++k){double n=0,ms=0;for(auto s:samples[k]){n+=s.first;ms+=s.second;}
++            if(ms>0&&n/ms>bestscore){bestscore=n/ms;bestk=k;}}
++        return bestk;
++    }
++    void observe(int rows){if(!last_k)return;double ms=std::chrono::duration<double,std::milli>(Clock::now()-last_start).count();
++        auto& s=samples[last_k];s.push_back({rows,ms});if(s.size()>12)s.erase(s.begin());last_k=0;++rounds;}
++};
++
++DflashNative::DflashNative():p_(new Impl){}
++DflashNative::~DflashNative()=default;
++uint64_t DflashNative::weight_bytes()const{return p_->bytes;}
++bool DflashNative::load(const std::string& dir,const NativeHead& head,const NativeEmbed& embed,
++                       int max_context,bool graph,bool adaptive,std::string& err){
++    auto& p=*p_;
++    if(!head.loaded()||head.type()!=30||embed.type()!=30||max_context<2||max_context>262144){
++        err="DFlash2 native requires unchanged BF16 target head/embedding and context 2..262144";return false;}
++    p.head=&head;p.embed=&embed;p.max_context=max_context;p.graph=graph;p.adaptive=adaptive;
++    std::ifstream manifest(dir+"/manifest.txt");std::string line;
++    if(!std::getline(manifest,line)||line!="STRATA_DFLASH2 1"||!std::getline(manifest,line)||
++       line!="source d6723f2a359eaf33ec0c95f22ae8edda896774020c552296a85e1913b4d3186f"){
++        err="DFlash2: invalid native manifest; run tools/dflash2_pack.py";return false;}
++    uint64_t total=0;
++    while(std::getline(manifest,line)){
++        std::istringstream in(line);std::string tag,name;Impl::Tensor t{};int ndim=0;
++        if(!(in>>tag>>name>>t.off>>t.bytes>>ndim)||tag!="tensor"||ndim<1||ndim>3||t.off!=total||t.bytes%2){err="DFlash2: invalid tensor record";return false;}
++        uint64_t elems=1;for(int i=0;i<ndim;++i){int d=0;if(!(in>>d)||d<1||d>V||elems>1206131200u/d){err="DFlash2: invalid tensor shape";return false;}t.dims.push_back(d);elems*=d;}
++        if(elems*2!=t.bytes||!p.tensors.emplace(name,t).second){err="DFlash2: duplicate/invalid tensor size";return false;}total+=t.bytes;
++    }
++    if(total!=1206131200){err="DFlash2: wrong parameter byte count";return false;}
++    if(!check(cudaStreamCreateWithFlags(&p.cs,cudaStreamNonBlocking),"stream",err)||!p.alloc(p.weights,total/2,err))return false;
++    std::ifstream file(dir+"/weights.bin",std::ios::binary|std::ios::ate);
++    if(!file||file.tellg()!=std::streampos(total)){err="DFlash2: missing/truncated native weights";return false;}
++    file.seekg(0);std::vector<char> chunk(8<<20);
++    for(uint64_t off=0;off<total;){size_t n=size_t(std::min<uint64_t>(chunk.size(),total-off));
++        if(!file.read(chunk.data(),n)||!check(cudaMemcpy((char*)p.weights+off,chunk.data(),n,cudaMemcpyHostToDevice),"weight upload",err))return false;off+=n;}
++    p.bytes=total;
++    try{
++        p.weight("fc.weight",{H,H*5});p.weight("hidden_norm.weight",{H});p.weight("norm.weight",{H});
++        p.weight("candidate_selector.hidden_projection.weight",{RANK,H});
++        p.weight("candidate_selector.predecessor_codebook",{V,RANK});p.weight("candidate_selector.successor_codebook",{V,RANK});
++        for(int i=0;i<5;++i){auto& l=p.layers[i];std::string b="layers."+std::to_string(i)+".";
++            l.ln1=p.weight(b+"input_layernorm.weight",{H});l.ln2=p.weight(b+"post_attention_layernorm.weight",{H});
++            l.q=p.weight(b+"self_attn.q_proj.weight",{Q,H});l.k=p.weight(b+"self_attn.k_proj.weight",{KV,H});
++            l.v=p.weight(b+"self_attn.v_proj.weight",{KV,H});l.o=p.weight(b+"self_attn.o_proj.weight",{H,Q});
++            l.qn=p.weight(b+"self_attn.q_norm.weight",{D});l.kn=p.weight(b+"self_attn.k_norm.weight",{D});
++            l.gate=p.weight(b+"mlp.gate_proj.weight",{FF,H});l.up=p.weight(b+"mlp.up_proj.weight",{FF,H});l.down=p.weight(b+"mlp.down_proj.weight",{H,FF});
++            l.acp=p.weight(b+"attention_conv.kernel_projection.weight",{640,H});l.acb=p.weight(b+"attention_conv.base_kernel",{2,2,H});
++            l.mcp=p.weight(b+"mlp_conv.kernel_projection.weight",{640,H});l.mcb=p.weight(b+"mlp_conv.base_kernel",{2,2,H});
++            if(!p.alloc(l.kc,size_t(RING)*KV,err)||!p.alloc(l.vc,size_t(RING)*KV,err))return false;
++        }
++    }catch(const std::exception& e){err=e.what();return false;}
++    bool ok=p.alloc(p.feat,CHUNK*H*5,err)&&p.alloc(p.ctx,CHUNK*H,err)&&p.alloc(p.normed,CHUNK*H,err)&&
++        p.alloc(p.x,8*H,err)&&p.alloc(p.ln,8*H,err)&&p.alloc(p.cv,8*H,err)&&p.alloc(p.proj,8*H,err)&&
++        p.alloc(p.q,8*Q,err)&&p.alloc(p.qr,8*Q,err)&&p.alloc(p.k,CHUNK*KV,err)&&p.alloc(p.kr,CHUNK*KV,err)&&
++        p.alloc(p.v,CHUNK*KV,err)&&p.alloc(p.att,8*Q,err)&&p.alloc(p.out,8*H,err)&&p.alloc(p.gate,8*FF,err)&&
++        p.alloc(p.up,8*FF,err)&&p.alloc(p.dyn,8*640,err)&&p.alloc(p.logits,7*V,err)&&p.alloc(p.selector,7*RANK,err)&&
++        p.alloc(p.tmp,std::max(CHUNK*H,7*V),err)&&p.alloc(p.embedf,8*H,err)&&
++        p.alloc(p.partscores,7*((V+255)/256)*TOP,err)&&p.alloc(p.partids,7*((V+255)/256)*TOP,err)&&
++        p.alloc(p.best,7*TOP,err)&&p.alloc(p.candidates,7*TOP,err)&&p.alloc(p.tokens,7,err)&&
++        p.alloc(p.anchor_dev,1,err)&&p.alloc(p.position,1,err)&&p.gemm.init(p.cs,0,err);
++    if(!ok)return false;
++    int64_t zero=0;int32_t anchor=0;
++    cudaMemcpy(p.position,&zero,8,cudaMemcpyHostToDevice);cudaMemcpy(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice);
++    cudaMemsetAsync(p.x,0,8*H*2,p.cs);
++    for(auto& l:p.layers){cudaMemsetAsync(l.kc,0,size_t(RING)*KV*2,p.cs);cudaMemsetAsync(l.vc,0,size_t(RING)*KV*2,p.cs);}
++    if(graph)for(int count=1;count<=7;++count){
++        p.forward(count);if(!check(cudaStreamSynchronize(p.cs),"graph warmup",err))return false;
++        cudaGraph_t g=nullptr;
++        if(!check(cudaStreamBeginCapture(p.cs,cudaStreamCaptureModeThreadLocal),"begin capture",err))return false;
++        p.forward(count);
++        if(!check(cudaStreamEndCapture(p.cs,&g),"end capture",err))return false;
++        auto status=cudaGraphInstantiate(&p.graphs[count],g,nullptr,nullptr,0);cudaGraphDestroy(g);
++        if(!check(status,"instantiate",err))return false;
++    }
++    std::fprintf(stderr,"strata dflash native: weights=%llu shared_head=%llu max_candidates=7 window=2048 context=%d graphs=%d adaptive=%d\n",
++        (unsigned long long)p.bytes,(unsigned long long)head.weight_bytes(),max_context,graph?7:0,adaptive?1:0);
++    return reset(err);
++}
++bool DflashNative::reset(std::string& err){auto& p=*p_;
++    if(!check(cudaStreamSynchronize(p.cs),"reset",err))return false;
++    p.received=0;p.last_k=0;p.rounds=0;for(auto& s:p.samples)s.clear();
++    // Logical length masks all old rows; each visible row is overwritten before reading.
++    return true;
++}
++bool DflashNative::append(const float* source,int cap,int rows,int64_t pos,std::string& err){auto& p=*p_;
++    if(!source||rows<1||rows>cap||pos!=p.received||pos+rows>p.max_context){err="DFlash2: noncontiguous/out-of-range target features";return false;}
++    p.observe(rows);
++    for(int row0=0;row0<rows;row0+=CHUNK){int n=std::min(CHUNK,rows-row0);int64_t at=pos+row0;
++        if(!check(cudaMemcpyAsync(p.position,&at,8,cudaMemcpyHostToDevice,p.cs),"position",err))return false;
++        features16<<<(n*5*H+255)/256,256,0,p.cs>>>(source,p.feat,cap,row0,n);p.append_project(n);
++        // The producer can reuse its feature buffers once append returns.
++        if(!check(cudaStreamSynchronize(p.cs),"append features",err))return false;
++    }p.received+=rows;p.feature_rows+=rows;return true;
++}
++bool DflashNative::append_host(const float* f,int rows,int64_t pos,std::string& err){auto& p=*p_;
++    if(!f||rows<1||pos!=p.received||pos+rows>p.max_context){err="DFlash2 witness: invalid features";return false;}
++    std::vector<uint16_t> host(CHUNK*5*H);
++    for(int row0=0;row0<rows;row0+=CHUNK){int n=std::min(CHUNK,rows-row0);int64_t at=pos+row0;
++        for(int i=0;i<n*5*H;++i)host[i]=bf16_from_f32(f[row0*5*H+i]);
++        cudaMemcpyAsync(p.position,&at,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.feat,host.data(),n*5*H*2,cudaMemcpyHostToDevice,p.cs);
++        p.append_project(n);if(!check(cudaStreamSynchronize(p.cs),"witness append",err))return false;
++    }p.received+=rows;return true;
++}
++bool DflashNative::draft(int64_t pos,int anchor,int cap,int32_t* ids,int& got,std::string& err){auto& p=*p_;got=0;
++    if(pos!=p.received||anchor<0||anchor>=V||cap<1||cap>7||pos+cap>=p.max_context){err="DFlash2: invalid draft request";return false;}
++    int count=p.choose(cap);p.last_start=Clock::now();
++    cudaMemcpyAsync(p.position,&pos,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice,p.cs);
++    p.embed->gather_one(anchor,p.embedf,p.cs);
++    for(int i=1;i<=count;++i)p.embed->gather_one(248077,p.embedf+i*H,p.cs);
++    cast16<<<((count+1)*H+255)/256,256,0,p.cs>>>(p.embedf,p.x,(count+1)*H);
++    if(p.graph)cudaGraphLaunch(p.graphs[count],p.cs);else p.forward(count);
++    cudaMemcpyAsync(ids,p.tokens,count*4,cudaMemcpyDeviceToHost,p.cs);
++    if(!check(cudaStreamSynchronize(p.cs),"draft",err))return false;
++    for(int i=0;i<count;++i)if(ids[i]<0||ids[i]>=V){err="DFlash2: invalid proposal ID";return false;}
++    got=count;p.last_k=count;++p.calls;p.elapsed_ms+=std::chrono::duration<double,std::milli>(Clock::now()-p.last_start).count();return true;
++}
++bool DflashNative::hidden(float* out,int rows,std::string& err)const{auto& p=*p_;
++    if(rows<1||rows>7)return false;
++    widen<<<(rows*H+255)/256,256,0,p.cs>>>(p.ln+H,p.tmp,rows*H);
++    cudaMemcpyAsync(out,p.tmp,rows*H*4,cudaMemcpyDeviceToHost,p.cs);return check(cudaStreamSynchronize(p.cs),"hidden witness",err);
++}
++} // namespace strata::core
+diff --git a/src/prefill/dflash_witness.cpp b/src/prefill/dflash_witness.cpp
+new file mode 100644
+index 0000000..f892eb5
+--- /dev/null
++++ b/src/prefill/dflash_witness.cpp
+@@ -0,0 +1,40 @@
++#include "strata/core/dflash_native.hpp"
++#include "strata/core/native_head.hpp"
++#include <cstdio>
++#include <fstream>
++#include <sstream>
++#include <vector>
++
++int main(int argc,char** argv){
++    if(argc!=7){std::fprintf(stderr,"usage: dflash_native_witness PACK TARGET_GGUF SCRIPT CONTEXT eager|graph OUT\n");return 2;}
++    std::string err;strata::core::NativeHead head;strata::core::NativeEmbed embed;
++    strata::core::DflashNative draft;
++    if(!head.load({argv[2]},2560,248320,err)||!embed.load({argv[2]},2560,248320,err)||
++       !draft.load(argv[1],head,embed,std::stoi(argv[4]),std::string(argv[5])=="graph",false,err)){
++        std::fprintf(stderr,"%s\n",err.c_str());return 1;}
++    std::ifstream script(argv[3]);std::string line;int cases=0;
++    if(!script)return 2;
++    while(std::getline(script,line)){
++        std::istringstream in(line);std::string op;in>>op;bool ok=false;
++        if(op=="reset")ok=draft.reset(err);
++        else if(op=="append"){
++            std::string path;int rows;int64_t pos;in>>path>>rows>>pos;
++            if(rows<1||rows>262144)return 2;
++            std::vector<float> f(size_t(rows)*12800);std::ifstream input(path,std::ios::binary);
++            if(!input.read((char*)f.data(),f.size()*4))return 2;
++            ok=draft.append_host(f.data(),rows,pos,err);
++        }else if(op=="draft"){
++            int64_t pos;int anchor,count,got=0;std::string name;in>>pos>>anchor>>count>>name;
++            int32_t ids[7];ok=draft.draft(pos,anchor,count,ids,got,err);
++            if(ok){std::vector<float> hidden(size_t(got)*2560);ok=draft.hidden(hidden.data(),got,err);
++                std::ofstream f(std::string(argv[6])+"/"+name+".f32",std::ios::binary);f.write((char*)hidden.data(),hidden.size()*4);
++                std::ofstream tokens(std::string(argv[6])+"/"+name+".ids");
++                for(int i=0;i<got;++i)tokens<<ids[i]<<' ';tokens<<'\n';++cases;
++            }
++        }else return 2;
++        if(!ok){std::fprintf(stderr,"%s: %s\n",line.c_str(),err.c_str());return 1;}
++    }
++    std::printf("WITNESS DFLASH2_NATIVE cases=%d weight_bytes=%llu shared_head_bytes=%llu\n",cases,
++                (unsigned long long)draft.weight_bytes(),(unsigned long long)head.weight_bytes());
++    return cases?0:1;
++}
+diff --git a/tools/bench_dflash2_native.py b/tools/bench_dflash2_native.py
+new file mode 100644
+index 0000000..e0f9563
+--- /dev/null
++++ b/tools/bench_dflash2_native.py
+@@ -0,0 +1,160 @@
++"""Qwen3.8-F BS=1 speed test; all GPU weight allocations must fit 50% of physical VRAM."""
++import argparse,ast,json,os,re,subprocess,time,hashlib
++from pathlib import Path
++
++ap=argparse.ArgumentParser(__doc__)
++ap.add_argument('--engine',required=True)
++ap.add_argument('--smoke',action='store_true')
++ap.add_argument('--qa-only',action='store_true',help='functional QA first; no throughput workload warmups')
++ap.add_argument('--graph',action='store_true')
++ap.add_argument('--draft-adaptive',action='store_true')
++ap.add_argument('--expert-cache',type=int)
++ap.add_argument('--out',required=True)
++ap.add_argument('--cols',type=int,choices=[0,2,4],default=4)
++ap.add_argument('--mode',choices=['native','ipc','off','adaptive'],default='native')
++ap.add_argument('--width',type=int,choices=range(2,9),default=8)
++ap.add_argument('--context',type=int,default=512)
++ap.add_argument('--long-checks',action='store_true')
++ap.add_argument('--repeat',type=int,default=3)
++ap.add_argument('--checks',action='store_true')
++ap.add_argument('--profile',action='store_true')
++ap.add_argument('--dump-logits',action='store_true')
++ap.add_argument('--fuse',choices=['off','qfuse','qdedup','both','hc'],default='off')
++a=ap.parse_args()
++assert not a.long_checks or a.context>=2300
++out=Path(a.out);out.mkdir(parents=True,exist_ok=False)
++root=Path('/root/strata-dcu'); cache=root/'autoround'
++source_files=['CMakeLists.txt','src/program/generate.cpp','src/core/verify.cpp','src/prefill/prefill.cpp','include/strata/core/dflash_bridge.hpp','include/strata/core/verify.hpp','include/strata/prefill/prefill.hpp','src/kernels/cuda/native_mmvq.cu','include/strata/kernels/native_mmvq.hpp','src/core/mtp.cpp','include/strata/core/mtp.hpp','tools/dflash2_worker.py','tools/strata_dflash2.py','third_party/dflash/model.py','third_party/dflash/LICENSE','third_party/dflash/VERSION','include/strata/core/dflash_native.hpp','src/prefill/dflash.cu','src/prefill/dflash_witness.cpp','tools/dflash2_pack.py','tools/test_dflash2_native.py']
++def sha(path):
++ with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
++(out/'provenance.json').write_text(json.dumps({'engine_sha256':sha(a.engine),'source_sha256':{f:sha(root/'Strata'/f) for f in source_files},'driver_sha256':sha(__file__)},indent=2)+'\n')
++
++cmd=json.loads((cache/'run-command.json').read_text());cmd[0]=a.engine
++for flag,n in [('--mtp',2),('--mtp-adaptive',1),('--dflash2',2),('--dflash-adaptive',1),('--dflash-eager',1)]:
++ if flag in cmd:
++  i=cmd.index(flag);del cmd[i:i+n]
++for flag,value in [('--spec',str(a.width)),('--mtp-max-t','1' if a.mode=='off' else str(a.width)),('--max-context',str(a.context)),('--expert-cache',str(a.expert_cache or (8500 if a.mode=='adaptive' else 8300)))]:
++ cmd[cmd.index(flag)+1]=value
++if a.mode=='adaptive':cmd+=['--mtp',str(cache/'mtp'),'--mtp-adaptive']
++cmd+=['--serve','--prompt-cache','0','--conversation-cache-mib','0','--pcie-frac','0','--adapt-swaps','0']
++if a.mode=='native':
++ cmd+=['--dflash2','/root/private_data/strata-dcu/dflash-native/pack']
++ if a.draft_adaptive:cmd+=['--dflash-adaptive']
++ if not a.graph:cmd+=['--dflash-eager']
++if a.mode=='ipc':
++ cmd=['python3',str(root/'Strata/tools/strata_dflash2.py'),'--checkpoint','/root/private_data/strata-dcu/dflash2/checkpoint','--model','/root/private_data/Qwen3.8-F','--stats-file',str(out/'worker.json')]+(['--graph'] if a.graph else [])+(['--adaptive'] if a.draft_adaptive else [])+['--']+cmd
++env=os.environ.copy()
++for key in ['STRATA_VERIFY_PROFILE','STRATA_DECODE_TIMING','STRATA_DUMP_FIRST_LOGITS','STRATA_SPEC_PROB','STRATA_MTP_FRONT_CHECK','STRATA_SH_STREAM','STRATA_DFLASH_FD','STRATA_DFLASH_NATIVE']:
++ env.pop(key,None)
++settings=dict(STRATA_MAX_WEIGHT_VRAM_FRACTION='0.5',STRATA_TRACE='1',STRATA_BF16_Q8_VEC4='1',STRATA_BF16_Q8_COLS=str(a.cols),STRATA_ROUTE_TAIL_SKIP='0',STRATA_SPEC_COUPLED='1',
++ STRATA_QFUSE=str(int(a.fuse in ['qfuse','both'])),STRATA_VERIFY_QDEDUP=str(int(a.fuse in ['qdedup','both'])),STRATA_QFUSE_HC=str(int(a.fuse=='hc')))
++env.update(settings)
++if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRATA_SPEC_DEPTH='1')
++if a.checks and (a.profile or a.dump_logits):env['STRATA_DUMP_FIRST_LOGITS']=str(out/'logits.f32')
++(out/'command.json').write_text(json.dumps(dict(command=cmd,overrides=settings,profile=a.profile,checks=a.checks,dump_logits='STRATA_DUMP_FIRST_LOGITS' in env),indent=2)+'\n')
++from transformers import AutoTokenizer
++tok=AutoTokenizer.from_pretrained('/root/private_data/Qwen3.8-F',local_files_only=True)
++tok.chat_template=Path('/root/private_data/Qwen3.8-F/chat_template.jinja').read_text()
++story='Write a detailed 800-word story about a robot exploring an abandoned observatory. Begin the story immediately and continue with rich descriptions and dialogue.'
++workloads=[('story',story),('chinese','请详细解释大语言模型的 prefill 和 decode 阶段有什么区别，以及它们各自的性能瓶颈。请分段说明并举例。'),('code','Write a Python LRU cache class using OrderedDict. Include get and put methods, explain their complexity, and give a usage example.')]
++cases=[('warmup',story,128,None,0)]
++for rep in range(a.repeat):cases += [(name+f'-{rep}',prompt,256,None,0) for name,prompt in workloads]
++if a.checks:
++ cases += [('ok','Reply with exactly OK.',16,'OK',0),('arithmetic','What is 2+2? Answer only the number.',16,'4',0),('capital','中国的首都是哪座城市？只回答城市名称。',16,'北京',0)]
++ cases += [(f'sample-{i}','Write a short story about a lost compass and a mountain village.',64,None,.7) for i in range(2)]
++ cases += [('one_token','Reply with exactly OK.',1,None,0),('context_tail','Continue a long story for several paragraphs.',3,None,0)]
++if a.long_checks:
++ cases=[('window-crossing','Reply with exactly ORBIT.',16,'ORBIT',0),('long-recovery','Reply with exactly OK.',16,'OK',0)]
++if a.smoke:
++ cases=[('ok','Reply with exactly OK.',16,'OK',0),('arithmetic','What is 2+2? Answer only the number.',16,'4',0),('capital','中国的首都是哪座城市？只回答城市名称。',16,'北京',0),('story-short',story,64,None,0)]
++if a.qa_only:
++ cases=[('ok','Reply with exactly OK.',16,'OK',0),
++  ('arithmetic','What is 2+2? Answer only the number.',16,'4',0),
++  ('multiply','What is 17 times 23? Answer only the integer.',32,'391',0),
++  ('sum','What is the sum of the integers from 1 to 100 inclusive? Answer only the integer.',32,'5050',0),
++  ('capital','中国的首都是哪座城市？只回答城市名称。',16,'北京',0),
++  ('uppercase','Convert abc to uppercase. Output only the result.',16,'ABC',0),
++  ('sort-json','Sort [9,2,2,-1] ascending. Output only a JSON array.',64,None,0),
++  ('json','Output exactly one JSON object with boolean key ok set to true and integer key count set to 3. No Markdown.',64,None,0),
++  ('code-function','Return only Python code defining is_even(n), which is True exactly for even integers. No Markdown or explanation.',96,None,0),
++  ('multi-turn',[{'role':'user','content':'Remember the code word ORBIT. Reply OK.'},{'role':'assistant','content':'OK.'},{'role':'user','content':'What code word did I ask you to remember? Reply with only that word.'}],16,'ORBIT',0),
++  ('sample-0','Write a short story about a lost compass and a mountain village.',64,None,.7),
++  ('sample-1','Write a short story about a lost compass and a mountain village.',64,None,.7),
++  ('one_token','Reply with exactly OK.',1,None,0),
++  ('context_tail','Continue a long story for several paragraphs.',3,None,0)]
++records=[]
++mem=Path('/sys/fs/cgroup')
++def memory_snapshot():
++ return {n:(mem/n).read_text() for n in ['memory.current','memory.peak','memory.events','memory.max'] if (mem/n).exists()}
++(out/'memory-before.json').write_text(json.dumps(memory_snapshot(),indent=2)+'\n')
++with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
++ p=subprocess.Popen(cmd,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=err,text=True,bufsize=1)
++ def line():
++  s=p.stdout.readline()
++  if not s:raise RuntimeError(f'engine EOF: {p.poll()}')
++  stdout.write(s);stdout.flush()
++  if s.startswith('ERR '):raise RuntimeError(s)
++  return s.strip()
++ def send(s):p.stdin.write(s);p.stdin.flush()
++ def finish(stop=False):
++  ids=[];sent=False
++  while True:
++   s=line()
++   if s.startswith('T '):
++    ids.append(int(s.split()[1]))
++    if stop and len(ids)>=8 and not sent:send('STOP\n');sent=True
++   if s.startswith('DONE '):return ids,s
++ def gen(prompt,n,temperature=0,tail=False):
++  messages=prompt if isinstance(prompt,list) else [{'role':'user','content':prompt}]
++  ids=tok.apply_chat_template(messages,tokenize=True,add_generation_prompt=True,enable_thinking=False)
++  if tail:ids=ids[:3]+[tok.encode(' word',add_special_tokens=False)[0]]*((2100 if a.long_checks else a.context-11)-len(ids))+ids[3:]
++  assert len(ids)+n<=a.context
++  sampling=f'temperature={temperature} top_p=0.9 top_k=20 seed=1729' if temperature else 'temperature=0'
++  return ids,f'GEN {n} ckpt=0 {sampling} '+','.join(map(str,ids))+'\n'
++ try:
++  while not line().startswith('READY '):pass
++  usage_lines=[s for s in (out/'stderr.log').read_text().splitlines() if s.startswith('strata weight usage:')]
++  assert usage_lines, 'engine did not enforce/report the weight budget'
++  usage={k:float(v) if '.' in v else int(v) for k,v in re.findall(r'(\w+)=([0-9.]+)',usage_lines[-1])}
++  assert usage['limit']==usage['total']//2 and usage['weights']<=usage['limit']
++  assert usage['weights']==sum(usage[k] for k in ['pack','dense','head','experts','mtp'])+usage.get('external_draft',0)+usage.get('native_draft',0)
++  if a.mode=='ipc':assert usage['external_draft']>0
++  if a.mode=='native':assert usage['native_draft']==1206131200 and usage['external_draft']==0
++  (out/'weight-usage.json').write_text(json.dumps(usage,indent=2)+'\n')
++  print('WEIGHTS',usage,flush=True)
++  print('READY',a.mode,a.cols,a.fuse,flush=True)
++  for name,prompt,n,expected,temperature in cases:
++   prompt_ids,request=gen(prompt,n,temperature,name in ['context_tail','window-crossing'])
++   (out/(name+'.request.txt')).write_text(request)
++   started=time.monotonic();send(request);ids,done=finish();fields=done.split()
++   text=tok.decode(ids,skip_special_tokens=True)
++   assert int(fields[1])==len(ids) and int(fields[2])==len(prompt_ids) and len(ids)<=n and int(fields[8])==0
++   assert fields[5] in ['length','stop']
++   if expected is not None:assert text.strip()==expected,(name,text)
++   if name=='sort-json':assert json.loads(text)==[-1,2,2,9],text
++   if name=='json':assert json.loads(text)==dict(ok=True,count=3),text
++   if name=='code-function':
++    code=text.strip()
++    if code.startswith('```'):code='\n'.join(code.splitlines()[1:-1])
++    tree=ast.parse(code)
++    allowed=(ast.Module,ast.FunctionDef,ast.arguments,ast.arg,ast.Return,ast.Compare,ast.BinOp,ast.Mod,ast.Constant,ast.Name,ast.Load,ast.Eq,ast.Expr)
++    assert all(isinstance(n,allowed) for n in ast.walk(tree)),code
++    ns={'__builtins__':{}};exec(compile(tree,'qa-generated-code','exec'),ns)
++    assert all(ns['is_even'](n)==(n%2==0) for n in range(-20,21)),code
++   records.append(dict(case=name,prompt_ids=prompt_ids,generated_ids=ids,text=text,done=done,
++    decode_ms=float(fields[4]),decode_tps=1000*len(ids)/float(fields[4]),wall_s=time.monotonic()-started))
++   (out/'results.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
++   print('DONE',name,len(ids),round(records[-1]['decode_tps'],2),flush=True)
++  if (a.checks or a.qa_only) and not a.smoke and not a.long_checks:
++   assert records[-4]['generated_ids']==records[-3]['generated_ids'],'seed repeat'
++   assert len(records[-2]['generated_ids'])==1 and len(records[-1]['generated_ids'])<=3
++   _,request=gen(story,256);send(request);ids,done=finish(stop=True);assert done.split()[5]=='cancel'
++   _,request=gen('Reply with exactly OK.',16);send(request);ids,recovery=finish();assert tok.decode(ids,skip_special_tokens=True).strip()=='OK'
++   (out/'protocol.json').write_text(json.dumps(dict(cancel=done,recovery=recovery,seed_repeat=True,one_token_limit=True,context_tail=True),indent=2)+'\n')
++  send('QUIT\n');p.wait(timeout=30);assert p.returncode==0
++ finally:
++  if p.poll() is None:p.kill();p.wait()
++errors=(out/'stderr.log').read_text()
++assert not any(s in errors for s in ['Launch params','larger than launch bounds','invalid device function','out of memory'])
++(out/'memory-after.json').write_text(json.dumps(memory_snapshot(),indent=2)+'\n')
++print('PASS',flush=True)
+diff --git a/tools/dflash2_pack.py b/tools/dflash2_pack.py
+new file mode 100644
+index 0000000..8216c65
+--- /dev/null
++++ b/tools/dflash2_pack.py
+@@ -0,0 +1,74 @@
++"""Stage the pinned Flash-Next DFlash2 tensors for native CUDA/HIP execution.
++
++No quantization or head/embedding copies. Keep --out on persistent storage.
++"""
++import argparse
++import hashlib
++import json
++import os
++from pathlib import Path
++
++WEIGHT_SHA = "d6723f2a359eaf33ec0c95f22ae8edda896774020c552296a85e1913b4d3186f"
++
++
++def prepare(checkpoint, out):
++    checkpoint, out = Path(checkpoint), Path(out)
++    cfg = json.loads((checkpoint / "config.json").read_text())
++    expected = dict(hidden_size=2560, intermediate_size=7680, num_hidden_layers=5,
++                    num_attention_heads=32, num_key_value_heads=8, head_dim=128,
++                    vocab_size=248320, is_causal=False, sliding_window=2048)
++    if any(cfg.get(k) != v for k, v in expected.items()):
++        raise ValueError("unsupported DFlash2 target geometry")
++    dc = cfg["dflash_config"]
++    if dc != dict(block_size=8, conv_group_size=16, conv_kernel_size=2,
++                  mask_token_id=248077, selector_rank=256, selector_top_k=16,
++                  target_layer_ids=[5, 15, 25, 35, 45]):
++        raise ValueError("unsupported DFlash2 feature/selector configuration")
++    source = checkpoint / "model.safetensors"
++    with source.open("rb") as f:
++        digest = hashlib.file_digest(f, "sha256").hexdigest()
++    if digest != WEIGHT_SHA:
++        raise ValueError("draft checkpoint SHA-256 mismatch")
++    out.mkdir(parents=True, exist_ok=True)
++    # Stream the original tensor bytes; the C++ loader uses the exact shapes and offsets.
++    with source.open("rb") as f:
++        header_len = int.from_bytes(f.read(8), "little")
++        header = json.loads(f.read(header_len))
++        start = 8 + header_len
++        lines, offset = ["STRATA_DFLASH2 1", f"source {digest}"], 0
++        temp = out / "weights.bin.tmp"
++        with temp.open("wb") as dst:
++            for name, spec in sorted(header.items()):
++                if name == "__metadata__":
++                    continue
++                if spec["dtype"] != "BF16":
++                    raise ValueError(f"unexpected dtype for {name}")
++                lo, hi = spec["data_offsets"]
++                f.seek(start + lo)
++                size = hi - lo
++                data = f.read(size)
++                if len(data) != size:
++                    raise ValueError("truncated checkpoint")
++                dst.write(data)
++                shape = spec["shape"]
++                lines.append("tensor " + " ".join(map(str, [name, offset, size, len(shape), *shape])))
++                offset += size
++            dst.flush()
++            os.fsync(dst.fileno())
++        if offset != 1206131200:
++            raise ValueError("unexpected draft parameter size")
++        temp.replace(out / "weights.bin")
++        (out / "manifest.txt.tmp").write_text("\n".join(lines) + "\n")
++        (out / "manifest.txt.tmp").replace(out / "manifest.txt")
++    receipt = dict(checkpoint_sha256=digest, parameter_bytes=offset,
++                   config=cfg, format="STRATA_DFLASH2 1")
++    (out / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
++    return receipt
++
++
++if __name__ == "__main__":
++    ap = argparse.ArgumentParser(description=__doc__)
++    ap.add_argument("--checkpoint", required=True)
++    ap.add_argument("--out", required=True)
++    a = ap.parse_args()
++    print(json.dumps(prepare(a.checkpoint, a.out), indent=2))
+diff --git a/tools/test_dflash2_native.py b/tools/test_dflash2_native.py
+new file mode 100644
+index 0000000..31a4f44
+--- /dev/null
++++ b/tools/test_dflash2_native.py
+@@ -0,0 +1,138 @@
++"""Real-checkpoint numerical/cache witness for the native DFlash2 implementation."""
++import argparse
++import json
++import os
++import subprocess
++from pathlib import Path
++
++import numpy as np
++
++
++def prepare(a):
++    import torch
++    from dflash2_worker import Dflash2Worker, DraftCache
++    out = Path(a.out)
++    out.mkdir(parents=True, exist_ok=True)
++    os.environ["STRATA_DFLASH_GRAPH"] = "0"
++    os.environ["STRATA_DFLASH_ADAPTIVE"] = "0"
++    w = Dflash2Worker(a.checkpoint, a.target)
++    rng = np.random.default_rng(1729)
++    features = rng.standard_normal((2100, 12800), dtype=np.float32)
++    operations = []
++    cases = []
++    cache = DraftCache()
++    pos = 0
++    pending = []
++    def reset():
++        nonlocal cache, pos, pending
++        operations.append("reset")
++        cache, pos, pending = DraftCache(), 0, []
++    def append(n):
++        nonlocal pos
++        data = features[pos:pos+n]
++        path = out / f"features-{pos}-{n}.f32"
++        data.tofile(path)
++        operations.append(f"append {path.resolve()} {n} {pos}")
++        pending.append(data)
++        pos += n
++    def draft(k, name):
++        nonlocal pending
++        anchor = 248077
++        operations.append(f"draft {pos} {anchor} {k} {name}")
++        new = np.concatenate(pending, axis=0) if pending else np.empty((0,12800),dtype=np.float32)
++        with torch.inference_mode():
++            f = torch.from_numpy(new).to("cuda", dtype=torch.bfloat16)[None]
++            ids = torch.tensor([anchor]+[248077]*k)
++            noise = torch.nn.functional.embedding(ids, w.embedding).to("cuda")[None]
++            positions = torch.arange(pos-len(new), pos+k+1, device="cuda")[None]
++            hidden = w.model(target_hidden=f, noise_embedding=noise, position_ids=positions,
++                             past_key_values=cache, use_cache=True)[:, 1:]
++            tokens, _, _ = w.model.propose(hidden,torch.tensor([anchor],device="cuda"),
++                lambda h: torch.nn.functional.linear(h, w.head),0.)
++            cache.crop(pos)
++            hidden[0].float().cpu().numpy().tofile(out / (name+".reference.f32"))
++            token_ids = tokens[0].tolist()
++        pending = []
++        cases.append(dict(name=name, pos=pos, k=k, reference_ids=token_ids))
++    reset()
++    append(4)
++    draft(3,"short3")
++    draft(3,"repeat3")
++    append(2)
++    draft(1,"increment1")
++    append(1)
++    draft(7,"full7")
++    # Same final context, recomputed in one block: detects stale rejected/noise rows.
++    reset()
++    append(7)
++    draft(7,"recompute7")
++    reset()
++    append(2045)
++    draft(7,"window-edge")
++    append(9)
++    draft(7,"ring-wrap")
++    append(17)
++    draft(3,"after-wrap")
++    reset()
++    append(4)
++    draft(3,"reset-short3")
++    (out/"script.txt").write_text("\n".join(operations)+"\n")
++    (out/"reference.json").write_text(json.dumps(dict(seed=1729,cases=cases),indent=2)+"\n")
++    print("REFERENCE",len(cases),flush=True)
++
++
++def check(a):
++    root = Path(a.out)
++    ref = json.loads((root/"reference.json").read_text())
++    report = dict(seed=ref["seed"], modes={})
++    for mode in ["eager","graph"]:
++        out = root/mode
++        out.mkdir(exist_ok=True)
++        cmd = [a.binary,a.pack,a.gguf,str(root/"script.txt"),"4096",mode,str(out)]
++        result = subprocess.run(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
++        (out/"stdout.log").write_text(result.stdout)
++        (out/"stderr.log").write_text(result.stderr)
++        if result.returncode:
++            raise RuntimeError(result.stderr[-4000:])
++        records = []
++        for c in ref["cases"]:
++            name = c["name"]
++            expected = np.fromfile(root/(name+".reference.f32"),np.float32)
++            actual = np.fromfile(out/(name+".f32"),np.float32)
++            assert actual.shape==expected.shape and np.isfinite(actual).all()
++            rel = float(np.linalg.norm(actual-expected)/np.linalg.norm(expected))
++            ids = [int(v) for v in (out/(name+".ids")).read_text().split()]
++            records.append(dict(**c,ids=ids,relative_l2=rel,max_abs=float(np.max(np.abs(actual-expected))),
++                                tokens_equal=ids==c["reference_ids"]))
++            # Draft logits/IDs need not match another backend. These distances are
++            # diagnostics, not the functional acceptance gate (target QA is that gate).
++        byname = {r["name"]:r for r in records}
++        for x,y in [("short3","repeat3"),("short3","reset-short3"),("full7","recompute7")]:
++            assert np.array_equal(np.fromfile(out/(x+".f32"),np.float32),
++                                  np.fromfile(out/(y+".f32"),np.float32)), (mode,x,y)
++            assert byname[x]["ids"]==byname[y]["ids"]
++        report["modes"][mode] = records
++        print("WITNESS",mode,"max_relative_l2",max(r["relative_l2"] for r in records),
++              "matching_tokens",sum(sum(x==y for x,y in zip(r["ids"],r["reference_ids"])) for r in records),flush=True)
++    for c in ref["cases"]:
++        name = c["name"]
++        assert (root/"eager"/(name+".ids")).read_bytes()==(root/"graph"/(name+".ids")).read_bytes()
++        assert (root/"eager"/(name+".f32")).read_bytes()==(root/"graph"/(name+".f32")).read_bytes()
++    report["eager_graph_equal"] = True
++    report["repeat_reset_incremental_equal"] = True
++    report["reference_numerics_are_diagnostic"] = True
++    (root/"report.json").write_text(json.dumps(report,indent=2)+"\n")
++    print("PASS DFLASH2_NATIVE",flush=True)
++
++
++if __name__ == "__main__":
++    ap=argparse.ArgumentParser(description=__doc__)
++    ap.add_argument("mode",choices=["prepare","check"])
++    ap.add_argument("--checkpoint")
++    ap.add_argument("--target")
++    ap.add_argument("--binary")
++    ap.add_argument("--pack")
++    ap.add_argument("--gguf")
++    ap.add_argument("--out",required=True)
++    args=ap.parse_args()
++    (prepare if args.mode=="prepare" else check)(args)
+diff --git a/tools/report_dflash2_native.py b/tools/report_dflash2_native.py
+new file mode 100644
+index 0000000..7d03a85
+--- /dev/null
++++ b/tools/report_dflash2_native.py
+@@ -0,0 +1,54 @@
++"""Summarize functional DFlash2 QA first, followed by the measured speed smoke."""
++import argparse
++import json
++from pathlib import Path
++
++
++def summarize(root):
++    def read(run):
++        assert (root / (run + ".log")).read_text().rstrip().endswith("PASS"), run
++        return json.loads((root / run / "results.json").read_text())
++    reference = {r["case"]: r for r in read("qa-reference")}
++    qa = {}
++    for run in ["qa-full", "qa-adaptive"]:
++        records = read(run)
++        matches = {r["case"]: r["generated_ids"] == reference[r["case"]]["generated_ids"] for r in records}
++        assert all(matches.values()), matches
++        protocol = json.loads((root / run / "protocol.json").read_text())
++        assert protocol["cancel"].split()[5] == "cancel"
++        assert protocol["recovery"].split()[5] == "stop"
++        qa[run] = dict(requests=len(records), output_tokens=sum(len(r["generated_ids"]) for r in records),
++                       exact_target_matches=matches, protocol=protocol)
++    long = read("qa-long")
++    assert [r["text"].strip() for r in long] == ["ORBIT", "OK"]
++    assert len(long[0]["prompt_ids"]) == 2100
++    perf = read("bench-native")
++    usages = {run: json.loads((root / run / "weight-usage.json").read_text())
++              for run in ["qa-full", "qa-reference", "qa-adaptive", "qa-long", "bench-native"]}
++    for run, u in usages.items():
++        assert u["weights"] <= u["limit"] == u["total"] // 2
++        assert u["weights"] == sum(u[k] for k in ["pack", "dense", "head", "experts", "mtp", "external_draft", "native_draft"])
++    witness = json.loads((root / "witness" / "report.json").read_text())
++    assert witness["eager_graph_equal"] and witness["repeat_reset_incremental_equal"]
++    golden = root.parent / "dflash2" / "quality-final" / "results.json"
++    comparison = {}
++    if golden.exists():
++        old = {r["case"]: r for r in json.loads(golden.read_text())}
++        comparison = {r["case"]: r["generated_ids"] == old[r["case"]]["generated_ids"]
++                      for r in perf if r["case"] in old}
++        assert all(comparison.values()), comparison
++    summary = dict(qa=qa, long_context=dict(prompt_tokens=2100,answers=[r["text"].strip() for r in long],
++                  request_recovery=True), weights=usages,
++                  speed_smoke={r["case"]:r["decode_tps"] for r in perf if r["case"]!="warmup"},
++                  speed_repeats_per_workload=1, speed_output_equivalence=comparison,
++                  eager_graph_equal=True, cache_reset_incremental_equal=True,
++                  pytorch_hidden_relative_l2_max=max(r["relative_l2"] for r in witness["modes"]["graph"]),
++                  pytorch_draft_parity_claimed=False)
++    (root / "summary.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
++    print(json.dumps(summary,ensure_ascii=False,indent=2))
++
++
++if __name__ == "__main__":
++    ap=argparse.ArgumentParser(description=__doc__)
++    ap.add_argument("root",type=Path)
++    summarize(ap.parse_args().root)
+diff --git a/tools/audit_dflash2_native.py b/tools/audit_dflash2_native.py
+new file mode 100644
+index 0000000..5942781
+--- /dev/null
++++ b/tools/audit_dflash2_native.py
+@@ -0,0 +1,46 @@
++"""Freeze native DFlash deployment provenance; omit large local-only fixtures from Git."""
++import hashlib
++import json
++import os
++import subprocess
++from pathlib import Path
++
++root=Path('/root/private_data/strata-dcu/dflash-native')
++source=Path('/root/strata-dcu/Strata')
++def sha(path):
++    with path.open('rb') as f:
++        return hashlib.file_digest(f,'sha256').hexdigest()
++
++names=['CMakeLists.txt','include/strata/core/dflash_bridge.hpp','include/strata/core/dflash_native.hpp',
++       'include/strata/core/verify.hpp','include/strata/prefill/prefill.hpp','src/program/generate.cpp',
++       'src/prefill/dflash.cu','src/prefill/dflash_witness.cpp','tools/dflash2_pack.py',
++       'tools/autoround_pack.py','tools/bench_dflash2_native.py','tools/test_dflash2_native.py',
++       'tools/report_dflash2_native.py','tools/audit_dflash2_native.py']
++jobs=[]
++for proc in Path('/proc').iterdir():
++    if not proc.name.isdigit():
++        continue
++    try:
++        args=(proc/'cmdline').read_bytes().decode(errors='replace').split('\0')
++    except (OSError,ProcessLookupError):
++        continue
++    if not args:
++        continue
++    executable=Path(args[0]).name
++    is_engine=executable in ['strata','strata-final','dflash_native_witness']
++    is_driver=executable.startswith('python') and any(Path(a).name in
++        ['bench_dflash2_native.py','strata_dflash2.py','dflash2_worker.py'] for a in args[1:3])
++    if is_engine or is_driver:
++        jobs.append(dict(pid=int(proc.name),args=args))
++assert not jobs,jobs
++fixtures=sorted((root/'witness').glob('features-*.f32'))
++audit=dict(binary_sha256=sha(root/'strata-final'),
++           default_engine=os.path.realpath('/root/strata-dcu/build-gfx936/strata'),
++           source_sha256={n:sha(source/n) for n in names},
++           pack_weight_sha256=sha(root/'pack/weights.bin'),pack_bytes=(root/'pack/weights.bin').stat().st_size,
++           active_jobs=jobs,memory_events=Path('/sys/fs/cgroup/memory.events').read_text(),
++           root_layer=subprocess.check_output(['du','-xsh','/root'],text=True).strip(),
++           remote_only_fixtures=[dict(path=str(p),bytes=p.stat().st_size,sha256=sha(p)) for p in fixtures],
++           old_binary_retained=Path('/root/private_data/strata-dcu/dflash2/strata-final').is_file())
++(root/'audit.json').write_text(json.dumps(audit,indent=2)+'\n')
++print(json.dumps({k:v for k,v in audit.items() if k not in ['source_sha256','remote_only_fixtures']},indent=2))

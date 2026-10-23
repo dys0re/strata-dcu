@@ -1,0 +1,6 @@
+{
+  "command": "/usr/local/cuda/bin/nvcc -ccbin /usr/bin/g++-15 -std=c++17 -arch=sm_80 -Iinclude -c src/prefill/dflash.cu -o /tmp/strata-dflash-cuda.o",
+  "exit_code": 0,
+  "object_bytes": 442824,
+  "scope": "New CUDA translation unit only; full CUDA engine and execution not validated"
+}

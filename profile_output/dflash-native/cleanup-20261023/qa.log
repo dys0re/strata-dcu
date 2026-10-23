@@ -1,0 +1,18 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 22947840000, 'mtp': 0, 'weights': 32827238400, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.47781584, 'device_used': 34296823808, 'external_draft': 0, 'native_draft': 1206131200, 'staging': 44236800}
+READY native 4 off
+DONE ok 2 10.79
+DONE arithmetic 2 18.89
+DONE multiply 4 22.64
+DONE sum 5 29.64
+DONE capital 2 17.42
+DONE uppercase 2 19.21
+DONE sort-json 13 22.44
+DONE json 12 24.01
+DONE code-function 21 24.56
+DONE multi-turn 3 28.2
+DONE sample-0 64 16.73
+DONE sample-1 64 17.54
+DONE one_token 1 33.11
+DONE context_tail 3 21.47
+SEED_REPEAT True
+PASS

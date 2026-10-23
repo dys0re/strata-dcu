@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "arithmetic": true,
+  "multiply": true,
+  "sum": true,
+  "capital": true,
+  "uppercase": true,
+  "sort-json": true,
+  "json": true,
+  "code-function": true,
+  "sample-0": true,
+  "sample-1": true,
+  "one_token": true,
+  "context_tail": true
+}

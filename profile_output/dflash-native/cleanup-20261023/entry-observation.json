@@ -1,0 +1,58 @@
+{
+  "binary_entry": "/root/strata-dcu/build-gfx936/strata",
+  "binary_target": "/root/private_data/strata-dcu/dflash-native/cleanup-20261023/strata",
+  "binary_is_symlink": true,
+  "binary_sha256": "745c912b923cec9696517e9a898609c1e4483fb4baca3b411f1f52c0dc8a154a",
+  "generation_path": "/root/private_data/strata-dcu/autoround/generation.json",
+  "generation": {
+    "prompt": "Reply with exactly OK.",
+    "prompt_ids": [
+      248045,
+      846,
+      198,
+      20206,
+      440,
+      6681,
+      10092,
+      13,
+      248046,
+      198,
+      248045,
+      74455,
+      198,
+      248068,
+      271,
+      248069,
+      271
+    ],
+    "generated_ids": [
+      3793,
+      248046
+    ],
+    "text": "OK",
+    "raw_text": "OK<|im_end|>",
+    "engine_exit": 0,
+    "weight_vram": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32827238400,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47781584,
+      "device_used": 34296823808,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "finish_reason": "eos",
+    "draft_method": "dflash2",
+    "draft_backend": "native",
+    "draft_graph": true,
+    "draft_adaptive": true,
+    "draft_max_t": 8
+  },
+  "inference_processes_after": []
+}

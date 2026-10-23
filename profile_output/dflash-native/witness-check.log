@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/root/strata-dcu/Strata/tools/test_dflash2_native.py", line 136, in <module>
+    (prepare if args.mode=="prepare" else check)(args)
+  File "/root/strata-dcu/Strata/tools/test_dflash2_native.py", line 107, in check
+    assert rel < .025, (mode,name,rel)
+           ^^^^^^^^^^
+AssertionError: ('eager', 'short3', 0.04556955397129059)

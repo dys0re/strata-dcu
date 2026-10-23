@@ -1,0 +1,20 @@
+{
+  "CMakeLists.txt": "92eb5399f94c799374ac3d622cf53696d42f20d5f6afdaf6b59c13baaf47354b",
+  "docs/DCU_TEST_STANDARD.md": "c408392868b5d5c030354ba638288cadc0e1c381f3dc222387daeea5541b2dc8",
+  "docs/DFLASH2_IPC.md": "731e19e61929e58ecdb4369ee456dc6d7780c7dddfd502d4ad0bff302cfedde5",
+  "envs.md": "5da214a4843a4d75fcf6d514a762b0abced55a3facae0c1de21e4301ed11982a",
+  "include/strata/core/dflash_bridge.hpp": "72c791a23ff0adbdca49119e7992a908c09b8db44b2e92ecc9cce5acc27b3613",
+  "include/strata/core/verify.hpp": "e293fee4deebe0195762ebe2ccaf8edcd542d9515b14153fbd01761dc7efdadd",
+  "include/strata/prefill/prefill.hpp": "5f5290cf4e265459d295bd89b166e444a0029813b57bafc7faf8757e4df61c3f",
+  "src/program/generate.cpp": "6900e0469ddc6606860d6e52444a61a07c1b2c22a2ddffda2bcd3d3f32311af3",
+  "tools/autoround_pack.py": "fc5be051344042fefb2c6a06dbfcf3644f9bacc49a02660eaa4d9e068de90abd",
+  "docs/DFLASH2_NATIVE.md": "2957762fcc2c7a6aeb2d305c8d62c21451d74a6a19127a4fdcf8304e7ef3a099",
+  "include/strata/core/dflash_native.hpp": "87e9675a45af96dfe57f82fa7b1ece6a86da687d8f33dcbf8ae84cd43bd66b1d",
+  "src/prefill/dflash.cu": "915c5c7f8e9f8f186a589798f5d211b492a3491d86364a9a0884fabd7f3cc4b6",
+  "src/prefill/dflash_witness.cpp": "41d8d00f142c144afd7e738d9c66a91813fab6d036de191a51313e3f2d7a1f8f",
+  "tools/bench_dflash2_native.py": "074b3b749ee7b823c4a5b458628a78b1a29363658290b241651a353e989c973c",
+  "tools/dflash2_pack.py": "716f290791a4b2997c92577b99e5a86ab93b2ae21a911b1e0016327bf62590b4",
+  "tools/test_dflash2_native.py": "f6e894a4cd6b31b0b89367248e316b06bc1bd0b6a4833f5603282e867991f01e",
+  "tools/report_dflash2_native.py": "05a8d4822e79cfaf8c082e2699acd85e59969f76b306c84a8a25c40183ea3854",
+  "tools/audit_dflash2_native.py": "a5faa66adc45047c57f61de9a1d367d43853ebd036caef6b81fba950d5e99305"
+}

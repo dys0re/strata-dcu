@@ -55,6 +55,7 @@ void warm_gemm_libraries(int device);
 class Prefill {
 public:
     bool copy_dflash_features(int rows, std::vector<float>& out, std::string& err) const { return dflash_features_.read(rows,out,err); }
+    const strata::core::DflashFeatures& dflash_features() const { return dflash_features_; }
     /// E-9: the draft layer's K/V for prompt cells [cell0, cell0 + n) from their final residual rows `R_rows`
     /// (device) and `next_tokens` (host: the token at cell+1), in batches through this path's GEMMs and its idle
     /// scratch - call it from on_chunk.  false with `err` empty: not applicable here (a ring or hybrid K/V, another

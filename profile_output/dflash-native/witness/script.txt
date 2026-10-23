@@ -1,0 +1,21 @@
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-4.f32 4 0
+draft 4 248077 3 short3
+draft 4 248077 3 repeat3
+append /root/private_data/strata-dcu/dflash-native/witness/features-4-2.f32 2 4
+draft 6 248077 1 increment1
+append /root/private_data/strata-dcu/dflash-native/witness/features-6-1.f32 1 6
+draft 7 248077 7 full7
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-7.f32 7 0
+draft 7 248077 7 recompute7
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-2045.f32 2045 0
+draft 2045 248077 7 window-edge
+append /root/private_data/strata-dcu/dflash-native/witness/features-2045-9.f32 9 2045
+draft 2054 248077 7 ring-wrap
+append /root/private_data/strata-dcu/dflash-native/witness/features-2054-17.f32 17 2054
+draft 2071 248077 3 after-wrap
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-4.f32 4 0
+draft 4 248077 3 reset-short3

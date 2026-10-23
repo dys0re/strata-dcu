@@ -8,19 +8,27 @@
 #include <vector>
 #include <cerrno>
 #include <cstring>
+#include <memory>
+#if !defined(STRATA_GPU_METAL)
+#include "strata/core/dflash_native.hpp"
+#endif
 #if defined(__linux__)
 #include <sys/socket.h>
 #include <poll.h>
 #include <unistd.h>
 #endif
 namespace strata::core {
-inline bool dflash_enabled() { return std::getenv("STRATA_DFLASH_FD") != nullptr; }
+class NativeHead;
+class NativeEmbed;
+inline bool dflash_enabled() { return std::getenv("STRATA_DFLASH_FD") != nullptr || std::getenv("STRATA_DFLASH_NATIVE") != nullptr; }
 // Captures only the five completed-layer residual means expected by this checkpoint.
 // Copies inside captured graphs; reducing on the host keeps this prototype backend-independent.
 class DflashFeatures {
     float* data_ = nullptr;
     int cap_ = 0, n_ = 0, hc_ = 0;
 public:
+    const float* device_data() const { return data_; }
+    int capacity() const { return cap_; }
     ~DflashFeatures() { if (data_) cudaFree(data_); }
     bool init(int cap, int n, int hc, std::string& err) {
         if (!dflash_enabled()) return true;
@@ -60,6 +68,9 @@ public:
 class DflashBridge {
     int fd_=-1;
     uint64_t weights_=0;
+#if !defined(STRATA_GPU_METAL)
+    std::unique_ptr<DflashNative> native_;
+#endif
     static constexpr int64_t magic=0x44464c32;
     bool transfer(void* p, size_t n, bool write, std::string& err) {
 #if defined(__linux__)
@@ -88,6 +99,17 @@ class DflashBridge {
         return r[1]==0||transfer(ids,(size_t)r[1]*4,false,err);
     }
 public:
+    bool init_native(const std::string& dir,const NativeHead& head,const NativeEmbed& embed,
+                     int max_context,bool graph,bool adaptive,std::string& err) {
+#if !defined(STRATA_GPU_METAL)
+        native_.reset(new DflashNative);
+        if(!native_->load(dir,head,embed,max_context,graph,adaptive,err))return false;
+        weights_=native_->weight_bytes();return true;
+#else
+        (void)dir;(void)head;(void)embed;(void)max_context;(void)graph;(void)adaptive;
+        err="Native DFlash2 currently requires CUDA/HIP";return false;
+#endif
+    }
     bool init(std::string& err) {
         const char* e=std::getenv("STRATA_DFLASH_FD");if(!e)return true;
         char* end=nullptr;long n=std::strtol(e,&end,10);
@@ -97,14 +119,36 @@ public:
         if(!transfer(hello,sizeof hello,false,err)||hello[0]!=(uint64_t)magic||!hello[1]) { err="DFlash2: invalid worker weight handshake";return false; }
         weights_=hello[1];return true;
     }
-    bool enabled() const { return fd_>=0; }
+    bool native() const {
+#if !defined(STRATA_GPU_METAL)
+        return native_ != nullptr;
+#else
+        return false;
+#endif
+    }
+    bool enabled() const { return native() || fd_>=0; }
     uint64_t weight_bytes() const { return weights_; }
-    bool reset(std::string& err) { return !enabled()||command(0,0,0,0,0,nullptr,nullptr,nullptr,err); }
+    bool reset(std::string& err) {
+#if !defined(STRATA_GPU_METAL)
+        if(native_)return native_->reset(err);
+#endif
+        return !enabled()||command(0,0,0,0,0,nullptr,nullptr,nullptr,err);
+    }
+    bool append(const DflashFeatures& source,int rows,int64_t pos,std::string& err) {
+#if !defined(STRATA_GPU_METAL)
+        if(native_)return native_->append(source.device_data(),source.capacity(),rows,pos,err);
+#endif
+        std::vector<float> features;
+        return source.read(rows,features,err)&&append(features,rows,pos,err);
+    }
     bool append(const std::vector<float>& features,int rows,int64_t pos,std::string& err) {
         if(features.size()!=(size_t)rows*12800) {err="DFlash2: feature size mismatch";return false;}
         return command(1,rows,pos,0,0,features.data(),nullptr,nullptr,err);
     }
     bool draft(int64_t pos,int anchor,int k,int32_t* ids,int& got,std::string& err) {
+#if !defined(STRATA_GPU_METAL)
+        if(native_)return native_->draft(pos,anchor,k,ids,got,err);
+#endif
         return command(2,0,pos,anchor,k,nullptr,ids,&got,err);
     }
 };

@@ -1,0 +1,50 @@
+{
+  "base_commit": "80ea84d",
+  "binary_sha256": "745c912b923cec9696517e9a898609c1e4483fb4baca3b411f1f52c0dc8a154a",
+  "hip_full_build": true,
+  "cuda_new_translation_unit_compile": true,
+  "qa_requests": 14,
+  "qa_output_tokens": 198,
+  "long_prompt_tokens": 2100,
+  "long_answers": [
+    "ORBIT",
+    "OK"
+  ],
+  "mtp_smoke_requests": 4,
+  "eager_graph_equal": true,
+  "cache_repeat_reset_incremental_equal": true,
+  "public_entry_validation": "entry-validation.json",
+  "weight_usage": {
+    "pack": 1538035200,
+    "dense": 5819596800,
+    "head": 1271398400,
+    "experts": 22947840000,
+    "mtp": 0,
+    "weights": 32827238400,
+    "total": 68702699520,
+    "limit": 34351349760,
+    "fraction": 0.47781584,
+    "device_used": 34296823808,
+    "external_draft": 0,
+    "native_draft": 1206131200,
+    "staging": 44236800
+  },
+  "source_sha256": {
+    "CMakeLists.txt": "92eb5399f94c799374ac3d622cf53696d42f20d5f6afdaf6b59c13baaf47354b",
+    "src/program/generate.cpp": "11fa64759ec872524b8f08715a96738f42dcc42e891296c67dc57031f1bd50a3",
+    "src/prefill/dflash.cu": "915c5c7f8e9f8f186a589798f5d211b492a3491d86364a9a0884fabd7f3cc4b6",
+    "include/strata/core/dflash_bridge.hpp": "72c791a23ff0adbdca49119e7992a908c09b8db44b2e92ecc9cce5acc27b3613",
+    "include/strata/core/dflash_native.hpp": "87e9675a45af96dfe57f82fa7b1ece6a86da687d8f33dcbf8ae84cd43bd66b1d",
+    "include/strata/core/verify.hpp": "e293fee4deebe0195762ebe2ccaf8edcd542d9515b14153fbd01761dc7efdadd",
+    "include/strata/prefill/prefill.hpp": "5f5290cf4e265459d295bd89b166e444a0029813b57bafc7faf8757e4df61c3f",
+    "tools/autoround_pack.py": "fc5be051344042fefb2c6a06dbfcf3644f9bacc49a02660eaa4d9e068de90abd",
+    "tools/bench_dflash2_native.py": "ac959c9a651b2903b5bb4e455981b6a2bca6c0fd0281e180adcbd1091c74d107",
+    "tools/test_dflash2_native.py": "f6e894a4cd6b31b0b89367248e316b06bc1bd0b6a4833f5603282e867991f01e"
+  },
+  "not_run": [
+    "full CUDA engine/runtime",
+    "SYCL",
+    "Metal"
+  ],
+  "new_performance_claim": false
+}

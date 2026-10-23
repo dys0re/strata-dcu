@@ -768,6 +768,9 @@ struct Options {
     /// The MTP's own window cap (0 = --spec): with --spec 6 --mtp-max-t 4 the long windows come from suffix matches.
     int mtp_max_t = 0;
     bool mtp_adaptive = false;
+    std::string dflash2;
+    bool dflash_adaptive = false;
+    bool dflash_graph = true;
     /// --lookup-chain K (opt-in, 0 = off): prompt lookup CHAINED after the MTP's proposal.  The suffix drafter matches
     /// the context followed by the MTP's drafts and appends up to K of the tokens that followed that match to the same
     /// verify window (the window grows to at most 8).  Greedy verification keeps the output; its own counts are kept.
@@ -922,6 +925,9 @@ void usage() {
                  "                       when it pays (default 3; 0 = MTP only)\n"
                  "  --mtp-max-t M        cap the MTP's windows at M tokens (0 = --spec; longer ones come from suffixes)\n"
                  "  --mtp-adaptive       single-request MTP: select window by measured tokens/ms; needs --suffix-draft 0\n"
+                 "  --dflash2 DIR        native Flash-Next DFlash2 pack (tools/dflash2_pack.py); shares BF16 target head\n"
+                 "  --dflash-adaptive    select 1..(--spec - 1) draft proposals using completed-round cost\n"
+                 "  --dflash-eager       disable DFlash GPU graphs (diagnostic)\n"
                  "  --spec N             the MTP drafter's verify window: how many tokens it proposes per check (setup\n"
                  "                       writes 4; --suffix-draft lets it grow by 2, up to 8, where a repeat is likely)\n"
                  "  --spec-min-p P       how sure the draft layer must be to extend a verify window by another guess\n"
@@ -2583,6 +2589,9 @@ int main(int argc, char** argv) {
         else if (a == "--spec-corrupt") o.spec_corrupt = std::atoi(next("--spec-corrupt"));
         else if (a == "--spec-follow") o.spec_follow = next("--spec-follow");
         else if (a == "--window-hashes") o.window_hashes = next("--window-hashes");
+        else if (a == "--dflash2") o.dflash2 = next("--dflash2");
+        else if (a == "--dflash-adaptive") o.dflash_adaptive = true;
+        else if (a == "--dflash-eager") o.dflash_graph = false;
         else if (a == "--mtp") o.mtp = next("--mtp");
         else if (a == "--mtp-window") o.mtp_window = std::atoll(next("--mtp-window"));
         else if (a == "--pcie-frac") o.pcie_frac = std::atof(next("--pcie-frac"));
@@ -3136,6 +3145,19 @@ int main(int argc, char** argv) {
     // Prompt lookup (the suffix drafter, on by default): the MTP keeps its --spec windows and a lookup window may be
     // up to 2 tokens longer; the draft policy (strata/spec/draft_policy.hpp) takes one only where it pays. Code
     // edits +6-11%, ordinary text unchanged (bench/results/2026-09-27-spec). --suffix-draft 0 turns it off.
+    if (!o.dflash2.empty()) {
+        if (std::getenv("STRATA_DFLASH_FD") || !o.mtp.empty() || o.mtp_adaptive || o.prefill_head_alias ||
+            o.spec < 2 || o.spec > 8 || o.max_context > 262144) {
+            std::fprintf(stderr,"strata: --dflash2 requires --spec 2..8, context <=262144, no MTP/IPC/head alias\n");return 2;
+        }
+#if defined(_WIN32)
+        _putenv_s("STRATA_DFLASH_NATIVE", "1");
+#else
+        setenv("STRATA_DFLASH_NATIVE", "1", 1);
+#endif
+    } else if (o.dflash_adaptive || !o.dflash_graph) {
+        std::fprintf(stderr,"strata: DFlash graph/adaptive options require --dflash2\n");return 2;
+    }
     if (o.mtp_adaptive && [] {
         const char* v = std::getenv("STRATA_SPEC_PROB");
         return v != nullptr && std::atoi(v) != 0;
@@ -5457,11 +5479,13 @@ int main(int argc, char** argv) {
     strata::core::DflashBridge dflash;
     if (strata::core::dflash_enabled() && (!o.serve || multi_gpu || !o.mtp.empty() || o.mtp_adaptive ||
         o.pipeline_windows > 0 || o.suffix_draft > 0 || o.lookup_chain > 0 || o.prompt_cache != 0 ||
-        o.batch != 0 || o.max_context > 512)) {
-        std::fprintf(stderr, "DFlash2 IPC requires solo --serve, context <=512, --prompt-cache 0, without MTP, pipeline or lookup drafting\n");
+        o.batch != 0 || (o.dflash2.empty() && o.max_context > 512))) {
+        std::fprintf(stderr, "DFlash2 requires solo --serve, --prompt-cache 0, without MTP, pipeline or lookup drafting (IPC context <=512)\n");
         return 2;
     }
-    if (!dflash.init(err)) { std::fprintf(stderr,"%s\n",err.c_str());return 2; }
+    if ((!o.dflash2.empty() && !dflash.init_native(o.dflash2,native_head,native_embed,(int)o.max_context,
+                                                o.dflash_graph,o.dflash_adaptive,err)) ||
+        (o.dflash2.empty() && !dflash.init(err))) { std::fprintf(stderr,"%s\n",err.c_str());return 2; }
     std::vector<float> logits((size_t) n_vocab);
     mem_mark("the native head");
     float* d_logits = nullptr;
@@ -6070,7 +6094,9 @@ int main(int argc, char** argv) {
     // Test/deployment weight budget: distinct from free-memory reserves for KV and workspaces.
     // Account owned allocations, including the draft head; never count a host-mapped embedding as VRAM.
     uint64_t weight_vram_limit = 0, weight_vram_total = 0;
-    const uint64_t fixed_weight_bytes = pool_bytes + native_dense.weight_bytes() + native_head.weight_bytes() + dflash.weight_bytes();
+    // Temporary verifier expert copies count toward the GPU weight budget.
+    const uint64_t staging_weight_bytes = o.spec >= 2 ? 16ull * strata::kernels::cpu::expert_layout().max_blob : 0;
+    const uint64_t fixed_weight_bytes = pool_bytes + native_dense.weight_bytes() + native_head.weight_bytes() + dflash.weight_bytes() + staging_weight_bytes;
     if (const char* setting = std::getenv("STRATA_MAX_WEIGHT_VRAM_FRACTION")) {
         char* end = nullptr;
         const double fraction = std::strtod(setting, &end);
@@ -6113,12 +6139,14 @@ int main(int argc, char** argv) {
         size_t free_b = 0, total_b = 0;
         if (cudaMemGetInfo(&free_b, &total_b) != cudaSuccess) return false;
         std::fprintf(stderr, "strata weight usage: pack=%llu dense=%llu head=%llu experts=%llu mtp=%llu "
-                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu external_draft=%llu\n",
+                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu external_draft=%llu native_draft=%llu staging=%llu\n",
                      (unsigned long long) pool_bytes, (unsigned long long) native_dense.weight_bytes(),
                      (unsigned long long) native_head.weight_bytes(), (unsigned long long) expert_b,
                      (unsigned long long) mtp_b, (unsigned long long) weights,
                      (unsigned long long) weight_vram_total, (unsigned long long) weight_vram_limit,
-                     (double) weights / weight_vram_total, (unsigned long long) (total_b - free_b), (unsigned long long) dflash.weight_bytes());
+                     (double) weights / weight_vram_total, (unsigned long long) (total_b - free_b),
+                     (unsigned long long)(dflash.native()?0:dflash.weight_bytes()),
+                     (unsigned long long)(dflash.native()?dflash.weight_bytes():0), (unsigned long long)staging_weight_bytes);
         if (weights <= weight_vram_limit) return true;
         std::fprintf(stderr, "strata generate: weight VRAM budget exceeded; refusing generation\n");
         return false;
@@ -9733,8 +9761,7 @@ int main(int argc, char** argv) {
             std::vector<int32_t> nxt((size_t) T);
             for (int64_t t = 0; t < T; ++t) nxt[(size_t) t] = (int32_t) cur[(size_t) (p0 + t + 1)];
             if (dflash.enabled()) {
-                std::vector<float> features;
-                if (!sp.copy_dflash_features((int)T,features,e) || !dflash.append(features,(int)T,p0,e)) return false;
+                if (!dflash.append(sp.dflash_features(),(int)T,p0,e)) return false;
             }
             // E-9: batched through the prompt path when it can (a layer split: only with STRATA_SPLIT_MTP_BATCH=1)
             bool batched = false;
@@ -13093,8 +13120,7 @@ int main(int argc, char** argv) {
                         return false;
                     if (!ver.commit(T, e) || (use_mtp && !mtp.prefill(ver.final_R_all(), nxt.data(), T, q, e))) return false;
                     if (dflash.enabled()) {
-                        std::vector<float> features;
-                        if (!ver.copy_dflash_features(T,features,e) || !dflash.append(features,T,q,e)) return false;
+                        if (!dflash.append(ver.dflash_features(),T,q,e)) return false;
                     }
                     q += T;
                     pp_reached = q;   // #471
@@ -15039,10 +15065,9 @@ int main(int argc, char** argv) {
                 bool drafted = !use_mtp || eos || produced_n >= max_new ||
                                mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p);
                 if (dflash.enabled() && drafted && !eos && produced_n < max_new) {
-                    std::vector<float> features;
                     int got=0;
                     const int cap=(int)std::min<int64_t>({S,max_new-produced_n,o.max_context-(p+a+1)});
-                    drafted=ver.copy_dflash_features(a+1,features,err) && dflash.append(features,a+1,p,err);
+                    drafted=dflash.append(ver.dflash_features(),a+1,p,err);
                     if (drafted && cap>1) drafted=dflash.draft(p+a+1,outv[(size_t)a],cap-1,drafts.data(),got,err);
                     dflash_t=got+1;
                 }

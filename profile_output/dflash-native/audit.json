@@ -1,0 +1,63 @@
+{
+  "binary_sha256": "2aba1cff1291d1af0479188e50050a7b78ff4b619fd90ab5f0e155e4e8f5c42d",
+  "default_engine": "/root/private_data/strata-dcu/dflash-native/strata-final",
+  "source_sha256": {
+    "CMakeLists.txt": "92eb5399f94c799374ac3d622cf53696d42f20d5f6afdaf6b59c13baaf47354b",
+    "include/strata/core/dflash_bridge.hpp": "72c791a23ff0adbdca49119e7992a908c09b8db44b2e92ecc9cce5acc27b3613",
+    "include/strata/core/dflash_native.hpp": "87e9675a45af96dfe57f82fa7b1ece6a86da687d8f33dcbf8ae84cd43bd66b1d",
+    "include/strata/core/verify.hpp": "e293fee4deebe0195762ebe2ccaf8edcd542d9515b14153fbd01761dc7efdadd",
+    "include/strata/prefill/prefill.hpp": "5f5290cf4e265459d295bd89b166e444a0029813b57bafc7faf8757e4df61c3f",
+    "src/program/generate.cpp": "6900e0469ddc6606860d6e52444a61a07c1b2c22a2ddffda2bcd3d3f32311af3",
+    "src/prefill/dflash.cu": "915c5c7f8e9f8f186a589798f5d211b492a3491d86364a9a0884fabd7f3cc4b6",
+    "src/prefill/dflash_witness.cpp": "41d8d00f142c144afd7e738d9c66a91813fab6d036de191a51313e3f2d7a1f8f",
+    "tools/dflash2_pack.py": "716f290791a4b2997c92577b99e5a86ab93b2ae21a911b1e0016327bf62590b4",
+    "tools/autoround_pack.py": "fc5be051344042fefb2c6a06dbfcf3644f9bacc49a02660eaa4d9e068de90abd",
+    "tools/bench_dflash2_native.py": "074b3b749ee7b823c4a5b458628a78b1a29363658290b241651a353e989c973c",
+    "tools/test_dflash2_native.py": "f6e894a4cd6b31b0b89367248e316b06bc1bd0b6a4833f5603282e867991f01e",
+    "tools/report_dflash2_native.py": "05a8d4822e79cfaf8c082e2699acd85e59969f76b306c84a8a25c40183ea3854",
+    "tools/audit_dflash2_native.py": "a5faa66adc45047c57f61de9a1d367d43853ebd036caef6b81fba950d5e99305"
+  },
+  "pack_weight_sha256": "75c78461ce6be468012b3c415b86ef738153b47494db102a9ef37540a84592d6",
+  "pack_bytes": 1206131200,
+  "active_jobs": [],
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n",
+  "root_layer": "954M\t/root",
+  "remote_only_fixtures": [
+    {
+      "path": "/root/private_data/strata-dcu/dflash-native/witness/features-0-2045.f32",
+      "bytes": 104704000,
+      "sha256": "f64557e4850d39c5d2d24a02e04bdfcd0b85fc09d99eee4120a9b430437cad2c"
+    },
+    {
+      "path": "/root/private_data/strata-dcu/dflash-native/witness/features-0-4.f32",
+      "bytes": 204800,
+      "sha256": "ee2e98d0d50578aa4a6710a1a70da520d65fa5640763142b0af73524fe56c0c8"
+    },
+    {
+      "path": "/root/private_data/strata-dcu/dflash-native/witness/features-0-7.f32",
+      "bytes": 358400,
+      "sha256": "aea7527ca8644ca6bff6825e9b152358b12d378ab0e4a3f5dc90be5ad8221b5b"
+    },
+    {
+      "path": "/root/private_data/strata-dcu/dflash-native/witness/features-2045-9.f32",
+      "bytes": 460800,
+      "sha256": "5c1cfb73da40174ef6750a2c133d76f06e23504862dceefbdb94855f1ad96646"
+    },
+    {
+      "path": "/root/private_data/strata-dcu/dflash-native/witness/features-2054-17.f32",
+      "bytes": 870400,
+      "sha256": "a9353c49f0fb99152a12fa6a7c4991ea4b080e7feff6a84a6b74f953f3df2be3"
+    },
+    {
+      "path": "/root/private_data/strata-dcu/dflash-native/witness/features-4-2.f32",
+      "bytes": 102400,
+      "sha256": "362d3b0c6caacf3157ff1c59403ed8bc03f8e4af66f778a90fc607bed49346ff"
+    },
+    {
+      "path": "/root/private_data/strata-dcu/dflash-native/witness/features-6-1.f32",
+      "bytes": 51200,
+      "sha256": "28ae4d84ae8371f3acd2cf7c3e1cb4af5bacdfa2cc725241256b7549dbbd51aa"
+    }
+  ],
+  "old_binary_retained": true
+}

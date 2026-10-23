@@ -1,0 +1,25 @@
+{
+  "base_commit": "80ea84dc30f449476e74905801be5e2d201d0984",
+  "real_index_unchanged": true,
+  "source_files": [
+    "CMakeLists.txt",
+    "docs/DCU_TEST_STANDARD.md",
+    "docs/DFLASH2_IPC.md",
+    "envs.md",
+    "include/strata/core/dflash_bridge.hpp",
+    "include/strata/core/verify.hpp",
+    "include/strata/prefill/prefill.hpp",
+    "src/program/generate.cpp",
+    "tools/autoround_pack.py",
+    "docs/DFLASH2_NATIVE.md",
+    "include/strata/core/dflash_native.hpp",
+    "src/prefill/dflash.cu",
+    "src/prefill/dflash_witness.cpp",
+    "tools/bench_dflash2_native.py",
+    "tools/dflash2_pack.py",
+    "tools/test_dflash2_native.py",
+    "tools/report_dflash2_native.py",
+    "tools/audit_dflash2_native.py"
+  ],
+  "cached_apply_check": true
+}

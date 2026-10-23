@@ -1,0 +1,71 @@
+{
+  "status": "pass",
+  "validator": "fresh agent /root/validate_dflash_clean_entry",
+  "validated_at_utc": "2026-10-23T05:53:13.553446+00:00",
+  "ledger_section": "Current native entry after DFlash-only cleanup (2026-10-23)",
+  "documents_read": [
+    ".aris/compute/scnet-dflash2.md",
+    "docs/DFLASH2_NATIVE.md"
+  ],
+  "command_runs": 1,
+  "command": "ssh -S /tmp/strata-dcu-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; bash /root/strata-dcu/run-autoround.sh --dflash2 /root/private_data/strata-dcu/dflash2/checkpoint --prompt \"Reply with exactly OK.\" --max-new 16'",
+  "exit_code": 0,
+  "engine_exit": 0,
+  "answer": "OK",
+  "prompt": "Reply with exactly OK.",
+  "generated_ids": [
+    3793,
+    248046
+  ],
+  "binary_entry": "/root/strata-dcu/build-gfx936/strata",
+  "binary_target": "/root/private_data/strata-dcu/dflash-native/cleanup-20261023/strata",
+  "binary_sha256": "745c912b923cec9696517e9a898609c1e4483fb4baca3b411f1f52c0dc8a154a",
+  "actual": {
+    "draft_method": "dflash2",
+    "draft_backend": "native",
+    "draft_graph": true,
+    "draft_adaptive": true,
+    "draft_max_t": 8,
+    "weight_vram.native_draft": 1206131200,
+    "weight_vram.external_draft": 0,
+    "weight_vram.staging": 44236800,
+    "weight_vram.weights": 32827238400,
+    "weight_vram.limit": 34351349760
+  },
+  "checks": {
+    "draft_method": true,
+    "draft_backend": true,
+    "draft_graph": true,
+    "draft_adaptive": true,
+    "draft_max_t": true,
+    "weight_vram.native_draft": true,
+    "weight_vram.external_draft": true,
+    "weight_vram.staging": true,
+    "weight_vram.weights": true,
+    "weight_vram.limit": true,
+    "command_verbatim": true,
+    "command_exit_zero": true,
+    "engine_exit_zero": true,
+    "answer_OK": true,
+    "stdout_answer_OK": true,
+    "binary_is_symlink": true,
+    "binary_target_match": true,
+    "binary_sha256_match": true,
+    "weight_limit_satisfied": true,
+    "no_inference_processes_after": true
+  },
+  "doc_divergences": [],
+  "inference_processes_after": [],
+  "artifacts": {
+    "stdout": "entry-stdout.log",
+    "stderr": "entry-stderr.log",
+    "generation": "entry-generation.json",
+    "observation": "entry-observation.json",
+    "execution": "entry-execution.json"
+  },
+  "notes": [
+    "Historical earlier ledger SHA and weights differ by design; validation uses only the last section.",
+    "No dependency installs, rebuilds, code/doc edits, commits, or pushes performed.",
+    "Runtime emitted a non-fatal ROCm SMI library warning; stderr was empty."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "engine_sha256": "2aba1cff1291d1af0479188e50050a7b78ff4b619fd90ab5f0e155e4e8f5c42d",
+  "source_sha256": {
+    "CMakeLists.txt": "92eb5399f94c799374ac3d622cf53696d42f20d5f6afdaf6b59c13baaf47354b",
+    "src/program/generate.cpp": "6900e0469ddc6606860d6e52444a61a07c1b2c22a2ddffda2bcd3d3f32311af3",
+    "src/core/verify.cpp": "4a9f0c69890cec5897c7416bf1290c1f2fca92cd98c937a1f511613fc0bf7433",
+    "src/prefill/prefill.cpp": "b82bda291d3998035d4079e23b9217ef60f92b1517fd85e31f96423d11e5e702",
+    "include/strata/core/dflash_bridge.hpp": "72c791a23ff0adbdca49119e7992a908c09b8db44b2e92ecc9cce5acc27b3613",
+    "include/strata/core/verify.hpp": "e293fee4deebe0195762ebe2ccaf8edcd542d9515b14153fbd01761dc7efdadd",
+    "include/strata/prefill/prefill.hpp": "5f5290cf4e265459d295bd89b166e444a0029813b57bafc7faf8757e4df61c3f",
+    "src/kernels/cuda/native_mmvq.cu": "b9aebb5ced120776b6ce133046f2274bb6f4c125601dc5298b1aa734d473e93c",
+    "include/strata/kernels/native_mmvq.hpp": "0520eae7c16152297246738e1d61ccb3c4946ddffc4efc030b45c8105c6e4dd1",
+    "src/core/mtp.cpp": "540534277f886f9c9173ccdd4506c008841f2f0f6bfe6a50dff6885ed3203e71",
+    "include/strata/core/mtp.hpp": "3bd1add95fe0d10883e3f40fdc16dbbef42b591c9ca063bd640653a26a3db443",
+    "tools/dflash2_worker.py": "00cb1b7afc97b6e4cb5748e26d737b083db76ad6db94e498bc908584370f8efb",
+    "tools/strata_dflash2.py": "15a75e60e21dbe7b2cde3444072184da816576872effb9cfff280c87fec2ad73",
+    "third_party/dflash/model.py": "f55b7fe0a4c0b3073e0f9cdce547cce29f4b8e2168c4d2818760007c43b7651e",
+    "third_party/dflash/LICENSE": "6fd2aebd899c0b48ea9abb845aef043c6dadff00a6726a10a1bc32db528a5422",
+    "third_party/dflash/VERSION": "fd6b24c6a65078f4701beb667f679a5e150e28ed82dffb44acdfff8af87c2131",
+    "include/strata/core/dflash_native.hpp": "87e9675a45af96dfe57f82fa7b1ece6a86da687d8f33dcbf8ae84cd43bd66b1d",
+    "src/prefill/dflash.cu": "915c5c7f8e9f8f186a589798f5d211b492a3491d86364a9a0884fabd7f3cc4b6",
+    "src/prefill/dflash_witness.cpp": "41d8d00f142c144afd7e738d9c66a91813fab6d036de191a51313e3f2d7a1f8f",
+    "tools/dflash2_pack.py": "716f290791a4b2997c92577b99e5a86ab93b2ae21a911b1e0016327bf62590b4",
+    "tools/test_dflash2_native.py": "f6e894a4cd6b31b0b89367248e316b06bc1bd0b6a4833f5603282e867991f01e"
+  },
+  "driver_sha256": "074b3b749ee7b823c4a5b458628a78b1a29363658290b241651a353e989c973c"
+}

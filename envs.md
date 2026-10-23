@@ -319,7 +319,9 @@ python3 /root/strata-dcu/Strata/tools/autoround_pack.py prepare \
 两次独立启动、每类六次 256-token 生成，BS=1、512 上下文、INT8 KV、12 workers，decode 中位数：**英文 29.48、中文 37.66、代码 38.51 token/s**。短问答、seed、上下文边界、STOP/恢复通过，没有 OOM。旧 19,000 专家配置被新预算拒绝；测试后推理进程均已退出。完整账单、范围和原始材料见[重测报告](profile_output/weight50/README.md)。旧满显存结果仅保留历史条件。
 
 
-### DFlash2 实验接入（2026-10-22）
+### DFlash2 IPC 接入记录（2026-10-22，历史）
+
+以下是首次 IPC 接入时的环境和结果；当前原生入口见下一节。
 
 已接入 `incoai/Qwen3.8-Flash-Next-DFlash2`，权重通过 ModelScope 下载到持久盘 `/root/private_data/strata-dcu/dflash2/checkpoint`，1,206,140,008 字节，SHA-256 与 HF 发布值一致。HF Mirror 大文件传输过慢后切换；ModelScope 有效传输阶段约 23 MiB/s。没有把大权重或构建放进系统盘，结束时 `/root` 本地占用 954MiB。
 
@@ -330,3 +332,23 @@ DFlash2 目前为独立 PyTorch 草稿进程＋Strata 验证器，支持单卡�
 各类三次 256-token 生成的中位数：增强 MTP 英文/中文/代码 **29.47 / 37.52 / 38.26 TPS**；自适应 DFlash2 **27.25 / 31.93 / 41.81 TPS**，分别 **−7.54% / −14.90% / +9.30%**。只在本轮代码任务观察到收益，保留显式开关。
 
 34 个请求、5,140 个输出 token IDs 与同一 8,300 专家布局的逐 token 参考一致；采样、STOP/恢复、单 token 和上下文边界通过，没有 OOM。增强 MTP 的 10 个回归请求与此前 weight50 输出一致。fresh agent 原样复跑真实草稿 witness 通过。测试及草稿进程均已退出。实现、范围、原始数据见 [接入文档](docs/DFLASH2_IPC.md) 和 [测试报告](profile_output/dflash2/README.md)。
+
+
+### 原生 DFlash2（2026-10-22）
+
+已补齐 Strata 内的原生 CUDA/HIP 草稿路径：完整五层网络、动态因果卷积、top-16 选择器、1–7 候选、七个 GPU graph、按已完成轮次成本选窗，以及 2048 滑动窗口的环形 K/V。特征在 GPU 取 HC 均值并直接注入草稿，复用已有 BF16 输出头和主机映射 embedding，不启动 PyTorch 草稿进程。`--dflash2` 默认使用该路径，未传该开关时默认仍是增强 MTP。
+
+正式二进制 `/root/private_data/strata-dcu/dflash-native/strata-final`，SHA-256 `2aba1cff1291d1af0479188e50050a7b78ff4b619fd90ab5f0e155e4e8f5c42d`，`/root/strata-dcu/build-gfx936/strata` 已指向它。原 IPC、weight50 二进制均保留。草稿原始权重不变，原生派生包在 `/root/private_data/strata-dcu/dflash-native/pack`，标准 AutoRound 缓存通过 `dflash2-native` 符号链接复用它。运行时 Python/DTK/PyTorch 环境未更换。
+
+固定 8300 GPU 专家、16276 RAM 专家，GPU 草稿参数 1206131200 字节，全部 GPU 权重 **32783001600 字节 / 47.717196%**。省去 1271398400 字节重复输出头，未增加专家数；PLE 仍在磁盘。
+
+验收先看 QA：固定七候选的 13 个请求、自适应的 14 个请求，最终 token IDs 全部与关闭草稿的逐 token 参考一致。覆盖问答、算术、格式/JSON、生成 Python 函数的执行、多轮消息、采样复现、单 token、上下文尾部及 STOP/恢复。2100-token 提示越过草稿窗口后返回 ORBIT，后续请求返回 OK。graph/eager、重复/重置、增量/完整重算的独立缓存检查通过。草稿隐藏状态与 PyTorch 的差异仍记录为诊断，未声称两种实现数值等价。
+
+原生自适应、最大七候选，每类单次 256-token 生成的速度记录：英文 **22.26**、中文 **24.33**、代码 **33.06 TPS**。四个请求（包括预热）的最终输出与此前逐 token 参考一致。本轮没有超过增强 MTP；该单轮记录不作统计显著性结论。只验证了 HIP/gfx936 的实际运行，CUDA 对新增 `.cu` 做了编译检查，完整 CUDA 引擎与其他后端未运行验证。实现与范围见 [原生文档](docs/DFLASH2_NATIVE.md)，原始结果见 [验收记录](profile_output/dflash-native/README.md)。
+
+
+### 原生 DFlash2 清理与重新验证（2026-10-23）
+
+工作区已移除未提交的专家预测、训练/TTT、临时分流和生命周期插桩，保留原生 DFlash2。HIP 完整构建通过；新增 DFlash CUDA 翻译单元使用 CUDA 13.3 / g++-15、sm_80 编译通过。重新执行 14 项端到端 QA、2100-token 长提示及请求恢复，以及原生 graph/eager、重复/重置、增量和环形缓存检查，均通过。增强 MTP 的 4 项回归通过。采样 token 完全一致只作为记录，答案、格式和代码执行作为功能验收依据。
+
+清理后二进制：`/root/private_data/strata-dcu/dflash-native/cleanup-20261023/strata`，SHA-256 `745c912b923cec9696517e9a898609c1e4483fb4baca3b411f1f52c0dc8a154a`；`/root/strata-dcu/build-gfx936/strata` 已指向它。原生 DFlash2 的 8300 常驻专家及草稿权重加上已有的 16 个临时专家槽后，完整 GPU 权重为 32827238400 字节（47.781584%）。原始结果见 `profile_output/dflash-native/cleanup-20261023/`。本轮没有重新进行性能对比，不新增速度提升结论。
