@@ -1,0 +1,12 @@
+{
+  "abba_four_runs": true,
+  "mtp_18qa_each": true,
+  "native_and_joint_20qa_each": true,
+  "weights_and_experts_fixed": true,
+  "numerical_and_pool_gates": true,
+  "independent_entry_four_cases": true,
+  "default_and_override_verified": true,
+  "final_sources_match": true,
+  "gpu_idle_and_jobs_exited": true,
+  "scope": "HIP runtime and x86 CPU fallback only; no full CUDA/SYCL/Metal/multi-GPU runtime claim"
+}

@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/root/private_data/strata-dcu/optimization-angle-20261025/run_q4_probe.py", line 14, in <module>
+    with (R/'q4-build.log').open('w') as log:subprocess.run(cmd,check=True,stdout=log,stderr=subprocess.STDOUT)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['g++', '-O3', '-DNDEBUG', '-std=c++20', '-mavx512f', '-mavx512bw', '-mavx512vl', '-mavx512dq', '-mavx512vnni', '-mavx2', '-mf16c', '-mfma', '-I/root/strata-dcu/Strata/include', '-I/root/strata-dcu/llama.cpp/ggml/include', '-I/root/strata-dcu/llama.cpp/ggml/src', '/root/private_data/strata-dcu/optimization-angle-20261025/q4_probe.cpp', '/root/private_data/strata-dcu/optimization-angle-20261025/q4_unsigned_probe.cpp', '/root/private_data/strata-dcu/p1/build/libstrata_kernels_cpu.a', '/root/private_data/strata-dcu/p1/build/ggml/src/libggml-cpu.a', '/root/private_data/strata-dcu/p1/build/ggml/src/libggml-base.a', '-lpthread', '-lm', '-o', '/root/private_data/strata-dcu/optimization-angle-20261025/q4-probe']' returned non-zero exit status 1.

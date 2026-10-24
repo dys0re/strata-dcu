@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "dense_gguf": "/root/private_data/strata-dcu/model-specific-20261024/dense-q8.gguf",
+  "mtp_runtime": "/root/private_data/strata-dcu/model-specific-20261024/mtp-tuned",
+  "hc_q8": true,
+  "draft_head_proxy": false,
+  "engine_sha256": "3ae138ead7fdbab0324bb17b423022d32c497eb18e3fb5aa82901011b98c9450",
+  "selection": "hc-q8-tuned"
+}

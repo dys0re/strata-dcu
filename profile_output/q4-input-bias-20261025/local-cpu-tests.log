@@ -1,0 +1,13 @@
+Test project /tmp/strara-q4-cpu-build
+    Start 35: q4_cpu_multitoken
+1/4 Test #35: q4_cpu_multitoken ................   Passed    0.14 sec
+    Start 36: q4_cpu_input_bias
+2/4 Test #36: q4_cpu_input_bias ................   Passed    0.14 sec
+    Start 37: q4_cpu_input_bias_fallback
+3/4 Test #37: q4_cpu_input_bias_fallback .......   Passed    0.13 sec
+    Start 38: q4_cpu_multitoken_fallback
+4/4 Test #38: q4_cpu_multitoken_fallback .......   Passed    0.13 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.55 sec

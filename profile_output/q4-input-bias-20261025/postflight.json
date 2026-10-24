@@ -1,0 +1,37 @@
+{
+  "engine": "/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final",
+  "engine_sha256": "4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd",
+  "gpu_used_mib": 2,
+  "gpu_output": "\n================================= System Management Interface ==================================\n================================================================================================\nHCU[0]\t\t: vram Total Memory (MiB): 65520\nHCU[0]\t\t: vram Total Used Memory (MiB): 2\n================================================================================================\n======================================== End of SMI Log ========================================\n\n",
+  "engine_processes": [],
+  "job_handles_alive": [],
+  "checked_job_handles": [
+    109612,
+    112694,
+    120173,
+    122676,
+    123637
+  ],
+  "memory_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "cpu_max": "1500000 100000",
+  "memory_max": "63350767616",
+  "system_sizes": "896M\t/root/strata-dcu\n59M\t/root/.cache\n",
+  "ple": "/root/private_data/strata-dcu/autoround/ple.gguf",
+  "model_config": {
+    "schema": 1,
+    "dense_gguf": "/root/private_data/strata-dcu/model-specific-20261024/dense-q8.gguf",
+    "mtp_runtime": "/root/private_data/strata-dcu/model-specific-20261024/mtp-tuned",
+    "hc_q8": true,
+    "draft_head_proxy": false,
+    "engine_sha256": "4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd",
+    "selection": "hc-q8-tuned",
+    "cpu_q4_input_bias": true,
+    "weight_selection_engine_sha256": "3ae138ead7fdbab0324bb17b423022d32c497eb18e3fb5aa82901011b98c9450"
+  }
+}

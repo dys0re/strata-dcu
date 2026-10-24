@@ -58,10 +58,10 @@ int main() {
                 for(int j=0;j<32;++j)y[2+j]=uint8_t((t+b+j)%5==0?128:rng());
             }
         }
-        for(int nt:{1,2,3,4,5,7,8,9,17})for(bool gu:{false,true}) {
+        for(int nt:{1,2,3,4,5,7,8,9,17})for(bool gu:{false,true})for(bool bias:{false,true}) {
             for(auto& v:dst)std::fill(v.begin(),v.end(),-12345.f);
-            if(gu)cpu::q4_512_gu_rows(w,stride,up,n,ap.data(),nt,op.data(),1,rows-1);
-            else cpu::q4_512_rows(w,stride,n,ap.data(),nt,op.data(),1,rows-1);
+            if(gu)cpu::q4_512_gu_rows(w,stride,up,n,ap.data(),nt,op.data(),1,rows-1,bias);
+            else cpu::q4_512_rows(w,stride,n,ap.data(),nt,op.data(),1,rows-1,bias);
             for(int t=0;t<maxt;++t)for(int r=0;r<rows;++r) {
                 ++checks;
                 if(t>=nt||r==0||r==rows-1) { failures+=dst[t][r]!=-12345.f;continue; }
@@ -90,7 +90,7 @@ int main() {
         for(int j=0;j<640;++j)row[j]=normal(rng);
         wt->from_float(row.data(),blob.data()+fmt.down_off+r*fmt.d_row,640);
     }
-    constexpr int nt=9;
+    for(int nt:{1,2,3,4,5,9,17}) {
     std::vector<std::vector<uint8_t>> aq(nt,std::vector<uint8_t>(fmt.act_bytes)),hq(nt,std::vector<uint8_t>(fmt.h_bytes));
     std::vector<std::vector<float>> ff(nt,std::vector<float>(640)),out(nt,std::vector<float>(2560));
     std::vector<const void*> aa(nt),hh(nt);std::vector<float*> fp(nt),oo(nt);
@@ -119,6 +119,8 @@ int main() {
     }
     const double relative=std::sqrt(squared/(ref_squared+1e-30));
     failures+=!std::isfinite(relative)||relative>3e-4;
-    std::printf("Q4 CPU: checks=%d worst_scaled_error=%.3g whole_expert_relative_L2=%.3g failures=%d\n",checks,worst,relative,failures);
+    std::printf("Q4 whole expert: nt=%d relative_L2=%.3g\n",nt,relative);
+    }
+    std::printf("Q4 CPU: checks=%d worst_scaled_error=%.3g failures=%d\n",checks,worst,failures);
     return failures?1:0;
 }

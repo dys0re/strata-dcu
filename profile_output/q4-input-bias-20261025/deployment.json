@@ -1,0 +1,8 @@
+{
+  "engine": "/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final",
+  "sha256": "4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd",
+  "previous_engine": "/root/private_data/strata-dcu/model-specific-20261024/final-v1/strata-final",
+  "mtp_input_bias_default": true,
+  "default_rule": "geometric-mean TPS ratio >=1.01 and no task below 0.97, using pooled 6 samples/task/config; descriptive result only, not statistical significance",
+  "geometric_mean_ratio": 1.0117656396049133
+}

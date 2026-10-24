@@ -425,7 +425,8 @@ def run_model(ck, out, a):
                 not isinstance(machine_variant.get("dense_gguf"), str) or
                 (machine_variant.get("mtp_runtime") is not None and not isinstance(machine_variant["mtp_runtime"], str)) or
                 not isinstance(machine_variant.get("hc_q8"), bool) or
-                not isinstance(machine_variant.get("draft_head_proxy"), bool)):
+                not isinstance(machine_variant.get("draft_head_proxy"), bool) or
+                not isinstance(machine_variant.get("cpu_q4_input_bias", False), bool)):
             raise ValueError("invalid DCU model-default configuration")
         a.dense_gguf = a.dense_gguf or machine_variant["dense_gguf"]
         a.mtp_runtime = a.mtp_runtime or machine_variant.get("mtp_runtime")
@@ -505,6 +506,8 @@ def run_model(ck, out, a):
     if machine_variant:
         env.setdefault("STRATA_HC_Q8", str(int(machine_variant["hc_q8"])))
         env.setdefault("STRATA_DRAFT_HEAD_PROXY", str(int(machine_variant["draft_head_proxy"])))
+        if "cpu_q4_input_bias" in machine_variant:
+            env.setdefault("STRATA_CPU_Q4_INPUT_BIAS", str(int(machine_variant["cpu_q4_input_bias"])))
     if a.dense_gguf:
         env["STRATA_DENSE_Q8_VARIANT"] = "1"
     # gfx936 measurements: staged passes strict HC parity and improves decode.
@@ -563,6 +566,7 @@ def run_model(ck, out, a):
                                      "shared_stream": env.get("STRATA_SH_STREAM", "auto"),
                                      "pool_idle_us": env.get("STRATA_POOL_IDLE_US")},
               "kernel_options": {"hc_split": env.get("STRATA_HC_SPLIT", "auto"), "cpu_q4_mt": env.get("STRATA_CPU_Q4_MT") == "1",
+                                 "cpu_q4_input_bias": env.get("STRATA_CPU_Q4_INPUT_BIAS") == "1",
                                  "dflash_small_gemv": env.get("STRATA_DFLASH_SMALL_GEMV") == "1"},
               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
     if a.dflash2:

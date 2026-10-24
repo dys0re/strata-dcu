@@ -1,0 +1,5 @@
+{
+  "source": "/root/strata-dcu/Strata/src/kernels/cpu/q4_avx512.cpp",
+  "source_sha256": "023ee54150a93f009938a759ba7a240a3fd5c66a7de6587945144fe982f0c425",
+  "generated_sha256": "92c8cc35c1966f137f27bda1dd000c578f98dc50279cb999c6ba359083cd66a6"
+}

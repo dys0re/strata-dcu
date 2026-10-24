@@ -1,0 +1,15 @@
+speculation              19 rounds of 7, drafts accepted 46 of 58 (0.793), 3.42 tokens per round
+suffix drafts            13 windows, drafts accepted 44 of 48
+accepted per round       0:5 1:1 2:2 3:3 4:8 5:0 6:0
+verify window            wait for rings 21.291  pool 48.702  host 0.117  commit 0.062 ms/round; CPU experts 20.28 distinct / 28.05 routed per layer
+pool multi               expert pipeline 46.793 ms/round; CPU pool call 48.558 ms/round
+dispatch                 plan 0.318  activation quantize 0.298  jobs 0.266  run 46.817 ms/round
+resident RAM             41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+expert tiers             decode: RAM 18498 blobs, files 0 blobs, 0.0 MB read from the files (0.00 MB/round, 0.0 ms/round of reading, 0.00 GB/s per reading thread); prompt copies 23503.6 MB
+io path                  file reads: page cache held 39334.2 MB, not 5112.7 MB (mincore at the read); io prefetch on: 0 read ahead, 0 used, 0 unused, 0 skipped (cached), 0 dropped; pread 9718.3 MB in 3515 calls (21.15 ms each); decode waited 0.0 ms/round in the fetches
+routing prefetch         0 experts warmed, 0 of the file tier's 0 blob reads had been warmed (0.0%); predictor 25.6 ms/round on its thread, 51 layers skipped (still busy)
+mtp                      33.781 ms/round drafting (18 rounds), MTP prompt 86.5 ms, 1067 MiB of VRAM
+prompt  : 248045 846 198 11762 279 1414 1881 361 1272 29 9212 6681 11 1973 9212 466 29611 13 198 27 1272 15877 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 3786 1272 29 248046 198 248045 74455 198 248068 271 248069 271
+output  : 760 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 248046
+decode                   65 tokens in 2301.3 ms  ->  28.24 tok/s
+prefill                  95 tokens in 8134.4 ms  ->  11.68 tok/s  (time to first token 59299.9 ms)

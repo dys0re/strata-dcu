@@ -1,0 +1,18 @@
+[0/1] Re-running CMake...
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: x86_64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: -march=native 
+-- ggml version: 0.24.0
+-- ggml commit:  3cf03257f
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/strara-q4-cpu-build
+[1/7] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/native_expert.cpp.o
+[2/7] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/q4_avx512.cpp.o
+[3/7] Building CXX object CMakeFiles/q4_avx512_parity.dir/src/kernels/cpu/q4_avx512_parity.cpp.o
+[4/7] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/pool.cpp.o
+[5/7] Linking CXX static library libstrata_kernels_cpu.a
+[6/7] Linking CXX executable q4_avx512_parity

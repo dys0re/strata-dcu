@@ -139,6 +139,21 @@ bool q4_multitoken() {
     }();
     return on;
 }
+
+bool q4_input_bias() {
+    static const bool on = [] {
+        const char* e = std::getenv("STRATA_CPU_Q4_INPUT_BIAS");
+        return e && e[0] == '1' && e[1] == '\0';
+    }();
+    return on;
+}
+
+void announce_q4_input_bias() {
+    static std::once_flag once;
+    std::call_once(once, [] {
+        std::fprintf(stderr, "strata cpu q4: shared input bias and single-position rows active\n");
+    });
+}
 #endif
 }  // namespace
 
@@ -189,9 +204,11 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
                     int r0, int r1) {
 #if defined(STRATA_Q4_AVX512)
     // AutoRound's Q4_0: reuse decoding and activation loads across candidates.
-    // One token keeps ggml's bandwidth-bound path. Other formats are unchanged.
-    if (nt >= 2 && f.gu_type == GGML_TYPE_Q4_0 && q4_multitoken() && q4_512_fits((int) f.n_embd)) {
-        q4_512_gu_rows(blob, f.gu_row, f.up_off, (int) f.n_embd, act, nt, ff, r0, r1);
+    // Input-bias reuse also handles one position. With it off, keep the old dispatch.
+    const bool bias = q4_input_bias();
+    if ((nt >= 2 || (bias && nt == 1)) && f.gu_type == GGML_TYPE_Q4_0 && q4_multitoken() && q4_512_fits((int) f.n_embd)) {
+        if (bias) announce_q4_input_bias();
+        q4_512_gu_rows(blob, f.gu_row, f.up_off, (int) f.n_embd, act, nt, ff, r0, r1, bias);
         return;
     }
 #endif
@@ -308,8 +325,10 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
 void native_down_rows(const NativeFmt& f, const uint8_t* blob, const void* const* hq, int nt, float* const* out,
                       int r0, int r1) {
 #if defined(STRATA_Q4_AVX512)
-    if (nt >= 2 && f.d_type == GGML_TYPE_Q4_0 && q4_multitoken() && q4_512_fits((int) f.n_ff)) {
-        q4_512_rows(blob + f.down_off, f.d_row, (int) f.n_ff, hq, nt, out, r0, r1);
+    const bool bias = q4_input_bias();
+    if ((nt >= 2 || (bias && nt == 1)) && f.d_type == GGML_TYPE_Q4_0 && q4_multitoken() && q4_512_fits((int) f.n_ff)) {
+        if (bias) announce_q4_input_bias();
+        q4_512_rows(blob + f.down_off, f.d_row, (int) f.n_ff, hq, nt, out, r0, r1, bias);
         return;
     }
 #endif

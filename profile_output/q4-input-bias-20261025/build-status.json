@@ -1,0 +1,44 @@
+[
+  {
+    "label": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "/root/private_data/strata-dcu/p1/build",
+      "--target",
+      "strata",
+      "q4_avx512_parity",
+      "pool_tasks_test",
+      "-j",
+      "4"
+    ],
+    "returncode": 0,
+    "wall_seconds": 281.4485208429396
+  },
+  {
+    "label": "cpu-tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/root/private_data/strata-dcu/p1/build",
+      "-R",
+      "^(q4_cpu_|pool_expert_pipeline_q4_bias)",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "returncode": 0,
+    "wall_seconds": 10.548789687920362
+  },
+  {
+    "label": "real-expert-pool",
+    "command": [
+      "/root/private_data/strata-dcu/p1/build/pool_tasks_test",
+      "2",
+      "2",
+      "/root/private_data/strata-dcu/q4-input-bias-20261025/real-expert-l0e0.bin"
+    ],
+    "returncode": 0,
+    "wall_seconds": 4.774582548066974
+  }
+]

@@ -431,3 +431,24 @@ PLE、Q8派生权重、MTP、构建和日志均在持久盘。结束时GPU2MiB�
 这是外部bench的自动选核重测，生产wrapper默认未切换；不构成独占。
 结束GPU2MiB、无推理进程、OOM0，系统目录896MiB/cache59MiB。
 原始记录及方法见 [重测报告](profile_output/idle-core-retest-20261025/README.md)。
+
+### CPU INT4输入修正复用（2026-10-25）
+
+环境仍为dflash2@52f8bc84，没有安装或升级依赖。
+当前生产引擎改为持久盘`/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final`，
+SHA256为`4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd`。
+CPU Q4_0按输入复用整数修正，并支持单位置；已有ISA检查及`STRATA_CPU_Q4_MT=1`仍是前提。
+本机增强MTP的selected-model.json选择`cpu_q4_input_bias=true`，
+可用`STRATA_CPU_Q4_INPUT_BIAS=0`覆盖；原生/联合模式保持显式选择。
+`STRATA_DCU_MODEL_DEFAULTS=0`会同时停用模型配置中的该默认值。
+
+固定8500/16076专家与原Q8/蒸馏MTP权重，权重29373360352B，仍不超过50%。
+空闲选核下四次ABBA冷启动，每类每版合并六次256token样本：
+旧版37.07/49.18/56.87TPS，新版37.90/48.35/58.61TPS（英文/中文/代码），
+分别+2.24%/-1.71%/+3.06%，小幅混合收益，不声称统计显著。
+47124项标量参考、完整专家、合成及真实专家线程池552项各自通过；
+四轮增强MTP18QA+STOP/恢复及原生/联合强制拒绝的18QA+lookup/恢复通过。
+自动选核仍是外部测速方法，生产CPU绑定没有在本轮改动。
+细节、全部单次值和公开入口复核记录见[本轮材料](profile_output/q4-input-bias-20261025/README.md)。
+独立公开入口复核已原样执行一次、退出0，四项默认/覆盖/原生/联合检查通过。
+配置中的当前引擎摘要已更新，旧权重选择来源另存；结束GPU2MiB，无引擎/编译/队列进程，OOM0。

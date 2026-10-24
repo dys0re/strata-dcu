@@ -1672,6 +1672,9 @@ if(STRATA_NATIVE_EXPERTS)
     add_test(NAME pool_expert_pipeline_sleep COMMAND pool_tasks_test)
     set_tests_properties(pool_expert_pipeline_sleep PROPERTIES TIMEOUT 180
       ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1;STRATA_POOL_IDLE_US=0;STRATA_POOL_TEST_DELAY_US=2000")
+    add_test(NAME pool_expert_pipeline_q4_bias COMMAND pool_tasks_test)
+    set_tests_properties(pool_expert_pipeline_q4_bias PROPERTIES TIMEOUT 180
+      ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1;STRATA_CPU_Q4_INPUT_BIAS=1")
     add_test(NAME router_dot_parity COMMAND router_dot_parity)
     add_test(NAME router_dot_parity_avx COMMAND ${CMAKE_COMMAND} -E env STRATA_FORCE_ISA=avx $<TARGET_FILE:router_dot_parity>)
   endif()
@@ -1687,6 +1690,12 @@ if(STRATA_NATIVE_EXPERTS)
     target_link_libraries(q4_avx512_parity PRIVATE strata_kernels_cpu)
     add_test(NAME q4_cpu_multitoken COMMAND q4_avx512_parity)
     set_tests_properties(q4_cpu_multitoken PROPERTIES ENVIRONMENT "STRATA_CPU_Q4_MT=1" TIMEOUT 120)
+    add_test(NAME q4_cpu_input_bias COMMAND q4_avx512_parity)
+    set_tests_properties(q4_cpu_input_bias PROPERTIES
+                        ENVIRONMENT "STRATA_CPU_Q4_MT=1;STRATA_CPU_Q4_INPUT_BIAS=1" TIMEOUT 120)
+    add_test(NAME q4_cpu_input_bias_fallback COMMAND q4_avx512_parity)
+    set_tests_properties(q4_cpu_input_bias_fallback PROPERTIES
+                        ENVIRONMENT "STRATA_CPU_Q4_MT=1;STRATA_CPU_Q4_INPUT_BIAS=1;STRATA_FORCE_ISA=avx2" TIMEOUT 120)
     add_test(NAME q4_cpu_multitoken_fallback COMMAND q4_avx512_parity)
     set_tests_properties(q4_cpu_multitoken_fallback PROPERTIES
                         ENVIRONMENT "STRATA_CPU_Q4_MT=1;STRATA_FORCE_ISA=avx2" TIMEOUT 120)

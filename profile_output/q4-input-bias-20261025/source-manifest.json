@@ -1,0 +1,9 @@
+{
+  "CMakeLists.txt": "6be12cf7e337be1c3b995fbd66c7a8d8e76633c66a292b793b213359fbb03bd2",
+  "include/strata/kernels/cpu/q4_avx512.hpp": "fdeada8ad09be5070d3fa8db18cebfed18fc66a7365e5c4d89029901c57c2ff2",
+  "src/kernels/cpu/q4_avx512.cpp": "83c27422de3eabd3487afc5c3049bb44da10c202716ddc73c962dce4a4a8e48f",
+  "src/kernels/cpu/native_expert.cpp": "561f30dffd1e93743fe57429196db734d2dfe9dbe42f2b5162d89e928ef7a0b0",
+  "src/kernels/cpu/q4_avx512_parity.cpp": "86e84edd6afc6f258bf573db9e4dceccab95e333e486250b51c72dc00ab611e8",
+  "tools/autoround_pack.py": "d44ff9e8475baa9cf35f8080d0441ab94eb60a7c75cea6c6f6def6a11c80121a",
+  "tools/bench_dflash2_native.py": "4e84a096fc862b88f274ed49b035117148b1cd7439d9ef9ee84ab3f8d16b9804"
+}

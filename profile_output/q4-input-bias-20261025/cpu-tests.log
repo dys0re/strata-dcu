@@ -1,0 +1,16 @@
+Internal ctest changing into directory: /root/private_data/strata-dcu/p1/build
+Test project /root/private_data/strata-dcu/p1/build
+    Start 119: pool_expert_pipeline_q4_bias
+1/5 Test #119: pool_expert_pipeline_q4_bias .....   Passed    4.85 sec
+    Start 122: q4_cpu_multitoken
+2/5 Test #122: q4_cpu_multitoken ................   Passed    1.13 sec
+    Start 123: q4_cpu_input_bias
+3/5 Test #123: q4_cpu_input_bias ................   Passed    0.99 sec
+    Start 124: q4_cpu_input_bias_fallback
+4/5 Test #124: q4_cpu_input_bias_fallback .......   Passed    0.94 sec
+    Start 125: q4_cpu_multitoken_fallback
+5/5 Test #125: q4_cpu_multitoken_fallback .......   Passed    0.92 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  10.41 sec

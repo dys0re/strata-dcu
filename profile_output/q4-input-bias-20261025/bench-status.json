@@ -1,0 +1,30 @@
+[
+  {
+    "label": "baseline-a",
+    "returncode": 0,
+    "seconds": 210.16429524309933,
+    "engine": "/root/private_data/strata-dcu/model-specific-20261024/final-v1/strata-final",
+    "input_bias": "0"
+  },
+  {
+    "label": "candidate-b",
+    "returncode": 0,
+    "seconds": 210.16761178290471,
+    "engine": "/root/private_data/strata-dcu/q4-input-bias-20261025/strata-candidate",
+    "input_bias": "1"
+  },
+  {
+    "label": "candidate-b2",
+    "returncode": 0,
+    "seconds": 212.12054248480126,
+    "engine": "/root/private_data/strata-dcu/q4-input-bias-20261025/strata-candidate",
+    "input_bias": "1"
+  },
+  {
+    "label": "baseline-a2",
+    "returncode": 0,
+    "seconds": 212.0019180770032,
+    "engine": "/root/private_data/strata-dcu/model-specific-20261024/final-v1/strata-final",
+    "input_bias": "0"
+  }
+]

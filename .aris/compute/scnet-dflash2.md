@@ -185,3 +185,33 @@ selectedproxy31.97/44.23/51.25TPS. Expert slots8500, allweights<=34351349760B.
 Worker queue max0.242%, selected main queue max3.731%; startup selection is not exclusivity.
 Postflight GPU2MiB, noengine/buildprocesses, OOM0; systemroot896MiB/cache59MiB.
 Evidence: profile_output/idle-core-retest-20261025/README.md and v2/audit.json.
+
+## CPU Q4 input-bias reuse (2026-10-25)
+
+Runtime reused unchanged dflash2@52f8bc84; no package installs or dependency changes.
+Public engine /root/strata-dcu/build-gfx936/strata now points to
+/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final.
+SHA256: 4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd.
+STRATA_CPU_Q4_INPUT_BIAS=1, together with CPU_Q4_MT and the existing ISA guard,
+shares input correction and also handles one-position Q4 CPU expert jobs.
+General engine default remains off. The existing model-specific selected-model.json now
+contains cpu_q4_input_bias=true only for its enhanced-MTP default path; explicit env0 wins.
+Native/joint keep opt-in, unchanged model weights and scheduling defaults.
+
+Full HIP build,47124 scalar checks,whole-expert1..17positions,CPU/real-expert pool552checks each,
+local no-AVX512 fallback and no-Q4-macro compile passed. Four ABBA normal-throughput starts
+all passed18QA+STOP/recovery; native/joint forced rejection also passed fullQA+lookup.
+Fixed8500/8300 GPUexpert slots and allweights<=34351349760B,PLE persistent.
+Pooled six-sample medians old37.07/49.18/56.87 versus new37.90/48.35/58.61TPS;
+mixed small gains,geomean+1.18%,not a significance or universal-speed claim.
+Quiet-core placement is still benchmark-only; public CPU binding was not changed.
+
+Fresh documented-entry invocation and expected values:
+profile_output/q4-input-bias-20261025/ENTRY.md. Execute only after the root confirms GPU idle.
+
+Fresh documented-entry validation: PASS, validate_q4_bias_entry. Verbatim invocation ran once,exit0,
+all four default/override/native/joint checks and final GPU-idle marker passed, no retries.
+Evidence: profile_output/q4-input-bias-20261025/entry-validation.txt and entry/.
+After validation, descriptive model-config engine digest refreshed to current SHA; previous weight-selection
+digest retained separately, all runtime options unchanged. Postflight GPU2MiB, noengine/build/queue jobs,
+OOM0,systemroot896MiB/cache59MiB. Final audit PASS.

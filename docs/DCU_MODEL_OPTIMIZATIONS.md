@@ -117,6 +117,10 @@ STRATA_DCU_MODEL_DEFAULTS=0 bash /root/strata-dcu/run-autoround.sh --prompt 'Rep
 显式 `--dense-gguf`、`--mtp-runtime` 和 `STRATA_HC_Q8`、`STRATA_DRAFT_HEAD_PROXY` 可覆盖各项。
 这些默认值只由本机 wrapper 启用，通用引擎不自行选择机器上的权重变体。
 
+2026-10-25同一配置新增可选布尔值`cpu_q4_input_bias`，当前本机增强MTP选择true，
+用于[CPU INT4输入修正复用](DCU_Q4_INPUT_BIAS.md)。显式`STRATA_CPU_Q4_INPUT_BIAS=0`可关闭。
+`STRATA_DCU_MODEL_DEFAULTS=0`也会停用该配置项的默认注入；用户显式环境值仍然有效。
+
 
 2026-10-25 补充：后段骤降的主要原因已通过同进程换核对照定位为固定核心上的宿主用户态争用。
 当前默认组合的256-token英文生成从9.72TPS恢复到33.24TPS，移回后12.18TPS。

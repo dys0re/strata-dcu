@@ -1,5 +1,5 @@
 // Q4_0 x Q8_0: shared weight decoding and activation loads across tokens.
-// Uses AVX-512 VL/BW/VNNI; packed unsigned magnitudes with signed activations.
+// Uses AVX-512 VL/BW/VNNI. Optional shared input bias avoids per-row sign work.
 #include "strata/kernels/cpu/q4_avx512.hpp"
 
 #define GGML_COMMON_DECL_CPP
@@ -9,6 +9,7 @@
 #include <immintrin.h>
 #include <algorithm>
 #include <cmath>
+#include <type_traits>
 
 namespace strata::kernels::cpu {
 namespace {
@@ -25,10 +26,13 @@ inline __m256i unpack(const uint8_t* q) {
                             _mm_srli_epi16(v, 4), 1), _mm256_set1_epi8(15));
 }
 
-struct Acts {
+struct SignFix { __mmask32 ymin[kSlice][kMaxBlocks]; };
+struct InputBias { __m256i correction[kSlice][kMaxBlocks]; };
+
+template<bool BIAS>
+struct Acts : std::conditional_t<BIAS, InputBias, SignFix> {
     const block_q8_0* y[kSlice];
     float d[kSlice][kMaxBlocks];
-    __mmask32 ymin[kSlice][kMaxBlocks];
     bool any_min = false;
     int nb;
     Acts(const void* const* act, int nt, int n) : nb(n / QK8_0) {
@@ -36,9 +40,14 @@ struct Acts {
             y[t] = static_cast<const block_q8_0*>(act[t]);
             for (int i = 0; i < nb; ++i) {
                 d[t][i] = h2f(y[t][i].d);
-                ymin[t][i] = _mm256_cmpeq_epi8_mask(_mm256_loadu_si256(
-                    reinterpret_cast<const __m256i*>(y[t][i].qs)), _mm256_set1_epi8(-128));
-                any_min |= ymin[t][i] != 0;
+                const __m256i q8 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(y[t][i].qs));
+                if constexpr (BIAS) {
+                    // One signed sum per four elements, shared by every weight row.
+                    this->correction[t][i] = _mm256_dpbusd_epi32(_mm256_setzero_si256(), _mm256_set1_epi8(8), q8);
+                } else {
+                    this->ymin[t][i] = _mm256_cmpeq_epi8_mask(q8, _mm256_set1_epi8(-128));
+                    any_min |= this->ymin[t][i] != 0;
+                }
             }
         }
     }
@@ -66,8 +75,8 @@ inline __m256 product(__m256i q, __m256i mag, __m256i y, __mmask32 ymin) {
     return _mm256_cvtepi32_ps(p);
 }
 
-template<int NT, bool GU, bool FIX_MIN>
-void rows(const uint8_t* w, size_t row_bytes, size_t up_off, const Acts& a,
+template<int NT, bool GU, bool BIAS, bool FIX_MIN>
+void rows(const uint8_t* w, size_t row_bytes, size_t up_off, const Acts<BIAS>& a,
            float* const* out, int r0, int r1) {
     const __m256i eight = _mm256_set1_epi8(8);
     for (int r = r0; r < r1; ++r) {
@@ -76,19 +85,31 @@ void rows(const uint8_t* w, size_t row_bytes, size_t up_off, const Acts& a,
         __m256 ag[NT], au[NT];
         for (int t = 0; t < NT; ++t) { ag[t] = _mm256_setzero_ps(); au[t] = _mm256_setzero_ps(); }
         for (int i = 0; i < a.nb; ++i) {
-            const __m256i qg = _mm256_sub_epi8(unpack(g[i].qs), eight);
-            const __m256i mg = _mm256_abs_epi8(qg);
+            const __m256i qg = BIAS ? unpack(g[i].qs) : _mm256_sub_epi8(unpack(g[i].qs), eight);
+            const __m256i mg = BIAS ? _mm256_setzero_si256() : _mm256_abs_epi8(qg);
             const float dg = h2f(g[i].d);
             __m256i qu, mu; float du;
             if constexpr (GU) {
-                qu = _mm256_sub_epi8(unpack(u[i].qs), eight);
-                mu = _mm256_abs_epi8(qu); du = h2f(u[i].d);
+                qu = BIAS ? unpack(u[i].qs) : _mm256_sub_epi8(unpack(u[i].qs), eight);
+                mu = BIAS ? _mm256_setzero_si256() : _mm256_abs_epi8(qu); du = h2f(u[i].d);
             }
             for (int t = 0; t < NT; ++t) {
                 const __m256i y = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(a.y[t][i].qs));
-                ag[t] = _mm256_fmadd_ps(_mm256_set1_ps(dg * a.d[t][i]), product<FIX_MIN>(qg, mg, y, a.ymin[t][i]), ag[t]);
-                if constexpr (GU)
-                    au[t] = _mm256_fmadd_ps(_mm256_set1_ps(du * a.d[t][i]), product<FIX_MIN>(qu, mu, y, a.ymin[t][i]), au[t]);
+                if constexpr (BIAS) {
+                    // (u-8)*y = u*y - 8*y; no signed negation, including y=-128.
+                    const __m256 pg = _mm256_cvtepi32_ps(_mm256_sub_epi32(
+                        _mm256_dpbusd_epi32(_mm256_setzero_si256(), qg, y), a.correction[t][i]));
+                    ag[t] = _mm256_fmadd_ps(_mm256_set1_ps(dg * a.d[t][i]), pg, ag[t]);
+                    if constexpr (GU) {
+                        const __m256 pu = _mm256_cvtepi32_ps(_mm256_sub_epi32(
+                            _mm256_dpbusd_epi32(_mm256_setzero_si256(), qu, y), a.correction[t][i]));
+                        au[t] = _mm256_fmadd_ps(_mm256_set1_ps(du * a.d[t][i]), pu, au[t]);
+                    }
+                } else {
+                    ag[t] = _mm256_fmadd_ps(_mm256_set1_ps(dg * a.d[t][i]), product<FIX_MIN>(qg, mg, y, a.ymin[t][i]), ag[t]);
+                    if constexpr (GU)
+                        au[t] = _mm256_fmadd_ps(_mm256_set1_ps(du * a.d[t][i]), product<FIX_MIN>(qu, mu, y, a.ymin[t][i]), au[t]);
+                }
             }
         }
         for (int t = 0; t < NT; ++t) {
@@ -101,27 +122,27 @@ void rows(const uint8_t* w, size_t row_bytes, size_t up_off, const Acts& a,
     }
 }
 
-template<bool GU>
+template<bool GU, bool BIAS>
 void dispatch(const uint8_t* w, size_t row_bytes, size_t up_off, int n,
                const void* const* act, int nt, float* const* out, int r0, int r1) {
     if (nt <= 0 || r0 >= r1) return;
     const int slices = (nt + kSlice - 1) / kSlice;
     for (int s = 0, t0 = 0; s < slices; ++s) {
         const int count = nt / slices + (s < nt % slices);
-        const Acts a(act + t0, count, n);
+        const Acts<BIAS> a(act + t0, count, n);
         if (a.any_min) {
             switch (count) {
-                case 1: rows<1, GU, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
-                case 2: rows<2, GU, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
-                case 3: rows<3, GU, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
-                case 4: rows<4, GU, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 1: rows<1, GU, BIAS, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 2: rows<2, GU, BIAS, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 3: rows<3, GU, BIAS, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 4: rows<4, GU, BIAS, true>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
             }
         } else {
             switch (count) {
-                case 1: rows<1, GU, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
-                case 2: rows<2, GU, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
-                case 3: rows<3, GU, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
-                case 4: rows<4, GU, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 1: rows<1, GU, BIAS, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 2: rows<2, GU, BIAS, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 3: rows<3, GU, BIAS, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
+                case 4: rows<4, GU, BIAS, false>(w, row_bytes, up_off, a, out + t0, r0, r1); break;
             }
         }
         t0 += count;
@@ -132,12 +153,14 @@ void dispatch(const uint8_t* w, size_t row_bytes, size_t up_off, int n,
 bool q4_512_fits(int n) { return n > 0 && n % QK8_0 == 0 && n / QK8_0 <= kMaxBlocks; }
 
 void q4_512_gu_rows(const uint8_t* blob, size_t row_bytes, size_t up_off, int n,
-                    const void* const* act, int nt, float* const* ff, int r0, int r1) {
-    dispatch<true>(blob, row_bytes, up_off, n, act, nt, ff, r0, r1);
+                    const void* const* act, int nt, float* const* ff, int r0, int r1, bool input_bias) {
+    if (input_bias) dispatch<true, true>(blob, row_bytes, up_off, n, act, nt, ff, r0, r1);
+    else dispatch<true, false>(blob, row_bytes, up_off, n, act, nt, ff, r0, r1);
 }
 
 void q4_512_rows(const uint8_t* w, size_t row_bytes, int n, const void* const* act,
-                 int nt, float* const* out, int r0, int r1) {
-    dispatch<false>(w, row_bytes, 0, n, act, nt, out, r0, r1);
+                 int nt, float* const* out, int r0, int r1, bool input_bias) {
+    if (input_bias) dispatch<false, true>(w, row_bytes, 0, n, act, nt, out, r0, r1);
+    else dispatch<false, false>(w, row_bytes, 0, n, act, nt, out, r0, r1);
 }
 }  // namespace strata::kernels::cpu

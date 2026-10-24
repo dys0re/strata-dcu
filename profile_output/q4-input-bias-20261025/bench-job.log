@@ -1,0 +1,9 @@
+START baseline-a
+END baseline-a 0
+START candidate-b
+END candidate-b 0
+START candidate-b2
+END candidate-b2 0
+START baseline-a2
+END baseline-a2 0
+ABBA_COMPLETE

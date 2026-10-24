@@ -1,0 +1,34 @@
+[
+  {
+    "name": "mtp-default",
+    "answer_correct": true,
+    "lookup_exercised": true,
+    "input_bias": true,
+    "weights": 29373360352,
+    "expert_slots": 8500
+  },
+  {
+    "name": "mtp-override",
+    "answer_correct": true,
+    "lookup_exercised": true,
+    "input_bias": false,
+    "weights": 29373360352,
+    "expert_slots": 8500
+  },
+  {
+    "name": "native-opt-in",
+    "answer_correct": true,
+    "lookup_exercised": true,
+    "input_bias": true,
+    "weights": 32827238400,
+    "expert_slots": 8300
+  },
+  {
+    "name": "joint-opt-in",
+    "answer_correct": true,
+    "lookup_exercised": true,
+    "input_bias": true,
+    "weights": 34195377152,
+    "expert_slots": 8300
+  }
+]

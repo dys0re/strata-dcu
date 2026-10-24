@@ -1,0 +1,10 @@
+[
+  {
+    "label": "native-qa",
+    "returncode": 0
+  },
+  {
+    "label": "joint-reject-qa",
+    "returncode": 0
+  }
+]

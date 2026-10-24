@@ -54,3 +54,7 @@ HC Q8、Q8 非专家投影/输出头、发布的蒸馏 MTP。草稿筛选仍默�
 `--dense-gguf FILE`、`--mtp-runtime DIR` 显式选择准备好的变体；原生 DFlash2 的共享输出头须保留 BF16。
 `STRATA_DCU_MODEL_DEFAULTS=0` 恢复此前权重选择，原有层内交接默认仍保留。
 配置路径由 `STRATA_DCU_MODEL_CONFIG` 指定，当前文件在持久盘 `model-specific-20261024/selected-model.json`。
+
+2026-10-25 的 [CPU INT4 输入修正复用](DCU_Q4_INPUT_BIAS.md) 在同一本机模型配置中启用
+`cpu_q4_input_bias=true`，只作用于增强MTP默认入口。显式设置`STRATA_CPU_Q4_INPUT_BIAS=0`可关闭。
+原生DFlash2和联合模式保持显式选择；新算式还需要`STRATA_CPU_Q4_MT=1`及现有CPU能力检查通过。

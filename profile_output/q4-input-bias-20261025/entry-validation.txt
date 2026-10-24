@@ -1,0 +1,29 @@
+# CPU Q4 input-bias independent documented-entry validation
+
+Date: 2026-10-25
+Validator: validate_q4_bias_entry
+Working directory: /home/dry/data/strara-dcu/Strata
+Execution count: 1
+Execution session: 44561
+Root supplied the required idle-GPU / no-inference-or-build precondition before launch.
+No source/config edits, command retries, or additional inference were performed.
+
+Exact documented invocation:
+ssh -S /tmp/strata-q4-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; python3 -u /root/private_data/strata-dcu/q4-input-bias-20261025/validate_entry.py'
+
+Full invocation stdout/stderr (combined):
+PASS ENTRY mtp-default
+PASS ENTRY mtp-override
+PASS ENTRY native-opt-in
+PASS ENTRY joint-opt-in
+PASS Q4 INPUT BIAS PUBLIC ENTRIES; GPU idle
+
+Exit code: 0
+
+Outcome: PASS. All four ENTRY.md markers appeared in the documented order, followed by the final GPU-idle marker. The invocation exited 0.
+Doc-vs-reality divergence observed through the documented invocation: none.
+
+Additional root-reported observation (not independently inspected by this validator): selected-model.json engine_sha256 still records an earlier engine digest, while the actual engine, deployment.json and ENTRY.md use the new digest. Root stated that this descriptive field does not select parameters and that configuration remained frozen during this invocation. This observation did not produce a failure or output difference in the documented validation.
+
+Logging note: the first local tool wrapper attempted to store an undefined exit-code field while the command was still running and raised a store error after launch. Its session handle and initial empty output were already preserved. All subsequent reads used the same live session 44561; the invocation was not restarted.
+
