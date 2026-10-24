@@ -1,0 +1,386 @@
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.796
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.788
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.796
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.860
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.829
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.838
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.941
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.286
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.790
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.310
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.358
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.393
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.421
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.688
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.174
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.795
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.123
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.168
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.256
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.290
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.597
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.402
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.791
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.423
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.515
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.459
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.464
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.544
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.220
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.811
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.240
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.270
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.304
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.325
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.496
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.149
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.797
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.120
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.195
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.240
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.291
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.613
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.926
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.567
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.688
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.883
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=14.048
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=14.329
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=23.136
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.830
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=5.042
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.661
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.772
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.870
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.948
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=11.645
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.334
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.879
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.365
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.328
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.354
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.358
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.542
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.216
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.176
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.253
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.075
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.638
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.744
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=18.084
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.770
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.359
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.590
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.699
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.842
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.955
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=9.692
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.358
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.897
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.357
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.321
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.331
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.376
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=5.139
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=209.231
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=209.608
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=208.155
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=209.761
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=210.148
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=210.476
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=227.277
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=70.307
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=70.677
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=70.481
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=71.521
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=71.491
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=71.713
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=79.334
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.190
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=21.017
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.112
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.854
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.136
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.014
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=22.834
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=105.770
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=106.025
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=105.063
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=106.183
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=105.616
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=105.395
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=116.190
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=53.393
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=54.014
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=53.515
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=53.009
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=52.975
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=54.940
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=63.106
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.377
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.018
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.576
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.887
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.837
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.882
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=22.755
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: layer-end spin budget 0 us; inter-phase budget 20000 us
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=278 experts=1993 wall_ms=204.737
+pool tasks: 552 bitwise comparisons passed

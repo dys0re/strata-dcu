@@ -1,0 +1,10 @@
+src/kernels/cuda/verify_kernels.cu(274): warning #20199-D: unrecognized #pragma in device code
+  #pragma clang fp contract(off)
+          ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+src/kernels/cuda/verify_kernels.cu(1370): warning #177-D: function "strata::kernels::<unnamed>::resident_plan_par_kernel" was declared but never referenced
+  __attribute__((global)) void resident_plan_par_kernel(const int32_t* __restrict__ ids, int n, int k, const int32_t* __restrict__ res,
+                               ^
+

@@ -13,6 +13,8 @@ export STRATA_BF16_Q8_COLS="${STRATA_BF16_Q8_COLS:-4}"
 # Measured on this gfx936 host. Each can be set to 0 for the prior kernel path.
 export STRATA_CPU_Q4_MT="${STRATA_CPU_Q4_MT:-1}"
 export STRATA_DFLASH_SMALL_GEMV="${STRATA_DFLASH_SMALL_GEMV:-1}"
+# This host's enhanced-MTP defaults; individual scheduling variables still override them.
+export STRATA_DCU_SCHEDULING_DEFAULTS="${STRATA_DCU_SCHEDULING_DEFAULTS:-1}"
 exec python3 /root/strata-dcu/Strata/tools/autoround_pack.py run \
   --model /root/private_data/Qwen3.8-F \
   --out /root/strata-dcu/autoround \

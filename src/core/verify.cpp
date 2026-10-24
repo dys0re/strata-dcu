@@ -93,6 +93,9 @@ namespace {
 constexpr float EPS = 1e-6f;
 using Clock = std::chrono::steady_clock;
 double ms_since(Clock::time_point t) { return std::chrono::duration<double, std::milli>(Clock::now() - t).count(); }
+const bool g_pool_trace = std::getenv("STRATA_POOL_TRACE") != nullptr;
+const bool g_trace_full = std::getenv("STRATA_VERIFY_TRACE_FULL") != nullptr;
+long long host_now_ns() { return std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now().time_since_epoch()).count(); }
 const bool g_dbg = std::getenv("STRATA_VERIFY_DEBUG") != nullptr;
 inline bool g_lfuse() { static const bool on = [] { const char* v = std::getenv("STRATA_LFUSE"); return v != nullptr && v[0] == '1'; }(); return on; }
 // STRATA_ROUTE_RESIDENT=<margin logits> (+ STRATA_ROUTE_RESIDENT_RANKS=lo-hi, default 6-9): residency-biased routing.
@@ -523,7 +526,8 @@ void Verifier::trace_dump(std::FILE* f) const {
     static const char* names[kProfPer] = {"pre", "hc-read0", "qkv gemv", "conv", "ab", "z", "rec", "kv-idx",
                                           "k/v rope", "kv append", "q", "scores+topk", "kv-resolve", "attention",
                                           "gate", "", "out-proj", "router+ring", "shared", "waitA", "VRAM hits", "waitB",
-                                          "PCIe grp", "waitCPU", "combine", "", "head", "", "", "", "", "", ""};
+                                          "PCIe grp", "waitCPU", "combine", "", "head", "", "", "", "", "", "",
+                                          "resident-done", "CPU-rows-copied"};
     const uint64_t end = g_trace_next.load();
     const uint64_t n = end < 160 ? end : 160;
     std::fprintf(f, "strata verify trace (#649): the last %llu handshake events (host clock, us before the last; "
@@ -554,7 +558,7 @@ void Verifier::trace_dump(std::FILE* f) const {
                 if (trace_h_[(size_t) ((l * kProfPer + i) * 2 + grp)] != 0) last_l = l;
     std::fprintf(f, "strata verify trace: GPU breadcrumbs (us after the window's first), the GPU got as far as layer "
                     "%lld:\n", (long long) last_l);
-    for (int64_t l = std::max<int64_t>(0, last_l - 2); l <= std::min<int64_t>(g_->n_layers, last_l + 1); ++l)
+    for (int64_t l = g_trace_full ? 0 : std::max<int64_t>(0, last_l - 2); l <= std::min<int64_t>(g_->n_layers, last_l + 1); ++l)
         for (int grp = 0; grp < 2; ++grp) {
             std::string line;
             char b[64];
@@ -628,6 +632,9 @@ Verifier::~Verifier() {
     for (cudaEvent_t e : df_join_)
         if (e) cudaEventDestroy(e);
     if (arena_) cudaFree(arena_);
+    if (skip_) cudaFree(skip_);
+    if (slot_off_d_) cudaFree(slot_off_d_);
+    if (h_pcie_stage_) cudaFreeHost(h_pcie_stage_);
     if (hcount_d_) cudaFree(hcount_d_);
     void* hosts[] = {h_tok_, h_step_, h_pos_, h_commit_, h_ple_, h_out_, h_x_, h_ids_, h_w_, h_seq_, h_flag_, h_ymiss_,
                      h_flagA_, h_plan_, h_flagB_, h_plan_err_, h_nf_, herr_h_, hdrop_h_, h_bal_};
@@ -775,8 +782,25 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         sink_.start2 = h_plan_ + ptr_off + 4 * cap;
         sink_.cap = cap;
         sink_.publish = &Verifier::publish_plan;
+        if (const char* v = std::getenv("STRATA_CPU_EARLY_RESULT"))
+            if (std::atoi(v) != 0) sink_.complete = &Verifier::complete_results;
         sink_.fetch = &Verifier::fetch_dma;
         sink_.ctx = this;
+    }
+    if (const char* v = std::getenv("STRATA_PCIE_STAGED_MAX")) {
+        sink_.staged_max = std::clamp(std::atoi(v), 0, (int) kStagingBlobs);
+        if (sink_.staged_max > 0) {
+            void* unused_device = nullptr;
+            const size_t bytes = (size_t) kStagingBlobs * strata::kernels::cpu::expert_layout().max_blob;
+            if (!mapped(bytes, (void**) &h_pcie_stage_, &unused_device)) {
+                err = "verify: small pinned expert staging allocation failed " + strata::core::pin_exhausted_hint();
+                return false;
+            }
+            sink_.host_staging = h_pcie_stage_;
+            sink_.pcie_mode = 0;
+            std::fprintf(stderr, "strata verify: bounded DMA offload, at most %d experts/group, %zu pinned host bytes\n",
+                         sink_.staged_max, bytes);
+        }
     }
 
     // APR: the rotated copy of the expert input (nat_xr_, T x N floats) only where a layer's gate/up is
@@ -787,6 +811,11 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         for (size_t l = 0; lay.native && l < lay.fmt.size(); ++l) had_gu_any = had_gu_any || lay.fmt[l].had_gu;
     }
     // ---- the device arena: the same sequence counted, then carved
+    if (const char* v = std::getenv("STRATA_VERIFY_HIT_PLAN"))
+        independent_hits_ = std::atoi(v) != 0 && !always_publish_ && remote_opt_ == nullptr && hits.d_res != nullptr;
+    // Swap-space hits are not described by the residency table; let their existing host plan own all hit work.
+    if (const char* v = std::getenv("STRATA_FS_SLOTS"))
+        if (std::atoi(v) > 0) independent_hits_ = false;
     auto carve = [&](Bump& b) {
         tok_ = b.take<int32_t>(T); step_ = b.take<int32_t>(T * strata::kernels::kStepCount);
         pos_ = b.take<int32_t>(T * (NH + NKV + IQ)); commit_ = b.take<int32_t>(2 + T);
@@ -811,6 +840,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
         shared_ = b.take<float>(T * N); parts_ = b.take<float>(T * K * N); hit_out_ = b.take<float>(T * K * N);
         hit_slot_ = b.take<int32_t>(T * K); hit_dst_ = b.take<int32_t>(T * K); hit_count_ = b.take<int32_t>(4);
         plan_ = b.take<int32_t>(2 * ((uint64_t) plan_i32_ + 16));
+        hit_plan_ = independent_hits_ ? b.take<int32_t>(2 * ((uint64_t) plan_i32_ + 16)) : nullptr;
         staging_ = b.take<uint8_t>((uint64_t) kStagingBlobs * strata::kernels::cpu::expert_layout().max_blob);
         hit_xq_ = b.take<uint8_t>(T * (N / 32) * 34); hit_xs_ = b.take<float>(T * (N / 32));
         nat_xq_ = b.take<uint8_t>(T * (N / 32) * 36);
@@ -979,7 +1009,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
     {
         const char* v = std::getenv("STRATA_VERIFY_DEVICE_PLAN");
         // (not with set_always_publish: the device table may lag the host's while windows are in flight)
-        device_plan_ = !all_resident_ && !always_publish_ && (v != nullptr && std::atoi(v) != 0);
+        device_plan_ = !all_resident_ && !always_publish_ && !independent_hits_ && (v != nullptr && std::atoi(v) != 0);
     }
     // (halo's STRATA_VERIFY_RESIDENT=1 is this window's all_resident_ graph above, which 0.1.39 has on by default)
     if (g_qfuse() || g_qfuse_hc()) {   // S26: the HC read's q8_1 group counters, zeroed once (each launch leaves them zero)
@@ -990,7 +1020,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
             qcnt_ = nullptr;
         }
     }
-    if (all_resident_ || device_plan_) {
+    if (all_resident_ || device_plan_ || independent_hits_) {
         bool ok2 = true;
         if (device_plan_)
             ok2 = cudaMalloc((void**) &skip_, 64) == cudaSuccess && cudaMemset(skip_, 0, 64) == cudaSuccess;
@@ -999,8 +1029,11 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
                   cudaMemcpy(slot_off_d_, hits.slot_off, (size_t) hits.n_slots * sizeof(unsigned long long),
                              cudaMemcpyHostToDevice) == cudaSuccess;
         }
-        if (!ok2) { cudaGetLastError(); all_resident_ = false; device_plan_ = false; }
+        if (!ok2) { cudaGetLastError(); all_resident_ = false; device_plan_ = false; independent_hits_ = false; }
     }
+    if (independent_hits_)
+        std::fprintf(stderr, "strata verify: resident groups start from a separate GPU plan (STRATA_VERIFY_HIT_PLAN)\n");
+    sink_.device_hits = independent_hits_;
     std::fprintf(stderr, "strata verify: window up to %d tokens, %.1f MiB of device buffers%s\n", max_t,
                  (double) count.used / 1048576.0,
                  all_resident_ ? " (100% VRAM resident: zero-doorbell graph)" : "");
@@ -1053,6 +1086,9 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
     auto stamp = [&](int64_t l, int i, int grp) {
         if (prof_on_ && grp == 0) gpu_stamp(prof_, (int) (l * kProfPer + i), cs);
         if (trace_m_ != nullptr) gpu_stamp(trace_m_, (int) ((l * kProfPer + i) * 2 + grp), cs);   // #649
+    };
+    auto schedule_stamp = [&](int64_t l, int i, int grp) {
+        if (trace_m_ != nullptr) gpu_stamp(trace_m_, (int) ((l * kProfPer + i) * 2 + grp), cs);
     };
     const int tb_[2] = {0, (T + 1) / 2}, te_[2] = {G == 2 ? (T + 1) / 2 : T, T};
     // S26 STRATA_LFUSE=1: where the shared expert's gate / scale fusions apply (the paths they replace are the ones taken)
@@ -1901,6 +1937,12 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                           hits_.cache_base, slot_off_d_, (long long) hits_.blob,
                           plan_ + (size_t) grp * (size_t) (plan_i32_ + 16), (long long) max_t_ * K, nullptr, 0, cs, m_plan_err_);
         } else {
+#if !defined(STRATA_GPU_METAL)
+            if (independent_hits_)
+                resident_hit_plan(ids_ + tb * K, n * (int) K, (int) K, hits_.d_res + l * g.n_expert,
+                                  (int) g.n_expert, hits_.cache_base, slot_off_d_, (long long) hits_.blob,
+                                  hit_plan_ + (size_t) grp * (size_t) (plan_i32_ + 16), (long long) max_t_ * K, cs);
+#endif
             if (device_plan_)   // E-6: every routed expert resident: this group's plan without the host
                 resident_plan(ids_ + tb * K, n * (int) K, (int) K, hits_.d_res + l * g.n_expert, (int) g.n_expert,
                               hits_.cache_base, slot_off_d_, (long long) hits_.blob,
@@ -1991,7 +2033,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         const int tb = tb_[grp], te = te_[grp], n = te - tb;
         const uint32_t ring = (uint32_t) ((l - lb_) * G + grp + 1);
         const int64_t cap = (int64_t) n * K, capx = (int64_t) max_t_ * K;
-        int32_t* pl = plan_ + (size_t) grp * (size_t) (plan_i32_ + 16);
+        int32_t* pl = (independent_hits_ && !ar_on() ? hit_plan_ : plan_) + (size_t) grp * (size_t) (plan_i32_ + 16);
         const int32_t* p_counts = pl;
         const int32_t* p_start = pl + 4;
         const int32_t* p_dst = p_start + capx + 1;
@@ -2005,16 +2047,19 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
         const auto& lay = strata::kernels::cpu::expert_layout();
         // plan v0.3 P6: the VRAM groups now; the PCIe groups once the copy engine has landed them in staging.
         // `gy`: the native launch's groups side by side (0: cap, one block row per possible group).
-        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy, float* dst_buf) {
+        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy, float* dst_buf,
+                           const int32_t* gd = nullptr, const int32_t* gt = nullptr) {
+            if (gd == nullptr) gd = p_dst;
+            if (gt == nullptr) gt = p_tok;
             if (lay.native) {
                 // the layer's GGUF formats (i-quant gate/up, Q2_0 / IQ4_NL down)
                 const auto& f = lay.fmt[(size_t) l];
                 NativeExpertLayout L = native_expert_layout(f.gu_type, f.d_type, f.n_embd, f.n_ff);
                 if (f.had_d) { L.had_block = f.had_block; L.d_signs = had_sh_; }   // APR: h is rotated in there
-                native_expert_grouped(L, gp, gs, gn, p_dst, p_tok, cap, cap,
+                native_expert_grouped(L, gp, gs, gn, gd, gt, cap, cap,
                                       nat_xq_ + (size_t) tb * (N / 32) * 36, hit_scratch_, dst_buf, cs, gy);
             } else {
-                moe_grouped_s2(gp, gs, gn, p_dst, p_tok, cap, cap, hit_xq_ + (size_t) tb * (N / 32) * 34,
+                moe_grouped_s2(gp, gs, gn, gd, gt, cap, cap, hit_xq_ + (size_t) tb * (N / 32) * 34,
                                hit_xs_ + (size_t) tb * (N / 32), hit_scratch_, dst_buf, cs);
             }
         };
@@ -2024,14 +2069,28 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             grouped(p_ptr, p_start, p_counts, 0, parts_out);
             stamp(l, 20, grp);
         } else {
-            if (device_plan_) {   // E-6: skipped when the device planned this group (all its experts resident)
+            if (independent_hits_) {
+                if (m_bal_ != nullptr) gpu_stamp(m_bal_ + ((l - lb_) * 2 + grp) * 4, 0, cs);
+                const int32_t* hp = hit_plan_ + (size_t) grp * (size_t) (plan_i32_ + 16);
+                const int32_t* hs = hp + 4;
+                const int32_t* hd = hs + capx + 1;
+                const int32_t* ht = hd + capx;
+                const auto* hptr = (const unsigned long long*) (hp + ptr_off);
+                grouped(hptr, hs, hp, 0, hit_out, hd, ht);
+                schedule_stamp(l, 33, grp);
+            }
+            if (independent_hits_) {
+#if !defined(STRATA_GPU_METAL)
+                append_pcie_plan_after(m_flagA_, ring, pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, capx, cs);
+#endif
+            } else if (device_plan_) {   // E-6: skipped when the device planned this group (all its experts resident)
                 wait_flag_ge_or(m_flagA_, ring, skip_ + grp, cs);
                 copy_i32_from_mapped_unless(pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, plan_i32_, skip_ + grp, ring, cs);
             } else {
                 if (fuse_wait_on() && !prof_on_ && m_bal_ == nullptr) {   // 143-amdk: one launch for the wait and the copy
                     wait_copy_i32_from_mapped(m_flagA_, ring, pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, plan_i32_, cs);
                 } else {
-                if (m_bal_ != nullptr)   // set_pcie_balance: the GPU's share starts as the plan arrives
+                if (m_bal_ != nullptr && !independent_hits_)   // independent hits started before the host plan
                     wait_flag_ge_stamped(m_flagA_, ring, nullptr, m_bal_ + ((l - lb_) * 2 + grp) * 4, cs);
                 else
                     wait_flag_ge(m_flagA_, ring, cs);              // the pool published this group's GPU plan
@@ -2039,7 +2098,10 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 }
             }
             stamp(l, 19, grp);
-            grouped(p_ptr, p_start, p_counts, 0, hit_out);
+            if (!independent_hits_) {
+                grouped(p_ptr, p_start, p_counts, 0, hit_out);
+                schedule_stamp(l, 33, grp);
+            }
             stamp(l, 20, grp);
             if (device_plan_) wait_flag_ge_or(m_flagB_, ring, skip_ + grp, cs);
             else if (m_bal_ != nullptr)   // set_pcie_balance: the PCIe part starts
@@ -2080,6 +2142,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 else
                     copy_from_mapped(parts_out, m_ymiss_ + (size_t) tb * K * N, (int64_t) n * K * N, cs);
             }
+            schedule_stamp(l, 34, grp);
             // 143-amdk: the add of the GPU's hit rows is done by the combine that follows (one launch fewer)
             hits_in_combine = fuse_hits_on() && !prof_on_ && !remote_opt_ && !sg_gated_[grp] && dec_batch && n > 1 &&
                               native_moe_combine_enabled() && n <= 8 &&
@@ -2251,7 +2314,8 @@ std::string Verifier::profile_report() {
                                           "k/v+norm-rope", "kv+idx append", "q+q-idx", "scores+topk", "kv-resolve",
                                           "attention", "gate", "", "out-proj", "router+plan+bell", "shared+quant",
                                           "waitA", "VRAM hits", "waitB", "PCIe grp", "waitCPU", "copy+combine",
-                                          "(gap)", "head", "  hc0 norm", "  hc0 down", "  hc0 up", "  hc1 norm", "  hc1 down", "  hc1 up"};
+                                          "(gap)", "head", "  hc0 norm", "  hc0 down", "  hc0 up", "  hc1 norm", "  hc1 down", "  hc1 up",
+                                          "resident-done", "CPU-rows-copied"};
     std::string out;
     char b[80];
     double total = 0;
@@ -2746,6 +2810,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         // 0.1.43: with the all-resident graph the host serves no layer, so nothing can hold a layer back: every copy first
         if (adapt_gate_ != nullptr && adapt_gate_->active.load(std::memory_order_acquire) && ar_on() &&
             !adapt_gate_wait((int32_t) g.n_layers, err)) return false;
+        const long long launch_before = g_pool_trace ? host_now_ns() : 0;
 #if !defined(STRATA_USE_HIP) && !defined(STRATA_HIP_GFX906)
         // A blocking instrumented launch cannot also serve the graph's CPU doorbells.
         static const bool threaded_launch = [] {
@@ -2758,6 +2823,9 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
 #else
         const cudaError_t le = cudaGraphLaunch(ar_off_ ? exec_nr_[T] : exec_[T], cs_);
 #endif
+        if (g_pool_trace)
+            std::fprintf(stderr, "verify graph: pos=%lld T=%d before_ns=%lld after_ns=%lld\n",
+                         (long long) pos0, T, launch_before, host_now_ns());
         trace_ev("LAUNCHED", -1, -1, (int64_t) le);
         if (le != cudaSuccess) { err = std::string("verify: launch: ") + cudaGetErrorString(le); return false; }
 #if !defined(STRATA_USE_HIP) && !defined(STRATA_HIP_GFX906)
@@ -2903,7 +2971,13 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
             _mm_sfence();
             ms_host += ms_since(tp);
         }
-        if (!(test_stall && k + 1 == steps)) *flag = want;
+        if (!(test_stall && k + 1 == steps)) {
+            const long long release_ns = g_pool_trace ? host_now_ns() : 0;
+            *flag = want;
+            if (g_pool_trace)
+                std::fprintf(stderr, "verify ready: ring=%u layer=%lld group=%d time_ns=%lld early=0\n",
+                             want, (long long) l, grp, release_ns);
+        }
         if (h_bal_ != nullptr) bal_p_[(size_t) ((k / G) * 2 + grp)] = ms_since(b);
         ms_wait += std::chrono::duration<double, std::milli>(b - a).count();
         ms_pool += ms_since(b);
@@ -3025,6 +3099,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
         }
     }
     VDBG("window done\n");
+    if (g_trace && g_trace_full) trace_dump(stderr);
     ++windows;
     progress_at("decode");
     progress_beat();
@@ -3034,15 +3109,17 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
 // set_pcie_balance: each stamped step's times into the model's fits (PcieModel::sample), solved once a window.
 void Verifier::pcie_balance_window(int64_t steps, int G) {
     const volatile unsigned long long* st = h_bal_;
-    PcieModel& M = *bal_;
     for (int64_t k = 0; k < steps; ++k) {
         const size_t i = (size_t) ((k / G) * 2 + k % G);
         if (!bal_ok_[i]) continue;
         const unsigned long long ta = st[4 * i], tb = st[4 * i + 1], tw = st[4 * i + 2];
         if (ta == 0 || tb < ta || tw < tb || tw - ta > 1000000000ull) continue;   // not stamped in this window
+        const int width = G == 1 ? last_t_ : k % G == 0 ? (last_t_ + 1) / 2 : last_t_ / 2;
+        PcieModel& M = bal_width_ != nullptr ? bal_width_[width] : *bal_;
         M.sample(bal_nc_[i], bal_np_[i], bal_p_[i], (double) (tw - ta) * 1e-6);
     }
-    M.solve();
+    if (bal_width_ != nullptr) for (int width = 1; width <= last_t_; ++width) bal_width_[width].solve();
+    else bal_->solve();
 }
 
 void Verifier::set_plan_slot(int grp) {
@@ -3061,6 +3138,8 @@ void Verifier::set_plan_slot(int grp) {
     const int64_t per = G == 2 ? kStagingBlobs / 2 : kStagingBlobs;
     sink_.staging = (unsigned long long) (staging_ + (size_t) (grp * per) * strata::kernels::cpu::expert_layout().max_blob);
     sink_.staging_cap = per;
+    sink_.host_staging = h_pcie_stage_ == nullptr ? nullptr
+        : h_pcie_stage_ + (size_t) (grp * per) * strata::kernels::cpu::expert_layout().max_blob;
 }
 
 // Flag B only rises: a host function of an earlier layer may run after a later layer already raised it directly.
@@ -3114,6 +3193,17 @@ void Verifier::publish_plan(void* ctx) {
     Verifier* v = (Verifier*) ctx;
     _mm_sfence();
     *(volatile uint32_t*) v->h_flagA_ = v->cur_layer_ + 1;
+}
+
+void Verifier::complete_results(void* ctx) {
+    Verifier* v = (Verifier*) ctx;
+    // The pool's completion acquire covers every worker's output writes. Keep layer 0's PLE gate on the host
+    // driver: it must gather the disk rows before it publishes that layer's completion.
+    _mm_sfence();
+    const long long release_ns = g_pool_trace ? host_now_ns() : 0;
+    raise_flag(v->h_flag_, (uint32_t) (v->cur_layer_ + 1));
+    if (g_pool_trace)
+        std::fprintf(stderr, "verify ready: ring=%u time_ns=%lld early=1\n", v->cur_layer_ + 1, release_ns);
 }
 
 bool Verifier::window_logprobs(const int32_t* targets, int T, int64_t pos0, int32_t extra_id, std::FILE* out,

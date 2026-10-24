@@ -1,0 +1,42 @@
+[
+  {
+    "label": "resident-plan",
+    "returncode": 0
+  },
+  {
+    "label": "pool-plain",
+    "returncode": 0
+  },
+  {
+    "label": "pool-pipeline",
+    "returncode": 0
+  },
+  {
+    "label": "pool-sleep",
+    "returncode": 0
+  },
+  {
+    "label": "core",
+    "returncode": 0
+  },
+  {
+    "label": "cpu-early",
+    "returncode": 0
+  },
+  {
+    "label": "idle-500",
+    "returncode": 0
+  },
+  {
+    "label": "forced-staged-2",
+    "returncode": 0
+  },
+  {
+    "label": "native-qa",
+    "returncode": 0
+  },
+  {
+    "label": "joint-reject-qa",
+    "returncode": 0
+  }
+]

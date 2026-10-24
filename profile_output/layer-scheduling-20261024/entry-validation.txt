@@ -1,0 +1,42 @@
+Fresh agent-follows-doc validation
+Date: 2026-10-24
+Scope: validation only; no source/docs edits, setup changes, or retries.
+Read inputs:
+- /home/dry/.codex/skills/run-experiment/SKILL.md
+- Latest "Layer scheduling public entry (2026-10-24)" block in .aris/compute/scnet-dflash2.md
+- profile_output/layer-scheduling-20261024/ENTRY.md
+
+Precondition: parent explicitly confirmed GPU idle at 2 MiB and no inference processes before this run.
+Working directory: /home/dry/data/strara-dcu/Strata
+Invocation (executed verbatim exactly once):
+ssh -S /tmp/strata-dcu-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; python3 -u /root/private_data/strata-dcu/layer-scheduling-20261024/validate_entry.py'
+
+Exit status: 0
+
+Complete captured stdout/stderr:
+PASS ENTRY mtp
+PASS ENTRY native
+PASS ENTRY joint
+PASS ALL PUBLIC ENTRIES; GPU idle; no remaining engine
+
+Documented expectation versus actual:
+- Exit status 0: matched, actual 0.
+- PASS ENTRY mtp: matched, first marker.
+- PASS ENTRY native: matched, second marker.
+- PASS ENTRY joint: matched, third marker.
+- PASS ALL PUBLIC ENTRIES; GPU idle; no remaining engine: matched, final marker.
+- Script reported all three public-entry checks passing; the documentation describes these as cold starts, exact answer copying, lookup, defaults, symlink/hash, and weight-bill checks.
+- Documented target: /root/private_data/strata-dcu/layer-scheduling-20261024/v9/strata-final
+- Documented SHA256: a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2
+- Documented MTP: 8500 GPU experts; 33542205952 total weight bytes; resident planning, expert CPU pipeline, early result publication enabled.
+- Documented native: 8300 GPU experts; 32827238400 total weight bytes; those three new options disabled.
+- Documented joint: 8300 GPU experts; 34195377152 total weight bytes; those three new options disabled.
+- Documented common settings: HC staged, CPU Q4 multiposition kernels, native DFlash small projection; split/swap/layer-end sleep disabled; lookup explicitly 3; CPU pool 12 workers plus main; PLE persistent disk.
+- Documented weight cap: 34351349760 bytes.
+- Individual setting values and bills were not printed by the invocation; their pass status is reported by its PASS markers. No hidden setup files or remote evidence files were inspected.
+- Remote evidence destination per documentation: /root/private_data/strata-dcu/layer-scheduling-20261024/v9/entry/
+
+Divergences: none in exit status, marker ordering, or final completion/state output. No additional unprinted per-setting evidence claimed.
+
+Final GPU/process state: the invocation reported "GPU idle; no remaining engine" and exited 0. This independent pass did not run an extra GPU/process command or inspect undocumented files.
+

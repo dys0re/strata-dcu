@@ -1,0 +1,8 @@
+{
+  "engine_path": "/root/private_data/strata-dcu/layer-scheduling-20261024/v9/strata-final",
+  "engine_sha256": "a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2",
+  "engines": [],
+  "gpu": "\n================================= System Management Interface ==================================\n================================================================================================\nHCU[0]\t\t: vram Total Memory (MiB): 65520\nHCU[0]\t\t: vram Total Used Memory (MiB): 2\n================================================================================================\n======================================== End of SMI Log ========================================\n\n",
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n",
+  "system_paths": "895M\t/root/strata-dcu\n59M\t/root/.cache\n"
+}

@@ -209,11 +209,14 @@ public:
     /// read once for all of its tokens.
     void run_split_multi(ExpertJobMulti* jobs, int n);
     /// Plan v0.3 P6: the same for a native pack's layer (ggml-cpu arithmetic, `nact` activations).
-    void run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n);
+    void run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n,
+                                void (*ready)(void*) = nullptr, void* ready_ctx = nullptr);
     static constexpr int kMaxSplitMulti = 96;
     /// run_split_multi's phases, accumulated ms: gate/up rows, the intermediate quantization, down rows.
     double ms_multi_gu = 0, ms_multi_q = 0, ms_multi_down = 0;
     int64_t multi_bytes = 0;
+    bool native_pipeline() const { return native_pipeline_; }
+    double pipeline_ms() const { return ms_pipeline_; }
 
     /// Total `_mm_pause` iterations spent waiting, over all workers, is no longer counted - see the note on the
     /// atomics below.  It was a LOCKED read-modify-write in the park loop, so measuring the contention added to
@@ -251,6 +254,9 @@ private:
     void worker(int id);
     void drain(int id, ExpertScratch& scratch, uint32_t epoch);
     void run_phase(int mode, int n_tasks);
+    void native_rows(int expert, int r0, int r1, bool up);
+    void run_native_pipeline(const NativeFmt& f, ExpertJobMulti* jobs, int n, void (*ready)(void*), void* ready_ctx);
+    void drain_pipeline(int id);
     /// Claim the next job of batch `epoch`, or -1 (that batch is exhausted, or it is not the current one).
     int claim(uint32_t epoch);
     /// Publish the batch whose description the caller has just written: reset `done`, then `head`, then the epoch.
@@ -305,6 +311,8 @@ private:
     std::mutex sleep_mu_;
     std::condition_variable sleep_cv_;
     std::chrono::microseconds spin_before_sleep_{kSpinBeforeSleep};
+    std::chrono::microseconds idle_spin_before_sleep_{kSpinBeforeSleep};
+    std::chrono::microseconds test_worker_delay_{0}; // test-only: deschedule a worker after it observes an epoch
     std::vector<std::thread> threads_;
     std::vector<ExpertScratch> scratch_;   // one per worker: no allocation, no false sharing of the hot data
     // run_split state: mode 0 = whole experts, 1 = gate/up row parts, 2 = down row parts
@@ -326,6 +334,24 @@ private:
     };
     const NativeFmt* nfmt_ = nullptr;
     std::vector<SplitBufMulti> split_multi_;
+    // One batch, no recycling until all workers have parked. A producer reserves slots, writes their payload,
+    // then releases ready; consumers never inspect a reserved slot before its ready flag is visible.
+    struct PipelineSlot {
+        std::atomic<bool> ready{false};
+        int expert = 0, r0 = 0, r1 = 0;
+        bool up = true;
+    };
+    struct alignas(64) PipelineExpert { std::atomic<int> gu_left{0}; };
+    static constexpr int kPipelineCapacity = 2 * (kMaxTasks + kMaxSplitMulti);
+    std::unique_ptr<PipelineSlot[]> pipeline_slots_;
+    std::unique_ptr<PipelineExpert[]> pipeline_experts_;
+    alignas(64) std::atomic<int> pipeline_head_{0};
+    alignas(64) std::atomic<int> pipeline_tail_{0};
+    alignas(64) std::atomic<int> pipeline_down_left_{0};
+    int pipeline_parts_ = 1;
+    bool native_pipeline_ = false;
+    double ms_pipeline_ = 0;
+    int64_t pipeline_batches_ = 0, pipeline_jobs_ = 0;
     PoolAffinity affinity_ = PoolAffinity::All;
     CpuTopology topo_;
 };

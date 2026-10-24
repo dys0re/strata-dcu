@@ -1660,6 +1660,12 @@ if(STRATA_NATIVE_EXPERTS)
     target_link_libraries(pool_tasks_test PRIVATE strata_kernels_cpu)
     add_test(NAME pool_tasks_test COMMAND pool_tasks_test)
     set_tests_properties(pool_tasks_test PROPERTIES TIMEOUT 180)
+    add_test(NAME pool_expert_pipeline COMMAND pool_tasks_test)
+    set_tests_properties(pool_expert_pipeline PROPERTIES TIMEOUT 180
+      ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1")
+    add_test(NAME pool_expert_pipeline_sleep COMMAND pool_tasks_test)
+    set_tests_properties(pool_expert_pipeline_sleep PROPERTIES TIMEOUT 180
+      ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1;STRATA_POOL_IDLE_US=0;STRATA_POOL_TEST_DELAY_US=2000")
     add_test(NAME router_dot_parity COMMAND router_dot_parity)
     add_test(NAME router_dot_parity_avx COMMAND ${CMAKE_COMMAND} -E env STRATA_FORCE_ISA=avx $<TARGET_FILE:router_dot_parity>)
   endif()

@@ -1145,6 +1145,8 @@ void drive_pool_multi(void* user, const float* x_f, const int32_t* ids, int64_t 
                       int64_t layer) {
     Drive* t = (Drive*) user;
     t->d.layers = layer;
+    std::vector<int32_t> routing_ids;
+    if (t->routing != nullptr) routing_ids.assign(ids, ids + n_tok * k);
     const Clock::time_point a = Clock::now();
     strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out);
     t->cpu_ms += std::chrono::duration<double, std::milli>(Clock::now() - a).count();
@@ -1157,7 +1159,7 @@ void drive_pool_multi(void* user, const float* x_f, const int32_t* ids, int64_t 
         for (int64_t tok = 0; tok < n_tok; ++tok) {
             const int32_t rec[2] = {(int32_t) layer, (int32_t) k};
             std::fwrite(rec, sizeof rec, 1, t->routing);
-            std::fwrite(ids + tok * k, sizeof(int32_t), (size_t) k, t->routing);
+            std::fwrite(routing_ids.data() + tok * k, sizeof(int32_t), (size_t) k, t->routing);
             static const float one[64] = {};   // k <= 64 in a verify window; zeros read as unit weights
             std::fwrite(one, sizeof(float), (size_t) k, t->routing);
         }
@@ -3580,7 +3582,10 @@ int main(int argc, char** argv) {
     // 16 workers: 12.2 either way.  One GPU, no batch slots, no --pcie-frac.
     auto pcie_balance = [&]() {
         const char* e = std::getenv("STRATA_PCIE_BALANCE");
-        return !pcie_given && native_pack && !multi_gpu && o.batch <= 0 && e != nullptr && std::strcmp(e, "1") == 0;
+        const char* staged = std::getenv("STRATA_PCIE_STAGED_MAX");
+        const bool bounded = staged != nullptr && std::atoi(staged) > 0;
+        return native_pack && !multi_gpu && o.batch <= 0 &&
+               (bounded || (!pcie_given && e != nullptr && std::strcmp(e, "1") == 0));
     };
     // the canonical Q2_0 pack's CPU kernels are AVX-512 only; a native pack runs on AVX2 CPUs as well
     if (!native_pack) {
@@ -9087,7 +9092,9 @@ int main(int argc, char** argv) {
             for (int st = 0; st + 1 < n_stages; ++st) stage_ver_p(st, 1).set_next(&stage_ver_p(st + 1, 1), &split_drive_b);
         }
         ver.set_remote_expert_opt(remote_opt.get());
-        if (pcie_balance() && n_stages == 1) ver.set_pcie_balance(&drive.d.pcie_model);
+        if (pcie_balance() && n_stages == 1) ver.set_pcie_balance(&drive.d.pcie_model,
+            std::getenv("STRATA_PCIE_STAGED_MAX") != nullptr && std::atoi(std::getenv("STRATA_PCIE_STAGED_MAX")) > 0
+                ? drive.d.staged_pcie_model : nullptr);
         if (batch_mtp) ver.set_batch_graph_limit(64);   // --batch-mtp only: slot rotation makes many layouts (LRU); 0.1.39 keeps all
         if (!ver.init(wt, g, ss, vh, native_head.loaded() || prefill_head_alias_bound ? &native_head : nullptr,
                       batch_mtp ? strata::kernels::kVerifyMaxT : std::max(o.spec, std::min(o.batch, (int) strata::kernels::kVerifyMaxT)), err) ||
@@ -16113,7 +16120,9 @@ int main(int argc, char** argv) {
         vh.blob = thits.blob;
         vh.slot_off = xcache.slot_offsets();   // E-6: the device plan's pointers
         vh.n_slots = xcache.slots();
-        if (pcie_balance()) ver.set_pcie_balance(&drive.d.pcie_model);
+        if (pcie_balance()) ver.set_pcie_balance(&drive.d.pcie_model,
+            std::getenv("STRATA_PCIE_STAGED_MAX") != nullptr && std::atoi(std::getenv("STRATA_PCIE_STAGED_MAX")) > 0
+                ? drive.d.staged_pcie_model : nullptr);
         if (!ver.init(wt, g, ss, vh, native_head.loaded() ? &native_head : nullptr, o.spec, err)) {
             std::fprintf(stderr, "strata generate: %s\n", err.c_str());
             return 1;
@@ -16598,7 +16607,10 @@ int main(int argc, char** argv) {
                         ver.ms_commit / rounds,
                         (double) (drive.d.multi_misses - misses0) / (double) (rounds * g.n_layers),
                         (double) (drive.d.multi_entries - entries0) / (double) (rounds * g.n_layers));
-        if (rounds > 0)
+        if (rounds > 0 && pool.native_pipeline())
+            std::printf("%-24s expert pipeline %.3f ms/round; CPU pool call %.3f ms/round\n", "pool multi",
+                        pool.pipeline_ms() / rounds, (drive.cpu_ms - pool_ms0) / rounds);
+        else if (rounds > 0)
             std::printf("%-24s gate/up %.3f  quantize %.3f  down %.3f ms/round; %.1f GB/s over the rows phases; "
                         "CPU pool call %.3f ms/round\n", "pool multi", pool.ms_multi_gu / rounds,
                         pool.ms_multi_q / rounds, pool.ms_multi_down / rounds,

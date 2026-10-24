@@ -1,0 +1,25 @@
+{
+  "base_commit": "a6b66f290e0d6f76862e5da211b523339865789a",
+  "dirty_worktree": true,
+  "engine_sha256": "a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2",
+  "baseline_engine_sha256": "1c5b8a268585ab62bfe53a098c114b7e645c8befa91384d58c645fec9a8ff396",
+  "source_local_remote_equal": true,
+  "source_sha256": {
+    "CMakeLists.txt": "7f88924a780607f3c75a264e90b4663d8b1bbd8ca12de5ee946d7bd6ed54d3c6",
+    "include/strata/core/expert_source.hpp": "bce409206cd3f965a9419118df54895862719ec83aab72eeb6016b61289b4b7e",
+    "include/strata/core/verify.hpp": "b41e12926b68dbfd448e7caf4de1827f9ac433cc561595ecce18c7cb1183b361",
+    "include/strata/kernels/cpu/pool.hpp": "d828dbb79e2bb3a41aa7b6b1ccb0fdd14fa82fa107794d6478ec962c96988a5e",
+    "include/strata/kernels/verify_kernels.hpp": "2a9311764ed092d528cb9306097ce54343a0cc1d3c23b081f88105bf008931b0",
+    "src/core/expert_source.cpp": "9b47589813358675c7671481bfd3c6b22541c09f7cae00e56e74cfd75785e28b",
+    "src/core/verify.cpp": "e623e8e9cf07d632db9a80e50f80eee30fc11a1da33e4c68726f850f1d60b74c",
+    "src/kernels/cpu/pool.cpp": "7e1df083484c82668ef28ec45613485850dd23bbd3e852740f0d5f8af3fff881",
+    "src/kernels/cpu/pool_tasks_test.cpp": "04621bee89939d5af72d06faa5f77c6e5795ba74d6d2c74c8ab4751b61294632",
+    "src/kernels/cuda/verify_kernels.cu": "834b4018368457650f554ba1d5126d5ba3c29370888c20565caf8a75ce07db1e",
+    "src/kernels/resident_plan_parity.cpp": "0fa459fe50836cee1c0ca3f19989ae5a7c26e82515caad1b41e1891ad2d0102f",
+    "src/program/generate.cpp": "e2aa04537c6d026026982e7eab22238e224cea9596d8738d62077bcb09a76b89",
+    "strata-test/run-autoround.sh": "edeb9e9b2b5e6ca374a5cbdf555ab29211f5613913ce2df2ccb4f59f84e0c6e7",
+    "tools/autoround_pack.py": "465512ccd8d8b3625745ce5be6e4fb43a3655528d1ba53ce1e3be024e04f07ff",
+    "tools/bench_dflash2_native.py": "b84be24e1b633c433edb5d4448cb487fac0d3bf9eb05e5b10c9c31f3c4a073a9"
+  },
+  "note": "Final C++ matches source-v9.tar used for HIP build. Wrapper and autoround_pack.py default selection changed after binary build; source hash here records final deployed launchers. Baseline binary is from base_commit; source_sha256 in v7/baseline/provenance.json describes contemporary workspace, not its build source."
+}

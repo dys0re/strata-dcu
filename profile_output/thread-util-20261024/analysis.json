@@ -1,0 +1,3577 @@
+{
+  "summary": {
+    "story": {
+      "host_cpu_pct_median": 99.67869872972595,
+      "worker_mean_pct_median": 98.04678099539127,
+      "host_runqueue_ms": 49.898512,
+      "throttled_usec": 2214,
+      "nr_throttled": 2
+    },
+    "chinese": {
+      "host_cpu_pct_median": 99.89737404782001,
+      "worker_mean_pct_median": 99.93059112717829,
+      "host_runqueue_ms": 12.5262,
+      "throttled_usec": 1821,
+      "nr_throttled": 1
+    },
+    "code": {
+      "host_cpu_pct_median": 99.9228239919904,
+      "worker_mean_pct_median": 96.19686662894698,
+      "host_runqueue_ms": 26.035043,
+      "throttled_usec": 7419,
+      "nr_throttled": 4
+    }
+  },
+  "requests": [
+    {
+      "case": "story-0",
+      "sample_wall_ms": 7764.518011,
+      "reported_decode_ms": 7764.4,
+      "decode_tps": 32.97099582710834,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 7739.570516,
+        "cpu_pct": 99.67869872972595,
+        "runqueue_ms": 5.081977
+      },
+      "worker_mean_pct": 99.94865972262946,
+      "worker_min_pct": 99.89725174197937,
+      "worker_max_pct": 99.98916474919875,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 7739.570516,
+          "cpu_pct": 99.67869872972595,
+          "runqueue_ms": 5.081977
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 7754.414707,
+          "cpu_pct": 99.86987854254846,
+          "runqueue_ms": 1.118431
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 5.5049,
+          "cpu_pct": 0.07089815481400395,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 3.634204,
+          "cpu_pct": 0.046805274903753455,
+          "runqueue_ms": 0.107371
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 3.548072,
+          "cpu_pct": 0.04569597230598787,
+          "runqueue_ms": 0.076111
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 5.52974,
+          "cpu_pct": 0.07121807164547769,
+          "runqueue_ms": 0.006251
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 4.356998,
+          "cpu_pct": 0.056114210744664855,
+          "runqueue_ms": 0.048471
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 3.534703,
+          "cpu_pct": 0.04552379162482955,
+          "runqueue_ms": 0.03928
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 3.808348,
+          "cpu_pct": 0.04904809280633659,
+          "runqueue_ms": 0.078832
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 3.867694,
+          "cpu_pct": 0.04981241584500975,
+          "runqueue_ms": 0.07655
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 3.857295,
+          "cpu_pct": 0.049678486089353734,
+          "runqueue_ms": 0.158061
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 3.555068,
+          "cpu_pct": 0.045786074486059945,
+          "runqueue_ms": 0.08664
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 3.433337,
+          "cpu_pct": 0.04421828882534612,
+          "runqueue_ms": 0.242252
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 3.936005,
+          "cpu_pct": 0.05069220001066207,
+          "runqueue_ms": 0.109621
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 3.983161,
+          "cpu_pct": 0.05129952682648237,
+          "runqueue_ms": 0.048332
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 3.779663,
+          "cpu_pct": 0.048678655837301785,
+          "runqueue_ms": 0.01805
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 3.584409,
+          "cpu_pct": 0.04616396014436394,
+          "runqueue_ms": 0.176381
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 3.57961,
+          "cpu_pct": 0.04610215334588397,
+          "runqueue_ms": 0.09338
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 26.657601,
+          "cpu_pct": 0.3433258955962772,
+          "runqueue_ms": 0.06723
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 7759.479844,
+          "cpu_pct": 99.93511294593094,
+          "runqueue_ms": 1.570415
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 7760.720775,
+          "cpu_pct": 99.95109501974726,
+          "runqueue_ms": 0.349064
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 7760.676276,
+          "cpu_pct": 99.9505219126988,
+          "runqueue_ms": 0.415063
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 7760.731315,
+          "cpu_pct": 99.95123076545595,
+          "runqueue_ms": 0.336654
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 7760.722686,
+          "cpu_pct": 99.95111963170639,
+          "runqueue_ms": 0.337673
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 7760.742255,
+          "cpu_pct": 99.95137166280443,
+          "runqueue_ms": 0.325374
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 7760.566543,
+          "cpu_pct": 99.94910865047383,
+          "runqueue_ms": 0.641387
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 7756.540104,
+          "cpu_pct": 99.89725174197937,
+          "runqueue_ms": 4.524615
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 7763.676706,
+          "cpu_pct": 99.98916474919875,
+          "runqueue_ms": 0.311132
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 7760.781535,
+          "cpu_pct": 99.95187755383262,
+          "runqueue_ms": 0.265714
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 7761.037727,
+          "cpu_pct": 99.95517707609064,
+          "runqueue_ms": 0.046522
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 7760.704465,
+          "cpu_pct": 99.95088496163449,
+          "runqueue_ms": 0.378564
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 2448.022456,
+          "cpu_pct": 31.52832477858747,
+          "runqueue_ms": 0.559376
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.549376,
+          "cpu_pct": 0.01995456766028487,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 111165214,
+        "user_usec": 105820415,
+        "system_usec": 5344799,
+        "nr_periods": 78,
+        "nr_throttled": 1,
+        "throttled_usec": 888
+      }
+    },
+    {
+      "case": "chinese-0",
+      "sample_wall_ms": 6569.107663,
+      "reported_decode_ms": 6568.9,
+      "decode_tps": 38.97151730122243,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 6554.736525,
+        "cpu_pct": 99.78123150453227,
+        "runqueue_ms": 3.836269
+      },
+      "worker_mean_pct": 99.93059112717829,
+      "worker_min_pct": 99.9132311374328,
+      "worker_max_pct": 99.97935036127296,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 6554.736525,
+          "cpu_pct": 99.78123150453227,
+          "runqueue_ms": 3.836269
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 6563.220904,
+          "cpu_pct": 99.91038723519243,
+          "runqueue_ms": 0.164201
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 9.639489,
+          "cpu_pct": 0.14673970186687135,
+          "runqueue_ms": 0.02255
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 6.42989,
+          "cpu_pct": 0.09788072185535741,
+          "runqueue_ms": 0.0117
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 6.585206,
+          "cpu_pct": 0.10024506124462951,
+          "runqueue_ms": 0.03253
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 6.460366,
+          "cpu_pct": 0.09834465092401394,
+          "runqueue_ms": 0.07278
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 6.601026,
+          "cpu_pct": 0.10048588542976358,
+          "runqueue_ms": 0.143092
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 6.527873,
+          "cpu_pct": 0.09937229430365023,
+          "runqueue_ms": 0.07702
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 6.319779,
+          "cpu_pct": 0.09620452768030695,
+          "runqueue_ms": 0.147842
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 6.128471,
+          "cpu_pct": 0.09329229043570328,
+          "runqueue_ms": 0.03823
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 6.704871,
+          "cpu_pct": 0.10206669374235829,
+          "runqueue_ms": 0.193053
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 6.675582,
+          "cpu_pct": 0.10162083409897069,
+          "runqueue_ms": 0.0771
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 6.72827,
+          "cpu_pct": 0.1024228912839482,
+          "runqueue_ms": 0.108941
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 6.518578,
+          "cpu_pct": 0.09923079867780818,
+          "runqueue_ms": 0.07886
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 6.020208,
+          "cpu_pct": 0.09164422793537644,
+          "runqueue_ms": 0.086132
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 6.911568,
+          "cpu_pct": 0.10521319415921407,
+          "runqueue_ms": 0.0538
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 6.449494,
+          "cpu_pct": 0.09817914899349701,
+          "runqueue_ms": 0.083281
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 6.817233,
+          "cpu_pct": 0.10377715436751854,
+          "runqueue_ms": 0.08853
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 43.427586,
+          "cpu_pct": 0.661088053779398,
+          "runqueue_ms": 0.084781
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 6564.200532,
+          "cpu_pct": 99.92529988467629,
+          "runqueue_ms": 0.546974
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 6564.240894,
+          "cpu_pct": 99.9259143060265,
+          "runqueue_ms": 0.503482
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 6563.945253,
+          "cpu_pct": 99.92141383175866,
+          "runqueue_ms": 0.800393
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 6564.390575,
+          "cpu_pct": 99.92819286511974,
+          "runqueue_ms": 0.383451
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 6564.150654,
+          "cpu_pct": 99.92454060346857,
+          "runqueue_ms": 0.598142
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 6564.398243,
+          "cpu_pct": 99.92830959330252,
+          "runqueue_ms": 0.368483
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 6563.407723,
+          "cpu_pct": 99.9132311374328,
+          "runqueue_ms": 1.337913
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 6564.327612,
+          "cpu_pct": 99.92723439399657,
+          "runqueue_ms": 0.446684
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 6567.751166,
+          "cpu_pct": 99.97935036127296,
+          "runqueue_ms": 0.244872
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 6564.503363,
+          "cpu_pct": 99.92990981064395,
+          "runqueue_ms": 0.259123
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 6564.709165,
+          "cpu_pct": 99.9330426866837,
+          "runqueue_ms": 0.01014
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 6564.552253,
+          "cpu_pct": 99.93065405175717,
+          "runqueue_ms": 0.166752
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 2416.800239,
+          "cpu_pct": 36.790388633945575,
+          "runqueue_ms": 0.964364
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.803869,
+          "cpu_pct": 0.0274598787619231,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 94469582,
+        "user_usec": 87461921,
+        "system_usec": 7007660,
+        "nr_periods": 66,
+        "nr_throttled": 0,
+        "throttled_usec": 0
+      }
+    },
+    {
+      "case": "code-0",
+      "sample_wall_ms": 6464.182268,
+      "reported_decode_ms": 6464.1,
+      "decode_tps": 39.603347720486994,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 6213.420404,
+        "cpu_pct": 96.12074886499782,
+        "runqueue_ms": 17.013127
+      },
+      "worker_mean_pct": 96.19686662894698,
+      "worker_min_pct": 96.171471320895,
+      "worker_max_pct": 96.28960332403796,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 6213.420404,
+          "cpu_pct": 96.12074886499782,
+          "runqueue_ms": 17.013127
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 6435.192946,
+          "cpu_pct": 99.55153922339865,
+          "runqueue_ms": 3.15337
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 5.287108,
+          "cpu_pct": 0.0817908248994318,
+          "runqueue_ms": 0.116741
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 5.18329,
+          "cpu_pct": 0.08018477488883827,
+          "runqueue_ms": 0.07394
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 6.054394,
+          "cpu_pct": 0.09366063252843909,
+          "runqueue_ms": 0.063402
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 5.081821,
+          "cpu_pct": 0.07861506358131051,
+          "runqueue_ms": 0.113191
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 5.023651,
+          "cpu_pct": 0.07771518177742076,
+          "runqueue_ms": 0.137873
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 5.530235,
+          "cpu_pct": 0.08555196575097564,
+          "runqueue_ms": 0.04639
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 5.356408,
+          "cpu_pct": 0.08286288625424632,
+          "runqueue_ms": 0.02011
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 5.785318,
+          "cpu_pct": 0.08949806425848139,
+          "runqueue_ms": 0.11617
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 5.65787,
+          "cpu_pct": 0.08752646143671516,
+          "runqueue_ms": 0.00381
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 5.370517,
+          "cpu_pct": 0.08308115052055336,
+          "runqueue_ms": 0.0706
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 5.324384,
+          "cpu_pct": 0.08236747943135195,
+          "runqueue_ms": 0.00441
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 5.285272,
+          "cpu_pct": 0.0817624222349666,
+          "runqueue_ms": 0.107101
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 5.283534,
+          "cpu_pct": 0.08173553561686173,
+          "runqueue_ms": 0.225302
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 5.670778,
+          "cpu_pct": 0.08772614640017759,
+          "runqueue_ms": 0.060411
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 5.443518,
+          "cpu_pct": 0.08421046583026208,
+          "runqueue_ms": 0.033321
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 5.960112,
+          "cpu_pct": 0.09220210311062349,
+          "runqueue_ms": 0.066731
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 35.299461,
+          "cpu_pct": 0.5460777486851643,
+          "runqueue_ms": 0.175922
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 6216.699196,
+          "cpu_pct": 96.171471320895,
+          "runqueue_ms": 1.533165
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 6218.24264,
+          "cpu_pct": 96.1953481847582,
+          "runqueue_ms": 0.155801
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 6218.08312,
+          "cpu_pct": 96.19288043256023,
+          "runqueue_ms": 0.243371
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 6218.028699,
+          "cpu_pct": 96.19203854726456,
+          "runqueue_ms": 0.267172
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 6217.671947,
+          "cpu_pct": 96.18651964347735,
+          "runqueue_ms": 0.425323
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 6217.888397,
+          "cpu_pct": 96.1898680948518,
+          "runqueue_ms": 0.266253
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 6216.828212,
+          "cpu_pct": 96.17346718045853,
+          "runqueue_ms": 1.535212
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 6218.23423,
+          "cpu_pct": 96.19521808322871,
+          "runqueue_ms": 0.130682
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 6224.335464,
+          "cpu_pct": 96.28960332403796,
+          "runqueue_ms": 0.13055
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 6218.058369,
+          "cpu_pct": 96.19249753803507,
+          "runqueue_ms": 0.121932
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 6217.972047,
+          "cpu_pct": 96.19116214870938,
+          "runqueue_ms": 0.112851
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 6218.047219,
+          "cpu_pct": 96.19232504908693,
+          "runqueue_ms": 0.090611
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 1816.990816,
+          "cpu_pct": 28.10859503443692,
+          "runqueue_ms": 0.101091
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.199693,
+          "cpu_pct": 0.018559083736529317,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 89226743,
+        "user_usec": 83049745,
+        "system_usec": 6176997,
+        "nr_periods": 64,
+        "nr_throttled": 0,
+        "throttled_usec": 0
+      }
+    },
+    {
+      "case": "story-1",
+      "sample_wall_ms": 7991.727799,
+      "reported_decode_ms": 7991.7,
+      "decode_tps": 32.03323448077381,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 7898.180068,
+        "cpu_pct": 98.82944297712811,
+        "runqueue_ms": 39.86054
+      },
+      "worker_mean_pct": 98.04678099539127,
+      "worker_min_pct": 98.04002680096788,
+      "worker_max_pct": 98.0734038511764,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 7898.180068,
+          "cpu_pct": 98.82944297712811,
+          "runqueue_ms": 39.86054
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 7980.5447,
+          "cpu_pct": 99.8600665678153,
+          "runqueue_ms": 0.766679
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 0.444176,
+          "cpu_pct": 0.005557947056900255,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 0.229681,
+          "cpu_pct": 0.002873984271946047,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 0.440664,
+          "cpu_pct": 0.005514001616210453,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 0.287253,
+          "cpu_pct": 0.003594379178379221,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 0.366212,
+          "cpu_pct": 0.0045823883046395035,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 0.353915,
+          "cpu_pct": 0.00442851669753173,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 0.292783,
+          "cpu_pct": 0.0036635757293514894,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 0.563974,
+          "cpu_pct": 0.007056972086443807,
+          "runqueue_ms": 0.00407
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 0.347554,
+          "cpu_pct": 0.004348921894505581,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 0.276624,
+          "cpu_pct": 0.003461379153011365,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 0.323421,
+          "cpu_pct": 0.004046947145027505,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 0.315953,
+          "cpu_pct": 0.00395350051886821,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 0.216173,
+          "cpu_pct": 0.002704959496081055,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 0.347735,
+          "cpu_pct": 0.004351186736409014,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 0.358005,
+          "cpu_pct": 0.004479694616786084,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 0.305783,
+          "cpu_pct": 0.0038262439323604393,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 2.266954,
+          "cpu_pct": 0.028366256421842376,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 7835.092076,
+          "cpu_pct": 98.04002680096788,
+          "runqueue_ms": 0.635826
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 7835.644243,
+          "cpu_pct": 98.04693603278717,
+          "runqueue_ms": 0.11996
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 7835.493409,
+          "cpu_pct": 98.04504865619235,
+          "runqueue_ms": 0.268854
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 7835.440903,
+          "cpu_pct": 98.04439165183334,
+          "runqueue_ms": 0.373824
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 7835.420592,
+          "cpu_pct": 98.04413750153554,
+          "runqueue_ms": 0.379921
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 7835.299531,
+          "cpu_pct": 98.04262267266444,
+          "runqueue_ms": 0.388792
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 7835.194667,
+          "cpu_pct": 98.04131051586133,
+          "runqueue_ms": 0.487397
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 7835.319496,
+          "cpu_pct": 98.04287249348543,
+          "runqueue_ms": 0.433416
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 7837.759479,
+          "cpu_pct": 98.0734038511764,
+          "runqueue_ms": 0.806663
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 7835.512621,
+          "cpu_pct": 98.04528905477052,
+          "runqueue_ms": 0.204353
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 7835.679282,
+          "cpu_pct": 98.04737447364603,
+          "runqueue_ms": 0.07137
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 7835.725935,
+          "cpu_pct": 98.04795823977487,
+          "runqueue_ms": 0.0706
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 2485.554994,
+          "cpu_pct": 31.101597257992395,
+          "runqueue_ms": 0.278622
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.902707,
+          "cpu_pct": 0.02380845604173461,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 112433153,
+        "user_usec": 107237764,
+        "system_usec": 5195390,
+        "nr_periods": 80,
+        "nr_throttled": 0,
+        "throttled_usec": 0
+      }
+    },
+    {
+      "case": "chinese-1",
+      "sample_wall_ms": 6230.251573,
+      "reported_decode_ms": 6229.3,
+      "decode_tps": 41.096110317371135,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 6223.857718,
+        "cpu_pct": 99.89737404782001,
+        "runqueue_ms": 5.298292
+      },
+      "worker_mean_pct": 99.41522026053399,
+      "worker_min_pct": 99.31862740207842,
+      "worker_max_pct": 99.46023752643094,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 6223.857718,
+          "cpu_pct": 99.89737404782001,
+          "runqueue_ms": 5.298292
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 6223.473117,
+          "cpu_pct": 99.8912009263097,
+          "runqueue_ms": 1.874048
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 0.743678,
+          "cpu_pct": 0.01193656453975105,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 0.368003,
+          "cpu_pct": 0.005906711722441709,
+          "runqueue_ms": 0.01776
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 0.473929,
+          "cpu_pct": 0.0076068998891451346,
+          "runqueue_ms": 0.02833
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 0.443273,
+          "cpu_pct": 0.007114849132593767,
+          "runqueue_ms": 0.00252
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 0.441604,
+          "cpu_pct": 0.007088060487216541,
+          "runqueue_ms": 0.03482
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 0.476166,
+          "cpu_pct": 0.0076428053413373775,
+          "runqueue_ms": 0.00562
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 0.598934,
+          "cpu_pct": 0.009613319670679051,
+          "runqueue_ms": 0.96096
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 0.457818,
+          "cpu_pct": 0.007348306800066354,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 0.343984,
+          "cpu_pct": 0.0055211895694665235,
+          "runqueue_ms": 0.01932
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 0.353233,
+          "cpu_pct": 0.005669642643818807,
+          "runqueue_ms": 0.00263
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 0.455926,
+          "cpu_pct": 0.007317938844971261,
+          "runqueue_ms": 0.02194
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 0.434695,
+          "cpu_pct": 0.006977166088827534,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 0.376231,
+          "cpu_pct": 0.006038777015529674,
+          "runqueue_ms": 0.00461
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 0.358212,
+          "cpu_pct": 0.005749559159896223,
+          "runqueue_ms": 0.01279
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 0.515,
+          "cpu_pct": 0.00826611885516553,
+          "runqueue_ms": 0.00841
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 0.521906,
+          "cpu_pct": 0.008376965101405866,
+          "runqueue_ms": 0.00348
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 3.438472,
+          "cpu_pct": 0.05518993831487132,
+          "runqueue_ms": 0.01837
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 6194.02306,
+          "cpu_pct": 99.41850641863319,
+          "runqueue_ms": 0.354543
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 6187.800346,
+          "cpu_pct": 99.31862740207842,
+          "runqueue_ms": 6.524465
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 6194.072188,
+          "cpu_pct": 99.41929495821982,
+          "runqueue_ms": 0.281823
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 6194.119068,
+          "cpu_pct": 99.42004741579639,
+          "runqueue_ms": 0.241053
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 6194.266523,
+          "cpu_pct": 99.42241417415714,
+          "runqueue_ms": 0.09201
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 6194.211401,
+          "cpu_pct": 99.42152942657746,
+          "runqueue_ms": 0.1178
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 6193.973609,
+          "cpu_pct": 99.41771269466521,
+          "runqueue_ms": 0.369892
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 6194.17022,
+          "cpu_pct": 99.42086844203266,
+          "runqueue_ms": 0.167662
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 6196.623013,
+          "cpu_pct": 99.46023752643094,
+          "runqueue_ms": 1.049532
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 6194.280911,
+          "cpu_pct": 99.42264511186217,
+          "runqueue_ms": 0.04266
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 6194.135,
+          "cpu_pct": 99.42030313580726,
+          "runqueue_ms": 0.191132
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 6194.14455,
+          "cpu_pct": 99.42045642014719,
+          "runqueue_ms": 0.201582
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 2675.484126,
+          "cpu_pct": 42.94343646723237,
+          "runqueue_ms": 6.19452
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.331752,
+          "cpu_pct": 0.02137557343224156,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 89519343,
+        "user_usec": 84810635,
+        "system_usec": 4708708,
+        "nr_periods": 62,
+        "nr_throttled": 1,
+        "throttled_usec": 1821
+      }
+    },
+    {
+      "case": "code-1",
+      "sample_wall_ms": 8712.272427,
+      "reported_decode_ms": 8712.1,
+      "decode_tps": 29.384419370760206,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 8707.432933,
+        "cpu_pct": 99.94445198952914,
+        "runqueue_ms": 4.680556
+      },
+      "worker_mean_pct": 67.37229257079719,
+      "worker_min_pct": 67.36184782069373,
+      "worker_max_pct": 67.44363947791872,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 8707.432933,
+          "cpu_pct": 99.94445198952914,
+          "runqueue_ms": 4.680556
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 8703.818653,
+          "cpu_pct": 99.90296706088068,
+          "runqueue_ms": 4.158073
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 0.646778,
+          "cpu_pct": 0.007423757755732998,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 0.562666,
+          "cpu_pct": 0.006458315034505291,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 0.508303,
+          "cpu_pct": 0.005834333169205431,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 0.504245,
+          "cpu_pct": 0.005787755195043099,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 0.42837,
+          "cpu_pct": 0.004916857267599307,
+          "runqueue_ms": 0.01572
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 0.421814,
+          "cpu_pct": 0.004841607095443504,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 0.503288,
+          "cpu_pct": 0.005776770690047202,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 0.433865,
+          "cpu_pct": 0.0049799292163479544,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 0.428152,
+          "cpu_pct": 0.004914355050160325,
+          "runqueue_ms": 0.00324
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 0.453913,
+          "cpu_pct": 0.00521004139624111,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 0.589963,
+          "cpu_pct": 0.006771631683275416,
+          "runqueue_ms": 0.026111
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 0.557626,
+          "cpu_pct": 0.006400465603805894,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 0.467745,
+          "cpu_pct": 0.005368805944938342,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 0.63689,
+          "cpu_pct": 0.007310262682170373,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 0.499205,
+          "cpu_pct": 0.0057299057643437025,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 0.403723,
+          "cpu_pct": 0.004633957482192952,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 4.027156,
+          "cpu_pct": 0.04622394482890061,
+          "runqueue_ms": 0.00459
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 5869.078071,
+          "cpu_pct": 67.36563990826637,
+          "runqueue_ms": 0.0815
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 5868.747694,
+          "cpu_pct": 67.36184782069373,
+          "runqueue_ms": 0.510385
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 5869.131929,
+          "cpu_pct": 67.36625809371056,
+          "runqueue_ms": 0.03778
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 5869.156949,
+          "cpu_pct": 67.36654527481295,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 5869.098158,
+          "cpu_pct": 67.36587046809068,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 5869.081117,
+          "cpu_pct": 67.36567487044216,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 5869.090939,
+          "cpu_pct": 67.36578760796365,
+          "runqueue_ms": 0.05442
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 5869.071567,
+          "cpu_pct": 67.36556525495342,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 5875.873606,
+          "cpu_pct": 67.44363947791872,
+          "runqueue_ms": 0.116882
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 5869.160919,
+          "cpu_pct": 67.36659084271768,
+          "runqueue_ms": 0.054031
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 5869.20991,
+          "cpu_pct": 67.36715316443582,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 5869.19117,
+          "cpu_pct": 67.36693806556056,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 2139.672088,
+          "cpu_pct": 24.559288129799434,
+          "runqueue_ms": 10.21633
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.923259,
+          "cpu_pct": 0.022075285364581494,
+          "runqueue_ms": 0.01778
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 90008880,
+        "user_usec": 83820738,
+        "system_usec": 6188143,
+        "nr_periods": 88,
+        "nr_throttled": 4,
+        "throttled_usec": 7419
+      }
+    },
+    {
+      "case": "story-2",
+      "sample_wall_ms": 8905.70341,
+      "reported_decode_ms": 8905.6,
+      "decode_tps": 28.74595759971254,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 8898.91113,
+        "cpu_pct": 99.92373112277271,
+        "runqueue_ms": 4.955995
+      },
+      "worker_mean_pct": 88.11975369369878,
+      "worker_min_pct": 88.0703616537798,
+      "worker_max_pct": 88.18336183508721,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 8898.91113,
+          "cpu_pct": 99.92373112277271,
+          "runqueue_ms": 4.955995
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 8900.596863,
+          "cpu_pct": 99.94265981287603,
+          "runqueue_ms": 0.960783
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 0.351696,
+          "cpu_pct": 0.003949109731243565,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 0.348445,
+          "cpu_pct": 0.003912605034754913,
+          "runqueue_ms": 0.00431
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 0.405085,
+          "cpu_pct": 0.0045486019615827294,
+          "runqueue_ms": 0.083221
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 0.303593,
+          "cpu_pct": 0.0034089727225712764,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 0.286535,
+          "cpu_pct": 0.003217432546409043,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 0.293041,
+          "cpu_pct": 0.003290486854423552,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 0.344495,
+          "cpu_pct": 0.003868251435514626,
+          "runqueue_ms": 0.04362
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 0.309663,
+          "cpu_pct": 0.0034771312915304014,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 0.375423,
+          "cpu_pct": 0.004215534503186425,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 0.322985,
+          "cpu_pct": 0.0036267208229428336,
+          "runqueue_ms": 0.00835
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 0.396534,
+          "cpu_pct": 0.004452584840796983,
+          "runqueue_ms": 0.01432
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 0.338371,
+          "cpu_pct": 0.0037994865135532285,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 0.391424,
+          "cpu_pct": 0.004395205880767143,
+          "runqueue_ms": 0.00496
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 0.407022,
+          "cpu_pct": 0.004570352068349422,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 0.426864,
+          "cpu_pct": 0.004793153110406582,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 0.392402,
+          "cpu_pct": 0.0044061876073638526,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 2.808768,
+          "cpu_pct": 0.0315389798053021,
+          "runqueue_ms": 0.00275
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 7847.696023,
+          "cpu_pct": 88.11988971233885,
+          "runqueue_ms": 0.057921
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 7843.285201,
+          "cpu_pct": 88.0703616537798,
+          "runqueue_ms": 4.606216
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 7847.783776,
+          "cpu_pct": 88.12087506965382,
+          "runqueue_ms": 0.06012
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 7847.872576,
+          "cpu_pct": 88.12187218347978,
+          "runqueue_ms": 0.04921
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 7847.774835,
+          "cpu_pct": 88.1207746733169,
+          "runqueue_ms": 0.041851
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 7847.675213,
+          "cpu_pct": 88.11965604185778,
+          "runqueue_ms": 0.142032
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 7847.266847,
+          "cpu_pct": 88.11507059833694,
+          "runqueue_ms": 0.573318
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 7847.797106,
+          "cpu_pct": 88.1210247490153,
+          "runqueue_ms": 0.093791
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 7853.348662,
+          "cpu_pct": 88.18336183508721,
+          "runqueue_ms": 0.645245
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 7847.708774,
+          "cpu_pct": 88.1200328902487,
+          "runqueue_ms": 0.087171
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 7847.645732,
+          "cpu_pct": 88.11932500680483,
+          "runqueue_ms": 0.081611
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 7846.35217,
+          "cpu_pct": 88.10479991046547,
+          "runqueue_ms": 1.377814
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 2338.488537,
+          "cpu_pct": 26.258324910912343,
+          "runqueue_ms": 1.08747
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.974711,
+          "cpu_pct": 0.022173554508705562,
+          "runqueue_ms": 0.00899
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 114277604,
+        "user_usec": 108148136,
+        "system_usec": 6129469,
+        "nr_periods": 89,
+        "nr_throttled": 1,
+        "throttled_usec": 1326
+      }
+    },
+    {
+      "case": "chinese-2",
+      "sample_wall_ms": 6250.976439,
+      "reported_decode_ms": 6250.8,
+      "decode_tps": 40.95475779100275,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 6247.084614,
+        "cpu_pct": 99.93774052681243,
+        "runqueue_ms": 3.391639
+      },
+      "worker_mean_pct": 100.00977050955095,
+      "worker_min_pct": 99.97163486349208,
+      "worker_max_pct": 100.01565016297128,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 6247.084614,
+          "cpu_pct": 99.93774052681243,
+          "runqueue_ms": 3.391639
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 6246.625274,
+          "cpu_pct": 99.93039223483785,
+          "runqueue_ms": 0.696184
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 0.340624,
+          "cpu_pct": 0.005449132680693503,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 0.353461,
+          "cpu_pct": 0.005654492597264451,
+          "runqueue_ms": 0.00747
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 0.520045,
+          "cpu_pct": 0.008319420254976903,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 0.491646,
+          "cpu_pct": 0.007865107232409454,
+          "runqueue_ms": 0.02148
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 0.415314,
+          "cpu_pct": 0.00664398600847134,
+          "runqueue_ms": 0.01117
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 0.387063,
+          "cpu_pct": 0.006192040616008471,
+          "runqueue_ms": 0.01222
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 0.323311,
+          "cpu_pct": 0.005172167950959701,
+          "runqueue_ms": 0.00328
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 0.376915,
+          "cpu_pct": 0.006029697978837639,
+          "runqueue_ms": 0.00426
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 0.364763,
+          "cpu_pct": 0.005835296350250729,
+          "runqueue_ms": 0.0093
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 0.341582,
+          "cpu_pct": 0.00546445828637045,
+          "runqueue_ms": 0.00735
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 0.347142,
+          "cpu_pct": 0.0055534043902992864,
+          "runqueue_ms": 0.01116
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 0.391885,
+          "cpu_pct": 0.006269180564415818,
+          "runqueue_ms": 0.02009
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 0.349471,
+          "cpu_pct": 0.005590662569445017,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 0.457477,
+          "cpu_pct": 0.007318488630764779,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 0.476954,
+          "cpu_pct": 0.0076300719520277175,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 0.519612,
+          "cpu_pct": 0.008312493337170936,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 2.577702,
+          "cpu_pct": 0.0412367895664692,
+          "runqueue_ms": 0.01191
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 6251.933427,
+          "cpu_pct": 100.01530941620624,
+          "runqueue_ms": 0.058051
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 6249.203341,
+          "cpu_pct": 99.97163486349208,
+          "runqueue_ms": 2.788087
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 6251.940567,
+          "cpu_pct": 100.01542363836128,
+          "runqueue_ms": 0.050651
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 6251.946098,
+          "cpu_pct": 100.01551212053768,
+          "runqueue_ms": 0.04571
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 6251.935848,
+          "cpu_pct": 100.01534814615545,
+          "runqueue_ms": 0.05592
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 6251.934988,
+          "cpu_pct": 100.01533438830484,
+          "runqueue_ms": 0.05579
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 6251.118808,
+          "cpu_pct": 100.0022775481781,
+          "runqueue_ms": 0.87316
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 6251.892697,
+          "cpu_pct": 100.01465783800245,
+          "runqueue_ms": 0.099801
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 6251.517673,
+          "cpu_pct": 100.00865839129744,
+          "runqueue_ms": 0.474955
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 6251.954727,
+          "cpu_pct": 100.01565016297128,
+          "runqueue_ms": 0.047181
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 6251.722504,
+          "cpu_pct": 100.01193517536468,
+          "runqueue_ms": 0.269974
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 6251.945617,
+          "cpu_pct": 100.01550442573985,
+          "runqueue_ms": 0.046471
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 2249.007796,
+          "cpu_pct": 35.97850380571559,
+          "runqueue_ms": 9.534902
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.368935,
+          "cpu_pct": 0.021899538629823974,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 89728767,
+        "user_usec": 85228034,
+        "system_usec": 4500733,
+        "nr_periods": 62,
+        "nr_throttled": 0,
+        "throttled_usec": 0
+      }
+    },
+    {
+      "case": "code-2",
+      "sample_wall_ms": 5737.258397,
+      "reported_decode_ms": 5737.1,
+      "decode_tps": 44.62184727475554,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 5732.83061,
+        "cpu_pct": 99.9228239919904,
+        "runqueue_ms": 4.34136
+      },
+      "worker_mean_pct": 99.97752547045802,
+      "worker_min_pct": 99.92512211054941,
+      "worker_max_pct": 100.04455697866662,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 5732.83061,
+          "cpu_pct": 99.9228239919904,
+          "runqueue_ms": 4.34136
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 5734.239835,
+          "cpu_pct": 99.94738668208532,
+          "runqueue_ms": 0.62916
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 0.179091,
+          "cpu_pct": 0.0031215432111903188,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 0.197142,
+          "cpu_pct": 0.0034361708390733305,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 0.243164,
+          "cpu_pct": 0.0042383309792557,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 0.169151,
+          "cpu_pct": 0.0029482897282166807,
+          "runqueue_ms": 0.00684
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 0.190621,
+          "cpu_pct": 0.0033225102794685927,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 0.192233,
+          "cpu_pct": 0.003350607323186249,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 0.186321,
+          "cpu_pct": 0.003247561589651023,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 0.168621,
+          "cpu_pct": 0.0029390518664484688,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 0.176092,
+          "cpu_pct": 0.00306927085752453,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 0.171692,
+          "cpu_pct": 0.002992579174920505,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 0.156972,
+          "cpu_pct": 0.002736010636754313,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 0.21767,
+          "cpu_pct": 0.003793972398276835,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 0.186531,
+          "cpu_pct": 0.0032512218745025787,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 0.131852,
+          "cpu_pct": 0.00229817084879679,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 0.223512,
+          "cpu_pct": 0.0038957980368615423,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 0.279022,
+          "cpu_pct": 0.004863333332622773,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 1.559554,
+          "cpu_pct": 0.027182913720872105,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 5733.105749,
+          "cpu_pct": 99.92761964491312,
+          "runqueue_ms": 0.04453
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 5733.124229,
+          "cpu_pct": 99.92794174998006,
+          "runqueue_ms": 0.0385
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 5732.962459,
+          "cpu_pct": 99.92512211054941,
+          "runqueue_ms": 0.140951
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 5733.074578,
+          "cpu_pct": 99.92707633663166,
+          "runqueue_ms": 0.044501
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 5737.112089,
+          "cpu_pct": 99.997449862114,
+          "runqueue_ms": 0.03471
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 5737.088758,
+          "cpu_pct": 99.99704320446699,
+          "runqueue_ms": 0.038051
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 5737.090128,
+          "cpu_pct": 99.99706708346815,
+          "runqueue_ms": 0.056301
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 5737.038119,
+          "cpu_pct": 99.99616057034986,
+          "runqueue_ms": 0.07434
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 5739.814746,
+          "cpu_pct": 100.04455697866662,
+          "runqueue_ms": 0.177292
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 5737.075519,
+          "cpu_pct": 99.99681244965198,
+          "runqueue_ms": 0.03532
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 5737.07188,
+          "cpu_pct": 99.99674902214448,
+          "runqueue_ms": 0.04178
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 5737.069448,
+          "cpu_pct": 99.99670663255992,
+          "runqueue_ms": 0.036851
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 1702.342648,
+          "cpu_pct": 29.671709555388883,
+          "runqueue_ms": 0.10372
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 1.432924,
+          "cpu_pct": 0.024975761955384,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 81978761,
+        "user_usec": 77114794,
+        "system_usec": 4863967,
+        "nr_periods": 57,
+        "nr_throttled": 0,
+        "throttled_usec": 0
+      }
+    },
+    {
+      "case": "ok",
+      "sample_wall_ms": 66.66534,
+      "reported_decode_ms": 66.5,
+      "decode_tps": 30.075187969924812,
+      "host": {
+        "tid": 9024,
+        "affinity": "0",
+        "runtime_ms": 66.169142,
+        "cpu_pct": 99.25568818819494,
+        "runqueue_ms": 0.0
+      },
+      "worker_mean_pct": 102.00331486596583,
+      "worker_min_pct": 102.00252485024453,
+      "worker_max_pct": 102.00465489263236,
+      "threads": [
+        {
+          "tid": 9024,
+          "affinity": "0",
+          "runtime_ms": 66.169142,
+          "cpu_pct": 99.25568818819494,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9025,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9027,
+          "affinity": "0-127",
+          "runtime_ms": 66.107141,
+          "cpu_pct": 99.16268483742826,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9028,
+          "affinity": "0-127",
+          "runtime_ms": 0.03942,
+          "cpu_pct": 0.05913117671041654,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9029,
+          "affinity": "0-127",
+          "runtime_ms": 0.02446,
+          "cpu_pct": 0.0366907301455299,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9030,
+          "affinity": "0-127",
+          "runtime_ms": 0.02648,
+          "cpu_pct": 0.03972079044372983,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9031,
+          "affinity": "0-127",
+          "runtime_ms": 0.043921,
+          "cpu_pct": 0.06588281106794025,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9032,
+          "affinity": "0-127",
+          "runtime_ms": 0.02521,
+          "cpu_pct": 0.03781575253347542,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9033,
+          "affinity": "0-127",
+          "runtime_ms": 0.052141,
+          "cpu_pct": 0.07821305643982315,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9034,
+          "affinity": "0-127",
+          "runtime_ms": 0.03667,
+          "cpu_pct": 0.05500609462128296,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9035,
+          "affinity": "0-127",
+          "runtime_ms": 0.0364,
+          "cpu_pct": 0.054601086561622575,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9036,
+          "affinity": "0-127",
+          "runtime_ms": 0.037071,
+          "cpu_pct": 0.05560760659137117,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9037,
+          "affinity": "0-127",
+          "runtime_ms": 0.03984,
+          "cpu_pct": 0.059761189247666026,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9038,
+          "affinity": "0-127",
+          "runtime_ms": 0.038591,
+          "cpu_pct": 0.05788765196427409,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9039,
+          "affinity": "0-127",
+          "runtime_ms": 0.0285,
+          "cpu_pct": 0.04275085074192977,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9040,
+          "affinity": "0-127",
+          "runtime_ms": 0.03387,
+          "cpu_pct": 0.05080601103961969,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9041,
+          "affinity": "0-127",
+          "runtime_ms": 0.043351,
+          "cpu_pct": 0.06502779405310166,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9042,
+          "affinity": "0-127",
+          "runtime_ms": 0.03824,
+          "cpu_pct": 0.05736114148671559,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9043,
+          "affinity": "0-127",
+          "runtime_ms": 0.02937,
+          "cpu_pct": 0.044055876711946565,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9044,
+          "affinity": "0-127",
+          "runtime_ms": 0.216851,
+          "cpu_pct": 0.32528297313116533,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9045,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9046,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9047,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9048,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9049,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9050,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9051,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9052,
+          "affinity": "0-127",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9053,
+          "affinity": "1",
+          "runtime_ms": 68.00052,
+          "cpu_pct": 102.00280985591613,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9054,
+          "affinity": "2",
+          "runtime_ms": 68.00037,
+          "cpu_pct": 102.00258485143854,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9055,
+          "affinity": "3",
+          "runtime_ms": 68.00033,
+          "cpu_pct": 102.00252485024453,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9056,
+          "affinity": "4",
+          "runtime_ms": 68.00175,
+          "cpu_pct": 102.00465489263236,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9057,
+          "affinity": "5",
+          "runtime_ms": 68.00125,
+          "cpu_pct": 102.00390487770707,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9058,
+          "affinity": "6",
+          "runtime_ms": 68.00047,
+          "cpu_pct": 102.00273485442361,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9059,
+          "affinity": "7",
+          "runtime_ms": 68.0011,
+          "cpu_pct": 102.00367987322947,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9060,
+          "affinity": "8",
+          "runtime_ms": 68.00115,
+          "cpu_pct": 102.003754874722,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9061,
+          "affinity": "9",
+          "runtime_ms": 68.00109,
+          "cpu_pct": 102.00366487293097,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9062,
+          "affinity": "10",
+          "runtime_ms": 68.00127,
+          "cpu_pct": 102.00393487830408,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9063,
+          "affinity": "11",
+          "runtime_ms": 68.00048,
+          "cpu_pct": 102.00274985472211,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9064,
+          "affinity": "12",
+          "runtime_ms": 68.0005,
+          "cpu_pct": 102.00277985531912,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9065,
+          "affinity": "0-127",
+          "runtime_ms": 25.072934,
+          "cpu_pct": 37.610149441973896,
+          "runqueue_ms": 0.00555
+        },
+        {
+          "tid": 9073,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9074,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9075,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9076,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9862,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        },
+        {
+          "tid": 9863,
+          "affinity": "0",
+          "runtime_ms": 0.0,
+          "cpu_pct": 0.0,
+          "runqueue_ms": 0.0
+        }
+      ],
+      "cgroup_delta": {
+        "usage_usec": 924866,
+        "user_usec": 842240,
+        "system_usec": 82625,
+        "nr_periods": 1,
+        "nr_throttled": 0,
+        "throttled_usec": 0
+      }
+    }
+  ]
+}

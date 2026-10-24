@@ -281,12 +281,12 @@ public:
     /// (its graphs are captured there).
     void set_always_publish(bool on) {
         always_publish_ = on;
-        if (on) device_plan_ = false;
+        if (on) { device_plan_ = false; independent_hits_ = false; sink_.device_hits = false; }
     }
     /// 0.1.43: the adaptive tier's overlap gate (see AdaptGate).  Refused (false) with the device-planned layers (E-6),
     /// which never ask the host.  The pointer must outlive the verifier's windows.
     bool set_adapt_gate(AdaptGate* g) {
-        if (g != nullptr && device_plan_) return false;
+        if (g != nullptr && (device_plan_ || independent_hits_)) return false;
         adapt_gate_ = g;
         return true;
     }
@@ -338,7 +338,7 @@ public:
     /// beside the CPU; best when the CPU is compute-bound, the i-quants), 1 = the grouped kernel reads the mapped
     /// arena directly, 2 = a copy kernel stages it inside the graph (no API calls on the pool's thread; best when
     /// the CPU is RAM-bound, Q2_0).  Set before the first `run`.
-    void set_pcie_mode(int mode) { sink_.pcie_mode = mode; }
+    void set_pcie_mode(int mode) { sink_.pcie_mode = h_pcie_stage_ != nullptr ? 0 : mode; }
     /// Called before every window this verifier launches (run, the batch and pipelined launches): the device's
     /// residency table catches up with the host's (the adaptive tier's evictions while its copies are in flight).
     /// It gets this verifier's stream; false (with the message in `err`) fails the launch.
@@ -349,10 +349,14 @@ public:
     /// each step's GPU work (the plan's arrival, the PCIe part's start, the wait for the CPU's rows; GPU clock), the host
     /// times its pool, and after each window *model (the dispatch's) takes the costs. One GPU, no batch slots. Set
     /// before `init` (the stamps are captured). `paused`: a request's own --pcie-frac holds meanwhile.
-    void set_pcie_balance(PcieModel* model) { bal_ = model; }
+    void set_pcie_balance(PcieModel* model, PcieModel* width_models = nullptr) {
+        bal_ = model; bal_width_ = width_models;
+    }
     void pause_pcie_balance(bool paused) {
         bal_paused_ = paused;
         if (bal_ != nullptr && m_bal_ != nullptr) bal_->on = !paused;
+        if (bal_width_ != nullptr && m_bal_ != nullptr)
+            for (int t = 1; t <= max_t_; ++t) bal_width_[t].on = !paused;
     }
     bool pcie_balance_on() const { return bal_ != nullptr && m_bal_ != nullptr; }
 
@@ -467,6 +471,7 @@ private:
     uint32_t* h_plan_err_ = nullptr; uint32_t* m_plan_err_ = nullptr;   // set by resident_plan on a -1 (all-resident graph)
     const int32_t* h_res_ = nullptr;      ///< the host residency table (VerifyHits::h_res)
     bool device_plan_ = false;            ///< E-6: resident-only layers planned on the device (STRATA_VERIFY_DEVICE_PLAN)
+    bool independent_hits_ = false;       ///< STRATA_VERIFY_HIT_PLAN: run resident groups before the CPU plan arrives
     uint32_t* skip_ = nullptr;            ///< E-6: per group, the ring whose plan the device built (0: the host's)
     unsigned* qcnt_ = nullptr;             ///< S26 STRATA_QFUSE: the HC read's q8_1 group counters (n_embd / 32)
     unsigned long long* slot_off_d_ = nullptr;   ///< E-6: the slot offsets on the device
@@ -503,8 +508,7 @@ private:
     unsigned long long* trace_h_ = nullptr;
     unsigned long long* trace_m_ = nullptr;
     size_t trace_n_ = 0;
-    static constexpr int kProfPer = 33;              // stamps per layer (32 left the hc-read second
-                                      // half's up-stamp at slot 32 = the next layer's slot 0: D8)
+    static constexpr int kProfPer = 35; // 0..32 retain the existing profile; 33/34 are scheduling trace marks
     bool prof_on_ = false;
     unsigned long long* prof_ = nullptr;              // device: n_layers * kProfPer + 4 stamps
     std::vector<unsigned long long> prof_h_;
@@ -570,6 +574,7 @@ private:
     std::vector<int32_t> bal_nc_, bal_np_;
     std::vector<char> bal_ok_;
     PcieModel* bal_ = nullptr;
+    PcieModel* bal_width_ = nullptr; // bounded offload fits each token-group width separately
     bool bal_paused_ = false;
     void pcie_balance_window(int64_t steps, int G);
     cudaEvent_t commit_done_ = nullptr;   // recorded after an async commit (set_commit_async); see wait_commit
@@ -584,6 +589,7 @@ private:
     GpuPlanSink sink_;
     uint32_t cur_layer_ = 0;
     static void publish_plan(void* ctx);
+    static void complete_results(void* ctx);
     void set_plan_slot(int grp);
     bool split_ = false;   // opt-in (--spec-split): exact but slower, see the overlap study
     std::function<bool(cudaStream_t, std::string&)> pre_launch_;   // set_pre_launch
@@ -607,6 +613,8 @@ private:
     float *logits_ = nullptr, *w_ = nullptr, *shared_ = nullptr, *parts_ = nullptr, *hit_out_ = nullptr;
     int32_t *ids_ = nullptr, *hit_slot_ = nullptr, *hit_dst_ = nullptr, *hit_count_ = nullptr;
     int32_t* plan_ = nullptr;                                     // device copy of the plan block
+    int32_t* hit_plan_ = nullptr;                                 // separate device-built resident-only plan
+    uint8_t* h_pcie_stage_ = nullptr;                             // small pinned bounce buffer, not the RAM expert arena
     uint8_t* staging_ = nullptr;                                  // VRAM slots for the PCIe share of the misses
     static constexpr int64_t kStagingBlobs = 16;
     static constexpr int64_t kPcieGroupRows = 4;                  // the PCIe call's groups side by side (of <= 16)

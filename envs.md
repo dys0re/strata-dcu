@@ -374,3 +374,17 @@ DFlash2 目前为独立 PyTorch 草稿进程＋Strata 验证器，支持单卡�
 缓存交换、PCIe 比例和搬运方式、锁页内存、suffix lookup 都已开放配置。
 默认仍是增强 MTP，交换/分流/lookup 关闭；权重限制和专家槽数保持不变。
 具体用法与结果见 [DCU 运行选项](docs/DCU_RUNTIME_OPTIONS.md)；公开入口独立复核已通过，三种模式均正确执行查找草稿；进程全部退出，GPU 回到 2 MiB。
+
+## 层内交接更新（2026-10-24）
+
+公开引擎链接现指向持久盘 `/root/private_data/strata-dcu/layer-scheduling-20261024/v9/strata-final`，
+SHA256 `a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2`。
+环境依赖未变。增强 MTP 入口默认开启 GPU 常驻专家独立安排、CPU 按专家推进、结果提前交回；
+原生 DFlash2/联合模式仍显式选择这些选项。临时搬运及层末休眠默认关闭。
+
+固定 8500 个常驻专家、全部 GPU 权重 33542205952 字节，三次中位数英文/中文/代码为
+34.65 / 42.33 / 45.03 TPS；同日原二进制为 33.27 / 41.23 / 40.63。
+原生及联合模式仍固定 8300 个专家，三种模式都满足权重 ≤50%。PLE、模型、构建和原始结果继续放持久盘。
+功能 QA、强制搬运、联合草稿拒绝后恢复、底层并发检查和三种公开入口独立复核通过。
+结束时 GPU 2 MiB，无推理进程；系统目录 `/root/strata-dcu` 895 MiB、`/root/.cache` 59 MiB。
+实现及完整范围见 [层内交接](docs/DCU_LAYER_SCHEDULING.md) 和 [本轮记录](profile_output/layer-scheduling-20261024/README.md)。

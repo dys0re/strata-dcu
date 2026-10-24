@@ -369,6 +369,7 @@ struct GpuPlanSink {
     int64_t staging_cap = 0;
     int64_t cap = 0;
     void (*publish)(void* ctx) = nullptr;
+    void (*complete)(void* ctx) = nullptr; ///< optional early result publication; caller suppresses it for PLE layer 0
     /// Starts the DMA copies of `n` host blobs (pinned) into staging slots 0..n-1 and signals the GPU when they land.
     void (*fetch)(void* ctx, const uint8_t* const* src, int n, size_t bytes) = nullptr;
     void* ctx = nullptr;
@@ -377,6 +378,9 @@ struct GpuPlanSink {
     /// holds the arena's device alias.
     int pcie_mode = 0;
     int32_t cpu_jobs = 0;   ///< host only: the distinct experts the pool computes for the layer just published
+    uint8_t* host_staging = nullptr; ///< small pinned bounce buffer; null keeps the original pinned-arena path
+    int staged_max = 0;             ///< maximum experts per layer group; 0 disables bounce-buffer offload
+    bool device_hits = false;      ///< resident groups already planned on GPU; host publishes only PCIe groups
 };
 
 /// Verifier::set_pcie_balance: a verify window's costs, fitted to each layer's measured times (ms, least squares with
@@ -454,17 +458,18 @@ struct PcieModel {
     bool ready() const { return on && ncpu >= 8 && ngpu_p >= 4; }
     /// The PCIe count for a layer of `nmiss` misses (`fixed`: pcie_num's).  Every 64th layer with a miss that would
     /// keep them all on one side moves one to the other, so both fits keep seeing both.
-    int pick(int nmiss, int fixed) {
-        int m = fixed;
+    int pick(int nmiss, int fixed, int limit = -1) {
+        const int max_move = limit < 0 ? nmiss : std::min(nmiss, limit);
+        int m = std::min(fixed, max_move);
         if (ready()) {
             double best = 1e300;
-            for (int k = 0; k <= nmiss; ++k) {
+            for (int k = 0; k <= max_move; ++k) {
                 const double cpu = nmiss - k > 0 ? a + c * (nmiss - k) + d * k : p0;
                 const double t = std::max(g0 + g * k, cpu);
                 if (t < best - 1e-6) { best = t; m = k; }
             }
         }
-        if (on && nmiss >= 1 && (++explore & 63u) == 0) m = m == 0 ? 1 : m == nmiss ? nmiss - 1 : m;
+        if (on && max_move >= 1 && (++explore & 63u) == 0) m = m == 0 ? 1 : m == nmiss ? nmiss - 1 : m;
         return m;
     }
 };
@@ -593,6 +598,7 @@ struct ExpertDispatch {
     GpuPlanSink* plan = nullptr;
     int pcie_num = 0;
     PcieModel pcie_model;          ///< Verifier::set_pcie_balance: the PCIe count from measured costs
+    PcieModel staged_pcie_model[strata::kernels::cpu::MAXT + 1];
     int64_t pcie_experts = 0;      ///< distinct experts the GPU read over PCIe in verify windows
     /// #588: routed (token, expert) entries the GPU computed from outside its cache in verify windows: read over PCIe
     /// (--pcie-frac, kind 1) or on another GPU (kind 2).  In neither cache_hits nor cache_refused.

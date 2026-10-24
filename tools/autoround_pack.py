@@ -490,6 +490,12 @@ def run_model(ck, out, a):
     env = dict(os.environ, STRATA_MAX_WEIGHT_VRAM_FRACTION="0.5")
     # gfx936 measurements: staged passes strict HC parity and improves decode.
     env.setdefault("STRATA_HC_SPLIT", "2")
+    # The machine-specific DCU wrapper opts into the combination measured with enhanced MTP. Other entrypoints
+    # and other draft modes keep scheduling opt-in; a caller's individual 0/1 override always wins.
+    if env.get("STRATA_DCU_SCHEDULING_DEFAULTS") == "1" and not a.dflash2 and a.mtp_mode == "adaptive":
+        env.setdefault("STRATA_VERIFY_HIT_PLAN", "1")
+        env.setdefault("STRATA_CPU_EXPERT_PIPELINE", "1")
+        env.setdefault("STRATA_CPU_EARLY_RESULT", "1")
     if a.dflash2:
         env.update(STRATA_ROUTE_TAIL_SKIP="0", STRATA_QFUSE="0", STRATA_VERIFY_QDEDUP="0", STRATA_QFUSE_HC="0")
         env.setdefault("STRATA_BF16_Q8_VEC4", "1")
@@ -525,8 +531,15 @@ def run_model(ck, out, a):
     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
               "expert_execution": {"resident_pin": a.resident_pin, "adapt_every": a.adapt_every, "adapt_swaps": a.adapt_swaps,
-                                   "pcie_mode": a.pcie_mode, "pcie_frac": a.pcie_frac},
+                                   "pcie_mode": "dma-staged" if int(env.get("STRATA_PCIE_STAGED_MAX") or "0") > 0 else a.pcie_mode,
+                                   "pcie_frac": a.pcie_frac},
               "suffix_draft": a.suffix_draft,
+              "scheduling_options": {"gpu_hit_plan": env.get("STRATA_VERIFY_HIT_PLAN") == "1",
+                                     "cpu_expert_pipeline": env.get("STRATA_CPU_EXPERT_PIPELINE") == "1",
+                                     "early_result": env.get("STRATA_CPU_EARLY_RESULT") == "1",
+                                     "staged_experts_max": max(0,min(16,int(env.get("STRATA_PCIE_STAGED_MAX") or "0"))),
+                                     "shared_stream": env.get("STRATA_SH_STREAM", "auto"),
+                                     "pool_idle_us": env.get("STRATA_POOL_IDLE_US")},
               "kernel_options": {"hc_split": env.get("STRATA_HC_SPLIT", "auto"), "cpu_q4_mt": env.get("STRATA_CPU_Q4_MT") == "1",
                                  "dflash_small_gemv": env.get("STRATA_DFLASH_SMALL_GEMV") == "1"},
               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}

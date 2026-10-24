@@ -27,6 +27,9 @@ ap.add_argument('--joint-fixed-prefix',action='store_true')
 ap.add_argument('--spec-prob',action='store_true')
 ap.add_argument('--corrupt',type=int,default=0)
 ap.add_argument('--timing-only',action='store_true')
+ap.add_argument('--thread-usage',action='store_true',help='sample per-thread scheduled CPU time at decode protocol boundaries')
+ap.add_argument('--shared-stream',choices=['auto','on','off'],default='auto',help='explicit shared-expert GPU stream placement; auto preserves backend defaults')
+ap.add_argument('--request-pcie-frac',type=float,help='explicit per-request fraction; exercises the fixed bounded-offload path')
 ap.add_argument('--width',type=int,choices=range(2,9),default=8)
 ap.add_argument('--context',type=int,default=512)
 ap.add_argument('--long-checks',action='store_true')
@@ -39,6 +42,7 @@ a=ap.parse_args()
 if a.resident_pin is None:a.resident_pin=a.pcie_frac!=0
 assert a.adapt_every >= 0 and a.adapt_swaps >= 0 and a.suffix_draft >= 0
 assert a.pcie_frac == -1 or 0 <= a.pcie_frac <= 1
+assert a.request_pcie_frac is None or 0 <= a.request_pcie_frac <= 1
 assert not a.long_checks or a.context>=2300
 out=Path(a.out);out.mkdir(parents=True,exist_ok=False)
 root=Path('/root/strata-dcu'); cache=root/'autoround'
@@ -84,9 +88,15 @@ for key in ['STRATA_VERIFY_PROFILE','STRATA_DECODE_TIMING','STRATA_DUMP_FIRST_LO
 settings=dict(STRATA_MAX_WEIGHT_VRAM_FRACTION='0.5',STRATA_TRACE='1',STRATA_BF16_Q8_VEC4='1',STRATA_BF16_Q8_COLS=str(a.cols),STRATA_ROUTE_TAIL_SKIP='0',STRATA_SPEC_COUPLED='1',
  STRATA_QFUSE=str(int(a.fuse in ['qfuse','both'])),STRATA_VERIFY_QDEDUP=str(int(a.fuse in ['qdedup','both'])),STRATA_QFUSE_HC=str(int(a.fuse=='hc')))
 env.update(settings)
+if a.shared_stream != 'auto':
+ settings['STRATA_SH_STREAM']='1' if a.shared_stream=='on' else '0'
+ env['STRATA_SH_STREAM']=settings['STRATA_SH_STREAM']
 for feature in ['STRATA_CPU_Q4_MT','STRATA_DFLASH_SMALL_GEMV']:
  settings[feature]=env.get(feature,'0')
  env[feature]=settings[feature]
+for feature in ['STRATA_VERIFY_HIT_PLAN','STRATA_CPU_EXPERT_PIPELINE','STRATA_CPU_EARLY_RESULT',
+                'STRATA_PCIE_STAGED_MAX','STRATA_POOL_IDLE_US','STRATA_POOL_SPIN_US']:
+ if feature in env:settings[feature]=env[feature]
 if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRATA_SPEC_DEPTH='1')
 if a.timing_only:env['STRATA_DECODE_TIMING']='1'
 if a.spec_prob:env['STRATA_SPEC_PROB']='1'
@@ -136,10 +146,28 @@ def memory_snapshot():
 (out/'memory-before.json').write_text(json.dumps(memory_snapshot(),indent=2)+'\n')
 with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
  p=subprocess.Popen(cmd,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=err,text=True,bufsize=1)
+ thread_records=[]
+ def thread_snapshot():
+  stamp=time.monotonic_ns();threads={}
+  for task in Path(f'/proc/{p.pid}/task').iterdir():
+   try:
+    sched=list(map(int,(task/'schedstat').read_text().split()))
+    status=(task/'status').read_text().splitlines()
+    threads[task.name]=dict(runtime_ns=sched[0],runqueue_ns=sched[1],affinity=next(s.split(':',1)[1].strip() for s in status if s.startswith('Cpus_allowed_list:')))
+   except FileNotFoundError:pass
+  return dict(time_ns=stamp,threads=threads)
+ thread_start=None
  def line():
+  global thread_start
   s=p.stdout.readline()
   if not s:raise RuntimeError(f'engine EOF: {p.poll()}')
   stdout.write(s);stdout.flush()
+  if a.thread_usage:
+   if s.startswith('REUSED '):thread_start=thread_snapshot()
+   if s.startswith('DONE ') and thread_start is not None:
+    thread_records.append(dict(pid=p.pid,done=s.strip(),start=thread_start,end=thread_snapshot()))
+    (out/'thread-usage.json').write_text(json.dumps(thread_records,indent=2)+'\n')
+    thread_start=None
   if s.startswith('ERR '):raise RuntimeError(s)
   return s.strip()
  def send(s):p.stdin.write(s);p.stdin.flush()
@@ -157,6 +185,7 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
   if tail:ids=ids[:3]+[tok.encode(' word',add_special_tokens=False)[0]]*((2100 if a.long_checks else a.context-11)-len(ids))+ids[3:]
   assert len(ids)+n<=a.context
   sampling=f'temperature={temperature} top_p=0.9 top_k=20 seed=1729' if temperature else 'temperature=0'
+  if a.request_pcie_frac is not None:sampling+=f' pcie_frac={a.request_pcie_frac}'
   return ids,f'GEN {n} ckpt=0 {sampling} '+','.join(map(str,ids))+'\n'
  try:
   while not line().startswith('READY '):pass

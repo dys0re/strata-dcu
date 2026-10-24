@@ -1,0 +1,499 @@
+{
+  "total_windows": 138,
+  "story_decode_windows": 37,
+  "rows": 6624,
+  "gpu_first": true,
+  "early_events": 1629,
+  "early_events_before_return": 1629,
+  "mean_ms_per_story_window": {
+    "cpu_plan_us": 30.690005216216214,
+    "cpu_pool_us": 15.11506954054054,
+    "gpu_resident_us": 4.4580135135135235,
+    "gpu_plan_wait_read_us": 31.80088378378377,
+    "gpu_cpu_wait_copy_us": 5.444716216216223,
+    "gpu_merge_us": 6.358389189189188
+  },
+  "layers": [
+    {
+      "layer": 0,
+      "windows": 37,
+      "cpu_plan_us": 724.7821351351351,
+      "cpu_pool_us": 208.6641081081081,
+      "gpu_resident_us": 128.8054054054054,
+      "gpu_plan_wait_read_us": 4588.85945945946,
+      "gpu_cpu_wait_copy_us": 64.8432432432432,
+      "gpu_merge_us": 134.18648648648653
+    },
+    {
+      "layer": 1,
+      "windows": 37,
+      "cpu_plan_us": 553.7119459459459,
+      "cpu_pool_us": 160.86891891891892,
+      "gpu_resident_us": 133.33513513513526,
+      "gpu_plan_wait_read_us": 452.8324324324323,
+      "gpu_cpu_wait_copy_us": 30.918918918918845,
+      "gpu_merge_us": 137.94324324324324
+    },
+    {
+      "layer": 2,
+      "windows": 37,
+      "cpu_plan_us": 554.160945945946,
+      "cpu_pool_us": 247.80605405405404,
+      "gpu_resident_us": 116.07837837837825,
+      "gpu_plan_wait_read_us": 468.24324324324334,
+      "gpu_cpu_wait_copy_us": 69.88918918918938,
+      "gpu_merge_us": 131.2324324324323
+    },
+    {
+      "layer": 3,
+      "windows": 37,
+      "cpu_plan_us": 575.0594864864864,
+      "cpu_pool_us": 354.52227027027027,
+      "gpu_resident_us": 73.96756756756754,
+      "gpu_plan_wait_read_us": 533.4918918918918,
+      "gpu_cpu_wait_copy_us": 122.57567567567551,
+      "gpu_merge_us": 131.67567567567573
+    },
+    {
+      "layer": 4,
+      "windows": 37,
+      "cpu_plan_us": 643.6657297297297,
+      "cpu_pool_us": 294.16662162162163,
+      "gpu_resident_us": 89.57297297297309,
+      "gpu_plan_wait_read_us": 586.0594594594593,
+      "gpu_cpu_wait_copy_us": 85.96756756756744,
+      "gpu_merge_us": 131.7243243243244
+    },
+    {
+      "layer": 5,
+      "windows": 37,
+      "cpu_plan_us": 613.8722702702703,
+      "cpu_pool_us": 254.3435945945946,
+      "gpu_resident_us": 102.19459459459486,
+      "gpu_plan_wait_read_us": 544.2999999999998,
+      "gpu_cpu_wait_copy_us": 72.64054054054036,
+      "gpu_merge_us": 134.34324324324342
+    },
+    {
+      "layer": 6,
+      "windows": 37,
+      "cpu_plan_us": 579.294027027027,
+      "cpu_pool_us": 224.63443243243242,
+      "gpu_resident_us": 112.10000000000032,
+      "gpu_plan_wait_read_us": 499.14864864864853,
+      "gpu_cpu_wait_copy_us": 73.48918918918925,
+      "gpu_merge_us": 135.50000000000006
+    },
+    {
+      "layer": 7,
+      "windows": 37,
+      "cpu_plan_us": 580.9273513513514,
+      "cpu_pool_us": 292.3306216216216,
+      "gpu_resident_us": 96.4459459459458,
+      "gpu_plan_wait_read_us": 515.0918918918921,
+      "gpu_cpu_wait_copy_us": 84.58378378378394,
+      "gpu_merge_us": 131.39189189189173
+    },
+    {
+      "layer": 8,
+      "windows": 37,
+      "cpu_plan_us": 627.052972972973,
+      "cpu_pool_us": 296.02875675675676,
+      "gpu_resident_us": 87.71621621621593,
+      "gpu_plan_wait_read_us": 572.3135135135133,
+      "gpu_cpu_wait_copy_us": 76.78648648648615,
+      "gpu_merge_us": 132.32432432432452
+    },
+    {
+      "layer": 9,
+      "windows": 37,
+      "cpu_plan_us": 628.7912702702703,
+      "cpu_pool_us": 378.0224054054054,
+      "gpu_resident_us": 73.38648648648628,
+      "gpu_plan_wait_read_us": 586.35945945946,
+      "gpu_cpu_wait_copy_us": 147.35675675675688,
+      "gpu_merge_us": 134.06756756756758
+    },
+    {
+      "layer": 10,
+      "windows": 37,
+      "cpu_plan_us": 663.0337027027027,
+      "cpu_pool_us": 286.75686486486484,
+      "gpu_resident_us": 95.21351351351316,
+      "gpu_plan_wait_read_us": 601.9783783783788,
+      "gpu_cpu_wait_copy_us": 84.28108108108141,
+      "gpu_merge_us": 132.04864864864822
+    },
+    {
+      "layer": 11,
+      "windows": 37,
+      "cpu_plan_us": 627.7867837837838,
+      "cpu_pool_us": 339.6825135135135,
+      "gpu_resident_us": 83.01351351351332,
+      "gpu_plan_wait_read_us": 578.418918918919,
+      "gpu_cpu_wait_copy_us": 120.55135135135178,
+      "gpu_merge_us": 135.23513513513515
+    },
+    {
+      "layer": 12,
+      "windows": 37,
+      "cpu_plan_us": 636.8355135135135,
+      "cpu_pool_us": 234.4697027027027,
+      "gpu_resident_us": 112.27027027027007,
+      "gpu_plan_wait_read_us": 592.289189189189,
+      "gpu_cpu_wait_copy_us": 61.9783783783783,
+      "gpu_merge_us": 134.64324324324323
+    },
+    {
+      "layer": 13,
+      "windows": 37,
+      "cpu_plan_us": 606.4380810810811,
+      "cpu_pool_us": 250.8812972972973,
+      "gpu_resident_us": 106.40810810810777,
+      "gpu_plan_wait_read_us": 530.4081081081084,
+      "gpu_cpu_wait_copy_us": 55.28108108108152,
+      "gpu_merge_us": 133.0135135135134
+    },
+    {
+      "layer": 14,
+      "windows": 37,
+      "cpu_plan_us": 604.2731081081081,
+      "cpu_pool_us": 353.1224054054054,
+      "gpu_resident_us": 82.99189189189251,
+      "gpu_plan_wait_read_us": 551.8540540540537,
+      "gpu_cpu_wait_copy_us": 128.11351351351294,
+      "gpu_merge_us": 130.84054054054138
+    },
+    {
+      "layer": 15,
+      "windows": 37,
+      "cpu_plan_us": 653.3811081081082,
+      "cpu_pool_us": 417.9426486486486,
+      "gpu_resident_us": 66.22702702702676,
+      "gpu_plan_wait_read_us": 620.7432432432435,
+      "gpu_cpu_wait_copy_us": 189.08108108108058,
+      "gpu_merge_us": 131.44324324324327
+    },
+    {
+      "layer": 16,
+      "windows": 37,
+      "cpu_plan_us": 672.8416216216216,
+      "cpu_pool_us": 432.6507027027027,
+      "gpu_resident_us": 58.810810810810906,
+      "gpu_plan_wait_read_us": 647.175675675676,
+      "gpu_cpu_wait_copy_us": 195.7324324324326,
+      "gpu_merge_us": 131.464864864864
+    },
+    {
+      "layer": 17,
+      "windows": 37,
+      "cpu_plan_us": 693.0172162162162,
+      "cpu_pool_us": 392.1779189189189,
+      "gpu_resident_us": 75.01621621621538,
+      "gpu_plan_wait_read_us": 651.0189189189193,
+      "gpu_cpu_wait_copy_us": 166.59729729729696,
+      "gpu_merge_us": 132.08108108108138
+    },
+    {
+      "layer": 18,
+      "windows": 37,
+      "cpu_plan_us": 685.3879189189189,
+      "cpu_pool_us": 253.76856756756757,
+      "gpu_resident_us": 107.34864864864899,
+      "gpu_plan_wait_read_us": 658.2162162162159,
+      "gpu_cpu_wait_copy_us": 62.24054054054098,
+      "gpu_merge_us": 131.27837837837777
+    },
+    {
+      "layer": 19,
+      "windows": 37,
+      "cpu_plan_us": 629.8551621621622,
+      "cpu_pool_us": 333.1924054054054,
+      "gpu_resident_us": 81.0162162162149,
+      "gpu_plan_wait_read_us": 579.4432432432444,
+      "gpu_cpu_wait_copy_us": 105.70540540540635,
+      "gpu_merge_us": 132.06486486486472
+    },
+    {
+      "layer": 20,
+      "windows": 37,
+      "cpu_plan_us": 659.272,
+      "cpu_pool_us": 349.42537837837835,
+      "gpu_resident_us": 80.80540540540568,
+      "gpu_plan_wait_read_us": 609.948648648648,
+      "gpu_cpu_wait_copy_us": 129.7810810810813,
+      "gpu_merge_us": 131.19999999999985
+    },
+    {
+      "layer": 21,
+      "windows": 37,
+      "cpu_plan_us": 646.2833513513514,
+      "cpu_pool_us": 255.53191891891893,
+      "gpu_resident_us": 122.40000000000146,
+      "gpu_plan_wait_read_us": 551.6837837837833,
+      "gpu_cpu_wait_copy_us": 112.09189189189154,
+      "gpu_merge_us": 135.5081081081082
+    },
+    {
+      "layer": 22,
+      "windows": 37,
+      "cpu_plan_us": 530.9634054054054,
+      "cpu_pool_us": 137.2639189189189,
+      "gpu_resident_us": 137.19189189189225,
+      "gpu_plan_wait_read_us": 426.3189189189188,
+      "gpu_cpu_wait_copy_us": 30.843243243242966,
+      "gpu_merge_us": 133.17567567567588
+    },
+    {
+      "layer": 23,
+      "windows": 37,
+      "cpu_plan_us": 535.1972162162162,
+      "cpu_pool_us": 410.0327567567567,
+      "gpu_resident_us": 67.36216216216299,
+      "gpu_plan_wait_read_us": 493.9918918918922,
+      "gpu_cpu_wait_copy_us": 163.87837837837895,
+      "gpu_merge_us": 131.4783783783777
+    },
+    {
+      "layer": 24,
+      "windows": 37,
+      "cpu_plan_us": 653.804945945946,
+      "cpu_pool_us": 325.57132432432434,
+      "gpu_resident_us": 85.1810810810812,
+      "gpu_plan_wait_read_us": 602.1432432432423,
+      "gpu_cpu_wait_copy_us": 109.08378378378296,
+      "gpu_merge_us": 132.49729729729833
+    },
+    {
+      "layer": 25,
+      "windows": 37,
+      "cpu_plan_us": 647.3353783783784,
+      "cpu_pool_us": 388.9412162162162,
+      "gpu_resident_us": 70.8837837837843,
+      "gpu_plan_wait_read_us": 607.3216216216215,
+      "gpu_cpu_wait_copy_us": 153.32972972973064,
+      "gpu_merge_us": 133.11891891891895
+    },
+    {
+      "layer": 26,
+      "windows": 37,
+      "cpu_plan_us": 674.4362972972973,
+      "cpu_pool_us": 306.00613513513514,
+      "gpu_resident_us": 101.70810810810862,
+      "gpu_plan_wait_read_us": 600.9567567567562,
+      "gpu_cpu_wait_copy_us": 102.051351351351,
+      "gpu_merge_us": 132.87297297297266
+    },
+    {
+      "layer": 27,
+      "windows": 37,
+      "cpu_plan_us": 634.7912432432432,
+      "cpu_pool_us": 349.6308378378378,
+      "gpu_resident_us": 84.63783783783741,
+      "gpu_plan_wait_read_us": 583.7054054054064,
+      "gpu_cpu_wait_copy_us": 122.51081081081144,
+      "gpu_merge_us": 134.70810810810704
+    },
+    {
+      "layer": 28,
+      "windows": 37,
+      "cpu_plan_us": 655.7327567567568,
+      "cpu_pool_us": 294.50035135135136,
+      "gpu_resident_us": 103.81621621621575,
+      "gpu_plan_wait_read_us": 586.0513513513516,
+      "gpu_cpu_wait_copy_us": 90.12162162162143,
+      "gpu_merge_us": 134.0513513513518
+    },
+    {
+      "layer": 29,
+      "windows": 37,
+      "cpu_plan_us": 629.5942432432432,
+      "cpu_pool_us": 253.87137837837838,
+      "gpu_resident_us": 107.58378378378256,
+      "gpu_plan_wait_read_us": 555.8324324324317,
+      "gpu_cpu_wait_copy_us": 64.24324324324364,
+      "gpu_merge_us": 129.8405405405397
+    },
+    {
+      "layer": 30,
+      "windows": 37,
+      "cpu_plan_us": 605.5418378378379,
+      "cpu_pool_us": 440.4882972972973,
+      "gpu_resident_us": 73.10810810810831,
+      "gpu_plan_wait_read_us": 561.5729729729725,
+      "gpu_cpu_wait_copy_us": 183.5918918918933,
+      "gpu_merge_us": 134.4270270270279
+    },
+    {
+      "layer": 31,
+      "windows": 37,
+      "cpu_plan_us": 668.6723243243243,
+      "cpu_pool_us": 449.2101891891892,
+      "gpu_resident_us": 61.729729729728746,
+      "gpu_plan_wait_read_us": 640.9972972972977,
+      "gpu_cpu_wait_copy_us": 213.10270270270317,
+      "gpu_merge_us": 131.9189189189189
+    },
+    {
+      "layer": 32,
+      "windows": 37,
+      "cpu_plan_us": 690.4419189189189,
+      "cpu_pool_us": 489.1181891891892,
+      "gpu_resident_us": 57.567567567568155,
+      "gpu_plan_wait_read_us": 669.862162162162,
+      "gpu_cpu_wait_copy_us": 241.30540540540608,
+      "gpu_merge_us": 130.75405405405448
+    },
+    {
+      "layer": 33,
+      "windows": 37,
+      "cpu_plan_us": 792.1747027027027,
+      "cpu_pool_us": 437.6082162162162,
+      "gpu_resident_us": 70.50810810810917,
+      "gpu_plan_wait_read_us": 756.0378378378371,
+      "gpu_cpu_wait_copy_us": 212.11081081081136,
+      "gpu_merge_us": 131.34594594594662
+    },
+    {
+      "layer": 34,
+      "windows": 37,
+      "cpu_plan_us": 709.2694864864865,
+      "cpu_pool_us": 315.2208108108108,
+      "gpu_resident_us": 109.64864864864963,
+      "gpu_plan_wait_read_us": 630.3891891891878,
+      "gpu_cpu_wait_copy_us": 114.46486486486577,
+      "gpu_merge_us": 131.362162162161
+    },
+    {
+      "layer": 35,
+      "windows": 37,
+      "cpu_plan_us": 682.1131081081081,
+      "cpu_pool_us": 359.2905405405405,
+      "gpu_resident_us": 85.6648648648662,
+      "gpu_plan_wait_read_us": 628.7243243243229,
+      "gpu_cpu_wait_copy_us": 133.76216216216207,
+      "gpu_merge_us": 131.41621621621684
+    },
+    {
+      "layer": 36,
+      "windows": 37,
+      "cpu_plan_us": 710.3297297297297,
+      "cpu_pool_us": 465.9176756756757,
+      "gpu_resident_us": 64.60540540540643,
+      "gpu_plan_wait_read_us": 675.9054054054052,
+      "gpu_cpu_wait_copy_us": 228.97297297297337,
+      "gpu_merge_us": 130.9297297297294
+    },
+    {
+      "layer": 37,
+      "windows": 37,
+      "cpu_plan_us": 757.8628108108109,
+      "cpu_pool_us": 306.7132162162162,
+      "gpu_resident_us": 114.54324324324419,
+      "gpu_plan_wait_read_us": 675.1945945945936,
+      "gpu_cpu_wait_copy_us": 121.82972972972985,
+      "gpu_merge_us": 132.06216216216225
+    },
+    {
+      "layer": 38,
+      "windows": 37,
+      "cpu_plan_us": 670.9833513513513,
+      "cpu_pool_us": 210.50321621621623,
+      "gpu_resident_us": 135.38108108108105,
+      "gpu_plan_wait_read_us": 573.7540540540543,
+      "gpu_cpu_wait_copy_us": 66.55675675675789,
+      "gpu_merge_us": 132.51081081081006
+    },
+    {
+      "layer": 39,
+      "windows": 37,
+      "cpu_plan_us": 584.8644864864865,
+      "cpu_pool_us": 402.6381621621622,
+      "gpu_resident_us": 63.87027027027157,
+      "gpu_plan_wait_read_us": 549.5135135135123,
+      "gpu_cpu_wait_copy_us": 155.84054054054167,
+      "gpu_merge_us": 129.69189189189046
+    },
+    {
+      "layer": 40,
+      "windows": 37,
+      "cpu_plan_us": 668.695027027027,
+      "cpu_pool_us": 395.62451351351353,
+      "gpu_resident_us": 67.60540540540643,
+      "gpu_plan_wait_read_us": 637.0837837837834,
+      "gpu_cpu_wait_copy_us": 163.83783783783684,
+      "gpu_merge_us": 131.58918918919045
+    },
+    {
+      "layer": 41,
+      "windows": 37,
+      "cpu_plan_us": 677.1824324324324,
+      "cpu_pool_us": 305.8475135135135,
+      "gpu_resident_us": 84.6513513513519,
+      "gpu_plan_wait_read_us": 625.2648648648645,
+      "gpu_cpu_wait_copy_us": 99.57297297297131,
+      "gpu_merge_us": 132.2918918918912
+    },
+    {
+      "layer": 42,
+      "windows": 37,
+      "cpu_plan_us": 607.8723783783784,
+      "cpu_pool_us": 143.35327027027026,
+      "gpu_resident_us": 129.92432432432662,
+      "gpu_plan_wait_read_us": 516.8459459459449,
+      "gpu_cpu_wait_copy_us": 30.848648648648883,
+      "gpu_merge_us": 132.24864864864895
+    },
+    {
+      "layer": 43,
+      "windows": 37,
+      "cpu_plan_us": 613.2791621621622,
+      "cpu_pool_us": 330.5237027027027,
+      "gpu_resident_us": 78.56486486486432,
+      "gpu_plan_wait_read_us": 560.899999999999,
+      "gpu_cpu_wait_copy_us": 105.5702702702716,
+      "gpu_merge_us": 131.1594594594597
+    },
+    {
+      "layer": 44,
+      "windows": 37,
+      "cpu_plan_us": 634.7752432432433,
+      "cpu_pool_us": 256.88397297297297,
+      "gpu_resident_us": 101.29729729730005,
+      "gpu_plan_wait_read_us": 564.9108108108092,
+      "gpu_cpu_wait_copy_us": 71.0270270270286,
+      "gpu_merge_us": 131.27567567567598
+    },
+    {
+      "layer": 45,
+      "windows": 37,
+      "cpu_plan_us": 611.2422972972973,
+      "cpu_pool_us": 242.84089189189189,
+      "gpu_resident_us": 101.26756756756583,
+      "gpu_plan_wait_read_us": 538.2540540540543,
+      "gpu_cpu_wait_copy_us": 71.98108108108076,
+      "gpu_merge_us": 132.62432432432527
+    },
+    {
+      "layer": 46,
+      "windows": 37,
+      "cpu_plan_us": 602.1582972972973,
+      "cpu_pool_us": 320.3058648648649,
+      "gpu_resident_us": 85.05675675675533,
+      "gpu_plan_wait_read_us": 546.8459459459468,
+      "gpu_cpu_wait_copy_us": 109.46216216216153,
+      "gpu_merge_us": 130.96756756756685
+    },
+    {
+      "layer": 47,
+      "windows": 37,
+      "cpu_plan_us": 580.9674324324325,
+      "cpu_pool_us": 166.17327027027028,
+      "gpu_resident_us": 129.5297297297303,
+      "gpu_plan_wait_read_us": 472.627027027025,
+      "gpu_cpu_wait_copy_us": 44.32972972972926,
+      "gpu_merge_us": 132.85945945945994
+    }
+  ],
+  "clock_note": "CPU offsets are from the CPU graph-launch clock; GPU offsets are from the GPU first marker. Axes are independent. Trace nodes and logging add overhead; not production TPS evidence."
+}

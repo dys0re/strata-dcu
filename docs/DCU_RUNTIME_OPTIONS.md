@@ -21,6 +21,10 @@ DFlash2 和联合模式固定 8300 个。PLE 继续从持久化磁盘读取。
 | `--suffix-draft` | 0 | prompt lookup 的最小匹配长度；3 为上游值 |
 
 本机对缓存交换和 GPU 拷贝分流的测量均出现退步，因此保持可配置、默认关闭。
+2026-10-24 增加的 [层内交接选项](DCU_LAYER_SCHEDULING.md) 在本机增强 MTP 入口默认开启
+GPU 自行安排常驻专家、CPU 按专家推进和结果提前交回。原生 DFlash2/联合模式仍为显式选择。
+`STRATA_PCIE_STAGED_MAX=2` 使用约 44 MB 锁页中转区，可不锁页整个 RAM 专家副本；
+它实际使用 DMA 并覆盖普通 pcie-mode。此分流及层末休眠仍默认关闭。
 `pcie-frac=-1` 本身不能证明发生了搬运；应检查实际 PCIe 专家数。
 48.5 GB/s 左右的启动探测值来自 DMA，不能作为 GPU 拷贝 kernel 的速度。
 `direct` 仅暴露原有接口，本轮没有测试，不作为推荐配置。

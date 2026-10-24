@@ -1,0 +1,29 @@
+[
+  {
+    "mode": "mtp",
+    "answer_correct": true,
+    "lookup_exercised": true,
+    "weights": 33542205952,
+    "expert_slots": 8500,
+    "scheduled": true,
+    "engine_sha256": "a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2"
+  },
+  {
+    "mode": "native",
+    "answer_correct": true,
+    "lookup_exercised": true,
+    "weights": 32827238400,
+    "expert_slots": 8300,
+    "scheduled": false,
+    "engine_sha256": "a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2"
+  },
+  {
+    "mode": "joint",
+    "answer_correct": true,
+    "lookup_exercised": true,
+    "weights": 34195377152,
+    "expert_slots": 8300,
+    "scheduled": false,
+    "engine_sha256": "a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2"
+  }
+]

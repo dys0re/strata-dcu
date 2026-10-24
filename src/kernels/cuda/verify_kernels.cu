@@ -1263,7 +1263,7 @@ static_assert(kResidentPlanMax < 32768, "resident_plan: the packed entry count m
 __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const int32_t* __restrict__ ids, int n, int k, const int32_t* __restrict__ res,
                                      int n_expert, const uint8_t* cache_base, const unsigned long long* slot_off,
                                      long long blob, int32_t* __restrict__ pl, long long capx, uint32_t* skip,
-                                     uint32_t ring, volatile uint32_t* plan_err) {
+                                     uint32_t ring, volatile uint32_t* plan_err, bool hits_only = false) {
     __shared__ int32_t s_ids[kResidentPlanMax];
     __shared__ int32_t s_excl[kResidentPlanMax];
     __shared__ int32_t s_wsum[4];
@@ -1278,7 +1278,7 @@ __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const i
         eid = ids[tid];
         s_ids[tid] = eid;
         slot = (eid >= 0 && eid < n_expert) ? res[eid] : -1;
-        if (slot < 0) atomicOr(&s_bad, 1);
+        if (slot < 0 && !hits_only) atomicOr(&s_bad, 1);
     }
     __syncthreads();
     if (s_bad) {
@@ -1338,7 +1338,7 @@ __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const i
         ptr[grp_idx] = (unsigned long long) (cache_base + (slot_off ? (size_t) slot_off[slot] : (size_t) slot * (size_t) blob));
         start[grp_idx] = ent_start;
     }
-    if (tid < n) {
+    if (tid < n && slot >= 0) {
         const int fj_warp = first_j >> 5;
         int fj_tot = s_excl[first_j];
 #pragma unroll
@@ -1350,11 +1350,13 @@ __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const i
         tok[out_idx] = tid / k;
     }
     if (tid == 0) {
-        const int groups = (s_wsum[0] + s_wsum[1] + s_wsum[2] + s_wsum[3]) & 0xffff;
-        start[groups] = n;
-        start2[0] = n;
+        const int total = s_wsum[0] + s_wsum[1] + s_wsum[2] + s_wsum[3];
+        const int groups = total & 0xffff;
+        const int entries = total >> 16;
+        start[groups] = entries;
+        start2[0] = entries;
         counts[0] = groups;
-        counts[1] = n;
+        counts[1] = entries;
         counts[2] = 0;
         if (skip != nullptr) {
             __threadfence();
@@ -1451,6 +1453,54 @@ void resident_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_
     resident_plan_kernel<<<1, kResidentPlanMax, 0, (cudaStream_t) stream>>>(ids, n_entries, k, res_layer, n_expert, cache_base, slot_off,
                                                               blob, plan, capx, skip, ring, plan_err);
     check("resident_plan");
+}
+
+void resident_hit_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_layer, int n_expert,
+                       const uint8_t* cache_base, const unsigned long long* slot_off, long long blob,
+                       int32_t* plan, long long capx, void* stream) {
+    resident_plan_kernel<<<1, kResidentPlanMax, 0, (cudaStream_t) stream>>>(
+        ids, n_entries, k, res_layer, n_expert, cache_base, slot_off, blob, plan, capx, nullptr, 0, nullptr, true);
+    check("resident_hit_plan");
+}
+
+namespace {
+__global__ void append_pcie_plan_kernel(const volatile uint32_t* flag, uint32_t value, int32_t* pl,
+                                        const volatile int32_t* host, long long capx) {
+    __shared__ int resident_entries, pcie_entries, pcie_groups;
+    if (threadIdx.x == 0) {
+        while (*flag < value) strata_spin_pause();
+        __threadfence_system();
+        resident_entries = pl[1];
+        // These are mapped host loads. Read once, then broadcast through shared memory rather than making every
+        // lane issue the same two PCIe reads (including the common zero-offload case).
+        pcie_entries = host[1];
+        pcie_groups = host[2];
+    }
+    __syncthreads();
+    const int tid = (int) threadIdx.x;
+    const int entries = pcie_entries, groups = pcie_groups, base = resident_entries;
+    const long long dst_off = 4 + capx + 1, tok_off = dst_off + capx;
+    const long long ptr_off = ((4 + capx + 1 + 2 * capx) + 1) & ~1ll;
+    const long long start2_off = ptr_off + 4 * capx;
+    if (tid < entries) {
+        pl[dst_off + base + tid] = host[dst_off + tid];
+        pl[tok_off + base + tid] = host[tok_off + tid];
+    }
+    if (tid < groups) {
+        auto* ptr2 = (unsigned long long*) (pl + ptr_off + 2 * capx);
+        const auto* hptr2 = (const volatile unsigned long long*) (host + ptr_off + 2 * capx);
+        ptr2[tid] = hptr2[tid];
+    }
+    if (tid <= groups) pl[start2_off + tid] = base + host[start2_off + tid];
+    if (tid == 0) { pl[1] = base + entries; pl[2] = groups; }
+}
+} // namespace
+
+void append_pcie_plan_after(const uint32_t* flag, uint32_t value, int32_t* device_plan,
+                            const int32_t* mapped_host_plan, long long capx, void* stream) {
+    append_pcie_plan_kernel<<<1, kResidentPlanMax, 0, (cudaStream_t) stream>>>(
+        flag, value, device_plan, mapped_host_plan, capx);
+    check("append_pcie_plan_after");
 }
 void wait_flag_ge_or(const uint32_t* flag, uint32_t value, const uint32_t* skip, void* stream) {
     wait_flag_ge_or_kernel<<<1, 1, 0, (cudaStream_t) stream>>>(flag, value, skip);

@@ -609,8 +609,16 @@ void ExpertPool::diag(std::FILE* f) const {
 ExpertPool::ExpertPool(int n_workers, bool pin, bool host_works, PoolAffinity affinity, int tasks)
     : tasks_(tasks), host_works_(host_works), affinity_(affinity), topo_(detect_cpu_topology(true, affinity)) {
     if (tasks < 0 || tasks > kMaxTasks) throw std::invalid_argument("expert pool tasks must be in 0..4096");
+    if (const char* e = std::getenv("STRATA_POOL_TEST_DELAY_US"))
+        test_worker_delay_ = std::chrono::microseconds((std::max)(0, std::atoi(e)));
     if (const char* e = std::getenv("STRATA_POOL_SPIN_US"))   // a test knob; see kSpinBeforeSleep
         spin_before_sleep_ = std::chrono::microseconds((std::max)(0, std::atoi(e)));
+    idle_spin_before_sleep_ = spin_before_sleep_;
+    if (const char* e = std::getenv("STRATA_POOL_IDLE_US")) {
+        idle_spin_before_sleep_ = std::chrono::microseconds((std::max)(0, std::atoi(e)));
+        std::fprintf(stderr, "strata cpu pool: layer-end spin budget %lld us; inter-phase budget %lld us\n",
+                     (long long) idle_spin_before_sleep_.count(), (long long) spin_before_sleep_.count());
+    }
     const PoolPlanInput plan_in = pool_plan_input(topo_);
     const PoolPlan plan = plan_pool_workers(plan_in);
     if (n_workers > 0) {
@@ -636,6 +644,12 @@ ExpertPool::ExpertPool(int n_workers, bool pin, bool host_works, PoolAffinity af
     strata::core::diag_pool_fn().store(&diag_active_pool);
     split_.resize((size_t) kMaxSplit);
     split_multi_.resize((size_t) kMaxSplitMulti);
+    if (const char* e = std::getenv("STRATA_CPU_EXPERT_PIPELINE")) native_pipeline_ = std::atoi(e) != 0;
+    if (native_pipeline_) {
+        pipeline_slots_.reset(new PipelineSlot[kPipelineCapacity]);
+        pipeline_experts_.reset(new PipelineExpert[kMaxSplitMulti]);
+        std::fprintf(stderr, "strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled\n");
+    }
     threads_.reserve((size_t) n_);
     for (int i = 0; i < n_; ++i) {
         const int core = pin ? (i < (int) topo_.worker_cores.size() ? topo_.worker_cores[(size_t) i] : -1) : -1;
@@ -654,6 +668,9 @@ ExpertPool::~ExpertPool() {
     // Bump the epoch so a PARKED worker notices the stop flag rather than sleeping through it.
     publish();
     for (auto& t : threads_) t.join();
+    if (native_pipeline_)
+        std::fprintf(stderr, "strata cpu pipeline: batches=%lld experts=%lld wall_ms=%.3f\n",
+                     (long long) pipeline_batches_, (long long) pipeline_jobs_, ms_pipeline_);
 }
 
 void ExpertPool::publish() {
@@ -671,6 +688,7 @@ void ExpertPool::publish() {
 
 void ExpertPool::worker(int id) {
     uint32_t seen = 0;
+    bool layer_end = false;
     // ARRIVE at the park before the first wait, so `parked_ == n_` is true from construction.  Counting only
     // on the RETURN from a drain leaves `parked_` at 0 until each worker has finished one batch, and the first
     // `run()` - which waits for `parked_ == n_` before publishing - then deadlocks.  It deadlocks on the very
@@ -689,6 +707,7 @@ void ExpertPool::worker(int id) {
         // After `kSpinBeforeSleep` with no work the worker sleeps instead (issue #4).  The clock is read once
         // every 1024 pauses, so the spin itself is unchanged.
         const auto parked_at = std::chrono::steady_clock::now();
+        const auto spin_budget = layer_end ? idle_spin_before_sleep_ : spin_before_sleep_;
         uint32_t spins = 0;
         const uint64_t um = umwait_cycles();
 #if defined(_MSC_VER) && defined(_M_X64) && !defined(__clang__)   // MSVC proper: clang-cl (the Windows HIP build) has no WAITPKG intrinsics by default
@@ -711,7 +730,7 @@ void ExpertPool::worker(int id) {
                 _mm_pause();
                 if ((++spins & 1023u) != 0) continue;
             }
-            if (std::chrono::steady_clock::now() - parked_at < spin_before_sleep_) continue;
+            if (std::chrono::steady_clock::now() - parked_at < spin_budget) continue;
             std::unique_lock<std::mutex> lk(sleep_mu_);
             wstate_[(size_t) id].store(kSleeping, std::memory_order_relaxed);
             sleepers_.fetch_add(1, std::memory_order_seq_cst);
@@ -724,13 +743,21 @@ void ExpertPool::worker(int id) {
         if (stop_.load(std::memory_order_acquire)) return;
         // acquire: the batch this epoch published (`head`, and the description before it) is visible from here
         seen = epoch_.load(std::memory_order_acquire);
+        if (test_worker_delay_.count() > 0 && id == 0 && (seen & 3u) == 0)
+            std::this_thread::sleep_for(test_worker_delay_);
         parked_.fetch_sub(1, std::memory_order_acq_rel);   // leaving the park
 
         // Drain: one claim per iteration, so a slow worker takes fewer experts and a fast one takes more.
         // Every job is the same size (all experts are 1,382,400 bytes), so there is nothing to schedule.  Only
         // this epoch's jobs: if the host has already moved on, the claims fail and the worker parks again.
         wstate_[(size_t) id].store(kBetween, std::memory_order_relaxed);
-        drain(id, scratch_[(size_t) id], seen);
+        const uint64_t batch = head_.load(std::memory_order_acquire);
+        if ((uint32_t) (batch >> 32) == seen && (batch & 0xffffu) < ((batch >> 16) & 0xffffu)) {
+            // A stale wake must not read mode_: the host may already be describing a new batch. A valid active
+            // batch cannot be reused until this worker has parked, so this snapshot is protected by parked_.
+            layer_end = mode_ == 0 || mode_ == 2 || mode_ == 4 || mode_ == 6 || mode_ == 7;
+            drain(id, scratch_[(size_t) id], seen);
+        }
         wstate_[(size_t) id].store(kParked, std::memory_order_relaxed);
         parked_.fetch_add(1, std::memory_order_acq_rel);   // back at the park
     }
@@ -805,8 +832,44 @@ void ExpertPool::wait_done(int n) {
     }
 }
 
+void ExpertPool::native_rows(int e, int r0, int r1, bool up) {
+    SplitBufMulti& sb = split_multi_[(size_t) e];
+    const NativeFmt* const nfmt = mjobs_[e].fmt != nullptr ? mjobs_[e].fmt : nfmt_;   // 149-cold: same types and rows
+    if (up && q2_native_kernels(nfmt->gu_type)) {
+        // a native Q2_0 pack: gate and up rows on the Q2_0 kernels, then SwiGLU
+        thread_local float gbuf[MAXT][FF], ubuf[MAXT][FF];
+        float* gp[MAXT];
+        float* up[MAXT];
+        for (int t = 0; t < mjobs_[e].nt; ++t) { gp[t] = gbuf[t]; up[t] = ubuf[t]; }
+        const int nbk = (int) (nfmt->n_embd / 64);
+        q2_rows_any(mjobs_[e].blob, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, gp, r0, r1);
+        q2_rows_any(mjobs_[e].blob + nfmt->up_off, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, up, r0, r1);
+        for (int t = 0; t < mjobs_[e].nt; ++t)
+            for (int r = r0; r < r1; ++r)
+                sb.ff[t][r] = (gbuf[t][r] / (1.f + std::exp(-gbuf[t][r]))) * ubuf[t][r];
+    } else if (up) {
+        float* ff[MAXT];
+        for (int t = 0; t < mjobs_[e].nt; ++t) ff[t] = sb.ff[t];
+        native_gu_rows(*nfmt, mjobs_[e].blob, mjobs_[e].nact, mjobs_[e].nt, ff, r0, r1);
+    } else if (q2_native_kernels(nfmt->d_type)) {
+        // Q2_0 down (most IQ layers): the AVX-512 kernel, ggml-cpu has only a scalar one on x86
+        const ActQ* a2[MAXT];
+        for (int t = 0; t < mjobs_[e].nt; ++t) a2[t] = &sb.a2[t];
+        q2_rows_any(mjobs_[e].blob + nfmt->down_off, nfmt->d_row, (int) (nfmt->n_ff / 64), a2,
+                    mjobs_[e].nt, mjobs_[e].out, r0, r1);
+    } else {
+        const void* hq[MAXT];
+        for (int t = 0; t < mjobs_[e].nt; ++t) hq[t] = sb.hq[t];
+        native_down_rows(*nfmt, mjobs_[e].blob, hq, mjobs_[e].nt, mjobs_[e].out, r0, r1);
+    }
+}
+
 void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
-    (void) id;
+    // A worker can observe an epoch and be descheduled before it leaves the park. The host may finish that
+    // batch without it. Check both its epoch and exhaustion before reading mode_ or pipeline batch storage.
+    const uint64_t batch = head_.load(std::memory_order_acquire);
+    if ((uint32_t) (batch >> 32) != epoch || (uint32_t) (batch & 0xffffu) >= ((batch >> 16) & 0xffffu)) return;
+    if (mode_ == 7) { drain_pipeline(id); return; }
     for (;;) {
         const int ci = claim(epoch);
         if (ci < 0) break;
@@ -832,35 +895,7 @@ void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
             for (int64_t r = g0; r < g1;) {
                 const int e = (int) (r / per), r0 = (int) (r % per);
                 const int r1 = (int) std::min<int64_t>(per, r0 + (g1 - r));
-                SplitBufMulti& sb = split_multi_[(size_t) e];
-                const NativeFmt* const nfmt = mjobs_[e].fmt != nullptr ? mjobs_[e].fmt : nfmt_;   // 149-cold: same types and rows
-                if (mode_ == 5 && q2_native_kernels(nfmt->gu_type)) {
-                    // a native Q2_0 pack: gate and up rows on the Q2_0 kernels, then SwiGLU
-                    thread_local float gbuf[MAXT][FF], ubuf[MAXT][FF];
-                    float* gp[MAXT];
-                    float* up[MAXT];
-                    for (int t = 0; t < mjobs_[e].nt; ++t) { gp[t] = gbuf[t]; up[t] = ubuf[t]; }
-                    const int nbk = (int) (nfmt->n_embd / 64);
-                    q2_rows_any(mjobs_[e].blob, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, gp, r0, r1);
-                    q2_rows_any(mjobs_[e].blob + nfmt->up_off, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, up, r0, r1);
-                    for (int t = 0; t < mjobs_[e].nt; ++t)
-                        for (int r = r0; r < r1; ++r)
-                            sb.ff[t][r] = (gbuf[t][r] / (1.f + std::exp(-gbuf[t][r]))) * ubuf[t][r];
-                } else if (mode_ == 5) {
-                    float* ff[MAXT];
-                    for (int t = 0; t < mjobs_[e].nt; ++t) ff[t] = sb.ff[t];
-                    native_gu_rows(*nfmt, mjobs_[e].blob, mjobs_[e].nact, mjobs_[e].nt, ff, r0, r1);
-                } else if (q2_native_kernels(nfmt->d_type)) {
-                    // Q2_0 down (most IQ layers): the AVX-512 kernel, ggml-cpu has only a scalar one on x86
-                    const ActQ* a2[MAXT];
-                    for (int t = 0; t < mjobs_[e].nt; ++t) a2[t] = &sb.a2[t];
-                    q2_rows_any(mjobs_[e].blob + nfmt->down_off, nfmt->d_row, (int) (nfmt->n_ff / 64), a2,
-                                mjobs_[e].nt, mjobs_[e].out, r0, r1);
-                } else {
-                    const void* hq[MAXT];
-                    for (int t = 0; t < mjobs_[e].nt; ++t) hq[t] = sb.hq[t];
-                    native_down_rows(*nfmt, mjobs_[e].blob, hq, mjobs_[e].nt, mjobs_[e].out, r0, r1);
-                }
+                native_rows(e, r0, r1, mode_ == 5);
                 r += r1 - r0;
             }
         } else {
@@ -958,8 +993,10 @@ void ExpertPool::run_split_multi(ExpertJobMulti* jobs, int n) {
     ms_drain_ += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
 }
 
-void ExpertPool::run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n) {
+void ExpertPool::run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n,
+                                      void (*ready)(void*), void* ready_ctx) {
     if (n <= 0) return;
+    if (native_pipeline_) { run_native_pipeline(f, jobs, n, ready, ready_ctx); return; }
     const auto t0 = std::chrono::steady_clock::now();
     // more distinct experts than buffers: run them in batches
     for (int b0 = 0; b0 < n; b0 += kMaxSplitMulti) {
@@ -987,6 +1024,87 @@ void ExpertPool::run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs
     multi_bytes += (int64_t) n * (int64_t) f.bytes;
     mode_ = 0;
     ms_drain_ += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    if (ready) ready(ready_ctx);
+}
+
+void ExpertPool::run_native_pipeline(const NativeFmt& f, ExpertJobMulti* jobs, int n,
+                                    void (*ready)(void*), void* ready_ctx) {
+    const auto t0 = std::chrono::steady_clock::now();
+    for (int b0 = 0; b0 < n; b0 += kMaxSplitMulti) {
+        const int nb = (std::min)(kMaxSplitMulti, n - b0);
+        wait_parked("before an expert pipeline");
+        mjobs_ = jobs + b0;
+        nfmt_ = &f;
+        // Preserve row parallelism when a layer has fewer experts than participating CPU threads.
+        const int wanted = phase_tasks((int64_t) nb * f.n_ff);
+        pipeline_parts_ = (std::min)((int) (std::min)(f.n_ff, f.n_embd), (wanted + nb - 1) / nb);
+        const int ngu = nb * pipeline_parts_, total = 2 * ngu;
+        for (int i = 0; i < total; ++i) pipeline_slots_[i].ready.store(false, std::memory_order_relaxed);
+        for (int e = 0; e < nb; ++e) {
+            pipeline_experts_[e].gu_left.store(pipeline_parts_, std::memory_order_relaxed);
+            for (int part = 0; part < pipeline_parts_; ++part) {
+                auto& task = pipeline_slots_[e * pipeline_parts_ + part];
+                task.expert = e; task.up = true;
+                task.r0 = (int) (f.n_ff * part / pipeline_parts_);
+                task.r1 = (int) (f.n_ff * (part + 1) / pipeline_parts_);
+                task.ready.store(true, std::memory_order_relaxed);
+            }
+        }
+        pipeline_head_.store(0, std::memory_order_relaxed);
+        pipeline_tail_.store(ngu, std::memory_order_relaxed);
+        pipeline_down_left_.store(ngu, std::memory_order_relaxed);
+        mode_ = 7;
+        const uint32_t epoch = begin_batch(total);
+        if (host_works_) drain(-1, host_scratch_, epoch);
+        wait_done(total);
+        // Pipeline consumers use their own queue, so head_ was not advanced by claim(). Explicitly close it
+        // before accepting late arrivals or reusing the batch description, just as claim() closes a row phase.
+        head_.store(pack_head(epoch, (uint32_t) total, (uint32_t) total), std::memory_order_release);
+        // All output writes are visible now. Let the GPU proceed while workers return to the park and the
+        // caller finishes counters. Buffer reuse still waits for every worker below.
+        if (b0 + nb == n && ready) ready(ready_ctx);
+        wait_parked("after an expert pipeline");
+        ++pipeline_batches_; pipeline_jobs_ += nb;
+    }
+    mode_ = 0;
+    hstate_.store(kIdle, std::memory_order_relaxed);
+    hstate_ms_.store(now_ms(), std::memory_order_relaxed);
+    const double elapsed = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    ms_pipeline_ += elapsed; ms_drain_ += elapsed;
+    multi_bytes += (int64_t) n * (int64_t) f.bytes;
+}
+
+void ExpertPool::drain_pipeline(int id) {
+    while (pipeline_down_left_.load(std::memory_order_acquire) != 0) {
+        int i = pipeline_head_.load(std::memory_order_relaxed);
+        if (i >= pipeline_tail_.load(std::memory_order_acquire) ||
+            !pipeline_slots_[i].ready.load(std::memory_order_acquire)) { _mm_pause(); continue; }
+        if (!pipeline_head_.compare_exchange_weak(i, i + 1, std::memory_order_relaxed)) continue;
+        const auto& task = pipeline_slots_[i];
+        const int e = task.expert;
+        if (id >= 0) wstate_[id].store(i, std::memory_order_relaxed);
+        else hstate_.store(i, std::memory_order_relaxed);
+        native_rows(e, task.r0, task.r1, task.up);
+        if (task.up) {
+            // The last gate/up part acquires every preceding part's writes. Only it quantizes this expert.
+            if (pipeline_experts_[e].gu_left.fetch_sub(1, std::memory_order_acq_rel) == 1) {
+                auto& sb = split_multi_[(size_t) e];
+                const NativeFmt& f = mjobs_[e].fmt != nullptr ? *mjobs_[e].fmt : *nfmt_;
+                for (int t = 0; t < mjobs_[e].nt; ++t)
+                    if (q2_native_kernels(f.d_type)) act_quant_any(sb.ff[t], (int) f.n_ff, sb.a2[t]);
+                    else native_quant_h(f, sb.ff[t], sb.hq[t]);
+                const int first = pipeline_tail_.fetch_add(pipeline_parts_, std::memory_order_relaxed);
+                for (int part = 0; part < pipeline_parts_; ++part) {
+                    auto& next = pipeline_slots_[first + part];
+                    next.expert = e; next.up = false;
+                    next.r0 = (int) (f.n_embd * part / pipeline_parts_);
+                    next.r1 = (int) (f.n_embd * (part + 1) / pipeline_parts_);
+                    next.ready.store(true, std::memory_order_release);
+                }
+            }
+        } else pipeline_down_left_.fetch_sub(1, std::memory_order_acq_rel);
+        done_.fetch_add(1, std::memory_order_release);
+    }
 }
 
 void ExpertPool::run(ExpertJob* jobs, int n) {

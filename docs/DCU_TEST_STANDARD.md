@@ -36,3 +36,8 @@ DFlash2 等外部草稿进程的 GPU 权重也必须计入同一个预算，不�
 上游文字提供的 CPU 1.2 ms 是按 RAM 带宽估算的项，不是可直接与本机完整专家池耗时相除的实测 CPU 时间。上游使用 STRATA_VERIFY_PROFILE 的阶段记录也应与正常测速区分。当前本机时序及配置见 [验证流程生命周期](../profile_output/verify-lifecycle-20261023/README.md)。
 
 2026-10-24：入口现显式暴露缓存交换、锁页 RAM、PCIe 比例及搬运方式、suffix 查找选项，默认选择以本机实测和 QA 为准。测试仍固定各模式的专家槽数，未修改量化格式或 CPU 线程池。
+
+同日后续的 [层内交接改动](DCU_LAYER_SCHEDULING.md) 修改了 CPU 任务安排及结果通知，专家数和权重预算不变。
+测速须同时记录 `STRATA_VERIFY_HIT_PLAN`、`STRATA_CPU_EXPERT_PIPELINE`、`STRATA_CPU_EARLY_RESULT`、
+`STRATA_PCIE_STAGED_MAX` 和 `STRATA_POOL_IDLE_US`。工作线程占用包含忙等；带逐层记录的运行仅用于定位，
+正式吞吐取不加这些记录的运行。不得把不同模式的专家数或草稿权重差异算作调度收益。

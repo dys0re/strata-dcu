@@ -1,0 +1,16 @@
+{
+  "hip_full_build": "passed; build-v9.log",
+  "cuda_kernel": "nvcc CUDA13.3 gcc15 std17 sm80, verify_kernels.cu compilation exit0",
+  "cuda_host": [
+    "verify.cpp: exit0",
+    "expert_source.cpp: exit0",
+    "generate.cpp: exit0"
+  ],
+  "cpu_host": "pool.cpp compilation exit0",
+  "cuda_hardware": "not run",
+  "sycl": "not built",
+  "metal": "not built",
+  "python_compile": "passed",
+  "shell_syntax": "passed",
+  "diff_check": "passed"
+}

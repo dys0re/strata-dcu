@@ -1,0 +1,255 @@
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.806
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=1.647
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.823
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=1.180
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.895
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.859
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=1.118
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.288
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.798
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.300
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.339
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.389
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.419
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.678
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.185
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.811
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.121
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.155
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.204
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.238
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.516
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.411
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.790
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.437
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.487
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.530
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.551
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.716
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.238
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.788
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.238
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.261
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.288
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.306
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.517
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.112
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.793
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.125
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.147
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.192
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.261
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=2 wall_ms=0.517
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.577
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.590
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.697
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.926
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=14.108
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=14.262
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=24.408
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.817
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=5.021
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.639
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.737
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.798
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.882
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=9.823
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.291
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.815
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.599
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.274
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.285
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.339
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.220
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.439
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.283
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.069
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.041
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.170
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.361
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=13.859
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.714
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.270
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.580
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.570
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.621
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.692
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=7.599
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.211
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=3.800
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.200
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.209
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.212
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=1.229
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=2 experts=14 wall_ms=4.032
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=205.533
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=206.886
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=210.739
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=207.821
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=207.656
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=208.335
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=224.224
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=88.359
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=72.984
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=72.496
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=72.059
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=72.107
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=72.855
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=83.028
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.695
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=21.070
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.817
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.199
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.972
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.905
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=24.383
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=104.921
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=105.311
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=104.999
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=106.190
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=105.867
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=105.875
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=122.237
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=55.130
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=55.798
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=55.276
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=55.470
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=55.046
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=61.144
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=62.691
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.022
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.525
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.802
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.823
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=19.907
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=20.160
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=4 experts=194 wall_ms=23.967
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata cpu pipeline: batches=278 experts=1993 wall_ms=189.409
+pool tasks: 552 bitwise comparisons passed

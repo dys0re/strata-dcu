@@ -4519,7 +4519,11 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
     if (d.jobs_multi.size() < (size_t) (n_tok * k)) d.jobs_multi.resize((size_t) (MAXT * k));
     static const bool ptrace = std::getenv("STRATA_POOL_TRACE") != nullptr;
     auto pt = [&](const char* what, long long a = -1) {
-        if (ptrace) { std::fprintf(stderr, "pool trace: layer %lld %s %lld\n", (long long) d.layers, what, a); std::fflush(stderr); }
+        if (ptrace) {
+            const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+            std::fprintf(stderr, "pool trace: layer %lld %s %lld time_ns=%lld\n", (long long) d.layers, what, a, (long long) ns);
+            std::fflush(stderr);
+        }
     };
     const auto c0 = std::chrono::steady_clock::now();
     const FileExpertSource::DecodeScope decode_scope;   // 149 STRATA_IO_PF_GATE: this thread reads for the decode
@@ -4587,15 +4591,38 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
             }
         }
         // STRATA_PCIE_BALANCE (opt-in, #1548): the count comes from the measured CPU and GPU costs instead of the share
-        const bool pcie_ok = (d.pcie_num > 0 || d.pcie_model.on) && d.src->pcie_layer(d.layers);
-        int m = pcie_ok ? d.pcie_model.pick(nmiss, (nmiss * d.pcie_num) >> 8) : 0;
+        GpuPlanSink& P = *d.plan;
+        const bool bounce = P.host_staging != nullptr && P.staged_max > 0;
+        PcieModel& model = bounce ? d.staged_pcie_model[n_tok] : d.pcie_model;
+        if (bounce) model.on = d.pcie_model.on;
+        const bool pcie_ok = (d.pcie_num > 0 || d.pcie_model.on) && (bounce || d.src->pcie_layer(d.layers));
+        int m = pcie_ok ? model.pick(nmiss, (nmiss * d.pcie_num) >> 8,
+                                           bounce ? std::min(P.staged_max, (int) P.staging_cap) : -1) : 0;
         // STRATA_PCIE_MIN1 (opt-in): the share rounds to 0 for 1-2 misses per layer, so the PCIe lane idles on the typical
         // decode step; with >= 2 misses give it at least one (the last in routing order).  It only flies if its blob is
         // pinned (the fetch below checks), else it stays a CPU miss exactly as before.  Read once.
         static const bool pcie_min1 = [] { const char* v = std::getenv("STRATA_PCIE_MIN1"); return v && std::atoi(v) != 0; }();
         if (pcie_min1 && pcie_ok && m < 1 && nmiss >= 2) m = 1;
+        bool move[kMaxWindowEntries] = {};
+        if (bounce) {
+            // Prefer experts reused by more of this group's actual token rows: one transfer serves all of them.
+            // No future routing prediction, and no change to the resident expert set.
+            for (int take = 0; take < m; ++take) {
+                int best = -1, best_rows = -1;
+                for (int q = 0; q < nd; ++q) {
+                    const int32_t e = ids[distinct[q]];
+                    if (move[q] || skip_d[q] || e < 0 || e >= d.n_expert ||
+                        d.host_res[(size_t) d.layers * (size_t) d.n_expert + e] >= 0 || helper_holds(e) ||
+                        (d.peer != nullptr && d.peer->has(d.layers, e))) continue;
+                    int rows = 0;
+                    for (int64_t i = 0; i < n; ++i) rows += first_of[i] == distinct[q];
+                    if (rows > best_rows) { best_rows = rows; best = q; }
+                }
+                if (best < 0) break;
+                move[best] = true;
+            }
+        }
         int miss_rank = 0, groups = 0, entries = 0, fetches = 0;
-        GpuPlanSink& P = *d.plan;
         const uint8_t* dma_src[64];
         int64_t pcie_i0[64];
         for (int q = 0; q < nd; ++q) {
@@ -4622,9 +4649,14 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
                     kd = 0;                        // Foresight: a landed swap-space slot holds it - a GPU group like a hit
                 } else {
                     if (d.fs != nullptr) d.fs->note_miss(d.src, d.layers, e);
-                    if (miss_rank >= nmiss - m && fetches < P.staging_cap && fetches < 64) {
-                        const uint8_t* src = d.src->pinned(d.layers, e) ? d.src->blob(d.layers, e) : nullptr;
+                    if ((bounce ? move[q] : miss_rank >= nmiss - m) && fetches < P.staging_cap && fetches < 64) {
+                        const uint8_t* src = bounce || d.src->pinned(d.layers, e) ? d.src->blob(d.layers, e) : nullptr;
                         if (src != nullptr) {
+                            if (bounce) {
+                                uint8_t* buf = P.host_staging + (size_t) fetches * lay.max_blob;
+                                std::memcpy(buf, src, lay.blob_bytes(d.layers));
+                                src = buf;
+                            }
                             kd = 1;
                             dma_src[fetches] = src;
                             pcie_i0[fetches] = i0;
@@ -4637,6 +4669,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
             for (int64_t i = i0; i < n; ++i)
                 if (first_of[i] == i0) kind[i] = kd;
             if (kd != 0) continue;                 // the VRAM groups first; the PCIe groups below
+            if (P.device_hits) continue;            // the GPU already owns these descriptors
             P.ptr[groups] = ptr;
             P.start[groups] = entries;
             for (int64_t i = i0; i < n; ++i)
@@ -4885,9 +4918,21 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
     }
     const auto c3 = std::chrono::steady_clock::now();
     if (d.plan != nullptr) d.plan->cpu_jobs = njobs;
+    const bool early = native && njobs > 0 && npend == 0 && d.layers > 0 && d.remote_count == 0 &&
+                       d.peer == nullptr && d.plan != nullptr && d.plan->complete != nullptr;
+    if (early) {
+        // The GPU may publish the next layer into the same ids buffer as soon as complete() runs.
+        // Clear the lookup while these ids still belong to this layer; jobs already contain every pointer.
+        for (int64_t i = 0; i < n_tok * k; ++i) {
+            const int64_t e = ids[i];
+            if (e >= 0 && e < d.n_expert) d.job_of[(size_t) e] = -1;
+        }
+    }
     pt("run", njobs);
     if (njobs > 0 && npend == 0) {
-        if (native) d.pool->run_split_multi_native(lay.fmt[(size_t) d.layers], d.jobs_multi.data(), njobs);
+        if (native) d.pool->run_split_multi_native(lay.fmt[(size_t) d.layers], d.jobs_multi.data(), njobs,
+            early ? d.plan->complete : nullptr,
+            d.plan != nullptr ? d.plan->ctx : nullptr);
         else d.pool->run_split_multi(d.jobs_multi.data(), njobs);
     }
     if (d.remote_count > 0) {
@@ -4914,7 +4959,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
     d.ms_actq += ms(c1, c2);
     d.ms_jobs += ms(c2, c3);
     d.ms_run += ms(c3, c4);
-    for (int64_t i = 0; i < n_tok * k; ++i) {
+    for (int64_t i = 0; !early && i < n_tok * k; ++i) {
         const int64_t e = ids[i];
         if (e >= 0 && e < d.n_expert) d.job_of[(size_t) e] = -1;
     }

@@ -1,0 +1,1488 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7c6bb085..6ef5b69a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1660,6 +1660,12 @@ if(STRATA_NATIVE_EXPERTS)
+     target_link_libraries(pool_tasks_test PRIVATE strata_kernels_cpu)
+     add_test(NAME pool_tasks_test COMMAND pool_tasks_test)
+     set_tests_properties(pool_tasks_test PROPERTIES TIMEOUT 180)
++    add_test(NAME pool_expert_pipeline COMMAND pool_tasks_test)
++    set_tests_properties(pool_expert_pipeline PROPERTIES TIMEOUT 180
++      ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1")
++    add_test(NAME pool_expert_pipeline_sleep COMMAND pool_tasks_test)
++    set_tests_properties(pool_expert_pipeline_sleep PROPERTIES TIMEOUT 180
++      ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1;STRATA_POOL_IDLE_US=0;STRATA_POOL_TEST_DELAY_US=2000")
+     add_test(NAME router_dot_parity COMMAND router_dot_parity)
+     add_test(NAME router_dot_parity_avx COMMAND ${CMAKE_COMMAND} -E env STRATA_FORCE_ISA=avx $<TARGET_FILE:router_dot_parity>)
+   endif()
+diff --git a/include/strata/core/expert_source.hpp b/include/strata/core/expert_source.hpp
+index fe8bf184..b3318b41 100644
+--- a/include/strata/core/expert_source.hpp
++++ b/include/strata/core/expert_source.hpp
+@@ -369,6 +369,7 @@ struct GpuPlanSink {
+     int64_t staging_cap = 0;
+     int64_t cap = 0;
+     void (*publish)(void* ctx) = nullptr;
++    void (*complete)(void* ctx) = nullptr; ///< optional early result publication; caller suppresses it for PLE layer 0
+     /// Starts the DMA copies of `n` host blobs (pinned) into staging slots 0..n-1 and signals the GPU when they land.
+     void (*fetch)(void* ctx, const uint8_t* const* src, int n, size_t bytes) = nullptr;
+     void* ctx = nullptr;
+@@ -377,6 +378,9 @@ struct GpuPlanSink {
+     /// holds the arena's device alias.
+     int pcie_mode = 0;
+     int32_t cpu_jobs = 0;   ///< host only: the distinct experts the pool computes for the layer just published
++    uint8_t* host_staging = nullptr; ///< small pinned bounce buffer; null keeps the original pinned-arena path
++    int staged_max = 0;             ///< maximum experts per layer group; 0 disables bounce-buffer offload
++    bool device_hits = false;      ///< resident groups already planned on GPU; host publishes only PCIe groups
+ };
+ 
+ /// Verifier::set_pcie_balance: a verify window's costs, fitted to each layer's measured times (ms, least squares with
+@@ -454,17 +458,18 @@ struct PcieModel {
+     bool ready() const { return on && ncpu >= 8 && ngpu_p >= 4; }
+     /// The PCIe count for a layer of `nmiss` misses (`fixed`: pcie_num's).  Every 64th layer with a miss that would
+     /// keep them all on one side moves one to the other, so both fits keep seeing both.
+-    int pick(int nmiss, int fixed) {
+-        int m = fixed;
++    int pick(int nmiss, int fixed, int limit = -1) {
++        const int max_move = limit < 0 ? nmiss : std::min(nmiss, limit);
++        int m = std::min(fixed, max_move);
+         if (ready()) {
+             double best = 1e300;
+-            for (int k = 0; k <= nmiss; ++k) {
++            for (int k = 0; k <= max_move; ++k) {
+                 const double cpu = nmiss - k > 0 ? a + c * (nmiss - k) + d * k : p0;
+                 const double t = std::max(g0 + g * k, cpu);
+                 if (t < best - 1e-6) { best = t; m = k; }
+             }
+         }
+-        if (on && nmiss >= 1 && (++explore & 63u) == 0) m = m == 0 ? 1 : m == nmiss ? nmiss - 1 : m;
++        if (on && max_move >= 1 && (++explore & 63u) == 0) m = m == 0 ? 1 : m == nmiss ? nmiss - 1 : m;
+         return m;
+     }
+ };
+@@ -593,6 +598,7 @@ struct ExpertDispatch {
+     GpuPlanSink* plan = nullptr;
+     int pcie_num = 0;
+     PcieModel pcie_model;          ///< Verifier::set_pcie_balance: the PCIe count from measured costs
++    PcieModel staged_pcie_model[strata::kernels::cpu::MAXT + 1];
+     int64_t pcie_experts = 0;      ///< distinct experts the GPU read over PCIe in verify windows
+     /// #588: routed (token, expert) entries the GPU computed from outside its cache in verify windows: read over PCIe
+     /// (--pcie-frac, kind 1) or on another GPU (kind 2).  In neither cache_hits nor cache_refused.
+diff --git a/include/strata/core/verify.hpp b/include/strata/core/verify.hpp
+index c208feaf..89fd6a96 100644
+--- a/include/strata/core/verify.hpp
++++ b/include/strata/core/verify.hpp
+@@ -281,12 +281,12 @@ public:
+     /// (its graphs are captured there).
+     void set_always_publish(bool on) {
+         always_publish_ = on;
+-        if (on) device_plan_ = false;
++        if (on) { device_plan_ = false; independent_hits_ = false; sink_.device_hits = false; }
+     }
+     /// 0.1.43: the adaptive tier's overlap gate (see AdaptGate).  Refused (false) with the device-planned layers (E-6),
+     /// which never ask the host.  The pointer must outlive the verifier's windows.
+     bool set_adapt_gate(AdaptGate* g) {
+-        if (g != nullptr && device_plan_) return false;
++        if (g != nullptr && (device_plan_ || independent_hits_)) return false;
+         adapt_gate_ = g;
+         return true;
+     }
+@@ -338,7 +338,7 @@ public:
+     /// beside the CPU; best when the CPU is compute-bound, the i-quants), 1 = the grouped kernel reads the mapped
+     /// arena directly, 2 = a copy kernel stages it inside the graph (no API calls on the pool's thread; best when
+     /// the CPU is RAM-bound, Q2_0).  Set before the first `run`.
+-    void set_pcie_mode(int mode) { sink_.pcie_mode = mode; }
++    void set_pcie_mode(int mode) { sink_.pcie_mode = h_pcie_stage_ != nullptr ? 0 : mode; }
+     /// Called before every window this verifier launches (run, the batch and pipelined launches): the device's
+     /// residency table catches up with the host's (the adaptive tier's evictions while its copies are in flight).
+     /// It gets this verifier's stream; false (with the message in `err`) fails the launch.
+@@ -349,10 +349,14 @@ public:
+     /// each step's GPU work (the plan's arrival, the PCIe part's start, the wait for the CPU's rows; GPU clock), the host
+     /// times its pool, and after each window *model (the dispatch's) takes the costs. One GPU, no batch slots. Set
+     /// before `init` (the stamps are captured). `paused`: a request's own --pcie-frac holds meanwhile.
+-    void set_pcie_balance(PcieModel* model) { bal_ = model; }
++    void set_pcie_balance(PcieModel* model, PcieModel* width_models = nullptr) {
++        bal_ = model; bal_width_ = width_models;
++    }
+     void pause_pcie_balance(bool paused) {
+         bal_paused_ = paused;
+         if (bal_ != nullptr && m_bal_ != nullptr) bal_->on = !paused;
++        if (bal_width_ != nullptr && m_bal_ != nullptr)
++            for (int t = 1; t <= max_t_; ++t) bal_width_[t].on = !paused;
+     }
+     bool pcie_balance_on() const { return bal_ != nullptr && m_bal_ != nullptr; }
+ 
+@@ -467,6 +471,7 @@ private:
+     uint32_t* h_plan_err_ = nullptr; uint32_t* m_plan_err_ = nullptr;   // set by resident_plan on a -1 (all-resident graph)
+     const int32_t* h_res_ = nullptr;      ///< the host residency table (VerifyHits::h_res)
+     bool device_plan_ = false;            ///< E-6: resident-only layers planned on the device (STRATA_VERIFY_DEVICE_PLAN)
++    bool independent_hits_ = false;       ///< STRATA_VERIFY_HIT_PLAN: run resident groups before the CPU plan arrives
+     uint32_t* skip_ = nullptr;            ///< E-6: per group, the ring whose plan the device built (0: the host's)
+     unsigned* qcnt_ = nullptr;             ///< S26 STRATA_QFUSE: the HC read's q8_1 group counters (n_embd / 32)
+     unsigned long long* slot_off_d_ = nullptr;   ///< E-6: the slot offsets on the device
+@@ -503,8 +508,7 @@ private:
+     unsigned long long* trace_h_ = nullptr;
+     unsigned long long* trace_m_ = nullptr;
+     size_t trace_n_ = 0;
+-    static constexpr int kProfPer = 33;              // stamps per layer (32 left the hc-read second
+-                                      // half's up-stamp at slot 32 = the next layer's slot 0: D8)
++    static constexpr int kProfPer = 35; // 0..32 retain the existing profile; 33/34 are scheduling trace marks
+     bool prof_on_ = false;
+     unsigned long long* prof_ = nullptr;              // device: n_layers * kProfPer + 4 stamps
+     std::vector<unsigned long long> prof_h_;
+@@ -570,6 +574,7 @@ private:
+     std::vector<int32_t> bal_nc_, bal_np_;
+     std::vector<char> bal_ok_;
+     PcieModel* bal_ = nullptr;
++    PcieModel* bal_width_ = nullptr; // bounded offload fits each token-group width separately
+     bool bal_paused_ = false;
+     void pcie_balance_window(int64_t steps, int G);
+     cudaEvent_t commit_done_ = nullptr;   // recorded after an async commit (set_commit_async); see wait_commit
+@@ -584,6 +589,7 @@ private:
+     GpuPlanSink sink_;
+     uint32_t cur_layer_ = 0;
+     static void publish_plan(void* ctx);
++    static void complete_results(void* ctx);
+     void set_plan_slot(int grp);
+     bool split_ = false;   // opt-in (--spec-split): exact but slower, see the overlap study
+     std::function<bool(cudaStream_t, std::string&)> pre_launch_;   // set_pre_launch
+@@ -607,6 +613,8 @@ private:
+     float *logits_ = nullptr, *w_ = nullptr, *shared_ = nullptr, *parts_ = nullptr, *hit_out_ = nullptr;
+     int32_t *ids_ = nullptr, *hit_slot_ = nullptr, *hit_dst_ = nullptr, *hit_count_ = nullptr;
+     int32_t* plan_ = nullptr;                                     // device copy of the plan block
++    int32_t* hit_plan_ = nullptr;                                 // separate device-built resident-only plan
++    uint8_t* h_pcie_stage_ = nullptr;                             // small pinned bounce buffer, not the RAM expert arena
+     uint8_t* staging_ = nullptr;                                  // VRAM slots for the PCIe share of the misses
+     static constexpr int64_t kStagingBlobs = 16;
+     static constexpr int64_t kPcieGroupRows = 4;                  // the PCIe call's groups side by side (of <= 16)
+diff --git a/include/strata/kernels/cpu/pool.hpp b/include/strata/kernels/cpu/pool.hpp
+index 36e8c89c..d1e09b08 100644
+--- a/include/strata/kernels/cpu/pool.hpp
++++ b/include/strata/kernels/cpu/pool.hpp
+@@ -209,11 +209,14 @@ public:
+     /// read once for all of its tokens.
+     void run_split_multi(ExpertJobMulti* jobs, int n);
+     /// Plan v0.3 P6: the same for a native pack's layer (ggml-cpu arithmetic, `nact` activations).
+-    void run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n);
++    void run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n,
++                                void (*ready)(void*) = nullptr, void* ready_ctx = nullptr);
+     static constexpr int kMaxSplitMulti = 96;
+     /// run_split_multi's phases, accumulated ms: gate/up rows, the intermediate quantization, down rows.
+     double ms_multi_gu = 0, ms_multi_q = 0, ms_multi_down = 0;
+     int64_t multi_bytes = 0;
++    bool native_pipeline() const { return native_pipeline_; }
++    double pipeline_ms() const { return ms_pipeline_; }
+ 
+     /// Total `_mm_pause` iterations spent waiting, over all workers, is no longer counted - see the note on the
+     /// atomics below.  It was a LOCKED read-modify-write in the park loop, so measuring the contention added to
+@@ -251,6 +254,9 @@ private:
+     void worker(int id);
+     void drain(int id, ExpertScratch& scratch, uint32_t epoch);
+     void run_phase(int mode, int n_tasks);
++    void native_rows(int expert, int r0, int r1, bool up);
++    void run_native_pipeline(const NativeFmt& f, ExpertJobMulti* jobs, int n, void (*ready)(void*), void* ready_ctx);
++    void drain_pipeline(int id);
+     /// Claim the next job of batch `epoch`, or -1 (that batch is exhausted, or it is not the current one).
+     int claim(uint32_t epoch);
+     /// Publish the batch whose description the caller has just written: reset `done`, then `head`, then the epoch.
+@@ -305,6 +311,8 @@ private:
+     std::mutex sleep_mu_;
+     std::condition_variable sleep_cv_;
+     std::chrono::microseconds spin_before_sleep_{kSpinBeforeSleep};
++    std::chrono::microseconds idle_spin_before_sleep_{kSpinBeforeSleep};
++    std::chrono::microseconds test_worker_delay_{0}; // test-only: deschedule a worker after it observes an epoch
+     std::vector<std::thread> threads_;
+     std::vector<ExpertScratch> scratch_;   // one per worker: no allocation, no false sharing of the hot data
+     // run_split state: mode 0 = whole experts, 1 = gate/up row parts, 2 = down row parts
+@@ -326,6 +334,24 @@ private:
+     };
+     const NativeFmt* nfmt_ = nullptr;
+     std::vector<SplitBufMulti> split_multi_;
++    // One batch, no recycling until all workers have parked. A producer reserves slots, writes their payload,
++    // then releases ready; consumers never inspect a reserved slot before its ready flag is visible.
++    struct PipelineSlot {
++        std::atomic<bool> ready{false};
++        int expert = 0, r0 = 0, r1 = 0;
++        bool up = true;
++    };
++    struct alignas(64) PipelineExpert { std::atomic<int> gu_left{0}; };
++    static constexpr int kPipelineCapacity = 2 * (kMaxTasks + kMaxSplitMulti);
++    std::unique_ptr<PipelineSlot[]> pipeline_slots_;
++    std::unique_ptr<PipelineExpert[]> pipeline_experts_;
++    alignas(64) std::atomic<int> pipeline_head_{0};
++    alignas(64) std::atomic<int> pipeline_tail_{0};
++    alignas(64) std::atomic<int> pipeline_down_left_{0};
++    int pipeline_parts_ = 1;
++    bool native_pipeline_ = false;
++    double ms_pipeline_ = 0;
++    int64_t pipeline_batches_ = 0, pipeline_jobs_ = 0;
+     PoolAffinity affinity_ = PoolAffinity::All;
+     CpuTopology topo_;
+ };
+diff --git a/include/strata/kernels/verify_kernels.hpp b/include/strata/kernels/verify_kernels.hpp
+index 45bc70e1..b5776a9a 100644
+--- a/include/strata/kernels/verify_kernels.hpp
++++ b/include/strata/kernels/verify_kernels.hpp
+@@ -108,6 +108,15 @@ void copy_rows_strided(float* dst, const float* src, int64_t rows, int64_t w, in
+ void resident_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_layer, int n_expert,
+                    const uint8_t* cache_base, const unsigned long long* slot_off, long long blob, int32_t* plan,
+                    long long capx, uint32_t* skip, uint32_t ring, void* stream, uint32_t* plan_err = nullptr);
++/// Build only the resident groups of a mixed CPU/GPU layer. Same grouping and output-row order as the host
++/// planner; misses are omitted. The plan has separate storage, so resident work need not wait for the host plan.
++void resident_hit_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_layer, int n_expert,
++                       const uint8_t* cache_base, const unsigned long long* slot_off, long long blob,
++                       int32_t* plan, long long capx, void* stream);
++/// After the host publishes its PCIe-only plan, append it to the device-built resident plan. Resident groups and
++/// their packed output rows remain first; PCIe rows follow. One launch combines the wait and mapped reads.
++void append_pcie_plan_after(const uint32_t* flag, uint32_t value, int32_t* device_plan,
++                            const int32_t* mapped_host_plan, long long capx, void* stream);
+ /// wait_flag_ge that also returns when *skip == value (device memory).
+ void wait_flag_ge_or(const uint32_t* flag, uint32_t value, const uint32_t* skip, void* stream);
+ /// copy_i32_from_mapped unless *skip == value.
+diff --git a/src/core/expert_source.cpp b/src/core/expert_source.cpp
+index ff62f0ec..8e0c2c08 100644
+--- a/src/core/expert_source.cpp
++++ b/src/core/expert_source.cpp
+@@ -4519,7 +4519,11 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+     if (d.jobs_multi.size() < (size_t) (n_tok * k)) d.jobs_multi.resize((size_t) (MAXT * k));
+     static const bool ptrace = std::getenv("STRATA_POOL_TRACE") != nullptr;
+     auto pt = [&](const char* what, long long a = -1) {
+-        if (ptrace) { std::fprintf(stderr, "pool trace: layer %lld %s %lld\n", (long long) d.layers, what, a); std::fflush(stderr); }
++        if (ptrace) {
++            const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
++            std::fprintf(stderr, "pool trace: layer %lld %s %lld time_ns=%lld\n", (long long) d.layers, what, a, (long long) ns);
++            std::fflush(stderr);
++        }
+     };
+     const auto c0 = std::chrono::steady_clock::now();
+     const FileExpertSource::DecodeScope decode_scope;   // 149 STRATA_IO_PF_GATE: this thread reads for the decode
+@@ -4587,15 +4591,38 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+             }
+         }
+         // STRATA_PCIE_BALANCE (opt-in, #1548): the count comes from the measured CPU and GPU costs instead of the share
+-        const bool pcie_ok = (d.pcie_num > 0 || d.pcie_model.on) && d.src->pcie_layer(d.layers);
+-        int m = pcie_ok ? d.pcie_model.pick(nmiss, (nmiss * d.pcie_num) >> 8) : 0;
++        GpuPlanSink& P = *d.plan;
++        const bool bounce = P.host_staging != nullptr && P.staged_max > 0;
++        PcieModel& model = bounce ? d.staged_pcie_model[n_tok] : d.pcie_model;
++        if (bounce) model.on = d.pcie_model.on;
++        const bool pcie_ok = (d.pcie_num > 0 || d.pcie_model.on) && (bounce || d.src->pcie_layer(d.layers));
++        int m = pcie_ok ? model.pick(nmiss, (nmiss * d.pcie_num) >> 8,
++                                           bounce ? std::min(P.staged_max, (int) P.staging_cap) : -1) : 0;
+         // STRATA_PCIE_MIN1 (opt-in): the share rounds to 0 for 1-2 misses per layer, so the PCIe lane idles on the typical
+         // decode step; with >= 2 misses give it at least one (the last in routing order).  It only flies if its blob is
+         // pinned (the fetch below checks), else it stays a CPU miss exactly as before.  Read once.
+         static const bool pcie_min1 = [] { const char* v = std::getenv("STRATA_PCIE_MIN1"); return v && std::atoi(v) != 0; }();
+         if (pcie_min1 && pcie_ok && m < 1 && nmiss >= 2) m = 1;
++        bool move[kMaxWindowEntries] = {};
++        if (bounce) {
++            // Prefer experts reused by more of this group's actual token rows: one transfer serves all of them.
++            // No future routing prediction, and no change to the resident expert set.
++            for (int take = 0; take < m; ++take) {
++                int best = -1, best_rows = -1;
++                for (int q = 0; q < nd; ++q) {
++                    const int32_t e = ids[distinct[q]];
++                    if (move[q] || skip_d[q] || e < 0 || e >= d.n_expert ||
++                        d.host_res[(size_t) d.layers * (size_t) d.n_expert + e] >= 0 || helper_holds(e) ||
++                        (d.peer != nullptr && d.peer->has(d.layers, e))) continue;
++                    int rows = 0;
++                    for (int64_t i = 0; i < n; ++i) rows += first_of[i] == distinct[q];
++                    if (rows > best_rows) { best_rows = rows; best = q; }
++                }
++                if (best < 0) break;
++                move[best] = true;
++            }
++        }
+         int miss_rank = 0, groups = 0, entries = 0, fetches = 0;
+-        GpuPlanSink& P = *d.plan;
+         const uint8_t* dma_src[64];
+         int64_t pcie_i0[64];
+         for (int q = 0; q < nd; ++q) {
+@@ -4622,9 +4649,14 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+                     kd = 0;                        // Foresight: a landed swap-space slot holds it - a GPU group like a hit
+                 } else {
+                     if (d.fs != nullptr) d.fs->note_miss(d.src, d.layers, e);
+-                    if (miss_rank >= nmiss - m && fetches < P.staging_cap && fetches < 64) {
+-                        const uint8_t* src = d.src->pinned(d.layers, e) ? d.src->blob(d.layers, e) : nullptr;
++                    if ((bounce ? move[q] : miss_rank >= nmiss - m) && fetches < P.staging_cap && fetches < 64) {
++                        const uint8_t* src = bounce || d.src->pinned(d.layers, e) ? d.src->blob(d.layers, e) : nullptr;
+                         if (src != nullptr) {
++                            if (bounce) {
++                                uint8_t* buf = P.host_staging + (size_t) fetches * lay.max_blob;
++                                std::memcpy(buf, src, lay.blob_bytes(d.layers));
++                                src = buf;
++                            }
+                             kd = 1;
+                             dma_src[fetches] = src;
+                             pcie_i0[fetches] = i0;
+@@ -4637,6 +4669,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+             for (int64_t i = i0; i < n; ++i)
+                 if (first_of[i] == i0) kind[i] = kd;
+             if (kd != 0) continue;                 // the VRAM groups first; the PCIe groups below
++            if (P.device_hits) continue;            // the GPU already owns these descriptors
+             P.ptr[groups] = ptr;
+             P.start[groups] = entries;
+             for (int64_t i = i0; i < n; ++i)
+@@ -4885,9 +4918,21 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+     }
+     const auto c3 = std::chrono::steady_clock::now();
+     if (d.plan != nullptr) d.plan->cpu_jobs = njobs;
++    const bool early = native && njobs > 0 && npend == 0 && d.layers > 0 && d.remote_count == 0 &&
++                       d.peer == nullptr && d.plan != nullptr && d.plan->complete != nullptr;
++    if (early) {
++        // The GPU may publish the next layer into the same ids buffer as soon as complete() runs.
++        // Clear the lookup while these ids still belong to this layer; jobs already contain every pointer.
++        for (int64_t i = 0; i < n_tok * k; ++i) {
++            const int64_t e = ids[i];
++            if (e >= 0 && e < d.n_expert) d.job_of[(size_t) e] = -1;
++        }
++    }
+     pt("run", njobs);
+     if (njobs > 0 && npend == 0) {
+-        if (native) d.pool->run_split_multi_native(lay.fmt[(size_t) d.layers], d.jobs_multi.data(), njobs);
++        if (native) d.pool->run_split_multi_native(lay.fmt[(size_t) d.layers], d.jobs_multi.data(), njobs,
++            early ? d.plan->complete : nullptr,
++            d.plan != nullptr ? d.plan->ctx : nullptr);
+         else d.pool->run_split_multi(d.jobs_multi.data(), njobs);
+     }
+     if (d.remote_count > 0) {
+@@ -4914,7 +4959,7 @@ void expert_pool_dispatch_multi(ExpertDispatch& d, const float* x_f, const int32
+     d.ms_actq += ms(c1, c2);
+     d.ms_jobs += ms(c2, c3);
+     d.ms_run += ms(c3, c4);
+-    for (int64_t i = 0; i < n_tok * k; ++i) {
++    for (int64_t i = 0; !early && i < n_tok * k; ++i) {
+         const int64_t e = ids[i];
+         if (e >= 0 && e < d.n_expert) d.job_of[(size_t) e] = -1;
+     }
+diff --git a/src/core/verify.cpp b/src/core/verify.cpp
+index 349aac2e..290dbd2f 100644
+--- a/src/core/verify.cpp
++++ b/src/core/verify.cpp
+@@ -93,6 +93,9 @@ namespace {
+ constexpr float EPS = 1e-6f;
+ using Clock = std::chrono::steady_clock;
+ double ms_since(Clock::time_point t) { return std::chrono::duration<double, std::milli>(Clock::now() - t).count(); }
++const bool g_pool_trace = std::getenv("STRATA_POOL_TRACE") != nullptr;
++const bool g_trace_full = std::getenv("STRATA_VERIFY_TRACE_FULL") != nullptr;
++long long host_now_ns() { return std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now().time_since_epoch()).count(); }
+ const bool g_dbg = std::getenv("STRATA_VERIFY_DEBUG") != nullptr;
+ inline bool g_lfuse() { static const bool on = [] { const char* v = std::getenv("STRATA_LFUSE"); return v != nullptr && v[0] == '1'; }(); return on; }
+ // STRATA_ROUTE_RESIDENT=<margin logits> (+ STRATA_ROUTE_RESIDENT_RANKS=lo-hi, default 6-9): residency-biased routing.
+@@ -523,7 +526,8 @@ void Verifier::trace_dump(std::FILE* f) const {
+     static const char* names[kProfPer] = {"pre", "hc-read0", "qkv gemv", "conv", "ab", "z", "rec", "kv-idx",
+                                           "k/v rope", "kv append", "q", "scores+topk", "kv-resolve", "attention",
+                                           "gate", "", "out-proj", "router+ring", "shared", "waitA", "VRAM hits", "waitB",
+-                                          "PCIe grp", "waitCPU", "combine", "", "head", "", "", "", "", "", ""};
++                                          "PCIe grp", "waitCPU", "combine", "", "head", "", "", "", "", "", "",
++                                          "resident-done", "CPU-rows-copied"};
+     const uint64_t end = g_trace_next.load();
+     const uint64_t n = end < 160 ? end : 160;
+     std::fprintf(f, "strata verify trace (#649): the last %llu handshake events (host clock, us before the last; "
+@@ -554,7 +558,7 @@ void Verifier::trace_dump(std::FILE* f) const {
+                 if (trace_h_[(size_t) ((l * kProfPer + i) * 2 + grp)] != 0) last_l = l;
+     std::fprintf(f, "strata verify trace: GPU breadcrumbs (us after the window's first), the GPU got as far as layer "
+                     "%lld:\n", (long long) last_l);
+-    for (int64_t l = std::max<int64_t>(0, last_l - 2); l <= std::min<int64_t>(g_->n_layers, last_l + 1); ++l)
++    for (int64_t l = g_trace_full ? 0 : std::max<int64_t>(0, last_l - 2); l <= std::min<int64_t>(g_->n_layers, last_l + 1); ++l)
+         for (int grp = 0; grp < 2; ++grp) {
+             std::string line;
+             char b[64];
+@@ -628,6 +632,9 @@ Verifier::~Verifier() {
+     for (cudaEvent_t e : df_join_)
+         if (e) cudaEventDestroy(e);
+     if (arena_) cudaFree(arena_);
++    if (skip_) cudaFree(skip_);
++    if (slot_off_d_) cudaFree(slot_off_d_);
++    if (h_pcie_stage_) cudaFreeHost(h_pcie_stage_);
+     if (hcount_d_) cudaFree(hcount_d_);
+     void* hosts[] = {h_tok_, h_step_, h_pos_, h_commit_, h_ple_, h_out_, h_x_, h_ids_, h_w_, h_seq_, h_flag_, h_ymiss_,
+                      h_flagA_, h_plan_, h_flagB_, h_plan_err_, h_nf_, herr_h_, hdrop_h_, h_bal_};
+@@ -775,9 +782,26 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+         sink_.start2 = h_plan_ + ptr_off + 4 * cap;
+         sink_.cap = cap;
+         sink_.publish = &Verifier::publish_plan;
++        if (const char* v = std::getenv("STRATA_CPU_EARLY_RESULT"))
++            if (std::atoi(v) != 0) sink_.complete = &Verifier::complete_results;
+         sink_.fetch = &Verifier::fetch_dma;
+         sink_.ctx = this;
+     }
++    if (const char* v = std::getenv("STRATA_PCIE_STAGED_MAX")) {
++        sink_.staged_max = std::clamp(std::atoi(v), 0, (int) kStagingBlobs);
++        if (sink_.staged_max > 0) {
++            void* unused_device = nullptr;
++            const size_t bytes = (size_t) kStagingBlobs * strata::kernels::cpu::expert_layout().max_blob;
++            if (!mapped(bytes, (void**) &h_pcie_stage_, &unused_device)) {
++                err = "verify: small pinned expert staging allocation failed " + strata::core::pin_exhausted_hint();
++                return false;
++            }
++            sink_.host_staging = h_pcie_stage_;
++            sink_.pcie_mode = 0;
++            std::fprintf(stderr, "strata verify: bounded DMA offload, at most %d experts/group, %zu pinned host bytes\n",
++                         sink_.staged_max, bytes);
++        }
++    }
+ 
+     // APR: the rotated copy of the expert input (nat_xr_, T x N floats) only where a layer's gate/up is
+     // Hadamard-folded; its one reader is that layer's f.had_gu branch in the expert-input step below
+@@ -787,6 +811,11 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+         for (size_t l = 0; lay.native && l < lay.fmt.size(); ++l) had_gu_any = had_gu_any || lay.fmt[l].had_gu;
+     }
+     // ---- the device arena: the same sequence counted, then carved
++    if (const char* v = std::getenv("STRATA_VERIFY_HIT_PLAN"))
++        independent_hits_ = std::atoi(v) != 0 && !always_publish_ && remote_opt_ == nullptr && hits.d_res != nullptr;
++    // Swap-space hits are not described by the residency table; let their existing host plan own all hit work.
++    if (const char* v = std::getenv("STRATA_FS_SLOTS"))
++        if (std::atoi(v) > 0) independent_hits_ = false;
+     auto carve = [&](Bump& b) {
+         tok_ = b.take<int32_t>(T); step_ = b.take<int32_t>(T * strata::kernels::kStepCount);
+         pos_ = b.take<int32_t>(T * (NH + NKV + IQ)); commit_ = b.take<int32_t>(2 + T);
+@@ -811,6 +840,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+         shared_ = b.take<float>(T * N); parts_ = b.take<float>(T * K * N); hit_out_ = b.take<float>(T * K * N);
+         hit_slot_ = b.take<int32_t>(T * K); hit_dst_ = b.take<int32_t>(T * K); hit_count_ = b.take<int32_t>(4);
+         plan_ = b.take<int32_t>(2 * ((uint64_t) plan_i32_ + 16));
++        hit_plan_ = independent_hits_ ? b.take<int32_t>(2 * ((uint64_t) plan_i32_ + 16)) : nullptr;
+         staging_ = b.take<uint8_t>((uint64_t) kStagingBlobs * strata::kernels::cpu::expert_layout().max_blob);
+         hit_xq_ = b.take<uint8_t>(T * (N / 32) * 34); hit_xs_ = b.take<float>(T * (N / 32));
+         nat_xq_ = b.take<uint8_t>(T * (N / 32) * 36);
+@@ -979,7 +1009,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+     {
+         const char* v = std::getenv("STRATA_VERIFY_DEVICE_PLAN");
+         // (not with set_always_publish: the device table may lag the host's while windows are in flight)
+-        device_plan_ = !all_resident_ && !always_publish_ && (v != nullptr && std::atoi(v) != 0);
++        device_plan_ = !all_resident_ && !always_publish_ && !independent_hits_ && (v != nullptr && std::atoi(v) != 0);
+     }
+     // (halo's STRATA_VERIFY_RESIDENT=1 is this window's all_resident_ graph above, which 0.1.39 has on by default)
+     if (g_qfuse() || g_qfuse_hc()) {   // S26: the HC read's q8_1 group counters, zeroed once (each launch leaves them zero)
+@@ -990,7 +1020,7 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+             qcnt_ = nullptr;
+         }
+     }
+-    if (all_resident_ || device_plan_) {
++    if (all_resident_ || device_plan_ || independent_hits_) {
+         bool ok2 = true;
+         if (device_plan_)
+             ok2 = cudaMalloc((void**) &skip_, 64) == cudaSuccess && cudaMemset(skip_, 0, 64) == cudaSuccess;
+@@ -999,8 +1029,11 @@ bool Verifier::init(const WeightTable& wt, const ModelGeometry& g, SessionState&
+                   cudaMemcpy(slot_off_d_, hits.slot_off, (size_t) hits.n_slots * sizeof(unsigned long long),
+                              cudaMemcpyHostToDevice) == cudaSuccess;
+         }
+-        if (!ok2) { cudaGetLastError(); all_resident_ = false; device_plan_ = false; }
++        if (!ok2) { cudaGetLastError(); all_resident_ = false; device_plan_ = false; independent_hits_ = false; }
+     }
++    if (independent_hits_)
++        std::fprintf(stderr, "strata verify: resident groups start from a separate GPU plan (STRATA_VERIFY_HIT_PLAN)\n");
++    sink_.device_hits = independent_hits_;
+     std::fprintf(stderr, "strata verify: window up to %d tokens, %.1f MiB of device buffers%s\n", max_t,
+                  (double) count.used / 1048576.0,
+                  all_resident_ ? " (100% VRAM resident: zero-doorbell graph)" : "");
+@@ -1054,6 +1087,9 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+         if (prof_on_ && grp == 0) gpu_stamp(prof_, (int) (l * kProfPer + i), cs);
+         if (trace_m_ != nullptr) gpu_stamp(trace_m_, (int) ((l * kProfPer + i) * 2 + grp), cs);   // #649
+     };
++    auto schedule_stamp = [&](int64_t l, int i, int grp) {
++        if (trace_m_ != nullptr) gpu_stamp(trace_m_, (int) ((l * kProfPer + i) * 2 + grp), cs);
++    };
+     const int tb_[2] = {0, (T + 1) / 2}, te_[2] = {G == 2 ? (T + 1) / 2 : T, T};
+     // S26 STRATA_LFUSE=1: where the shared expert's gate / scale fusions apply (the paths they replace are the ones taken)
+     auto lfuse_on = [&](int n) {
+@@ -1901,6 +1937,12 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+                           hits_.cache_base, slot_off_d_, (long long) hits_.blob,
+                           plan_ + (size_t) grp * (size_t) (plan_i32_ + 16), (long long) max_t_ * K, nullptr, 0, cs, m_plan_err_);
+         } else {
++#if !defined(STRATA_GPU_METAL)
++            if (independent_hits_)
++                resident_hit_plan(ids_ + tb * K, n * (int) K, (int) K, hits_.d_res + l * g.n_expert,
++                                  (int) g.n_expert, hits_.cache_base, slot_off_d_, (long long) hits_.blob,
++                                  hit_plan_ + (size_t) grp * (size_t) (plan_i32_ + 16), (long long) max_t_ * K, cs);
++#endif
+             if (device_plan_)   // E-6: every routed expert resident: this group's plan without the host
+                 resident_plan(ids_ + tb * K, n * (int) K, (int) K, hits_.d_res + l * g.n_expert, (int) g.n_expert,
+                               hits_.cache_base, slot_off_d_, (long long) hits_.blob,
+@@ -1991,7 +2033,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+         const int tb = tb_[grp], te = te_[grp], n = te - tb;
+         const uint32_t ring = (uint32_t) ((l - lb_) * G + grp + 1);
+         const int64_t cap = (int64_t) n * K, capx = (int64_t) max_t_ * K;
+-        int32_t* pl = plan_ + (size_t) grp * (size_t) (plan_i32_ + 16);
++        int32_t* pl = (independent_hits_ && !ar_on() ? hit_plan_ : plan_) + (size_t) grp * (size_t) (plan_i32_ + 16);
+         const int32_t* p_counts = pl;
+         const int32_t* p_start = pl + 4;
+         const int32_t* p_dst = p_start + capx + 1;
+@@ -2005,16 +2047,19 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+         const auto& lay = strata::kernels::cpu::expert_layout();
+         // plan v0.3 P6: the VRAM groups now; the PCIe groups once the copy engine has landed them in staging.
+         // `gy`: the native launch's groups side by side (0: cap, one block row per possible group).
+-        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy, float* dst_buf) {
++        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy, float* dst_buf,
++                           const int32_t* gd = nullptr, const int32_t* gt = nullptr) {
++            if (gd == nullptr) gd = p_dst;
++            if (gt == nullptr) gt = p_tok;
+             if (lay.native) {
+                 // the layer's GGUF formats (i-quant gate/up, Q2_0 / IQ4_NL down)
+                 const auto& f = lay.fmt[(size_t) l];
+                 NativeExpertLayout L = native_expert_layout(f.gu_type, f.d_type, f.n_embd, f.n_ff);
+                 if (f.had_d) { L.had_block = f.had_block; L.d_signs = had_sh_; }   // APR: h is rotated in there
+-                native_expert_grouped(L, gp, gs, gn, p_dst, p_tok, cap, cap,
++                native_expert_grouped(L, gp, gs, gn, gd, gt, cap, cap,
+                                       nat_xq_ + (size_t) tb * (N / 32) * 36, hit_scratch_, dst_buf, cs, gy);
+             } else {
+-                moe_grouped_s2(gp, gs, gn, p_dst, p_tok, cap, cap, hit_xq_ + (size_t) tb * (N / 32) * 34,
++                moe_grouped_s2(gp, gs, gn, gd, gt, cap, cap, hit_xq_ + (size_t) tb * (N / 32) * 34,
+                                hit_xs_ + (size_t) tb * (N / 32), hit_scratch_, dst_buf, cs);
+             }
+         };
+@@ -2024,14 +2069,28 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+             grouped(p_ptr, p_start, p_counts, 0, parts_out);
+             stamp(l, 20, grp);
+         } else {
+-            if (device_plan_) {   // E-6: skipped when the device planned this group (all its experts resident)
++            if (independent_hits_) {
++                if (m_bal_ != nullptr) gpu_stamp(m_bal_ + ((l - lb_) * 2 + grp) * 4, 0, cs);
++                const int32_t* hp = hit_plan_ + (size_t) grp * (size_t) (plan_i32_ + 16);
++                const int32_t* hs = hp + 4;
++                const int32_t* hd = hs + capx + 1;
++                const int32_t* ht = hd + capx;
++                const auto* hptr = (const unsigned long long*) (hp + ptr_off);
++                grouped(hptr, hs, hp, 0, hit_out, hd, ht);
++                schedule_stamp(l, 33, grp);
++            }
++            if (independent_hits_) {
++#if !defined(STRATA_GPU_METAL)
++                append_pcie_plan_after(m_flagA_, ring, pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, capx, cs);
++#endif
++            } else if (device_plan_) {   // E-6: skipped when the device planned this group (all its experts resident)
+                 wait_flag_ge_or(m_flagA_, ring, skip_ + grp, cs);
+                 copy_i32_from_mapped_unless(pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, plan_i32_, skip_ + grp, ring, cs);
+             } else {
+                 if (fuse_wait_on() && !prof_on_ && m_bal_ == nullptr) {   // 143-amdk: one launch for the wait and the copy
+                     wait_copy_i32_from_mapped(m_flagA_, ring, pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, plan_i32_, cs);
+                 } else {
+-                if (m_bal_ != nullptr)   // set_pcie_balance: the GPU's share starts as the plan arrives
++                if (m_bal_ != nullptr && !independent_hits_)   // independent hits started before the host plan
+                     wait_flag_ge_stamped(m_flagA_, ring, nullptr, m_bal_ + ((l - lb_) * 2 + grp) * 4, cs);
+                 else
+                     wait_flag_ge(m_flagA_, ring, cs);              // the pool published this group's GPU plan
+@@ -2039,7 +2098,10 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+                 }
+             }
+             stamp(l, 19, grp);
+-            grouped(p_ptr, p_start, p_counts, 0, hit_out);
++            if (!independent_hits_) {
++                grouped(p_ptr, p_start, p_counts, 0, hit_out);
++                schedule_stamp(l, 33, grp);
++            }
+             stamp(l, 20, grp);
+             if (device_plan_) wait_flag_ge_or(m_flagB_, ring, skip_ + grp, cs);
+             else if (m_bal_ != nullptr)   // set_pcie_balance: the PCIe part starts
+@@ -2080,6 +2142,7 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
+                 else
+                     copy_from_mapped(parts_out, m_ymiss_ + (size_t) tb * K * N, (int64_t) n * K * N, cs);
+             }
++            schedule_stamp(l, 34, grp);
+             // 143-amdk: the add of the GPU's hit rows is done by the combine that follows (one launch fewer)
+             hits_in_combine = fuse_hits_on() && !prof_on_ && !remote_opt_ && !sg_gated_[grp] && dec_batch && n > 1 &&
+                               native_moe_combine_enabled() && n <= 8 &&
+@@ -2251,7 +2314,8 @@ std::string Verifier::profile_report() {
+                                           "k/v+norm-rope", "kv+idx append", "q+q-idx", "scores+topk", "kv-resolve",
+                                           "attention", "gate", "", "out-proj", "router+plan+bell", "shared+quant",
+                                           "waitA", "VRAM hits", "waitB", "PCIe grp", "waitCPU", "copy+combine",
+-                                          "(gap)", "head", "  hc0 norm", "  hc0 down", "  hc0 up", "  hc1 norm", "  hc1 down", "  hc1 up"};
++                                          "(gap)", "head", "  hc0 norm", "  hc0 down", "  hc0 up", "  hc1 norm", "  hc1 down", "  hc1 up",
++                                          "resident-done", "CPU-rows-copied"};
+     std::string out;
+     char b[80];
+     double total = 0;
+@@ -2746,6 +2810,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+         // 0.1.43: with the all-resident graph the host serves no layer, so nothing can hold a layer back: every copy first
+         if (adapt_gate_ != nullptr && adapt_gate_->active.load(std::memory_order_acquire) && ar_on() &&
+             !adapt_gate_wait((int32_t) g.n_layers, err)) return false;
++        const long long launch_before = g_pool_trace ? host_now_ns() : 0;
+ #if !defined(STRATA_USE_HIP) && !defined(STRATA_HIP_GFX906)
+         // A blocking instrumented launch cannot also serve the graph's CPU doorbells.
+         static const bool threaded_launch = [] {
+@@ -2758,6 +2823,9 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+ #else
+         const cudaError_t le = cudaGraphLaunch(ar_off_ ? exec_nr_[T] : exec_[T], cs_);
+ #endif
++        if (g_pool_trace)
++            std::fprintf(stderr, "verify graph: pos=%lld T=%d before_ns=%lld after_ns=%lld\n",
++                         (long long) pos0, T, launch_before, host_now_ns());
+         trace_ev("LAUNCHED", -1, -1, (int64_t) le);
+         if (le != cudaSuccess) { err = std::string("verify: launch: ") + cudaGetErrorString(le); return false; }
+ #if !defined(STRATA_USE_HIP) && !defined(STRATA_HIP_GFX906)
+@@ -2903,7 +2971,13 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+             _mm_sfence();
+             ms_host += ms_since(tp);
+         }
+-        if (!(test_stall && k + 1 == steps)) *flag = want;
++        if (!(test_stall && k + 1 == steps)) {
++            const long long release_ns = g_pool_trace ? host_now_ns() : 0;
++            *flag = want;
++            if (g_pool_trace)
++                std::fprintf(stderr, "verify ready: ring=%u layer=%lld group=%d time_ns=%lld early=0\n",
++                             want, (long long) l, grp, release_ns);
++        }
+         if (h_bal_ != nullptr) bal_p_[(size_t) ((k / G) * 2 + grp)] = ms_since(b);
+         ms_wait += std::chrono::duration<double, std::milli>(b - a).count();
+         ms_pool += ms_since(b);
+@@ -3025,6 +3099,7 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+         }
+     }
+     VDBG("window done\n");
++    if (g_trace && g_trace_full) trace_dump(stderr);
+     ++windows;
+     progress_at("decode");
+     progress_beat();
+@@ -3034,15 +3109,17 @@ bool Verifier::run(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+ // set_pcie_balance: each stamped step's times into the model's fits (PcieModel::sample), solved once a window.
+ void Verifier::pcie_balance_window(int64_t steps, int G) {
+     const volatile unsigned long long* st = h_bal_;
+-    PcieModel& M = *bal_;
+     for (int64_t k = 0; k < steps; ++k) {
+         const size_t i = (size_t) ((k / G) * 2 + k % G);
+         if (!bal_ok_[i]) continue;
+         const unsigned long long ta = st[4 * i], tb = st[4 * i + 1], tw = st[4 * i + 2];
+         if (ta == 0 || tb < ta || tw < tb || tw - ta > 1000000000ull) continue;   // not stamped in this window
++        const int width = G == 1 ? last_t_ : k % G == 0 ? (last_t_ + 1) / 2 : last_t_ / 2;
++        PcieModel& M = bal_width_ != nullptr ? bal_width_[width] : *bal_;
+         M.sample(bal_nc_[i], bal_np_[i], bal_p_[i], (double) (tw - ta) * 1e-6);
+     }
+-    M.solve();
++    if (bal_width_ != nullptr) for (int width = 1; width <= last_t_; ++width) bal_width_[width].solve();
++    else bal_->solve();
+ }
+ 
+ void Verifier::set_plan_slot(int grp) {
+@@ -3061,6 +3138,8 @@ void Verifier::set_plan_slot(int grp) {
+     const int64_t per = G == 2 ? kStagingBlobs / 2 : kStagingBlobs;
+     sink_.staging = (unsigned long long) (staging_ + (size_t) (grp * per) * strata::kernels::cpu::expert_layout().max_blob);
+     sink_.staging_cap = per;
++    sink_.host_staging = h_pcie_stage_ == nullptr ? nullptr
++        : h_pcie_stage_ + (size_t) (grp * per) * strata::kernels::cpu::expert_layout().max_blob;
+ }
+ 
+ // Flag B only rises: a host function of an earlier layer may run after a later layer already raised it directly.
+@@ -3116,6 +3195,17 @@ void Verifier::publish_plan(void* ctx) {
+     *(volatile uint32_t*) v->h_flagA_ = v->cur_layer_ + 1;
+ }
+ 
++void Verifier::complete_results(void* ctx) {
++    Verifier* v = (Verifier*) ctx;
++    // The pool's completion acquire covers every worker's output writes. Keep layer 0's PLE gate on the host
++    // driver: it must gather the disk rows before it publishes that layer's completion.
++    _mm_sfence();
++    const long long release_ns = g_pool_trace ? host_now_ns() : 0;
++    raise_flag(v->h_flag_, (uint32_t) (v->cur_layer_ + 1));
++    if (g_pool_trace)
++        std::fprintf(stderr, "verify ready: ring=%u time_ns=%lld early=1\n", v->cur_layer_ + 1, release_ns);
++}
++
+ bool Verifier::window_logprobs(const int32_t* targets, int T, int64_t pos0, int32_t extra_id, std::FILE* out,
+                                std::string& err) {
+     if (next_ != nullptr) return next_->window_logprobs(targets, T, pos0, extra_id, out, err);
+diff --git a/src/kernels/cpu/pool.cpp b/src/kernels/cpu/pool.cpp
+index 80161b9a..7f782b68 100644
+--- a/src/kernels/cpu/pool.cpp
++++ b/src/kernels/cpu/pool.cpp
+@@ -609,8 +609,16 @@ void ExpertPool::diag(std::FILE* f) const {
+ ExpertPool::ExpertPool(int n_workers, bool pin, bool host_works, PoolAffinity affinity, int tasks)
+     : tasks_(tasks), host_works_(host_works), affinity_(affinity), topo_(detect_cpu_topology(true, affinity)) {
+     if (tasks < 0 || tasks > kMaxTasks) throw std::invalid_argument("expert pool tasks must be in 0..4096");
++    if (const char* e = std::getenv("STRATA_POOL_TEST_DELAY_US"))
++        test_worker_delay_ = std::chrono::microseconds((std::max)(0, std::atoi(e)));
+     if (const char* e = std::getenv("STRATA_POOL_SPIN_US"))   // a test knob; see kSpinBeforeSleep
+         spin_before_sleep_ = std::chrono::microseconds((std::max)(0, std::atoi(e)));
++    idle_spin_before_sleep_ = spin_before_sleep_;
++    if (const char* e = std::getenv("STRATA_POOL_IDLE_US")) {
++        idle_spin_before_sleep_ = std::chrono::microseconds((std::max)(0, std::atoi(e)));
++        std::fprintf(stderr, "strata cpu pool: layer-end spin budget %lld us; inter-phase budget %lld us\n",
++                     (long long) idle_spin_before_sleep_.count(), (long long) spin_before_sleep_.count());
++    }
+     const PoolPlanInput plan_in = pool_plan_input(topo_);
+     const PoolPlan plan = plan_pool_workers(plan_in);
+     if (n_workers > 0) {
+@@ -636,6 +644,12 @@ ExpertPool::ExpertPool(int n_workers, bool pin, bool host_works, PoolAffinity af
+     strata::core::diag_pool_fn().store(&diag_active_pool);
+     split_.resize((size_t) kMaxSplit);
+     split_multi_.resize((size_t) kMaxSplitMulti);
++    if (const char* e = std::getenv("STRATA_CPU_EXPERT_PIPELINE")) native_pipeline_ = std::atoi(e) != 0;
++    if (native_pipeline_) {
++        pipeline_slots_.reset(new PipelineSlot[kPipelineCapacity]);
++        pipeline_experts_.reset(new PipelineExpert[kMaxSplitMulti]);
++        std::fprintf(stderr, "strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled\n");
++    }
+     threads_.reserve((size_t) n_);
+     for (int i = 0; i < n_; ++i) {
+         const int core = pin ? (i < (int) topo_.worker_cores.size() ? topo_.worker_cores[(size_t) i] : -1) : -1;
+@@ -654,6 +668,9 @@ ExpertPool::~ExpertPool() {
+     // Bump the epoch so a PARKED worker notices the stop flag rather than sleeping through it.
+     publish();
+     for (auto& t : threads_) t.join();
++    if (native_pipeline_)
++        std::fprintf(stderr, "strata cpu pipeline: batches=%lld experts=%lld wall_ms=%.3f\n",
++                     (long long) pipeline_batches_, (long long) pipeline_jobs_, ms_pipeline_);
+ }
+ 
+ void ExpertPool::publish() {
+@@ -671,6 +688,7 @@ void ExpertPool::publish() {
+ 
+ void ExpertPool::worker(int id) {
+     uint32_t seen = 0;
++    bool layer_end = false;
+     // ARRIVE at the park before the first wait, so `parked_ == n_` is true from construction.  Counting only
+     // on the RETURN from a drain leaves `parked_` at 0 until each worker has finished one batch, and the first
+     // `run()` - which waits for `parked_ == n_` before publishing - then deadlocks.  It deadlocks on the very
+@@ -689,6 +707,7 @@ void ExpertPool::worker(int id) {
+         // After `kSpinBeforeSleep` with no work the worker sleeps instead (issue #4).  The clock is read once
+         // every 1024 pauses, so the spin itself is unchanged.
+         const auto parked_at = std::chrono::steady_clock::now();
++        const auto spin_budget = layer_end ? idle_spin_before_sleep_ : spin_before_sleep_;
+         uint32_t spins = 0;
+         const uint64_t um = umwait_cycles();
+ #if defined(_MSC_VER) && defined(_M_X64) && !defined(__clang__)   // MSVC proper: clang-cl (the Windows HIP build) has no WAITPKG intrinsics by default
+@@ -711,7 +730,7 @@ void ExpertPool::worker(int id) {
+                 _mm_pause();
+                 if ((++spins & 1023u) != 0) continue;
+             }
+-            if (std::chrono::steady_clock::now() - parked_at < spin_before_sleep_) continue;
++            if (std::chrono::steady_clock::now() - parked_at < spin_budget) continue;
+             std::unique_lock<std::mutex> lk(sleep_mu_);
+             wstate_[(size_t) id].store(kSleeping, std::memory_order_relaxed);
+             sleepers_.fetch_add(1, std::memory_order_seq_cst);
+@@ -724,13 +743,21 @@ void ExpertPool::worker(int id) {
+         if (stop_.load(std::memory_order_acquire)) return;
+         // acquire: the batch this epoch published (`head`, and the description before it) is visible from here
+         seen = epoch_.load(std::memory_order_acquire);
++        if (test_worker_delay_.count() > 0 && id == 0 && (seen & 3u) == 0)
++            std::this_thread::sleep_for(test_worker_delay_);
+         parked_.fetch_sub(1, std::memory_order_acq_rel);   // leaving the park
+ 
+         // Drain: one claim per iteration, so a slow worker takes fewer experts and a fast one takes more.
+         // Every job is the same size (all experts are 1,382,400 bytes), so there is nothing to schedule.  Only
+         // this epoch's jobs: if the host has already moved on, the claims fail and the worker parks again.
+         wstate_[(size_t) id].store(kBetween, std::memory_order_relaxed);
+-        drain(id, scratch_[(size_t) id], seen);
++        const uint64_t batch = head_.load(std::memory_order_acquire);
++        if ((uint32_t) (batch >> 32) == seen && (batch & 0xffffu) < ((batch >> 16) & 0xffffu)) {
++            // A stale wake must not read mode_: the host may already be describing a new batch. A valid active
++            // batch cannot be reused until this worker has parked, so this snapshot is protected by parked_.
++            layer_end = mode_ == 0 || mode_ == 2 || mode_ == 4 || mode_ == 6 || mode_ == 7;
++            drain(id, scratch_[(size_t) id], seen);
++        }
+         wstate_[(size_t) id].store(kParked, std::memory_order_relaxed);
+         parked_.fetch_add(1, std::memory_order_acq_rel);   // back at the park
+     }
+@@ -805,8 +832,44 @@ void ExpertPool::wait_done(int n) {
+     }
+ }
+ 
++void ExpertPool::native_rows(int e, int r0, int r1, bool up) {
++    SplitBufMulti& sb = split_multi_[(size_t) e];
++    const NativeFmt* const nfmt = mjobs_[e].fmt != nullptr ? mjobs_[e].fmt : nfmt_;   // 149-cold: same types and rows
++    if (up && q2_native_kernels(nfmt->gu_type)) {
++        // a native Q2_0 pack: gate and up rows on the Q2_0 kernels, then SwiGLU
++        thread_local float gbuf[MAXT][FF], ubuf[MAXT][FF];
++        float* gp[MAXT];
++        float* up[MAXT];
++        for (int t = 0; t < mjobs_[e].nt; ++t) { gp[t] = gbuf[t]; up[t] = ubuf[t]; }
++        const int nbk = (int) (nfmt->n_embd / 64);
++        q2_rows_any(mjobs_[e].blob, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, gp, r0, r1);
++        q2_rows_any(mjobs_[e].blob + nfmt->up_off, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, up, r0, r1);
++        for (int t = 0; t < mjobs_[e].nt; ++t)
++            for (int r = r0; r < r1; ++r)
++                sb.ff[t][r] = (gbuf[t][r] / (1.f + std::exp(-gbuf[t][r]))) * ubuf[t][r];
++    } else if (up) {
++        float* ff[MAXT];
++        for (int t = 0; t < mjobs_[e].nt; ++t) ff[t] = sb.ff[t];
++        native_gu_rows(*nfmt, mjobs_[e].blob, mjobs_[e].nact, mjobs_[e].nt, ff, r0, r1);
++    } else if (q2_native_kernels(nfmt->d_type)) {
++        // Q2_0 down (most IQ layers): the AVX-512 kernel, ggml-cpu has only a scalar one on x86
++        const ActQ* a2[MAXT];
++        for (int t = 0; t < mjobs_[e].nt; ++t) a2[t] = &sb.a2[t];
++        q2_rows_any(mjobs_[e].blob + nfmt->down_off, nfmt->d_row, (int) (nfmt->n_ff / 64), a2,
++                    mjobs_[e].nt, mjobs_[e].out, r0, r1);
++    } else {
++        const void* hq[MAXT];
++        for (int t = 0; t < mjobs_[e].nt; ++t) hq[t] = sb.hq[t];
++        native_down_rows(*nfmt, mjobs_[e].blob, hq, mjobs_[e].nt, mjobs_[e].out, r0, r1);
++    }
++}
++
+ void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
+-    (void) id;
++    // A worker can observe an epoch and be descheduled before it leaves the park. The host may finish that
++    // batch without it. Check both its epoch and exhaustion before reading mode_ or pipeline batch storage.
++    const uint64_t batch = head_.load(std::memory_order_acquire);
++    if ((uint32_t) (batch >> 32) != epoch || (uint32_t) (batch & 0xffffu) >= ((batch >> 16) & 0xffffu)) return;
++    if (mode_ == 7) { drain_pipeline(id); return; }
+     for (;;) {
+         const int ci = claim(epoch);
+         if (ci < 0) break;
+@@ -832,35 +895,7 @@ void ExpertPool::drain(int id, ExpertScratch& scratch, uint32_t epoch) {
+             for (int64_t r = g0; r < g1;) {
+                 const int e = (int) (r / per), r0 = (int) (r % per);
+                 const int r1 = (int) std::min<int64_t>(per, r0 + (g1 - r));
+-                SplitBufMulti& sb = split_multi_[(size_t) e];
+-                const NativeFmt* const nfmt = mjobs_[e].fmt != nullptr ? mjobs_[e].fmt : nfmt_;   // 149-cold: same types and rows
+-                if (mode_ == 5 && q2_native_kernels(nfmt->gu_type)) {
+-                    // a native Q2_0 pack: gate and up rows on the Q2_0 kernels, then SwiGLU
+-                    thread_local float gbuf[MAXT][FF], ubuf[MAXT][FF];
+-                    float* gp[MAXT];
+-                    float* up[MAXT];
+-                    for (int t = 0; t < mjobs_[e].nt; ++t) { gp[t] = gbuf[t]; up[t] = ubuf[t]; }
+-                    const int nbk = (int) (nfmt->n_embd / 64);
+-                    q2_rows_any(mjobs_[e].blob, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, gp, r0, r1);
+-                    q2_rows_any(mjobs_[e].blob + nfmt->up_off, nfmt->gu_row, nbk, mjobs_[e].act, mjobs_[e].nt, up, r0, r1);
+-                    for (int t = 0; t < mjobs_[e].nt; ++t)
+-                        for (int r = r0; r < r1; ++r)
+-                            sb.ff[t][r] = (gbuf[t][r] / (1.f + std::exp(-gbuf[t][r]))) * ubuf[t][r];
+-                } else if (mode_ == 5) {
+-                    float* ff[MAXT];
+-                    for (int t = 0; t < mjobs_[e].nt; ++t) ff[t] = sb.ff[t];
+-                    native_gu_rows(*nfmt, mjobs_[e].blob, mjobs_[e].nact, mjobs_[e].nt, ff, r0, r1);
+-                } else if (q2_native_kernels(nfmt->d_type)) {
+-                    // Q2_0 down (most IQ layers): the AVX-512 kernel, ggml-cpu has only a scalar one on x86
+-                    const ActQ* a2[MAXT];
+-                    for (int t = 0; t < mjobs_[e].nt; ++t) a2[t] = &sb.a2[t];
+-                    q2_rows_any(mjobs_[e].blob + nfmt->down_off, nfmt->d_row, (int) (nfmt->n_ff / 64), a2,
+-                                mjobs_[e].nt, mjobs_[e].out, r0, r1);
+-                } else {
+-                    const void* hq[MAXT];
+-                    for (int t = 0; t < mjobs_[e].nt; ++t) hq[t] = sb.hq[t];
+-                    native_down_rows(*nfmt, mjobs_[e].blob, hq, mjobs_[e].nt, mjobs_[e].out, r0, r1);
+-                }
++                native_rows(e, r0, r1, mode_ == 5);
+                 r += r1 - r0;
+             }
+         } else {
+@@ -958,8 +993,10 @@ void ExpertPool::run_split_multi(ExpertJobMulti* jobs, int n) {
+     ms_drain_ += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+ }
+ 
+-void ExpertPool::run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n) {
++void ExpertPool::run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs, int n,
++                                      void (*ready)(void*), void* ready_ctx) {
+     if (n <= 0) return;
++    if (native_pipeline_) { run_native_pipeline(f, jobs, n, ready, ready_ctx); return; }
+     const auto t0 = std::chrono::steady_clock::now();
+     // more distinct experts than buffers: run them in batches
+     for (int b0 = 0; b0 < n; b0 += kMaxSplitMulti) {
+@@ -987,6 +1024,87 @@ void ExpertPool::run_split_multi_native(const NativeFmt& f, ExpertJobMulti* jobs
+     multi_bytes += (int64_t) n * (int64_t) f.bytes;
+     mode_ = 0;
+     ms_drain_ += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
++    if (ready) ready(ready_ctx);
++}
++
++void ExpertPool::run_native_pipeline(const NativeFmt& f, ExpertJobMulti* jobs, int n,
++                                    void (*ready)(void*), void* ready_ctx) {
++    const auto t0 = std::chrono::steady_clock::now();
++    for (int b0 = 0; b0 < n; b0 += kMaxSplitMulti) {
++        const int nb = (std::min)(kMaxSplitMulti, n - b0);
++        wait_parked("before an expert pipeline");
++        mjobs_ = jobs + b0;
++        nfmt_ = &f;
++        // Preserve row parallelism when a layer has fewer experts than participating CPU threads.
++        const int wanted = phase_tasks((int64_t) nb * f.n_ff);
++        pipeline_parts_ = (std::min)((int) (std::min)(f.n_ff, f.n_embd), (wanted + nb - 1) / nb);
++        const int ngu = nb * pipeline_parts_, total = 2 * ngu;
++        for (int i = 0; i < total; ++i) pipeline_slots_[i].ready.store(false, std::memory_order_relaxed);
++        for (int e = 0; e < nb; ++e) {
++            pipeline_experts_[e].gu_left.store(pipeline_parts_, std::memory_order_relaxed);
++            for (int part = 0; part < pipeline_parts_; ++part) {
++                auto& task = pipeline_slots_[e * pipeline_parts_ + part];
++                task.expert = e; task.up = true;
++                task.r0 = (int) (f.n_ff * part / pipeline_parts_);
++                task.r1 = (int) (f.n_ff * (part + 1) / pipeline_parts_);
++                task.ready.store(true, std::memory_order_relaxed);
++            }
++        }
++        pipeline_head_.store(0, std::memory_order_relaxed);
++        pipeline_tail_.store(ngu, std::memory_order_relaxed);
++        pipeline_down_left_.store(ngu, std::memory_order_relaxed);
++        mode_ = 7;
++        const uint32_t epoch = begin_batch(total);
++        if (host_works_) drain(-1, host_scratch_, epoch);
++        wait_done(total);
++        // Pipeline consumers use their own queue, so head_ was not advanced by claim(). Explicitly close it
++        // before accepting late arrivals or reusing the batch description, just as claim() closes a row phase.
++        head_.store(pack_head(epoch, (uint32_t) total, (uint32_t) total), std::memory_order_release);
++        // All output writes are visible now. Let the GPU proceed while workers return to the park and the
++        // caller finishes counters. Buffer reuse still waits for every worker below.
++        if (b0 + nb == n && ready) ready(ready_ctx);
++        wait_parked("after an expert pipeline");
++        ++pipeline_batches_; pipeline_jobs_ += nb;
++    }
++    mode_ = 0;
++    hstate_.store(kIdle, std::memory_order_relaxed);
++    hstate_ms_.store(now_ms(), std::memory_order_relaxed);
++    const double elapsed = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
++    ms_pipeline_ += elapsed; ms_drain_ += elapsed;
++    multi_bytes += (int64_t) n * (int64_t) f.bytes;
++}
++
++void ExpertPool::drain_pipeline(int id) {
++    while (pipeline_down_left_.load(std::memory_order_acquire) != 0) {
++        int i = pipeline_head_.load(std::memory_order_relaxed);
++        if (i >= pipeline_tail_.load(std::memory_order_acquire) ||
++            !pipeline_slots_[i].ready.load(std::memory_order_acquire)) { _mm_pause(); continue; }
++        if (!pipeline_head_.compare_exchange_weak(i, i + 1, std::memory_order_relaxed)) continue;
++        const auto& task = pipeline_slots_[i];
++        const int e = task.expert;
++        if (id >= 0) wstate_[id].store(i, std::memory_order_relaxed);
++        else hstate_.store(i, std::memory_order_relaxed);
++        native_rows(e, task.r0, task.r1, task.up);
++        if (task.up) {
++            // The last gate/up part acquires every preceding part's writes. Only it quantizes this expert.
++            if (pipeline_experts_[e].gu_left.fetch_sub(1, std::memory_order_acq_rel) == 1) {
++                auto& sb = split_multi_[(size_t) e];
++                const NativeFmt& f = mjobs_[e].fmt != nullptr ? *mjobs_[e].fmt : *nfmt_;
++                for (int t = 0; t < mjobs_[e].nt; ++t)
++                    if (q2_native_kernels(f.d_type)) act_quant_any(sb.ff[t], (int) f.n_ff, sb.a2[t]);
++                    else native_quant_h(f, sb.ff[t], sb.hq[t]);
++                const int first = pipeline_tail_.fetch_add(pipeline_parts_, std::memory_order_relaxed);
++                for (int part = 0; part < pipeline_parts_; ++part) {
++                    auto& next = pipeline_slots_[first + part];
++                    next.expert = e; next.up = false;
++                    next.r0 = (int) (f.n_embd * part / pipeline_parts_);
++                    next.r1 = (int) (f.n_embd * (part + 1) / pipeline_parts_);
++                    next.ready.store(true, std::memory_order_release);
++                }
++            }
++        } else pipeline_down_left_.fetch_sub(1, std::memory_order_acq_rel);
++        done_.fetch_add(1, std::memory_order_release);
++    }
+ }
+ 
+ void ExpertPool::run(ExpertJob* jobs, int n) {
+diff --git a/src/kernels/cpu/pool_tasks_test.cpp b/src/kernels/cpu/pool_tasks_test.cpp
+index dbb5e754..901346f0 100644
+--- a/src/kernels/cpu/pool_tasks_test.cpp
++++ b/src/kernels/cpu/pool_tasks_test.cpp
+@@ -9,11 +9,32 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <limits>
++#include <random>
+ #include <stdexcept>
+ #include <vector>
+ 
+ namespace cpu = strata::kernels::cpu;
+ 
++void pipeline_env(const char* value) {
++#if defined(_WIN32)
++    _putenv_s("STRATA_CPU_EXPERT_PIPELINE", value);
++#else
++    setenv("STRATA_CPU_EXPERT_PIPELINE", value, 1);
++#endif
++}
++
++struct ReadyCheck {
++    const std::vector<float>* reference;
++    const std::vector<float>* output;
++    int calls = 0;
++    bool equal = true;
++    static void check(void* ctx) {
++        auto& c = *(ReadyCheck*) ctx;
++        ++c.calls;
++        c.equal &= std::memcmp(c.reference->data(), c.output->data(), c.output->size() * sizeof(float)) == 0;
++    }
++};
++
+ int main(int argc, char** argv) {
+     if (argc != 1 && argc != 4) return 2;
+     // its activation quantiser is the AVX one at least (act_quant_any): a CPU without AVX (Westmere) would stop on an illegal instruction
+@@ -64,21 +85,26 @@ int main(int argc, char** argv) {
+                 jobs[e].out[t] = out.data() + ((size_t) e * cpu::MAXT + t) * cpu::H;
+             }
+         }
++        const char* pipe = std::getenv("STRATA_CPU_EXPERT_PIPELINE");
++        const std::string pipeline = pipe ? pipe : "0";
++        pipeline_env("0");
+         { // The default partition is the arithmetic reference; inactive token slots remain zero.
+             cpu::ExpertPool baseline(3, false);
+             baseline.run_split_multi_native(f, jobs.data(), n);
+         }
++        pipeline_env(pipeline.c_str());
+         const auto ref = out;
+         for (float v : ref) if (!std::isfinite(v)) return 1;
+-        for (bool host : {false, true}) for (int workers : {1, 3})
++        for (bool host : {false, true}) for (int workers : {1, 3, 12})
+             for (int tasks : {0, 1, 41, 128, 192, 256, cpu::ExpertPool::kMaxTasks}) {
+                 cpu::ExpertPool pool(workers, false, host, cpu::PoolAffinity::All, tasks);
+                 for (int repeat = 0; repeat < 2; ++repeat) {
+                     std::fill(out.begin(), out.end(), 0.0f);
+                     for (const auto& job : jobs) for (int t = 0; t < job.nt; ++t)
+                         std::fill(job.out[t], job.out[t] + cpu::H, std::numeric_limits<float>::quiet_NaN());
+-                    pool.run_split_multi_native(f, jobs.data(), n);
+-                    if (std::memcmp(ref.data(), out.data(), out.size() * sizeof(float)) != 0) {
++                    ReadyCheck ready{&ref, &out};
++                    pool.run_split_multi_native(f, jobs.data(), n, &ReadyCheck::check, &ready);
++                    if (ready.calls != 1 || !ready.equal || std::memcmp(ref.data(), out.data(), out.size() * sizeof(float)) != 0) {
+                         std::fprintf(stderr, "mismatch n=%d workers=%d host=%d tasks=%d repeat=%d\n",
+                                      n, workers, host, tasks, repeat);
+                         return 1;
+@@ -87,6 +113,43 @@ int main(int argc, char** argv) {
+                 }
+             }
+     }
++    // Reuse one 12-worker pool across rapidly changing batch sizes and all window widths. A late worker must
++    // never consume the next batch's description under the previous batch's epoch (including sleep/wake).
++    std::vector<float> expected((size_t) cpu::MAXT * cpu::H), output((size_t) 13 * cpu::MAXT * cpu::H);
++    std::vector<cpu::ExpertJobMulti> jobs(13);
++    for (int e = 0; e < 13; ++e) {
++        jobs[e].blob = blob.data(); jobs[e].nt = cpu::MAXT;
++        for (int t = 0; t < cpu::MAXT; ++t) {
++            jobs[e].nact[t] = act[t].data(); jobs[e].act[t] = &qact[t];
++            jobs[e].out[t] = output.data() + ((size_t) e * cpu::MAXT + t) * cpu::H;
++        }
++    }
++    const char* pipe = std::getenv("STRATA_CPU_EXPERT_PIPELINE");
++    const std::string pipeline = pipe ? pipe : "0";
++    pipeline_env("0");
++    { cpu::ExpertPool refpool(3, false); refpool.run_split_multi_native(f, jobs.data(), 1); }
++    std::copy(output.begin(), output.begin() + expected.size(), expected.begin());
++    pipeline_env(pipeline.c_str());
++    std::mt19937 random(20261024);
++    {
++        cpu::ExpertPool pool(12, false);
++        for (int iteration = 0; iteration < 300; ++iteration) {
++            const int n = (int) (random() % 14);
++            for (int e = 0; e < n; ++e) {
++                jobs[e].nt = (int) (random() % cpu::MAXT) + 1;
++                for (int t = 0; t < jobs[e].nt; ++t)
++                    std::fill(jobs[e].out[t], jobs[e].out[t] + cpu::H, std::numeric_limits<float>::quiet_NaN());
++            }
++            if (iteration % 7 == 0) std::this_thread::sleep_for(std::chrono::microseconds(50));
++            pool.run_split_multi_native(f, jobs.data(), n);
++            for (int e = 0; e < n; ++e) for (int t = 0; t < jobs[e].nt; ++t)
++                if (std::memcmp(jobs[e].out[t], expected.data() + (size_t) t * cpu::H, cpu::H * sizeof(float))) {
++                    std::fprintf(stderr, "changing-batch mismatch iteration=%d n=%d e=%d t=%d\n", iteration, n, e, t);
++                    return 1;
++                }
++            ++checks;
++        }
++    }
+     std::printf("pool tasks: %d bitwise comparisons passed\n", checks);
+     return 0;
+ }
+diff --git a/src/kernels/cuda/verify_kernels.cu b/src/kernels/cuda/verify_kernels.cu
+index 3ddba710..1440bcfa 100644
+--- a/src/kernels/cuda/verify_kernels.cu
++++ b/src/kernels/cuda/verify_kernels.cu
+@@ -1263,7 +1263,7 @@ static_assert(kResidentPlanMax < 32768, "resident_plan: the packed entry count m
+ __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const int32_t* __restrict__ ids, int n, int k, const int32_t* __restrict__ res,
+                                      int n_expert, const uint8_t* cache_base, const unsigned long long* slot_off,
+                                      long long blob, int32_t* __restrict__ pl, long long capx, uint32_t* skip,
+-                                     uint32_t ring, volatile uint32_t* plan_err) {
++                                     uint32_t ring, volatile uint32_t* plan_err, bool hits_only = false) {
+     __shared__ int32_t s_ids[kResidentPlanMax];
+     __shared__ int32_t s_excl[kResidentPlanMax];
+     __shared__ int32_t s_wsum[4];
+@@ -1278,7 +1278,7 @@ __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const i
+         eid = ids[tid];
+         s_ids[tid] = eid;
+         slot = (eid >= 0 && eid < n_expert) ? res[eid] : -1;
+-        if (slot < 0) atomicOr(&s_bad, 1);
++        if (slot < 0 && !hits_only) atomicOr(&s_bad, 1);
+     }
+     __syncthreads();
+     if (s_bad) {
+@@ -1338,7 +1338,7 @@ __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const i
+         ptr[grp_idx] = (unsigned long long) (cache_base + (slot_off ? (size_t) slot_off[slot] : (size_t) slot * (size_t) blob));
+         start[grp_idx] = ent_start;
+     }
+-    if (tid < n) {
++    if (tid < n && slot >= 0) {
+         const int fj_warp = first_j >> 5;
+         int fj_tot = s_excl[first_j];
+ #pragma unroll
+@@ -1350,11 +1350,13 @@ __global__ void __launch_bounds__(kResidentPlanMax) resident_plan_kernel(const i
+         tok[out_idx] = tid / k;
+     }
+     if (tid == 0) {
+-        const int groups = (s_wsum[0] + s_wsum[1] + s_wsum[2] + s_wsum[3]) & 0xffff;
+-        start[groups] = n;
+-        start2[0] = n;
++        const int total = s_wsum[0] + s_wsum[1] + s_wsum[2] + s_wsum[3];
++        const int groups = total & 0xffff;
++        const int entries = total >> 16;
++        start[groups] = entries;
++        start2[0] = entries;
+         counts[0] = groups;
+-        counts[1] = n;
++        counts[1] = entries;
+         counts[2] = 0;
+         if (skip != nullptr) {
+             __threadfence();
+@@ -1452,6 +1454,54 @@ void resident_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_
+                                                               blob, plan, capx, skip, ring, plan_err);
+     check("resident_plan");
+ }
++
++void resident_hit_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_layer, int n_expert,
++                       const uint8_t* cache_base, const unsigned long long* slot_off, long long blob,
++                       int32_t* plan, long long capx, void* stream) {
++    resident_plan_kernel<<<1, kResidentPlanMax, 0, (cudaStream_t) stream>>>(
++        ids, n_entries, k, res_layer, n_expert, cache_base, slot_off, blob, plan, capx, nullptr, 0, nullptr, true);
++    check("resident_hit_plan");
++}
++
++namespace {
++__global__ void append_pcie_plan_kernel(const volatile uint32_t* flag, uint32_t value, int32_t* pl,
++                                        const volatile int32_t* host, long long capx) {
++    __shared__ int resident_entries, pcie_entries, pcie_groups;
++    if (threadIdx.x == 0) {
++        while (*flag < value) strata_spin_pause();
++        __threadfence_system();
++        resident_entries = pl[1];
++        // These are mapped host loads. Read once, then broadcast through shared memory rather than making every
++        // lane issue the same two PCIe reads (including the common zero-offload case).
++        pcie_entries = host[1];
++        pcie_groups = host[2];
++    }
++    __syncthreads();
++    const int tid = (int) threadIdx.x;
++    const int entries = pcie_entries, groups = pcie_groups, base = resident_entries;
++    const long long dst_off = 4 + capx + 1, tok_off = dst_off + capx;
++    const long long ptr_off = ((4 + capx + 1 + 2 * capx) + 1) & ~1ll;
++    const long long start2_off = ptr_off + 4 * capx;
++    if (tid < entries) {
++        pl[dst_off + base + tid] = host[dst_off + tid];
++        pl[tok_off + base + tid] = host[tok_off + tid];
++    }
++    if (tid < groups) {
++        auto* ptr2 = (unsigned long long*) (pl + ptr_off + 2 * capx);
++        const auto* hptr2 = (const volatile unsigned long long*) (host + ptr_off + 2 * capx);
++        ptr2[tid] = hptr2[tid];
++    }
++    if (tid <= groups) pl[start2_off + tid] = base + host[start2_off + tid];
++    if (tid == 0) { pl[1] = base + entries; pl[2] = groups; }
++}
++} // namespace
++
++void append_pcie_plan_after(const uint32_t* flag, uint32_t value, int32_t* device_plan,
++                            const int32_t* mapped_host_plan, long long capx, void* stream) {
++    append_pcie_plan_kernel<<<1, kResidentPlanMax, 0, (cudaStream_t) stream>>>(
++        flag, value, device_plan, mapped_host_plan, capx);
++    check("append_pcie_plan_after");
++}
+ void wait_flag_ge_or(const uint32_t* flag, uint32_t value, const uint32_t* skip, void* stream) {
+     wait_flag_ge_or_kernel<<<1, 1, 0, (cudaStream_t) stream>>>(flag, value, skip);
+     check("wait_flag_ge_or");
+diff --git a/src/kernels/resident_plan_parity.cpp b/src/kernels/resident_plan_parity.cpp
+index 881ab5ce..d97a9d17 100644
+--- a/src/kernels/resident_plan_parity.cpp
++++ b/src/kernels/resident_plan_parity.cpp
+@@ -18,6 +18,9 @@
+ #include <cstdlib>
+ #include <cstring>
+ #include <random>
++#include <atomic>
++#include <chrono>
++#include <thread>
+ #include <vector>
+ 
+ namespace k = strata::kernels;
+@@ -50,6 +53,12 @@ int main() {
+     ck(cudaMalloc(&d_skip, 4), "skip");
+     uint32_t* d_err = nullptr;
+     ck(cudaMalloc(&d_err, 4), "err");
++    int32_t *h_pcie, *m_pcie;
++    uint32_t *h_ready, *m_ready;
++    ck(cudaHostAlloc((void**) &h_pcie, plan_words * 4, cudaHostAllocMapped), "host pcie plan");
++    ck(cudaHostGetDevicePointer((void**) &m_pcie, h_pcie, 0), "mapped pcie plan");
++    ck(cudaHostAlloc((void**) &h_ready, 4, cudaHostAllocMapped), "host plan flag");
++    ck(cudaHostGetDevicePointer((void**) &m_ready, h_ready, 0), "mapped plan flag");
+ 
+     std::vector<int32_t> res(NE);
+     for (int e = 0; e < NE; ++e) res[e] = (e * 37 + 11) % 1000;      // distinct slots, not the identity
+@@ -144,6 +153,98 @@ int main() {
+         }
+     }
+ 
++    // Mixed layers must produce the same resident groups even while the host plan has not arrived.
++    for (int n = 1; n <= 80; ++n) for (int variant = 0; variant < 6; ++variant) {
++        std::vector<int32_t> rr = res, ids(n);
++        for (int e = 0; e < NE; ++e)
++            if (variant == 0 || (variant < 5 && e % (variant + 1) == 0)) rr[e] = -1;
++        for (int i = 0; i < n; ++i) ids[i] = (int) (rng() % (variant % 2 ? 9 : NE));
++        if (variant == 4) { ids[0] = -1; if (n > 1) ids[1] = NE; }
++        const bool use_off = (n + variant) % 2 != 0;
++        std::vector<int32_t> groups, start, dst, tok;
++        std::vector<unsigned long long> ptr;
++        for (int e : ids) {
++            if (e < 0 || e >= NE || rr[e] < 0) continue;
++            bool seen = false;
++            for (int old : groups) seen |= old == e;
++            if (!seen) groups.push_back(e);
++        }
++        for (int e : groups) {
++            start.push_back((int) dst.size());
++            ptr.push_back((uintptr_t) cache_base + (use_off ? off[rr[e]] : (unsigned long long) rr[e] * blob));
++            for (int i = 0; i < n; ++i) if (ids[i] == e) { dst.push_back(i); tok.push_back(i / K); }
++        }
++        start.push_back((int) dst.size());
++        ck(cudaMemcpy(d_res, rr.data(), NE * 4, cudaMemcpyHostToDevice), "mixed res");
++        ck(cudaMemcpy(d_ids, ids.data(), n * 4, cudaMemcpyHostToDevice), "mixed ids");
++        ck(cudaMemset(d_plan, 0xAB, plan_words * 4), "mixed fill");
++        k::resident_hit_plan(d_ids, n, K, d_res, NE, cache_base, use_off ? d_off : nullptr,
++                             blob, d_plan, capx, nullptr);
++        ck(cudaDeviceSynchronize(), "mixed sync");
++        std::vector<int32_t> plan(plan_words);
++        ck(cudaMemcpy(plan.data(), d_plan, plan_words * 4, cudaMemcpyDeviceToHost), "mixed plan");
++        const int32_t* pdst = plan.data() + 4 + capx + 1;
++        bool ok = plan[0] == (int) groups.size() && plan[1] == (int) dst.size() && plan[2] == 0;
++        ok &= std::memcmp(plan.data() + 4, start.data(), start.size() * 4) == 0;
++        if (!dst.empty()) {
++            ok &= std::memcmp(pdst, dst.data(), dst.size() * 4) == 0;
++            ok &= std::memcmp(pdst + capx, tok.data(), tok.size() * 4) == 0;
++            ok &= std::memcmp(plan.data() + ptr_off, ptr.data(), ptr.size() * 8) == 0;
++        }
++        ok &= plan[(size_t) (ptr_off + 4 * capx)] == (int) dst.size();
++        ++cases;
++        if (!ok) { ++bad; std::printf("mixed plan mismatch n=%d variant=%d\n", n, variant); }
++
++        // CPU publishes only missed groups. Resident descriptors must survive the append unchanged.
++        std::vector<int32_t> misses, pstart, pd, pt;
++        std::vector<unsigned long long> pp;
++        for (int e : ids) {
++            if (e < 0 || e >= NE || rr[e] >= 0 || misses.size() >= 2) continue;
++            bool seen = false; for (int old : misses) seen |= old == e;
++            if (!seen) misses.push_back(e);
++        }
++        for (int e : misses) {
++            pstart.push_back((int) pd.size());
++            pp.push_back(0x80000000ull + (unsigned long long) e * 65536);
++            for (int i = 0; i < n; ++i) if (ids[i] == e) { pd.push_back(i); pt.push_back(i / K); }
++        }
++        pstart.push_back((int) pd.size());
++        std::fill(h_pcie, h_pcie + plan_words, 0);
++        h_pcie[1] = (int) pd.size(); h_pcie[2] = (int) misses.size();
++        if (!pd.empty()) {
++            std::memcpy(h_pcie + 4 + capx + 1, pd.data(), pd.size() * 4);
++            std::memcpy(h_pcie + 4 + 2 * capx + 1, pt.data(), pt.size() * 4);
++            std::memcpy(h_pcie + ptr_off + 2 * capx, pp.data(), pp.size() * 8);
++        }
++        std::memcpy(h_pcie + ptr_off + 4 * capx, pstart.data(), pstart.size() * 4);
++        *(volatile uint32_t*) h_ready = 0;
++        std::atomic_thread_fence(std::memory_order_seq_cst);
++        k::append_pcie_plan_after(m_ready, 7, d_plan, m_pcie, capx, nullptr);
++        if (n % 17 == 0) std::this_thread::sleep_for(std::chrono::microseconds(100));
++        std::atomic_thread_fence(std::memory_order_seq_cst);
++        *(volatile uint32_t*) h_ready = 7;
++        ck(cudaDeviceSynchronize(), "append sync");
++        ck(cudaMemcpy(plan.data(), d_plan, plan_words * 4, cudaMemcpyDeviceToHost), "appended plan");
++        const int base = (int) dst.size();
++        ok = plan[0] == (int) groups.size() && plan[1] == base + (int) pd.size() && plan[2] == (int) misses.size();
++        ok &= std::memcmp(plan.data() + 4, start.data(), start.size() * 4) == 0;
++        if (base) {
++            ok &= std::memcmp(plan.data() + 4 + capx + 1, dst.data(), dst.size() * 4) == 0;
++            ok &= std::memcmp(plan.data() + 4 + 2 * capx + 1, tok.data(), tok.size() * 4) == 0;
++            ok &= std::memcmp(plan.data() + ptr_off, ptr.data(), ptr.size() * 8) == 0;
++        }
++        if (!pd.empty()) {
++            ok &= std::memcmp(plan.data() + 4 + capx + 1 + base, pd.data(), pd.size() * 4) == 0;
++            ok &= std::memcmp(plan.data() + 4 + 2 * capx + 1 + base, pt.data(), pt.size() * 4) == 0;
++            ok &= std::memcmp(plan.data() + ptr_off + 2 * capx, pp.data(), pp.size() * 8) == 0;
++        }
++        for (size_t i = 0; i < pstart.size(); ++i) ok &= plan[ptr_off + 4 * capx + i] == base + pstart[i];
++        ++cases;
++        if (!ok) { ++bad; std::printf("appended plan mismatch n=%d variant=%d\n", n, variant); }
++    }
++
++    ck(cudaFreeHost(h_pcie), "free host pcie plan");
++    ck(cudaFreeHost(h_ready), "free host flag");
+     std::printf("resident_plan: %d cases, %d failures\n", cases, bad);
+     if (bad) return 1;
+     std::printf("resident_plan_parity OK\n");
+diff --git a/src/program/generate.cpp b/src/program/generate.cpp
+index 4724ed5f..4e1a5555 100644
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -1145,6 +1145,8 @@ void drive_pool_multi(void* user, const float* x_f, const int32_t* ids, int64_t
+                       int64_t layer) {
+     Drive* t = (Drive*) user;
+     t->d.layers = layer;
++    std::vector<int32_t> routing_ids;
++    if (t->routing != nullptr) routing_ids.assign(ids, ids + n_tok * k);
+     const Clock::time_point a = Clock::now();
+     strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out);
+     t->cpu_ms += std::chrono::duration<double, std::milli>(Clock::now() - a).count();
+@@ -1157,7 +1159,7 @@ void drive_pool_multi(void* user, const float* x_f, const int32_t* ids, int64_t
+         for (int64_t tok = 0; tok < n_tok; ++tok) {
+             const int32_t rec[2] = {(int32_t) layer, (int32_t) k};
+             std::fwrite(rec, sizeof rec, 1, t->routing);
+-            std::fwrite(ids + tok * k, sizeof(int32_t), (size_t) k, t->routing);
++            std::fwrite(routing_ids.data() + tok * k, sizeof(int32_t), (size_t) k, t->routing);
+             static const float one[64] = {};   // k <= 64 in a verify window; zeros read as unit weights
+             std::fwrite(one, sizeof(float), (size_t) k, t->routing);
+         }
+@@ -3580,7 +3582,10 @@ int main(int argc, char** argv) {
+     // 16 workers: 12.2 either way.  One GPU, no batch slots, no --pcie-frac.
+     auto pcie_balance = [&]() {
+         const char* e = std::getenv("STRATA_PCIE_BALANCE");
+-        return !pcie_given && native_pack && !multi_gpu && o.batch <= 0 && e != nullptr && std::strcmp(e, "1") == 0;
++        const char* staged = std::getenv("STRATA_PCIE_STAGED_MAX");
++        const bool bounded = staged != nullptr && std::atoi(staged) > 0;
++        return native_pack && !multi_gpu && o.batch <= 0 &&
++               (bounded || (!pcie_given && e != nullptr && std::strcmp(e, "1") == 0));
+     };
+     // the canonical Q2_0 pack's CPU kernels are AVX-512 only; a native pack runs on AVX2 CPUs as well
+     if (!native_pack) {
+@@ -9087,7 +9092,9 @@ int main(int argc, char** argv) {
+             for (int st = 0; st + 1 < n_stages; ++st) stage_ver_p(st, 1).set_next(&stage_ver_p(st + 1, 1), &split_drive_b);
+         }
+         ver.set_remote_expert_opt(remote_opt.get());
+-        if (pcie_balance() && n_stages == 1) ver.set_pcie_balance(&drive.d.pcie_model);
++        if (pcie_balance() && n_stages == 1) ver.set_pcie_balance(&drive.d.pcie_model,
++            std::getenv("STRATA_PCIE_STAGED_MAX") != nullptr && std::atoi(std::getenv("STRATA_PCIE_STAGED_MAX")) > 0
++                ? drive.d.staged_pcie_model : nullptr);
+         if (batch_mtp) ver.set_batch_graph_limit(64);   // --batch-mtp only: slot rotation makes many layouts (LRU); 0.1.39 keeps all
+         if (!ver.init(wt, g, ss, vh, native_head.loaded() || prefill_head_alias_bound ? &native_head : nullptr,
+                       batch_mtp ? strata::kernels::kVerifyMaxT : std::max(o.spec, std::min(o.batch, (int) strata::kernels::kVerifyMaxT)), err) ||
+@@ -16113,7 +16120,9 @@ int main(int argc, char** argv) {
+         vh.blob = thits.blob;
+         vh.slot_off = xcache.slot_offsets();   // E-6: the device plan's pointers
+         vh.n_slots = xcache.slots();
+-        if (pcie_balance()) ver.set_pcie_balance(&drive.d.pcie_model);
++        if (pcie_balance()) ver.set_pcie_balance(&drive.d.pcie_model,
++            std::getenv("STRATA_PCIE_STAGED_MAX") != nullptr && std::atoi(std::getenv("STRATA_PCIE_STAGED_MAX")) > 0
++                ? drive.d.staged_pcie_model : nullptr);
+         if (!ver.init(wt, g, ss, vh, native_head.loaded() ? &native_head : nullptr, o.spec, err)) {
+             std::fprintf(stderr, "strata generate: %s\n", err.c_str());
+             return 1;
+@@ -16598,7 +16607,10 @@ int main(int argc, char** argv) {
+                         ver.ms_commit / rounds,
+                         (double) (drive.d.multi_misses - misses0) / (double) (rounds * g.n_layers),
+                         (double) (drive.d.multi_entries - entries0) / (double) (rounds * g.n_layers));
+-        if (rounds > 0)
++        if (rounds > 0 && pool.native_pipeline())
++            std::printf("%-24s expert pipeline %.3f ms/round; CPU pool call %.3f ms/round\n", "pool multi",
++                        pool.pipeline_ms() / rounds, (drive.cpu_ms - pool_ms0) / rounds);
++        else if (rounds > 0)
+             std::printf("%-24s gate/up %.3f  quantize %.3f  down %.3f ms/round; %.1f GB/s over the rows phases; "
+                         "CPU pool call %.3f ms/round\n", "pool multi", pool.ms_multi_gu / rounds,
+                         pool.ms_multi_q / rounds, pool.ms_multi_down / rounds,
+diff --git a/strata-test/run-autoround.sh b/strata-test/run-autoround.sh
+index 582706e4..59e9c115 100644
+--- a/strata-test/run-autoround.sh
++++ b/strata-test/run-autoround.sh
+@@ -13,6 +13,8 @@ export STRATA_BF16_Q8_COLS="${STRATA_BF16_Q8_COLS:-4}"
+ # Measured on this gfx936 host. Each can be set to 0 for the prior kernel path.
+ export STRATA_CPU_Q4_MT="${STRATA_CPU_Q4_MT:-1}"
+ export STRATA_DFLASH_SMALL_GEMV="${STRATA_DFLASH_SMALL_GEMV:-1}"
++# This host's enhanced-MTP defaults; individual scheduling variables still override them.
++export STRATA_DCU_SCHEDULING_DEFAULTS="${STRATA_DCU_SCHEDULING_DEFAULTS:-1}"
+ exec python3 /root/strata-dcu/Strata/tools/autoround_pack.py run \
+   --model /root/private_data/Qwen3.8-F \
+   --out /root/strata-dcu/autoround \
+diff --git a/tools/autoround_pack.py b/tools/autoround_pack.py
+index 8522f271..b497a0f9 100644
+--- a/tools/autoround_pack.py
++++ b/tools/autoround_pack.py
+@@ -490,6 +490,12 @@ def run_model(ck, out, a):
+     env = dict(os.environ, STRATA_MAX_WEIGHT_VRAM_FRACTION="0.5")
+     # gfx936 measurements: staged passes strict HC parity and improves decode.
+     env.setdefault("STRATA_HC_SPLIT", "2")
++    # The machine-specific DCU wrapper opts into the combination measured with enhanced MTP. Other entrypoints
++    # and other draft modes keep scheduling opt-in; a caller's individual 0/1 override always wins.
++    if env.get("STRATA_DCU_SCHEDULING_DEFAULTS") == "1" and not a.dflash2 and a.mtp_mode == "adaptive":
++        env.setdefault("STRATA_VERIFY_HIT_PLAN", "1")
++        env.setdefault("STRATA_CPU_EXPERT_PIPELINE", "1")
++        env.setdefault("STRATA_CPU_EARLY_RESULT", "1")
+     if a.dflash2:
+         env.update(STRATA_ROUTE_TAIL_SKIP="0", STRATA_QFUSE="0", STRATA_VERIFY_QDEDUP="0", STRATA_QFUSE_HC="0")
+         env.setdefault("STRATA_BF16_Q8_VEC4", "1")
+@@ -525,8 +531,15 @@ def run_model(ck, out, a):
+     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
+               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
+               "expert_execution": {"resident_pin": a.resident_pin, "adapt_every": a.adapt_every, "adapt_swaps": a.adapt_swaps,
+-                                   "pcie_mode": a.pcie_mode, "pcie_frac": a.pcie_frac},
++                                   "pcie_mode": "dma-staged" if int(env.get("STRATA_PCIE_STAGED_MAX") or "0") > 0 else a.pcie_mode,
++                                   "pcie_frac": a.pcie_frac},
+               "suffix_draft": a.suffix_draft,
++              "scheduling_options": {"gpu_hit_plan": env.get("STRATA_VERIFY_HIT_PLAN") == "1",
++                                     "cpu_expert_pipeline": env.get("STRATA_CPU_EXPERT_PIPELINE") == "1",
++                                     "early_result": env.get("STRATA_CPU_EARLY_RESULT") == "1",
++                                     "staged_experts_max": max(0,min(16,int(env.get("STRATA_PCIE_STAGED_MAX") or "0"))),
++                                     "shared_stream": env.get("STRATA_SH_STREAM", "auto"),
++                                     "pool_idle_us": env.get("STRATA_POOL_IDLE_US")},
+               "kernel_options": {"hc_split": env.get("STRATA_HC_SPLIT", "auto"), "cpu_q4_mt": env.get("STRATA_CPU_Q4_MT") == "1",
+                                  "dflash_small_gemv": env.get("STRATA_DFLASH_SMALL_GEMV") == "1"},
+               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
+diff --git a/tools/bench_dflash2_native.py b/tools/bench_dflash2_native.py
+index db7aff0d..ee583db2 100644
+--- a/tools/bench_dflash2_native.py
++++ b/tools/bench_dflash2_native.py
+@@ -27,6 +27,9 @@ ap.add_argument('--joint-fixed-prefix',action='store_true')
+ ap.add_argument('--spec-prob',action='store_true')
+ ap.add_argument('--corrupt',type=int,default=0)
+ ap.add_argument('--timing-only',action='store_true')
++ap.add_argument('--thread-usage',action='store_true',help='sample per-thread scheduled CPU time at decode protocol boundaries')
++ap.add_argument('--shared-stream',choices=['auto','on','off'],default='auto',help='explicit shared-expert GPU stream placement; auto preserves backend defaults')
++ap.add_argument('--request-pcie-frac',type=float,help='explicit per-request fraction; exercises the fixed bounded-offload path')
+ ap.add_argument('--width',type=int,choices=range(2,9),default=8)
+ ap.add_argument('--context',type=int,default=512)
+ ap.add_argument('--long-checks',action='store_true')
+@@ -39,6 +42,7 @@ a=ap.parse_args()
+ if a.resident_pin is None:a.resident_pin=a.pcie_frac!=0
+ assert a.adapt_every >= 0 and a.adapt_swaps >= 0 and a.suffix_draft >= 0
+ assert a.pcie_frac == -1 or 0 <= a.pcie_frac <= 1
++assert a.request_pcie_frac is None or 0 <= a.request_pcie_frac <= 1
+ assert not a.long_checks or a.context>=2300
+ out=Path(a.out);out.mkdir(parents=True,exist_ok=False)
+ root=Path('/root/strata-dcu'); cache=root/'autoround'
+@@ -84,9 +88,15 @@ for key in ['STRATA_VERIFY_PROFILE','STRATA_DECODE_TIMING','STRATA_DUMP_FIRST_LO
+ settings=dict(STRATA_MAX_WEIGHT_VRAM_FRACTION='0.5',STRATA_TRACE='1',STRATA_BF16_Q8_VEC4='1',STRATA_BF16_Q8_COLS=str(a.cols),STRATA_ROUTE_TAIL_SKIP='0',STRATA_SPEC_COUPLED='1',
+  STRATA_QFUSE=str(int(a.fuse in ['qfuse','both'])),STRATA_VERIFY_QDEDUP=str(int(a.fuse in ['qdedup','both'])),STRATA_QFUSE_HC=str(int(a.fuse=='hc')))
+ env.update(settings)
++if a.shared_stream != 'auto':
++ settings['STRATA_SH_STREAM']='1' if a.shared_stream=='on' else '0'
++ env['STRATA_SH_STREAM']=settings['STRATA_SH_STREAM']
+ for feature in ['STRATA_CPU_Q4_MT','STRATA_DFLASH_SMALL_GEMV']:
+  settings[feature]=env.get(feature,'0')
+  env[feature]=settings[feature]
++for feature in ['STRATA_VERIFY_HIT_PLAN','STRATA_CPU_EXPERT_PIPELINE','STRATA_CPU_EARLY_RESULT',
++                'STRATA_PCIE_STAGED_MAX','STRATA_POOL_IDLE_US','STRATA_POOL_SPIN_US']:
++ if feature in env:settings[feature]=env[feature]
+ if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRATA_SPEC_DEPTH='1')
+ if a.timing_only:env['STRATA_DECODE_TIMING']='1'
+ if a.spec_prob:env['STRATA_SPEC_PROB']='1'
+@@ -136,10 +146,28 @@ def memory_snapshot():
+ (out/'memory-before.json').write_text(json.dumps(memory_snapshot(),indent=2)+'\n')
+ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
+  p=subprocess.Popen(cmd,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=err,text=True,bufsize=1)
++ thread_records=[]
++ def thread_snapshot():
++  stamp=time.monotonic_ns();threads={}
++  for task in Path(f'/proc/{p.pid}/task').iterdir():
++   try:
++    sched=list(map(int,(task/'schedstat').read_text().split()))
++    status=(task/'status').read_text().splitlines()
++    threads[task.name]=dict(runtime_ns=sched[0],runqueue_ns=sched[1],affinity=next(s.split(':',1)[1].strip() for s in status if s.startswith('Cpus_allowed_list:')))
++   except FileNotFoundError:pass
++  return dict(time_ns=stamp,threads=threads)
++ thread_start=None
+  def line():
++  global thread_start
+   s=p.stdout.readline()
+   if not s:raise RuntimeError(f'engine EOF: {p.poll()}')
+   stdout.write(s);stdout.flush()
++  if a.thread_usage:
++   if s.startswith('REUSED '):thread_start=thread_snapshot()
++   if s.startswith('DONE ') and thread_start is not None:
++    thread_records.append(dict(pid=p.pid,done=s.strip(),start=thread_start,end=thread_snapshot()))
++    (out/'thread-usage.json').write_text(json.dumps(thread_records,indent=2)+'\n')
++    thread_start=None
+   if s.startswith('ERR '):raise RuntimeError(s)
+   return s.strip()
+  def send(s):p.stdin.write(s);p.stdin.flush()
+@@ -157,6 +185,7 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
+   if tail:ids=ids[:3]+[tok.encode(' word',add_special_tokens=False)[0]]*((2100 if a.long_checks else a.context-11)-len(ids))+ids[3:]
+   assert len(ids)+n<=a.context
+   sampling=f'temperature={temperature} top_p=0.9 top_k=20 seed=1729' if temperature else 'temperature=0'
++  if a.request_pcie_frac is not None:sampling+=f' pcie_frac={a.request_pcie_frac}'
+   return ids,f'GEN {n} ckpt=0 {sampling} '+','.join(map(str,ids))+'\n'
+  try:
+   while not line().startswith('READY '):pass

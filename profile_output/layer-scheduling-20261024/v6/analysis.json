@@ -1,0 +1,415 @@
+{
+  "baseline": {
+    "workloads": {
+      "story": {
+        "tps": [
+          33.13615594703393
+        ],
+        "median_tps": 33.13615594703393,
+        "host_cpu_pct": 99.06962619293833,
+        "worker_cpu_pct": 98.79524168556694
+      },
+      "chinese": {
+        "tps": [
+          41.43735836840401
+        ],
+        "median_tps": 41.43735836840401,
+        "host_cpu_pct": 98.82534693807965,
+        "worker_cpu_pct": 99.71997998726748
+      },
+      "code": {
+        "tps": [
+          41.85947642951747
+        ],
+        "median_tps": 41.85947642951747,
+        "host_cpu_pct": 99.85578413490383,
+        "worker_cpu_pct": 99.56776790714372
+      }
+    },
+    "qa": {
+      "functional_assertions_passed": true,
+      "qa_scope": "full",
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "pcie_per_layer": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gpu_plan_logged": false,
+    "cpu_pipeline_logged": false,
+    "staged_logged": false
+  },
+  "both": {
+    "workloads": {
+      "story": {
+        "tps": [
+          33.61476948934438
+        ],
+        "median_tps": 33.61476948934438,
+        "host_cpu_pct": 99.06066122641153,
+        "worker_cpu_pct": 99.95713611650908
+      },
+      "chinese": {
+        "tps": [
+          41.33565846412194
+        ],
+        "median_tps": 41.33565846412194,
+        "host_cpu_pct": 99.32282600077563,
+        "worker_cpu_pct": 99.94558498251887
+      },
+      "code": {
+        "tps": [
+          43.83786838364985
+        ],
+        "median_tps": 43.83786838364985,
+        "host_cpu_pct": 98.66611750523188,
+        "worker_cpu_pct": 98.9828050002517
+      }
+    },
+    "qa": {
+      "functional_assertions_passed": true,
+      "qa_scope": "full",
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "pcie_per_layer": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gpu_plan_logged": true,
+    "cpu_pipeline_logged": true,
+    "staged_logged": false
+  },
+  "cpu-pipeline": {
+    "workloads": {
+      "story": {
+        "tps": [
+          33.527162240033526
+        ],
+        "median_tps": 33.527162240033526,
+        "host_cpu_pct": 97.44650024968718,
+        "worker_cpu_pct": 99.17161731390378
+      },
+      "chinese": {
+        "tps": [
+          42.715077087365685
+        ],
+        "median_tps": 42.715077087365685,
+        "host_cpu_pct": 98.86774052211764,
+        "worker_cpu_pct": 99.99532607202663
+      },
+      "code": {
+        "tps": [
+          43.197273172131005
+        ],
+        "median_tps": 43.197273172131005,
+        "host_cpu_pct": 95.39488577924455,
+        "worker_cpu_pct": 97.49960865960547
+      }
+    },
+    "qa": {
+      "functional_assertions_passed": true,
+      "qa_scope": "full",
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "pcie_per_layer": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gpu_plan_logged": false,
+    "cpu_pipeline_logged": true,
+    "staged_logged": false
+  },
+  "early": {
+    "workloads": {
+      "story": {
+        "tps": [
+          34.39473330646245
+        ],
+        "median_tps": 34.39473330646245,
+        "host_cpu_pct": 98.4433086733683,
+        "worker_cpu_pct": 99.9692904073523
+      },
+      "chinese": {
+        "tps": [
+          41.53147306943543
+        ],
+        "median_tps": 41.53147306943543,
+        "host_cpu_pct": 98.84888612456588,
+        "worker_cpu_pct": 99.64410186262764
+      },
+      "code": {
+        "tps": [
+          44.86426806400168
+        ],
+        "median_tps": 44.86426806400168,
+        "host_cpu_pct": 98.64585116974872,
+        "worker_cpu_pct": 99.92455851391827
+      }
+    },
+    "qa": {
+      "functional_assertions_passed": true,
+      "qa_scope": "full",
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "pcie_per_layer": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gpu_plan_logged": true,
+    "cpu_pipeline_logged": true,
+    "staged_logged": false
+  },
+  "gpu-plan": {
+    "workloads": {
+      "story": {
+        "tps": [
+          33.4518084883964
+        ],
+        "median_tps": 33.4518084883964,
+        "host_cpu_pct": 98.87344315537464,
+        "worker_cpu_pct": 99.24501403549607
+      },
+      "chinese": {
+        "tps": [
+          41.970653332240346
+        ],
+        "median_tps": 41.970653332240346,
+        "host_cpu_pct": 99.29855313887032,
+        "worker_cpu_pct": 99.87749517825812
+      },
+      "code": {
+        "tps": [
+          42.703676519650365
+        ],
+        "median_tps": 42.703676519650365,
+        "host_cpu_pct": 96.55671255072339,
+        "worker_cpu_pct": 97.08159241870989
+      }
+    },
+    "qa": {
+      "functional_assertions_passed": true,
+      "qa_scope": "full",
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "pcie_per_layer": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gpu_plan_logged": true,
+    "cpu_pipeline_logged": false,
+    "staged_logged": false
+  },
+  "idle-200": {
+    "workloads": {
+      "story": {
+        "tps": [
+          32.37801330533984
+        ],
+        "median_tps": 32.37801330533984,
+        "host_cpu_pct": 98.53271022075278,
+        "worker_cpu_pct": 61.33736454681421
+      },
+      "chinese": {
+        "tps": [
+          38.63567763356475
+        ],
+        "median_tps": 38.63567763356475,
+        "host_cpu_pct": 97.7594323212773,
+        "worker_cpu_pct": 54.060315070767466
+      },
+      "code": {
+        "tps": [
+          41.1529249119874
+        ],
+        "median_tps": 41.1529249119874,
+        "host_cpu_pct": 99.0076611652511,
+        "worker_cpu_pct": 57.493741510831825
+      }
+    },
+    "qa": {
+      "functional_assertions_passed": true,
+      "qa_scope": "full",
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "pcie_per_layer": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gpu_plan_logged": true,
+    "cpu_pipeline_logged": true,
+    "staged_logged": false
+  },
+  "staged-2": {
+    "workloads": {
+      "story": {
+        "tps": [
+          32.53644463085116
+        ],
+        "median_tps": 32.53644463085116,
+        "host_cpu_pct": 99.31420709262385,
+        "worker_cpu_pct": 99.98208096641409
+      },
+      "chinese": {
+        "tps": [
+          41.13044456226603
+        ],
+        "median_tps": 41.13044456226603,
+        "host_cpu_pct": 99.21741965795388,
+        "worker_cpu_pct": 99.58103082806666
+      },
+      "code": {
+        "tps": [
+          43.03895361544022
+        ],
+        "median_tps": 43.03895361544022,
+        "host_cpu_pct": 98.557589616107,
+        "worker_cpu_pct": 99.80660623338277
+      }
+    },
+    "qa": {
+      "functional_assertions_passed": true,
+      "qa_scope": "full",
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "pcie_per_layer": [
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.01,
+      0.02,
+      0.01,
+      0.02,
+      0.02,
+      0.01,
+      0.02,
+      0.01,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.02,
+      0.01,
+      0.02,
+      0.02
+    ],
+    "gpu_plan_logged": true,
+    "cpu_pipeline_logged": true,
+    "staged_logged": true
+  }
+}

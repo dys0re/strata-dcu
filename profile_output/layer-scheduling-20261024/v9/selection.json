@@ -1,0 +1,41 @@
+{
+  "chosen": "core",
+  "flags": {
+    "STRATA_VERIFY_HIT_PLAN": "1",
+    "STRATA_CPU_EXPERT_PIPELINE": "1",
+    "STRATA_CPU_EARLY_RESULT": "1"
+  },
+  "baseline": {
+    "story": 33.27051790239781,
+    "chinese": 41.23047189563537,
+    "code": 40.62653738117531
+  },
+  "medians": {
+    "core": {
+      "story": 34.64656444125648,
+      "chinese": 42.32874220803916,
+      "code": 45.02999067738474
+    },
+    "cpu-early": {
+      "story": 33.97253002455046,
+      "chinese": 42.71436437355047,
+      "code": 44.757592181408114
+    },
+    "idle-500": {
+      "story": 33.508730595041754,
+      "chinese": 42.43117365289311,
+      "code": 44.44212975018662
+    }
+  },
+  "scores": {
+    "core": 1.0582052386417455,
+    "cpu-early": 1.0523502118191663,
+    "idle-500": 1.0427576931250044
+  },
+  "worker_busy": {
+    "core": 99.99656022551935,
+    "cpu-early": 99.98525953992565,
+    "idle-500": 79.53347301387168
+  },
+  "engine_sha256": "a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2"
+}

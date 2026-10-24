@@ -108,6 +108,15 @@ void copy_rows_strided(float* dst, const float* src, int64_t rows, int64_t w, in
 void resident_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_layer, int n_expert,
                    const uint8_t* cache_base, const unsigned long long* slot_off, long long blob, int32_t* plan,
                    long long capx, uint32_t* skip, uint32_t ring, void* stream, uint32_t* plan_err = nullptr);
+/// Build only the resident groups of a mixed CPU/GPU layer. Same grouping and output-row order as the host
+/// planner; misses are omitted. The plan has separate storage, so resident work need not wait for the host plan.
+void resident_hit_plan(const int32_t* ids, int n_entries, int k, const int32_t* res_layer, int n_expert,
+                       const uint8_t* cache_base, const unsigned long long* slot_off, long long blob,
+                       int32_t* plan, long long capx, void* stream);
+/// After the host publishes its PCIe-only plan, append it to the device-built resident plan. Resident groups and
+/// their packed output rows remain first; PCIe rows follow. One launch combines the wait and mapped reads.
+void append_pcie_plan_after(const uint32_t* flag, uint32_t value, int32_t* device_plan,
+                            const int32_t* mapped_host_plan, long long capx, void* stream);
 /// wait_flag_ge that also returns when *skip == value (device memory).
 void wait_flag_ge_or(const uint32_t* flag, uint32_t value, const uint32_t* skip, void* stream);
 /// copy_i32_from_mapped unless *skip == value.
