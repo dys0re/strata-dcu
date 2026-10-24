@@ -1,0 +1,216 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+Usage: /opt/hyhal/bin/hy-smi [options] 
+
+Description:                            The smi is C-3000 HCU system management interface.
+
+Optional Arguments:
+ -version --version                     Print version information of smi and exit.
+ -libversion --libversion               Print lib version information of smi and exit.
+ -h --help                              Show the help message of smi and exit.
+ --hcureset                             Reset specified HCU (One HCU must be specified).
+ --load FILE                            Load Clock, Fan, Performance settings from FILE.
+ --save FILE                            Save Clock, Fan, Performance settings to FILE.
+ -d --device DEVICE [DEVICE DEVICE ...] Execute command on specified device.
+ --finegrain                            Show fine-grained usage (support from driver version 
+                                        6.2.22).
+
+Display Options:
+ --forchip                              Display critical info in a concise format.
+ --mig                                  Display critical info with mig in a concise format.
+ --showhw                               Show Hardware details.
+ -a --showallinfo                       Show Temperature, Fan and Clock values.
+
+Topology:
+ -i --showid                            Show HCU ID.
+ -v --showvbios                         Show VBIOS version.
+ --showdriverversion                    Show kernel driver version.
+ -e --showevents TYPE                   Show event list.
+ --duration SECONDS                     The duration of --showevents
+ --showfwinfo                           Show FW information.
+ --showhswfw                            Show HSW FW version.
+ --showmemvendor                        Show HCU memory vendor.
+ --showmemdc                            Show HCU memory date code.
+ --showproductname                      Show SKU/Vendor name.
+ --showserial                           Show HCU's Serial Number.
+ --showpartnum                          Show HCU's Part Number.
+ --showuniqueid                         Show HCU's Unique ID.
+ --showbus                              Show PCI bus number.
+ --shownodeid                           Show node id.
+
+Pages Information:
+ --showpagesinfo                        Show retired, pending and unreservable pages.
+ --detail                               Show bad pages detail.
+ --showpendingpages                     Show pending pages.
+ --showretiredpages                     Show retired pages.
+ --showunreservablepages                Show unreservable pages.
+
+Hardware-related Information:
+ -f --showfan                           Show current fan speed.
+ -P --showpower                         Show current Average Graphics Package Power Consumption.
+ -t --showtemp                          Show current temperature.
+ -u --showuse                           Show current HCU use.
+ --showseuse                            Show current HCU SE use.
+ --showcunum                            Show current HCU CU number.
+ --showmemuse                           Show current HCU memory used.
+ --showvoltage                          Show current HCU voltage.
+ --showhash                             Show current HCU hash status.
+ --showboost                            Get the gfx boost level. 
+ --showhcuutil                          Show the ratio of time the HCU is active. 
+ --showcuutil                           Show the ratio of cycles an CU has at least 1 wave assigned, 
+                                        this value represents the average of all CUs. 
+ --showwaveutil                         Show the ratio of number of waves resident on an CU, this 
+                                        value represents the average of all CUs. 
+
+Software-related/controlled Information:
+ -b --showbw                            Show estimated PCIe use.
+ -c --showclocks                        Show current clock frequencies.
+ -g --showhcuclocks                     Show current HCU clock frequencies.
+ -l --showprofile                       Show compute profile attributes.
+ -M --showmaxpower                      Show maximum graphics package power this HCU will consume.
+ -m --showmemoverdrive                  Show current HCU memory clock overdrive level.
+ -o --showoverdrive                     Show current HCU clock overdrive level.
+ -p --showperflevel                     Show current DPM Performance Level.
+ -s --showclkfrq                        Show supported HCU and Memory Clock.
+ --showmeminfo TYPE [TYPE TYPE ...]     Show Memory usage information for given block(s).
+ --showmemeccinfo                       Show vram memory ECC information.
+ --showmemavailable                     Show available vram memory size.
+ --showpids                             Show current running KFD PIDs.
+ --showpidhcus PID [PID PID ...]        Show HCUs used by specified KFD PIDs.
+ --showcontainermem                     Show Container VRAM usaged.
+ --showreplaycount                      Show PCIe Replay Count.
+ --showrasinfo BLOCK [BLOCK BLOCK ...]  Show RAS enablement information and error counts for the 
+                                        specified block(s).
+ --showrasdmon                          Enable real-time RAS error monitoring (CE/UE).
+ --loop MINUTES                         Sampling interval in minutes (default: 1).
+ --loopnum COUNT                        Number of iterations to run (-1 for infinite, default: -1).
+ --showhslerr                           Show HSL error information since last read.
+ --showtopo                             Show hardware topology information.
+ --showtopoaccess                       Show the link accessibility between HCUs.
+ --showtopoweight                       Show the relative weight between HCUs.
+ --showtopohops                         Show the number of hops between HCUs.
+ --showtopotype                         Show the link type between HCUs.
+ --showtoponuma                         Show the numa nodes.
+ --showhslstatus                        Show the status of hsl link.
+ --showcurrenthslstate                  Show the current state of hsl link.
+ --showenergycounter                    Show the energy accumulator that stores amount of energy 
+                                        consumed.
+ --showexceptioninfo                    Show the exception information.
+ -R                                     Show device and HSW id for links.
+ --healthcheck                          Check the health status.
+ --showdfbw --showmembw                 Show df read/write bandwidth.
+ --showumcbw                            Show umc read/write bandwidth.
+ --channel CHANNEL                      Select umc channel (0-31 or all).
+ --showhslbw                            Show hsl receive/send bandwidth.
+ --link LINK                            Select hsl link (0-6 or all).
+ --direction <value>                    Select hsl link direction (0 for receive, 1 for send).
+ --showpciebw                           Show current pcie bandwidth.
+ --delay <value>                        Set the delay time (in ms) for --showumcbw, --showhslbw and 
+                                        --showpciebw.
+ --count <value>                        Number of times to collect bandwidth statistics
+ --bwdetail                             Show bandwidth detail.
+ --showmemiovol                         Show gddr6 memio voltage.
+ --showfdr                              Show frequency adjustment reason.
+ --showfdrhistory                       Show frequency adjustment history.
+
+Set Options:
+ --setsclk LEVEL [LEVEL LEVEL ...]      Set HCU Clock Frequency Level (requires manual Perf level).
+ --setmclk LEVEL [LEVEL LEVEL ...]      Set HCU Memory Clock Frequency Level (requires manual Perf 
+                                        level).
+ --setsocclk LEVEL [LEVEL LEVEL ...]    Set SOC Clock Frequency Level (requires manual Perf level).
+ --setfan LEVEL                         Set HCU Fan Speed (Level or %).
+ --setperflevel LEVEL                   Set Performance Level (auto, low, high or manual).
+ --customerset CUSTOMER                 Set customer.
+ --setpoweroverdrive WATTS              Set the maximum HCU power using Power OverDrive in Watts.
+ --setprofile LEVEL                     Specify power profile level.
+ --enablelowpower 1/0                   Enable/Disable the low power mode of HCU.
+ --setlowpowerdelay TIME                Set the delay time (in ms) before enter low power mode of 
+                                        HCU.
+ --rasenable BLOCK ERRTYPE              Enable RAS for specified block and error type.
+ --rasdisable BLOCK ERRTYPE             Disable RAS for specified block and error type.
+ --rasinject BLOCK ERRTYPE              Inject RAS poison for specified block (ONLY WORKS ON 
+                                        UNSECURE BOARDS).
+ --getmaxsclk                           Get max sclk numerical value(Mhz).
+ --getminsclk                           Get min sclk numerical value(Mhz).
+ --getmaxsocclk                         Get max socclk numerical value(Mhz).
+ --getminsocclk                         Get min socclk numerical value(Mhz).
+ -mig --multi-instance-gpu <value>      Enable or disable Multi Instance HCU: 0/DISABLED, 1/ENABLED. 
+                                        Requires root privilege.
+ --setmaxprocess COUNT                  Set the maximum number of processes.
+ --setmemiovol VOLTAGE LEVEL            Set gddr6 memio voltage
+ --setboost LEVEL                       Set the gfx boost level. 0-AI(default), 2-AI(typical), 
+                                        3-HPC(typical)
+
+Ecc Options:
+ --setecc <value>                       Set ecc mode, there are three modes, on: ecc on, off: ecc 
+                                        off, stable: ecc off and stable.
+ --showecc                              Show ecc mode, there are three modes: ecc on, ecc off, ecc 
+                                        off and stable.
+
+Driver Load Options:
+ --loaddriver                           Load driver by manual.
+ --unloaddriver                         Unload driver by manual.
+ --setautoloaddriver <value>            Set driver auto-load upon startup. 0: auto-load off, 1: 
+                                        auto-load on.
+ --getautoloaddriver                    Get driver auto-load upon startup.
+ --setdriverparams <value>              Set parameters of driver loading.
+ --getdriverparams                      Get parameters of driver loading.
+ --addstabledriverparams <value>        Add stable parameters of driver loading.
+ --getstabledriverparams                Get stable parameters of driver loading.
+ --clearstabledriverparams              Clear stable parameters of driver loading.
+ --setextendbw <value>                  Set extend bandwidth level. 0: off, 1: 1GB, 2: 2GB, 3: 4GB
+ --getextendbw                          Get extend bandwidth level.
+
+Hyckptd Options:
+ --setautorunhyckptd <value>            Set hyckptd auto-run upon startup. 0: auto-load off, 1: 
+                                        auto-load on.
+ --getautorunhyckptd                    Get hyckptd auto-run upon startup.
+ --runhyckptd                           Run hyckptd.
+ --stophyckptd                          Stop hyckptd.
+
+Reset Options:
+ -r --resetclocks                       Reset clocks and OverDrive to default.
+ --resetfans                            Reset fans to automatic (driver) control.
+ --resetpoweroverdrive                  Set the maximum HCU power back to the device deafult state.
+ --resethslerr                          Reset HSL error count.
+
+Auto-response Options:
+ --autorespond RESPONSE                 Response to automatically provide for all prompts (NOT 
+                                        RECOMMENDED).
+
+Output Options:
+ --loglevel LEVEL                       How much output will be printed for what program is doing, 
+                                        one of debug / info / warning / error / critical
+ --json                                 Print output in JSON format.
+ --csv                                  Print output in CSV format.
+ --old                                  Print time in CSV format.
+
+Dmon Options:
+ -idmon IDMON                           Excute dmon command on specified device ID.
+ -sdmon SDMON                           Display select data to be showed, c: clocks; f: fan RPM; p: 
+                                        power and temperature; u: HCU utilization.
+ -cdmon CDMON                           Display dmon for specified count.
+ -ddmon DDMON                           Display interval in seconds.
+ -odmon ODMON                           Display with date and time information.
+ -fdmon FDMON                           Log to a specified file.
+ -tdmon TDMON                           Output file format: text (default) or csv.
+
+Console Options:
+ --index INDEX                          Appoint the device to be record.
+ --time TIME                            Record test result last time in seconds.
+ --filename FILE                        Appoint the save file name.
+
+Virtual HCUs:
+ virtual                                Displays Virtual HCUs information. Use 'hy-smi virtual -h' 
+                                        for more information.
+
+Multi-Instance GPUs:
+ mig                                    Provides controls for MIG management. Use 'hy-smi mig -h' 
+                                        for more information.
+lrwxrwxrwx 1 root root 63 Oct 23 18:31 /root/strata-dcu/build-gfx936/strata -> /root/private_data/strata-dcu/joint-draft-20261023/strata-final
+/root/private_data/strata-dcu/joint-draft-20261023/strata-final
+1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1  /root/strata-dcu/build-gfx936/strata
+16:exec python3 /root/strata-dcu/Strata/tools/autoround_pack.py run \
+18:  --out /root/strata-dcu/autoround \
+19:  --llama /root/strata-dcu/llama.cpp \
+20:  --engine /root/strata-dcu/build-gfx936/strata --mtp-mode adaptive "$@"

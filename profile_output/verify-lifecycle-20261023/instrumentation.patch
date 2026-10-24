@@ -1,0 +1,167 @@
+--- a/src/core/verify.cpp
++++ b/src/core/verify.cpp
+@@ -94,6 +94,11 @@
+ using Clock = std::chrono::steady_clock;
+ double ms_since(Clock::time_point t) { return std::chrono::duration<double, std::milli>(Clock::now() - t).count(); }
+ const bool g_dbg = std::getenv("STRATA_VERIFY_DEBUG") != nullptr;
++// [PROFILE] Diagnostic-only lifecycle capture. Keep production fusion/stream choices.
++bool lifecycle_on() { static const bool on = std::getenv("STRATA_LIFECYCLE_CSV") != nullptr; return on; }
++thread_local int64_t lifecycle_cpu[256][3] = {};
++int64_t lifecycle_ns(Clock::time_point t) { return std::chrono::duration_cast<std::chrono::nanoseconds>(t.time_since_epoch()).count(); }
++
+ inline bool g_lfuse() { static const bool on = [] { const char* v = std::getenv("STRATA_LFUSE"); return v != nullptr && v[0] == '1'; }(); return on; }
+ // STRATA_ROUTE_RESIDENT=<margin logits> (+ STRATA_ROUTE_RESIDENT_RANKS=lo-hi, default 6-9): residency-biased routing.
+ struct RouteResidentCfg;
+@@ -858,9 +863,9 @@
+         std::fprintf(stderr, "strata verify trace (#649): on\n");
+ #endif
+     }
+-    prof_on_ = std::getenv("STRATA_VERIFY_PROFILE") != nullptr;
++    prof_on_ = std::getenv("STRATA_VERIFY_PROFILE") != nullptr || lifecycle_on();
+     if (prof_on_) {
+-        const size_t np = (size_t) g.n_layers * kProfPer + 4;
++        const size_t np = (size_t) g.n_layers * kProfPer + 4 + (lifecycle_on() ? 2 * g.n_layers : 0);
+         if (cudaMalloc((void**) &prof_, np * 8) != cudaSuccess) { prof_on_ = false; prof_ = nullptr; cudaGetLastError(); }
+         else { cudaMemset(prof_, 0, np * 8); prof_h_.assign(np, 0); }
+     }
+@@ -1075,7 +1080,7 @@
+     // makes side i depend on everything captured on `cs` so far, join(i) makes `cs` depend on everything captured on
+     // side i: a branch never races with what came before its fork or after its join.  Not in a split or batch window,
+     // nor under the stage profiler (whose stamps are on `cs`).
+-    const bool br = df_branch_ && G == 1 && !batch_rec_ && !prof_on_ && !side_mixer;   // STRATA_SIDE_MIXER wins
++    const bool br = df_branch_ && G == 1 && !batch_rec_ && (!prof_on_ || lifecycle_on()) && !side_mixer;   // STRATA_SIDE_MIXER wins
+     auto fork = [&](int i) {
+         cudaEventRecord(df_fork_, cs);
+         cudaStreamWaitEvent(df_side_[i], df_fork_, 0);
+@@ -1376,7 +1381,7 @@
+                     native_mmvq(wg->native_type, wg->native_data, xq_, z_ + (size_t) tb * ZV, (int) N, (int) ZV, n,
+                                 df_side_[1]);
+                 }
+-                const bool fuse_ab = fuse_convab_on() && !br && !batch_rec_ && !prof_on_ && !sidem;   // the side mixer computes the gates on its branch
++                const bool fuse_ab = fuse_convab_on() && !br && !batch_rec_ && (!prof_on_ || lifecycle_on()) && !sidem;   // the side mixer computes the gates on its branch
+                 if (!side_proj) mm(wqkv, qkv + (size_t) tb * C, (int) N, (int) C);   // with side_proj: above, first
+                 stamp(l, 2, grp);
+                 if (batch_rec_) {   // contiguous rows may be proposals for the same slot
+@@ -1843,7 +1848,7 @@
+             const char* e = std::getenv("STRATA_SH_FORK_LATE");
+             return !e || e[0] != '0';
+         }();
+-        const bool sh_fork = sh_stream_on() && !prof_on_ && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr;
++        const bool sh_fork = sh_stream_on() && (!prof_on_ || lifecycle_on()) && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr;
+         const bool sh_fork_late = sh_fork && sh_fork_late_env && !ar_on();
+         cudaStream_t sh_stream = sh_fork ? sh_cs_ : cs;
+         if (sh_fork && !sh_fork_late) {
+@@ -1951,6 +1956,7 @@
+                 else for (int t = tb; t < te; ++t) f32_to_bf16_bulk(mixed_ + t * N, sh_bf16_ + t * N, N, sh_stream);
+             }
+             try {
++                if (lifecycle_on() && grp == 0) gpu_stamp(prof_, g.n_layers*kProfPer+4+2*l, sh_stream);
+                 shared_expert_multi(n, xm, sh_bf16_ + tb * N, nsw, (const uint16_t*) wgi->data, sh_gate_ + (size_t) tb * g.n_ff,
+                                     sh_up_ + (size_t) tb * g.n_ff, sh_g_ + tb, shared_ + tb * N, N, g.n_ff, sh_stream,
+                                     qdedup ? (const void*) (nat_xq_ + (size_t) tb * (N / 32) * 36) : nullptr,
+@@ -1960,6 +1966,7 @@
+                 err = std::string("verify shared expert: ") + e.what();
+                 return false;
+             }
++            if (lifecycle_on() && grp == 0) gpu_stamp(prof_, g.n_layers*kProfPer+4+2*l+1, sh_stream);
+             if (sh_fork) cudaEventRecord(ev_join_, sh_cs_);
+         }
+         if (strata::kernels::cpu::expert_layout().native) {
+@@ -2028,7 +2035,7 @@
+                 wait_flag_ge_or(m_flagA_, ring, skip_ + grp, cs);
+                 copy_i32_from_mapped_unless(pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, plan_i32_, skip_ + grp, ring, cs);
+             } else {
+-                if (fuse_wait_on() && !prof_on_ && m_bal_ == nullptr) {   // 143-amdk: one launch for the wait and the copy
++                if (fuse_wait_on() && (!prof_on_ || lifecycle_on()) && m_bal_ == nullptr) {   // 143-amdk: one launch for the wait and the copy
+                     wait_copy_i32_from_mapped(m_flagA_, ring, pl, m_plan_ + (size_t) grp * (size_t) plan_i32_, plan_i32_, cs);
+                 } else {
+                 if (m_bal_ != nullptr)   // set_pcie_balance: the GPU's share starts as the plan arrives
+@@ -2061,7 +2068,7 @@
+                 copy_or_zero_from_mapped(parts_out, m_ymiss_ + (size_t) tb * K * N, (long long) n * K * N,
+                                          skip_ + grp, ring, cs);
+             } else {
+-                const bool fuse_rows = fuse_rows_on() && !prof_on_ && !remote_opt_ && dec_batch && m_bal_ == nullptr;   // 143-amdk
++                const bool fuse_rows = fuse_rows_on() && (!prof_on_ || lifecycle_on()) && !remote_opt_ && dec_batch && m_bal_ == nullptr;   // 143-amdk
+                 if (!fuse_rows) {
+                     if (m_bal_ != nullptr)   // set_pcie_balance: ... and ends as it waits for the CPU's rows
+                         wait_flag_ge_stamped(m_flag_, ring, m_bal_ + ((l - lb_) * 2 + grp) * 4 + 2, nullptr, cs);
+@@ -2081,14 +2088,14 @@
+                     copy_from_mapped(parts_out, m_ymiss_ + (size_t) tb * K * N, (int64_t) n * K * N, cs);
+             }
+             // 143-amdk: the add of the GPU's hit rows is done by the combine that follows (one launch fewer)
+-            hits_in_combine = fuse_hits_on() && !prof_on_ && !remote_opt_ && !sg_gated_[grp] && dec_batch && n > 1 &&
++            hits_in_combine = fuse_hits_on() && (!prof_on_ || lifecycle_on()) && !remote_opt_ && !sg_gated_[grp] && dec_batch && n > 1 &&
+                               native_moe_combine_enabled() && n <= 8 &&
+                               native_moe_combine_hits_supported(parts_ + (size_t) tb * K * N, shared_ + tb * N, bo_ + tb * N, N, K, n);
+             if (!hits_in_combine) moe_hit_add(parts_out, hit_out, p_dst, p_counts + 1, cap, N, cs);
+         }
+         // Same condition as `sh_fork` above, which is per group and out of scope here: wait only when the fork
+         // actually ran (a wait on an event never recorded is a no-op, but saying it outright reads better).
+-        if (sh_stream_on() && !prof_on_ && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr) {
++        if (sh_stream_on() && (!prof_on_ || lifecycle_on()) && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr) {
+             cudaStreamWaitEvent(cs, ev_join_, 0);
+         }
+         if (sg_gated_[grp]) {   // STRATA_LFUSE: the shared expert's gate was not applied: the combine applies it (all rows are hits)
+@@ -2586,6 +2593,20 @@
+ void Verifier::collect_profile() {
+     cudaMemcpy(prof_h_.data(), prof_, prof_h_.size() * 8, cudaMemcpyDeviceToHost);
+     accumulate_profile(prof_h_.data());
++    // [PROFILE] Copy and emit after the normal end-of-window synchronization.
++    if (lifecycle_on()) {
++        static FILE* f=[] { FILE* p=std::fopen(std::getenv("STRATA_LIFECYCLE_CSV"),"w"); if(p)std::setvbuf(p,nullptr,_IOFBF,1<<20); return p; }();
++        if(f) {
++            const auto end=lifecycle_ns(Clock::now());
++            for(int l=lb_;l<=le_;++l) {
++                std::fprintf(f,"%lld,%d,%lld,%lld,%d",(long long)end,last_t_,(long long)last_pos0_,(long long)windows,l);
++                for(int j=0;j<kProfPer;++j)std::fprintf(f,",%llu",l<le_||j<2 ? prof_h_[l*kProfPer+j] : 0ull);
++                for(int j=0;j<2;++j)std::fprintf(f,",%llu",l<le_ ? prof_h_[g_->n_layers*kProfPer+4+2*l+j] : 0ull);
++                for(int j=0;j<3;++j)std::fprintf(f,",%lld",l<le_ ? (long long)lifecycle_cpu[l][j] : 0ll);
++                std::fputc('\n',f);
++            }
++        }
++    }
+ }
+ 
+ void Verifier::accumulate_profile(const unsigned long long* stamps) {
+@@ -2907,6 +2928,11 @@
+         if (h_bal_ != nullptr) bal_p_[(size_t) ((k / G) * 2 + grp)] = ms_since(b);
+         ms_wait += std::chrono::duration<double, std::milli>(b - a).count();
+         ms_pool += ms_since(b);
++        if (lifecycle_on() && grp == 0 && l < 256) {
++            lifecycle_cpu[l][0]=lifecycle_ns(a); lifecycle_cpu[l][1]=lifecycle_ns(b);
++            lifecycle_cpu[l][2]=lifecycle_ns(Clock::now());
++        }
++
+     }
+     // (#646 staged the next stage's inputs here; 0.1.39b keeps the layer split's order: each stage stages its own)
+     if (chain) {
+--- a/src/program/generate.cpp
++++ b/src/program/generate.cpp
+@@ -1145,9 +1145,26 @@
+                       int64_t layer) {
+     Drive* t = (Drive*) user;
+     t->d.layers = layer;
++    // [PROFILE] Per-layer CPU stages; no extra synchronization or dispatch changes.
++    static FILE* lifecycle_pool=[] {
++        const char* path=std::getenv("STRATA_LIFECYCLE_CPU_CSV");
++        FILE* f=path?std::fopen(path,"w"):nullptr;
++        if(f) { std::setvbuf(f,nullptr,_IOFBF,1<<20);
++            std::fprintf(f,"begin_ns,end_ns,layer,T,plan_ms,actq_ms,jobs_ms,compute_ms,cpu_experts,cpu_entries,gpu_hits,pcie_experts\n"); }
++        return f;
++    }();
++    const double plan0=t->d.ms_plan,actq0=t->d.ms_actq,jobs0=t->d.ms_jobs,run0=t->d.ms_run;
++    const int64_t misses0=t->d.multi_misses,entries0=t->d.multi_entries,hits0=t->d.cache_hits,pcie0=t->d.pcie_experts;
+     const Clock::time_point a = Clock::now();
+     strata::core::expert_pool_dispatch_multi(t->d, x_f, ids, n_tok, k, out);
+-    t->cpu_ms += std::chrono::duration<double, std::milli>(Clock::now() - a).count();
++    const Clock::time_point b=Clock::now();
++    t->cpu_ms += std::chrono::duration<double, std::milli>(b - a).count();
++    if(lifecycle_pool)std::fprintf(lifecycle_pool,"%lld,%lld,%lld,%lld,%.9f,%.9f,%.9f,%.9f,%lld,%lld,%lld,%lld\n",
++        (long long)std::chrono::duration_cast<std::chrono::nanoseconds>(a.time_since_epoch()).count(),
++        (long long)std::chrono::duration_cast<std::chrono::nanoseconds>(b.time_since_epoch()).count(),
++        (long long)layer,(long long)n_tok,t->d.ms_plan-plan0,t->d.ms_actq-actq0,t->d.ms_jobs-jobs0,t->d.ms_run-run0,
++        (long long)(t->d.multi_misses-misses0),(long long)(t->d.multi_entries-entries0),
++        (long long)(t->d.cache_hits-hits0),(long long)(t->d.pcie_experts-pcie0));
+     ++t->calls;
+     // the routing trace for the serve path: the same record format drive_pool writes (layer, k, ids, weights),
+     // one record per token.  The multi dispatch fuses the router weights into the kernel and does not surface

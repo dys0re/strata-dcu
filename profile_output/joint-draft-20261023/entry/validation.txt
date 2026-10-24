@@ -1,0 +1,10 @@
+PASS: fresh agent-follows-doc validation
+
+Documented SSH command executed verbatim exactly once; controller exit 0, engine_exit 0, generated text OK.
+All 32 checks passed.
+Complete component sum: pack=1538035200 + dense=5819596800 + head=1271398400 + experts=22947840000 + mtp=1368138752 + external_draft=0 + native_draft=1206131200 + staging=44236800 = 34195377152; limit 34351349760, headroom 155972608.
+Actual MTP layer/head loading, native DFlash execution, joint draft counters and joint budget are present in engine.stderr.log.
+Engine symlink and SHA match the final ledger block before and after. Controller PID 39869 and engine PID 39885 exited; no inference processes remain. VRAM returned to 2 MiB / 65,520 MiB and GPU utilization 0%.
+No documentation/reality divergence.
+
+Instrumentation note: hy-smi --showpids fails with a platform process-directory error, so independent ps is used for process evidence. Initial exploratory symlink path error is preserved in preflight.log and corrected by reading the wrapper; the documented invocation was unmodified.

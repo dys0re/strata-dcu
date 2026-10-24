@@ -1,0 +1,19 @@
+{
+  "rc": 0,
+  "devices": 1,
+  "visibility": {
+    "HIP_VISIBLE_DEVICES": null,
+    "ROCR_VISIBLE_DEVICES": null,
+    "CUDA_VISIBLE_DEVICES": null
+  },
+  "bus_rc": 0,
+  "bdf": "0000:b5:00.0",
+  "sysfs": {
+    "numa_node": "7",
+    "current_link_speed": "32.0 GT/s PCIe",
+    "current_link_width": "16",
+    "mem_info_vram_total": "68702699520",
+    "pp_dpm_sclk": "0: 300Mhz \n1: 600Mhz \n2: 800Mhz \n3: 1000Mhz \n4: 1150Mhz \n5: 1220Mhz \n6: 1300Mhz \n7: 1350Mhz *\n8: 1400Mhz \n9: 1450Mhz \n10: 1500Mhz",
+    "pp_dpm_mclk": "0: 1800Mhz * (DPM disabled)"
+  }
+}

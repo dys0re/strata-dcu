@@ -1,0 +1,109 @@
+{
+  "default-fast0": {
+    "comparisons": 185,
+    "differing_comparisons": 0,
+    "nonfinite": 0,
+    "first_by_tensor": {}
+  },
+  "default-fast1": {
+    "comparisons": 185,
+    "differing_comparisons": 70,
+    "nonfinite": 0,
+    "first_by_tensor": {
+      "rs": {
+        "variant": "1",
+        "T": "3",
+        "apply": "0",
+        "tensor": "rs",
+        "elements": "12",
+        "different": "1",
+        "first": "11",
+        "plain_bits": "3f7eef5b",
+        "other_bits": "3f7eef5c",
+        "max_abs": "5.96046447754e-08",
+        "relative_l2": "1.71233558106e-08",
+        "nonfinite": "0"
+      },
+      "xn": {
+        "variant": "1",
+        "T": "3",
+        "apply": "0",
+        "tensor": "xn",
+        "elements": "30720",
+        "different": "1854",
+        "first": "28160",
+        "plain_bits": "3d52ce1d",
+        "other_bits": "3d52ce1e",
+        "max_abs": "2.38418579102e-07",
+        "relative_l2": "2.08511268888e-08",
+        "nonfinite": "0"
+      },
+      "lo": {
+        "variant": "1",
+        "T": "3",
+        "apply": "0",
+        "tensor": "lo",
+        "elements": "960",
+        "different": "199",
+        "first": "640",
+        "plain_bits": "3bef673e",
+        "other_bits": "3bef675e",
+        "max_abs": "2.38418579102e-07",
+        "relative_l2": "7.35688281828e-08",
+        "nonfinite": "0"
+      },
+      "inject": {
+        "variant": "1",
+        "T": "3",
+        "apply": "0",
+        "tensor": "inject",
+        "elements": "12",
+        "different": "3",
+        "first": "8",
+        "plain_bits": "c0393e9a",
+        "other_bits": "c0393e9b",
+        "max_abs": "4.76837158203e-07",
+        "relative_l2": "8.99190510056e-08",
+        "nonfinite": "0"
+      },
+      "mixed": {
+        "variant": "1",
+        "T": "3",
+        "apply": "0",
+        "tensor": "mixed",
+        "elements": "7680",
+        "different": "1212",
+        "first": "5122",
+        "plain_bits": "be39adee",
+        "other_bits": "be39adef",
+        "max_abs": "1.19209289551e-07",
+        "relative_l2": "4.00640744787e-08",
+        "nonfinite": "0"
+      }
+    }
+  },
+  "no-contract-fast0": {
+    "comparisons": 185,
+    "differing_comparisons": 0,
+    "nonfinite": 0,
+    "first_by_tensor": {}
+  },
+  "no-contract-fast1": {
+    "comparisons": 185,
+    "differing_comparisons": 0,
+    "nonfinite": 0,
+    "first_by_tensor": {}
+  },
+  "norm-no-contract-fast0": {
+    "comparisons": 185,
+    "differing_comparisons": 0,
+    "nonfinite": 0,
+    "first_by_tensor": {}
+  },
+  "norm-no-contract-fast1": {
+    "comparisons": 185,
+    "differing_comparisons": 0,
+    "nonfinite": 0,
+    "first_by_tensor": {}
+  }
+}

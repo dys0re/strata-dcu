@@ -1,0 +1,15 @@
+observed_pid 28378 present False
+observed_pid 28393 present False
+/root/private_data/strata-dcu/q4-multitoken-20261023/strata-final
+/root/private_data/strata-dcu/q4-multitoken-20261023/strata-final
+d8e293371f4bc399baf7b1562ef516af475b7870791ecd60f2d8f9bb4a1b9ac5  /root/strata-dcu/build-gfx936/strata
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+
+================================= System Management Interface ==================================
+================================================================================================
+HCU[0]		: vram Total Memory (MiB): 65520
+HCU[0]		: vram Total Used Memory (MiB): 2
+================================================================================================
+======================================== End of SMI Log ========================================
+

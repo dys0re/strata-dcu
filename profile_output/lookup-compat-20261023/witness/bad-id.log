@@ -1,0 +1,2 @@
+strata dflash native: weights=1206131200 shared_head=1271398400 max_candidates=7 window=2048 context=4096 graphs=0 adaptive=0
+seed 4 553 3 -1 rejected: DFlash2: invalid prefix token

@@ -1,0 +1,32 @@
+{
+  "production_engine_sha256": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1",
+  "diagnostic_engine_sha256": "7060a916d2954b6904e41faf9617a465d549f70244168fe0e78ea2749394e28e",
+  "production_sources_unchanged": true,
+  "production_and_build_entry_restored": true,
+  "diagnostic_windows_checked": {
+    "mtp-profile": 547,
+    "native-profile": 504,
+    "joint-profile": 464
+  },
+  "gpu_partition_exact": true,
+  "cpu_rows_match_windows": true,
+  "raw_trace_sha256": {
+    "mtp-profile/lifecycle.csv": "562b6a90c5993f5b5d5759b5392c36d2869640f345fb49f03f64365c2f678fd5",
+    "mtp-profile/cpu.csv": "4863edc4f812c4d2a0a4bd16a0cde505581aee74a913f778e1588fc57a71ccc8",
+    "native-profile/lifecycle.csv": "6df144f30b360447bb32eb0b28d699926d532da1f8ef7952f2b7520b67dc8538",
+    "native-profile/cpu.csv": "1ec6c60a94ebdaec6d1864a41119a9e5a2396723bcb4131196e7ce8836ae57b1",
+    "joint-profile/lifecycle.csv": "21740c05519e13d4e6f225ba8d21ced2c785e97fe4543bc94585df77a368d3fa",
+    "joint-profile/cpu.csv": "458607d2c32cec2f404496f008c95001ba47505ce30003884ea0343a4756f70b"
+  },
+  "compression_lossless": true,
+  "profiling_changes_adaptive_window_selection": true,
+  "profiling_tps_not_production_benchmark": true,
+  "fresh_documented_entry_checks": 31,
+  "all_model_weights_within_half_vram": true,
+  "oom_events": 0,
+  "oom_kills": 0,
+  "postflight_vram_mib": 2,
+  "root_source_mib": 895,
+  "root_cache_mib": 59,
+  "inference_processes_exited": true
+}

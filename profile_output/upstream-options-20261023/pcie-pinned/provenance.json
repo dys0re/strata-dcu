@@ -1,0 +1,33 @@
+{
+  "engine_sha256": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1",
+  "source_sha256": {
+    "CMakeLists.txt": "fa4d4b2f1bc7c83affa2366a4bbc2c0127695cf775976bf78e1a7383ccbe4f52",
+    "src/program/generate.cpp": "4868af3504e6bed8378e90abc05dc671da49bb4314c0db1404335c322a86a7a1",
+    "src/core/verify.cpp": "4a9f0c69890cec5897c7416bf1290c1f2fca92cd98c937a1f511613fc0bf7433",
+    "src/prefill/prefill.cpp": "b82bda291d3998035d4079e23b9217ef60f92b1517fd85e31f96423d11e5e702",
+    "include/strata/core/dflash_bridge.hpp": "f2d3b1afecaf82820e4d3d93c73fae26fa2b5fc0b9d0e3977f975e6231c60688",
+    "include/strata/core/verify.hpp": "e293fee4deebe0195762ebe2ccaf8edcd542d9515b14153fbd01761dc7efdadd",
+    "include/strata/prefill/prefill.hpp": "5f5290cf4e265459d295bd89b166e444a0029813b57bafc7faf8757e4df61c3f",
+    "src/kernels/cuda/native_mmvq.cu": "b9aebb5ced120776b6ce133046f2274bb6f4c125601dc5298b1aa734d473e93c",
+    "include/strata/kernels/native_mmvq.hpp": "0520eae7c16152297246738e1d61ccb3c4946ddffc4efc030b45c8105c6e4dd1",
+    "src/core/mtp.cpp": "540534277f886f9c9173ccdd4506c008841f2f0f6bfe6a50dff6885ed3203e71",
+    "include/strata/core/mtp.hpp": "3bd1add95fe0d10883e3f40fdc16dbbef42b591c9ca063bd640653a26a3db443",
+    "tools/dflash2_worker.py": "883d4f171746528b66676c622c2b84b9eae16a41ff05b1c25ab44a657f7f50b1",
+    "tools/strata_dflash2.py": "15a75e60e21dbe7b2cde3444072184da816576872effb9cfff280c87fec2ad73",
+    "third_party/dflash/model.py": "f55b7fe0a4c0b3073e0f9cdce547cce29f4b8e2168c4d2818760007c43b7651e",
+    "third_party/dflash/LICENSE": "6fd2aebd899c0b48ea9abb845aef043c6dadff00a6726a10a1bc32db528a5422",
+    "third_party/dflash/VERSION": "fd6b24c6a65078f4701beb667f679a5e150e28ed82dffb44acdfff8af87c2131",
+    "include/strata/core/dflash_native.hpp": "072a0afd5d54bce8dfd748ad6e72d53af0b9c80c43a299f9f0fe7c261df40452",
+    "src/prefill/dflash.cu": "5c31ee0d57f3fa9ae048e47fb1e396f50e907602f1611b049250236e2b38443e",
+    "src/prefill/dflash_witness.cpp": "4fbe46421b2a3962a5cb860906df2737da6b535095610570acbd1a03c68190c3",
+    "tools/dflash2_pack.py": "716f290791a4b2997c92577b99e5a86ab93b2ae21a911b1e0016327bf62590b4",
+    "tools/test_dflash2_native.py": "f6e894a4cd6b31b0b89367248e316b06bc1bd0b6a4833f5603282e867991f01e",
+    "src/kernels/cpu/native_expert.cpp": "c32610f7255bb254eaff73fc2fdcb819b1d9030309d13f4fb9e9de99708aafed",
+    "src/kernels/cpu/q4_avx512.cpp": "023ee54150a93f009938a759ba7a240a3fd5c66a7de6587945144fe982f0c425",
+    "include/strata/kernels/cpu/q4_avx512.hpp": "67a7471e8368d1fa1b0462112730786d8e1a95814a5b5b1278f4aec2975d1822",
+    "src/kernels/cuda/bf16_small.cu": "923f0b5b6805d9dd077ae7165c7425f5e80bf2b192909f1c10b9a70cc6836a00",
+    "include/strata/kernels/bf16_small.hpp": "3407fbdf7d911522dbdc533bbf2b11d89c0cb1ad32c23a4f4e29500f8dd8e114",
+    "include/strata/spec/joint_budget.hpp": "c76ba6aec381f890aa75c88cdb5a17a6e42392ee75349be17ca380e7f998ad92"
+  },
+  "driver_sha256": "287758cc642af7ca524a04a7fe4b6c6f609d01b5e461c0713a1e3554f158f620"
+}

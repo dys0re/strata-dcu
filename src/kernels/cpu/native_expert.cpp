@@ -9,6 +9,9 @@
 #include "strata/kernels/cpu/kq_avx2.hpp"
 #include "strata/kernels/cpu/nvfp4_avx2.hpp"
 #include "strata/kernels/cpu/nvfp4_avx512.hpp"
+#if defined(STRATA_Q4_AVX512)
+#include "strata/kernels/cpu/q4_avx512.hpp"
+#endif
 #include "strata/kernels/cpu/expert_layout.hpp"
 #include "strata/kernels/cpu/hadamard.hpp"
 #include "strata/kernels/cpu/tq_cpu.hpp"
@@ -127,6 +130,16 @@ bool q8k_avx1(int type) {
     static const bool on = !cpu_avx2_ok() && cpu_avx1_ok() && std::getenv("STRATA_NO_Q8K_AVX1") == nullptr;
     return on && type == (int) GGML_TYPE_Q8_K;
 }
+
+#if defined(STRATA_Q4_AVX512)
+bool q4_multitoken() {
+    static const bool on = [] {
+        const char* e = std::getenv("STRATA_CPU_Q4_MT");
+        return e && e[0] == '1' && e[1] == '\0' && cpu_avx512_ok();
+    }();
+    return on;
+}
+#endif
 }  // namespace
 
 void native_quant_act(const NativeFmt& f, const float* x, void* dst) {
@@ -174,6 +187,14 @@ int native_gu_mt_min(int gu_type) {
 
 void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* act, int nt, float* const* ff,
                     int r0, int r1) {
+#if defined(STRATA_Q4_AVX512)
+    // AutoRound's Q4_0: reuse decoding and activation loads across candidates.
+    // One token keeps ggml's bandwidth-bound path. Other formats are unchanged.
+    if (nt >= 2 && f.gu_type == GGML_TYPE_Q4_0 && q4_multitoken() && q4_512_fits((int) f.n_embd)) {
+        q4_512_gu_rows(blob, f.gu_row, f.up_off, (int) f.n_embd, act, nt, ff, r0, r1);
+        return;
+    }
+#endif
     // the multi-token kernels decode the weights once for all tokens: 2.0-2.4x ggml-cpu at three tokens, no faster
     // at one (all are bound by the codebook lookups, ~5 GB/s per core), measured by native_expert_parity.  AVX-512
     // first, then the AVX-2 one (Zen 2/3, Intel 12th-14th gen).  STRATA_NO_IQ512 drops an AVX-512 CPU to the
@@ -286,6 +307,12 @@ void native_gu_rows(const NativeFmt& f, const uint8_t* blob, const void* const* 
 
 void native_down_rows(const NativeFmt& f, const uint8_t* blob, const void* const* hq, int nt, float* const* out,
                       int r0, int r1) {
+#if defined(STRATA_Q4_AVX512)
+    if (nt >= 2 && f.d_type == GGML_TYPE_Q4_0 && q4_multitoken() && q4_512_fits((int) f.n_ff)) {
+        q4_512_rows(blob + f.down_off, f.d_row, (int) f.n_ff, hq, nt, out, r0, r1);
+        return;
+    }
+#endif
     // IQ4_NL down rows: the AVX-2 multi-token kernel decodes the nibbles and absolutises the weights once per
     // block instead of once per token; ggml-cpu's dot is single-token.  STRATA_NO_IQ4NL falls back to it.
     static const bool iq4nl_mt = std::getenv("STRATA_NO_IQ4NL") == nullptr;

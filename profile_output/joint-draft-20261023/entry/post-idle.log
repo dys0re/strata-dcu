@@ -1,0 +1,23 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+2026-10-23T18:34:06+08:00
+
+================================= System Management Interface ==================================
+================================================================================================
+HCU     Temp     AvgPwr     Perf     PwrCap     VRAM%      HCU%      Dec%      Enc%      Mode     
+0       52.0C    82.0W      manual   1000.0W    0%         0.0%      0.0%      0.0%      Normal   
+================================================================================================
+======================================== End of SMI Log ========================================
+
+
+================================= System Management Interface ==================================
+================================================================================================
+HCU[0]		: vram Total Memory (MiB): 65520
+HCU[0]		: vram Total Used Memory (MiB): 2
+================================================================================================
+======================================== End of SMI Log ========================================
+
+    PID    PPID STAT COMMAND
+lrwxrwxrwx 1 root root 63 Oct 23 18:31 /root/strata-dcu/build-gfx936/strata -> /root/private_data/strata-dcu/joint-draft-20261023/strata-final
+/root/private_data/strata-dcu/joint-draft-20261023/strata-final
+1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1  /root/strata-dcu/build-gfx936/strata

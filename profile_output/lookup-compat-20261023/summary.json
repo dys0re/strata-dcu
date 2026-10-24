@@ -1,0 +1,1544 @@
+{
+  "upstream-options-20261023/baseline": {
+    "median_tps": {
+      "story": 31.759816388561504,
+      "chinese": 39.318077100291816,
+      "code": 41.16351240533196
+    },
+    "samples_tps": {
+      "story": [
+        31.759816388561504,
+        32.4955572480325,
+        31.715354691642506
+      ],
+      "chinese": [
+        38.121333055365284,
+        39.47936586268583,
+        39.318077100291816
+      ],
+      "code": [
+        40.343550547632184,
+        41.16351240533196,
+        42.020944814681066
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the staged read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the split read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the hyper-connection read runs as the plain read (the norm per token, the down projection on 41 blocks)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/baseline-clean": {
+    "median_tps": {
+      "story": 31.74012770442006,
+      "chinese": 38.7350582538962,
+      "code": 40.752650514183834
+    },
+    "samples_tps": {
+      "story": [
+        31.571028648242013,
+        32.14142225793491,
+        31.74012770442006
+      ],
+      "chinese": [
+        37.29440729571843,
+        38.7350582538962,
+        39.382797717028446
+      ],
+      "code": [
+        40.752650514183834,
+        35.064170170800864,
+        43.35749610459996
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the staged read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the split read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the hyper-connection read runs as the plain read (the norm per token, the down projection on 41 blocks)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/both": {
+    "median_tps": {
+      "story": 13.651149149469418,
+      "chinese": 10.468078494232335,
+      "code": 11.915234278639616
+    },
+    "samples_tps": {
+      "story": [
+        12.383721211476226,
+        13.651149149469418,
+        14.754703061600884
+      ],
+      "chinese": [
+        10.468078494232335,
+        13.967394862617576,
+        5.659309564233164
+      ],
+      "code": [
+        11.915234278639616,
+        16.42773720754136,
+        9.181254460619233
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the staged read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the split read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the hyper-connection read runs as the plain read (the norm per token, the down projection on 41 blocks)"
+    ],
+    "pcie_policy": [
+      "strata generate: PCIe probe: 48.6 GB/s host->device (best of 48.5 48.6 48.5 48.6) -> pcie_frac 0.55 (default 0.55)",
+      "strata serve: PCIe share: the CPU pool takes 56 us per missed expert (49.4 GB/s of expert bytes), the link 48.6 GB/s -> pcie_frac 0.35 (was 0.55; --pcie-frac N fixes it, STRATA_PCIE_FRAC_DEFAULT=old keeps the start-up rule)"
+    ],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/cache": {
+    "median_tps": {
+      "story": 28.496688373128514,
+      "chinese": 29.705612736281463,
+      "code": 36.750455791785704
+    },
+    "samples_tps": {
+      "story": [
+        32.59942186962778,
+        24.339459397788534,
+        28.496688373128514
+      ],
+      "chinese": [
+        29.705612736281463,
+        27.403712346656963,
+        30.468935967626756
+      ],
+      "code": [
+        38.37965878084615,
+        36.750455791785704,
+        34.23375234019792
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the staged read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the split read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the hyper-connection read runs as the plain read (the norm per token, the down projection on 41 blocks)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/cache-pinned": {
+    "median_tps": {
+      "story": 13.79154298274441,
+      "chinese": 13.723156754902277,
+      "code": 20.265670271211665
+    },
+    "samples_tps": {
+      "story": [
+        13.79154298274441,
+        13.249557485482418,
+        15.214277648680934
+      ],
+      "chinese": [
+        17.689942300383514,
+        13.723156754902277,
+        11.3857224819096
+      ],
+      "code": [
+        28.531624407913068,
+        20.265670271211665,
+        13.99342964748583
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the staged read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the split read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the hyper-connection read runs as the plain read (the norm per token, the down projection on 41 blocks)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/dma": {
+    "median_tps": {
+      "story": 12.247221650791523,
+      "chinese": 12.584861787738607,
+      "code": 22.61903710052218
+    },
+    "samples_tps": {
+      "story": [
+        12.247221650791523,
+        11.15633688651042,
+        15.658737391963886
+      ],
+      "chinese": [
+        23.972057570394508,
+        9.469136533112387,
+        12.584861787738607
+      ],
+      "code": [
+        14.03778137252214,
+        22.92900070757463,
+        22.61903710052218
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34766585856,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as the plain one (STRATA_HC_SPLIT=0)"
+    ],
+    "pcie_policy": [
+      "strata generate: PCIe probe: 48.6 GB/s host->device (best of 48.6 48.6 48.5 48.5) -> pcie_frac 0.55 (default 0.55)",
+      "strata serve: PCIe share: the CPU pool takes 66 us per missed expert (41.6 GB/s of expert bytes), the link 48.6 GB/s -> pcie_frac 0.40 (was 0.55; --pcie-frac N fixes it, STRATA_PCIE_FRAC_DEFAULT=old keeps the start-up rule)",
+      "strata serve: PCIe share: the CPU pool takes 59 us per missed expert (46.6 GB/s of expert bytes), the link 48.6 GB/s -> pcie_frac 0.35 (was 0.40; --pcie-frac N fixes it, STRATA_PCIE_FRAC_DEFAULT=old keeps the start-up rule)"
+    ],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/dma-smoke": {
+    "median_tps": {},
+    "samples_tps": {
+      "story": [],
+      "chinese": [],
+      "code": []
+    },
+    "requests": 4,
+    "run_pass": true,
+    "full_qa_pass": false,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "ok"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34766585856,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as the plain one (STRATA_HC_SPLIT=0)"
+    ],
+    "pcie_policy": [
+      "strata generate: PCIe probe: 47.7 GB/s host->device (best of 47.2 47.4 47.5 47.7) -> pcie_frac 0.55 (default 0.55)"
+    ],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/pcie": {
+    "median_tps": {
+      "story": 32.29428164145778,
+      "chinese": 39.9463221296383,
+      "code": 42.45932363624301
+    },
+    "samples_tps": {
+      "story": [
+        32.35305268745182,
+        32.29428164145778,
+        32.137790777960504
+      ],
+      "chinese": [
+        39.31324672133665,
+        39.9463221296383,
+        40.34037188780334
+      ],
+      "code": [
+        41.495793688100754,
+        43.12450516314876,
+        42.45932363624301
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the staged read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the split read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the hyper-connection read runs as the plain read (the norm per token, the down projection on 41 blocks)"
+    ],
+    "pcie_policy": [
+      "strata generate: PCIe probe: 48.5 GB/s host->device (best of 48.4 48.5 48.5 48.5) -> pcie_frac 0.55 (default 0.55)",
+      "strata serve: PCIe share: the CPU pool takes 50 us per missed expert (55.0 GB/s of expert bytes), the link 48.5 GB/s -> pcie_frac 0.30 (was 0.55; --pcie-frac N fixes it, STRATA_PCIE_FRAC_DEFAULT=old keeps the start-up rule)"
+    ],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "upstream-options-20261023/pcie-pinned": {
+    "median_tps": {
+      "story": 8.812968834450446,
+      "chinese": 16.850530528422105,
+      "code": 12.677221113515602
+    },
+    "samples_tps": {
+      "story": [
+        8.812968834450446,
+        10.620952317732428,
+        4.526615082115627
+      ],
+      "chinese": [
+        16.850530528422105,
+        23.980366075275867,
+        5.2978487836677255
+      ],
+      "code": [
+        12.677221113515602,
+        17.13669864178275,
+        10.34138695773362
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the staged read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the split read differs from the plain read on this card - not used: lo differs for 3 token(s) at 640 (3bef675e, not 3bef673e)",
+      "strata hc: CUDA0: the hyper-connection read runs as the plain read (the norm per token, the down projection on 41 blocks)"
+    ],
+    "pcie_policy": [
+      "strata generate: PCIe probe: 48.4 GB/s host->device (best of 48.3 48.2 48.3 48.4) -> pcie_frac 0.55 (default 0.55)",
+      "strata serve: PCIe share: the CPU pool takes 66 us per missed expert (41.9 GB/s of expert bytes), the link 48.4 GB/s -> pcie_frac 0.40 (was 0.55; --pcie-frac N fixes it, STRATA_PCIE_FRAC_DEFAULT=old keeps the start-up rule)",
+      "strata serve: PCIe share: the CPU pool takes 62 us per missed expert (44.9 GB/s of expert bytes), the link 48.4 GB/s -> pcie_frac 0.35 (was 0.40; --pcie-frac N fixes it, STRATA_PCIE_FRAC_DEFAULT=old keeps the start-up rule)"
+    ],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "lookup-compat-20261023/hc-plain": {
+    "median_tps": {
+      "story": 31.791369140018627,
+      "chinese": 39.75710891273625,
+      "code": 41.131105398457585
+    },
+    "samples_tps": {
+      "story": [
+        32.18465948378823,
+        31.791369140018627,
+        31.743276253301424
+      ],
+      "chinese": [
+        39.75710891273625,
+        39.017847617015434,
+        40.06322477660058
+      ],
+      "code": [
+        41.131105398457585,
+        42.61836585203436,
+        40.8730222087398
+      ]
+    },
+    "requests": 10,
+    "run_pass": true,
+    "full_qa_pass": false,
+    "qa_cases_present": [],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34766585856,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as the plain one (STRATA_HC_SPLIT=0)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "lookup-compat-20261023/hc-split": {
+    "median_tps": {
+      "story": 31.552351019905096,
+      "chinese": 39.426468096902866,
+      "code": 40.8423739629866
+    },
+    "samples_tps": {
+      "story": [
+        31.286664059444664,
+        31.88640468331569,
+        31.552351019905096
+      ],
+      "chinese": [
+        39.17068319179864,
+        39.426468096902866,
+        40.15749266655163
+      ],
+      "code": [
+        40.372817738806795,
+        40.93642062172189,
+        40.8423739629866
+      ]
+    },
+    "requests": 10,
+    "run_pass": true,
+    "full_qa_pass": false,
+    "qa_cases_present": [],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as split (the norm per token and stream, then the plain read's down projection); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "lookup-compat-20261023/hc-staged": {
+    "median_tps": {
+      "story": 33.5473725592976,
+      "chinese": 42.205918720633086,
+      "code": 43.12741117606429
+    },
+    "samples_tps": {
+      "story": [
+        32.416552702223576,
+        33.5473725592976,
+        34.00411768612605
+      ],
+      "chinese": [
+        41.78636719770175,
+        42.205918720633086,
+        42.49244763137801
+      ],
+      "code": [
+        42.81938915465159,
+        45.97948883740144,
+        43.12741117606429
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": []
+  },
+  "lookup-compat-20261023/ipc-lookup": {
+    "median_tps": {},
+    "samples_tps": {
+      "story": [],
+      "chinese": [],
+      "code": []
+    },
+    "requests": 16,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 34098636800,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49632164,
+      "device_used": 36440113152,
+      "external_draft": 2477529600,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        16,
+        44,
+        48
+      ]
+    ],
+    "discarded_feedback": []
+  },
+  "lookup-compat-20261023/joint-hc": {
+    "median_tps": {
+      "story": 23.905349755810587,
+      "chinese": 29.503624566377393,
+      "code": 37.95291466524343
+    },
+    "samples_tps": {
+      "story": [
+        23.77922476011778,
+        24.096612355161476,
+        23.905349755810587
+      ],
+      "chinese": [
+        29.503624566377393,
+        29.4131164115998,
+        31.02165456902924
+      ],
+      "code": [
+        37.95291466524343,
+        37.12566166340367,
+        39.669626392698305
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35685138432,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": [
+      0
+    ]
+  },
+  "lookup-compat-20261023/joint-lookup": {
+    "median_tps": {
+      "story": 22.749691190715282,
+      "chinese": 30.036019758069244,
+      "code": 39.48728231864386
+    },
+    "samples_tps": {
+      "story": [
+        24.355205449477218,
+        22.64484741264927,
+        22.749691190715282
+      ],
+      "chinese": [
+        28.640792991955966,
+        30.388281518939262,
+        30.036019758069244
+      ],
+      "code": [
+        38.03185167577846,
+        39.97876128306837,
+        39.48728231864386
+      ]
+    },
+    "requests": 26,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35685138432,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        4,
+        3,
+        12
+      ],
+      [
+        1,
+        1,
+        2
+      ],
+      [
+        1,
+        1,
+        2
+      ],
+      [
+        7,
+        38,
+        42
+      ]
+    ],
+    "discarded_feedback": [
+      13
+    ]
+  },
+  "lookup-compat-20261023/joint-lookup-long": {
+    "median_tps": {},
+    "samples_tps": {
+      "story": [],
+      "chinese": [],
+      "code": []
+    },
+    "requests": 4,
+    "run_pass": true,
+    "full_qa_pass": false,
+    "qa_cases_present": [],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35743858688,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        7,
+        46,
+        49
+      ]
+    ],
+    "discarded_feedback": [
+      7
+    ]
+  },
+  "lookup-compat-20261023/joint-lookup-prob": {
+    "median_tps": {},
+    "samples_tps": {
+      "story": [],
+      "chinese": [],
+      "code": []
+    },
+    "requests": 16,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35685138432,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        10,
+        47,
+        51
+      ]
+    ],
+    "discarded_feedback": [
+      10
+    ]
+  },
+  "lookup-compat-20261023/joint-lookup-reject": {
+    "median_tps": {},
+    "samples_tps": {
+      "story": [],
+      "chinese": [],
+      "code": []
+    },
+    "requests": 16,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35685138432,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        2,
+        0,
+        4
+      ],
+      [
+        50,
+        0,
+        67
+      ]
+    ],
+    "discarded_feedback": [
+      52
+    ]
+  },
+  "lookup-compat-20261023/joint-plain": {
+    "median_tps": {
+      "story": 22.944413573054653,
+      "chinese": 26.998523518245097,
+      "code": 37.01294007084508
+    },
+    "samples_tps": {
+      "story": [
+        21.99010445299615,
+        23.055170302058755,
+        22.944413573054653
+      ],
+      "chinese": [
+        26.843104153341233,
+        28.758228672852685,
+        26.998523518245097
+      ],
+      "code": [
+        37.01294007084508,
+        35.56345854634363,
+        38.12928209711052
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35680944128,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as the plain one (STRATA_HC_SPLIT=0)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": [
+      0
+    ]
+  },
+  "lookup-compat-20261023/mtp-lookup": {
+    "median_tps": {
+      "story": 32.92562153541434,
+      "chinese": 42.44454023941374,
+      "code": 43.70017582492617
+    },
+    "samples_tps": {
+      "story": [
+        32.59029165764917,
+        33.6421578290295,
+        32.92562153541434
+      ],
+      "chinese": [
+        40.65363421257404,
+        42.44454023941374,
+        42.78146359397717
+      ],
+      "code": [
+        42.078272160949396,
+        43.70017582492617,
+        44.90834137356372
+      ]
+    },
+    "requests": 26,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34785460224,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        4,
+        3,
+        5
+      ],
+      [
+        4,
+        4,
+        5
+      ],
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        2,
+        2
+      ],
+      [
+        12,
+        41,
+        48
+      ]
+    ],
+    "discarded_feedback": []
+  },
+  "lookup-compat-20261023/native-hc": {
+    "median_tps": {
+      "story": 30.12650779641071,
+      "chinese": 35.12237954121392,
+      "code": 46.20938628158845
+    },
+    "samples_tps": {
+      "story": [
+        29.75982888098393,
+        30.12650779641071,
+        30.889521695062502
+      ],
+      "chinese": [
+        33.76952300548755,
+        35.47327725968933,
+        35.12237954121392
+      ],
+      "code": [
+        44.57988680888115,
+        46.20938628158845,
+        46.71788601565779
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32827238400,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47781584,
+      "device_used": 34296823808,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": [
+      0
+    ]
+  },
+  "lookup-compat-20261023/native-lookup": {
+    "median_tps": {
+      "story": 30.075187969924812,
+      "chinese": 34.64328245101223,
+      "code": 45.76004576004576
+    },
+    "samples_tps": {
+      "story": [
+        30.075187969924812,
+        29.53085166514783,
+        30.5920030592003
+      ],
+      "chinese": [
+        32.87657159001888,
+        34.64328245101223,
+        34.74531413292797
+      ],
+      "code": [
+        42.41500430777387,
+        45.76004576004576,
+        46.44159425285271
+      ]
+    },
+    "requests": 26,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32827238400,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47781584,
+      "device_used": 34296823808,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        3,
+        2,
+        5
+      ],
+      [
+        2,
+        1,
+        2
+      ],
+      [
+        5,
+        3,
+        5
+      ],
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        1,
+        2
+      ],
+      [
+        2,
+        1,
+        2
+      ],
+      [
+        8,
+        38,
+        46
+      ]
+    ],
+    "discarded_feedback": [
+      24
+    ]
+  },
+  "lookup-compat-20261023/native-lookup-long-resume": {
+    "median_tps": {},
+    "samples_tps": {
+      "story": [],
+      "chinese": [],
+      "code": []
+    },
+    "requests": 4,
+    "run_pass": true,
+    "full_qa_pass": false,
+    "qa_cases_present": [],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32827238400,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47781584,
+      "device_used": 34347155456,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [
+      [
+        10,
+        47,
+        54
+      ]
+    ],
+    "discarded_feedback": [
+      10
+    ]
+  },
+  "lookup-compat-20261023/native-plain": {
+    "median_tps": {
+      "story": 28.794457067014598,
+      "chinese": 33.46448973189192,
+      "code": 46.07133858834539
+    },
+    "samples_tps": {
+      "story": [
+        28.794457067014598,
+        28.678653447599842,
+        29.368912547179548
+      ],
+      "chinese": [
+        33.02245785121835,
+        33.87094640187348,
+        33.46448973189192
+      ],
+      "code": [
+        42.755027055915555,
+        46.07133858834539,
+        46.71191883804102
+      ]
+    },
+    "requests": 24,
+    "run_pass": true,
+    "full_qa_pass": true,
+    "qa_cases_present": [
+      "arithmetic",
+      "capital",
+      "code-function",
+      "context_tail",
+      "json",
+      "multi-turn",
+      "multiply",
+      "ok",
+      "one_token",
+      "sample-0",
+      "sample-1",
+      "sort-json",
+      "sum",
+      "uppercase"
+    ],
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 0,
+      "weights": 32827238400,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.47781584,
+      "device_used": 34292629504,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "hc": [
+      "strata hc: CUDA0: the hyper-connection read runs as the plain one (STRATA_HC_SPLIT=0)"
+    ],
+    "pcie_policy": [],
+    "suffix_windows": [],
+    "discarded_feedback": [
+      0
+    ]
+  }
+}

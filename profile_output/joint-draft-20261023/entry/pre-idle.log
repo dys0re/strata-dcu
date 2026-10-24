@@ -1,0 +1,18 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+2026-10-23T18:32:05+08:00
+
+================================= System Management Interface ==================================
+================================================================================================
+HCU[0]		: vram Total Memory (MiB): 65520
+HCU[0]		: vram Total Used Memory (MiB): 2
+================================================================================================
+================================================================================================
+[31mError[0m: [2026-10-23 18:32:05.697] Unable to open process directory
+================================================================================================
+[31mWarning[0m: [2026-10-23 18:32:05.697] One or more commands failed
+======================================== End of SMI Log ========================================
+
+[31mError[0m: [2026-10-23 18:32:05.697] Failed to show current process information: A generic error has occurred.
+drwxr-xr-x 4 root root 8192 Oct 23 16:56 /root/private_data/strata-dcu/autoround
+lrwxrwxrwx 1 root root   39 Oct 22 01:03 /root/strata-dcu/autoround -> /root/private_data/strata-dcu/autoround

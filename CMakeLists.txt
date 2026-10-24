@@ -392,6 +392,7 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
                           src/kernels/cuda/elementwise.cu
                           src/kernels/cuda/bf16_gemv.cu
                           src/kernels/cuda/native_mmvq.cu
+                          src/kernels/cuda/bf16_small.cu
                           src/kernels/cuda/native_bf16.cu
                           src/kernels/cuda/native_gr_norm.cu
                           src/kernels/cuda/native_moe.cu
@@ -1441,6 +1442,9 @@ if(STRATA_BUILD_TESTS)
   add_executable(mtp_budget_test src/spec/mtp_budget_test.cpp)
   target_link_libraries(mtp_budget_test PRIVATE strata_spec)
   add_test(NAME mtp_budget_test COMMAND mtp_budget_test)
+  add_executable(joint_budget_test src/spec/joint_budget_test.cpp)
+  target_link_libraries(joint_budget_test PRIVATE strata_spec)
+  add_test(NAME joint_budget_test COMMAND joint_budget_test)
 endif()
 if(STRATA_BUILD_TESTS OR STRATA_BUILD_CONVERSATION_TESTS)
   add_executable(message_boundary_test src/program/message_boundary_test.cpp)
@@ -1590,10 +1594,14 @@ if(STRATA_NATIVE_EXPERTS)
                                            src/kernels/cpu/iq_avx2.cpp src/kernels/cpu/kq_avx2.cpp
                                            src/kernels/cpu/kq_avx1.cpp src/kernels/cpu/q2_avx1.cpp src/kernels/cpu/iq_avx1.cpp
                                            src/kernels/cpu/nvfp4_avx512.cpp src/kernels/cpu/nvfp4_avx2.cpp
+                                           src/kernels/cpu/q4_avx512.cpp
                                            src/kernels/cpu/tq_cpu.cpp src/kernels/cpu/tq_avx2.cpp src/kernels/cpu/tq_avx512.cpp)
+  # Other host backends that do not compile this x86 translation unit keep
+  # native_expert.cpp's original dispatch and gain no unresolved symbols.
+  target_compile_definitions(strata_kernels_cpu PRIVATE STRATA_Q4_AVX512=1)
   target_include_directories(strata_kernels_cpu PRIVATE third_party/ggml)
   if(MSVC)
-    set_source_files_properties(src/kernels/cpu/iq_avx512.cpp src/kernels/cpu/nvfp4_avx512.cpp
+    set_source_files_properties(src/kernels/cpu/iq_avx512.cpp src/kernels/cpu/nvfp4_avx512.cpp src/kernels/cpu/q4_avx512.cpp
                                 PROPERTIES COMPILE_OPTIONS "/arch:AVX512")
     set_source_files_properties(src/kernels/cpu/iq_avx2.cpp PROPERTIES COMPILE_OPTIONS "/arch:AVX2")
     set_source_files_properties(src/kernels/cpu/kq_avx2.cpp PROPERTIES COMPILE_OPTIONS "/arch:AVX2")
@@ -1610,6 +1618,8 @@ if(STRATA_NATIVE_EXPERTS)
   else()
     set_source_files_properties(src/kernels/cpu/iq_avx512.cpp src/kernels/cpu/nvfp4_avx512.cpp PROPERTIES COMPILE_OPTIONS
                                 "-mavx512f;-mavx512bw;-mavx512vl;-mavx512dq;-mavx512vnni;-mavx512vbmi;-mf16c;-mfma")
+    set_source_files_properties(src/kernels/cpu/q4_avx512.cpp PROPERTIES COMPILE_OPTIONS
+                                "-mavx512f;-mavx512bw;-mavx512vl;-mavx512dq;-mavx512vnni;-mavx2;-mf16c;-mfma")
     set_source_files_properties(src/kernels/cpu/iq_avx2.cpp PROPERTIES COMPILE_OPTIONS "-mavx2;-mfma;-mf16c")
     set_source_files_properties(src/kernels/cpu/kq_avx2.cpp PROPERTIES COMPILE_OPTIONS "-mavx2;-mfma;-mf16c")
     set_source_files_properties(src/kernels/cpu/nvfp4_avx2.cpp PROPERTIES COMPILE_OPTIONS "-mavx2;-mfma;-mf16c")
@@ -1660,6 +1670,15 @@ if(STRATA_NATIVE_EXPERTS)
   # MODEL-UPDATE: the pool's expert rows per format on T threads against the RAM bandwidth (a benchmark, no test)
   add_executable(kq_cpu_bench src/kernels/cpu/kq_cpu_bench.cpp)
   target_link_libraries(kq_cpu_bench PRIVATE strata_kernels_cpu)
+  if(STRATA_BUILD_TESTS)
+    add_executable(q4_avx512_parity src/kernels/cpu/q4_avx512_parity.cpp)
+    target_link_libraries(q4_avx512_parity PRIVATE strata_kernels_cpu)
+    add_test(NAME q4_cpu_multitoken COMMAND q4_avx512_parity)
+    set_tests_properties(q4_cpu_multitoken PROPERTIES ENVIRONMENT "STRATA_CPU_Q4_MT=1" TIMEOUT 120)
+    add_test(NAME q4_cpu_multitoken_fallback COMMAND q4_avx512_parity)
+    set_tests_properties(q4_cpu_multitoken_fallback PROPERTIES
+                        ENVIRONMENT "STRATA_CPU_Q4_MT=1;STRATA_FORCE_ISA=avx2" TIMEOUT 120)
+  endif()
   if(STRATA_BUILD_TESTS)
     add_test(NAME iq_avx2_parity COMMAND iq_avx2_parity)
     add_test(NAME iq_avx2_parity_iq3s_mt1 COMMAND ${CMAKE_COMMAND} -E env STRATA_IQ3S_MT1=1 $<TARGET_FILE:iq_avx2_parity>)
@@ -2009,6 +2028,13 @@ if(STRATA_NATIVE_EXPERTS)
     target_link_libraries(nvfp4_decode_bench PRIVATE strata_kernels CUDA::cudart)
   endif()
   if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
+    if(STRATA_BUILD_TESTS)
+      add_executable(bf16_small_test src/kernels/bf16_small_test.cpp)
+      target_include_directories(bf16_small_test PRIVATE ${_strata_gpu_include_directories})
+      target_link_libraries(bf16_small_test PRIVATE strata_prefill strata_kernels ${_strata_gpu_runtime_target})
+      add_test(NAME bf16_small_mm COMMAND bf16_small_test)
+      set_tests_properties(bf16_small_mm PROPERTIES TIMEOUT 300)
+    endif()
     add_executable(native_expert_parity src/kernels/native_expert_parity.cpp)
     target_include_directories(native_expert_parity PRIVATE ${_strata_gpu_include_directories})
     # strata_engine: the --load-check mode runs the engine's start-up checks (NativeDense, check_experts_gguf)

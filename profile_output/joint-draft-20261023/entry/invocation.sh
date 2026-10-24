@@ -1,0 +1,1 @@
+ssh -S /tmp/strata-dcu-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; bash /root/strata-dcu/run-autoround.sh --dflash2 /root/private_data/strata-dcu/dflash2/checkpoint --dflash-mtp-prefix 2 --prompt "Reply with exactly OK." --max-new 16'

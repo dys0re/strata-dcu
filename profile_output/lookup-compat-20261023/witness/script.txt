@@ -1,0 +1,30 @@
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-4.f32 4 0
+draft 4 553 7 plain
+seed 4 553 7 - zero
+seed 4 553 7 393,85 prefix2
+discard
+seed 4 553 7 393,85 repeat2
+seed 4 553 7 17,42,99 prefix3
+append /root/private_data/strata-dcu/dflash-native/witness/features-4-2.f32 2 4
+seed 6 553 7 393,85 increment
+append /root/private_data/strata-dcu/dflash-native/witness/features-6-1.f32 1 6
+seed 7 553 7 393,85 full
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-7.f32 7 0
+seed 7 553 7 393,85 recompute
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-4.f32 4 0
+seed 4 553 2 393 short
+seed 4 553 7 393,85,17,42,99,100,101 all
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-2045.f32 2045 0
+seed 2045 553 7 393,85 edge
+append /root/private_data/strata-dcu/dflash-native/witness/features-2045-9.f32 9 2045
+seed 2054 553 7 393,85 wrap
+seed 2054 553 7 393,85 wrap-repeat
+append /root/private_data/strata-dcu/dflash-native/witness/features-2054-17.f32 17 2054
+seed 2071 553 3 393,85 after-wrap
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-4.f32 4 0
+seed 4 553 7 393,85 reset2

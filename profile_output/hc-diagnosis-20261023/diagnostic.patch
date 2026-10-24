@@ -1,0 +1,83 @@
+--- a/src/kernels/cuda/fused_gr.cu
++++ b/hc_probe.cu
+@@ -2454,7 +2454,8 @@
+               cudaMemcpyAsync(d_ip, h_ip.data(), h_ip.size() * 4, cudaMemcpyHostToDevice, st) == cudaSuccess;
+     if (!ok) why[0] = "setting up the check failed";
+     std::vector<float> h1, h2;
+-    // true when equal; false with the first difference in `w` (or a read-back failure in `ok`)
++    int variant_id=-1;
++    // Diagnostic: report all intermediates, including normalized input before down.
+     auto same = [&](const float* d1, const float* d2, size_t n, const char* what, int T, int apply, std::string& w) {
+         h1.resize(n);
+         h2.resize(n);
+@@ -2465,26 +2466,29 @@
+             ok = false;
+             return false;
+         }
+-        for (size_t i = 0; i < n; ++i) {
+-            uint32_t u1, u2;
+-            std::memcpy(&u1, &h1[i], 4);
+-            std::memcpy(&u2, &h2[i], 4);
+-            if (u1 != u2) {
+-                char buf[192];
+-                std::snprintf(buf, sizeof buf, "%s differs for %d token(s)%s at %zu (%08x, not %08x)", what, T,
+-                              apply ? " with the pending write" : "", i, u2, u1);
+-                w = buf;
+-                return false;
+-            }
+-        }
+-        return true;
++        size_t bad=0,first=n,nonfinite=0;double max_abs=0,sum_diff=0,sum_ref=0;
++        for(size_t i=0;i<n;++i){
++            uint32_t u1,u2;std::memcpy(&u1,&h1[i],4);std::memcpy(&u2,&h2[i],4);
++            if(u1!=u2){++bad;if(first==n)first=i;}
++            if(!std::isfinite(h1[i])||!std::isfinite(h2[i]))++nonfinite;
++            if(std::isfinite(h1[i])&&std::isfinite(h2[i])){
++                const double delta=double(h2[i])-h1[i];max_abs=std::max(max_abs,std::abs(delta));sum_diff+=delta*delta;sum_ref+=double(h1[i])*h1[i];
++            }
++        }
++        uint32_t u1=0,u2=0;
++        if(first<n){std::memcpy(&u1,&h1[first],4);std::memcpy(&u2,&h2[first],4);w=std::string(what)+" differs";}
++        std::printf("%d,%d,%d,%s,%zu,%zu,%zu,%08x,%08x,%.12g,%.12g,%zu\n",variant_id,T,apply,what,n,bad,first,u1,u2,max_abs,std::sqrt(sum_diff/std::max(sum_ref,1e-300)),nonfinite);
++        return bad==0 && nonfinite==0;
+     };
+-    auto all_same = [&](const Set& s1, const Set& s2, int T, int apply, std::string& w) {
+-        return same(s1.lo, s2.lo, (size_t) T * LR, "lo", T, apply, w) &&
+-               same(s1.rs, s2.rs, (size_t) T * HC, "rs", T, apply, w) &&
+-               same(s1.inj, s2.inj, (size_t) T * HC, "inject", T, apply, w) &&
+-               same(s1.mixed, s2.mixed, (size_t) T * N, "mixed", T, apply, w) &&
+-               same(s1.R_out, s2.R_out, (size_t) T * D, "R", T, apply, w);
++    auto all_same = [&](const Set& s1,const Set& s2,int T,int apply,std::string& w){
++        variant_id=(&s1==&set[3] || &s2==&set[3])?3:int(&s2-set);
++        bool equal=same(s1.rs,s2.rs,size_t(T)*HC,"rs",T,apply,w);
++        if(variant_id!=3)equal=same(s1.xn,s2.xn,size_t(T)*D,"xn",T,apply,w)&&equal;
++        equal=same(s1.lo,s2.lo,size_t(T)*LR,"lo",T,apply,w)&&equal;
++        equal=same(s1.inj,s2.inj,size_t(T)*HC,"inject",T,apply,w)&&equal;
++        equal=same(s1.mixed,s2.mixed,size_t(T)*N,"mixed",T,apply,w)&&equal;
++        if(apply)equal=same(s1.R_out,s2.R_out,size_t(T)*D,"R",T,apply,w)&&equal;
++        return equal;
+     };
+     ok_variant[2] = ok_variant[3] = ok;
+     bool single_ok = ok;
+@@ -2516,8 +2520,8 @@
+                 ok = false;
+                 break;
+             }
+-            if (ok_variant[2] && !all_same(set[0], set[1], T, apply, why[2])) ok_variant[2] = false;
+-            if (ok && ok_variant[3] && !all_same(set[0], set[2], T, apply, why[3])) ok_variant[3] = false;
++            if (!all_same(set[0], set[1], T, apply, why[2])) ok_variant[2] = false;
++            if (ok && !all_same(set[0], set[2], T, apply, why[3])) ok_variant[3] = false;
+             if (ok && T == 1 && single_ok && !all_same(set[3], set[0], T, apply, why[1])) single_ok = false;
+         }
+     }
+@@ -3042,3 +3046,10 @@
+ #endif
+ 
+ }  // namespace strata::kernels
++
++int main(){
++    std::printf("variant,T,apply,tensor,elements,different,first,plain_bits,other_bits,max_abs,relative_l2,nonfinite\n");
++    bool v[4];std::string why[4];bool ok=strata::kernels::fused_gr_selftest(v,why);
++    std::fprintf(stderr,"selftest_ran=%d plain_ok=%d split_equal=%d staged_equal=%d\n",ok,v[1],v[2],v[3]);
++    return ok?0:1;
++}

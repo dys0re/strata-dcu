@@ -1,0 +1,2 @@
+strata dflash native: weights=1206131200 shared_head=1271398400 max_candidates=7 window=2048 context=4096 graphs=0 adaptive=0
+strata dflash native: calls=15 feature_rows=0 draft_ms=149.336 graphs=0

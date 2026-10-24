@@ -1,0 +1,20 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+Starting AutoRound model; 96 prompt tokens
+speculation              18 rounds of 7, drafts accepted 47 of 58 (0.810), 3.61 tokens per round
+suffix drafts            12 windows, drafts accepted 42 of 48
+accepted per round       0:5 1:0 2:2 3:1 4:10 5:0 6:0
+verify window            wait for rings 31.782  pool 57.441  host 0.047  commit 0.073 ms/round; CPU experts 20.50 distinct / 29.88 routed per layer
+pool multi               gate/up 35.267  quantize 1.119  down 18.723 ms/round; 50.4 GB/s over the rows phases; CPU pool call 57.345 ms/round
+dispatch                 plan 0.553  activation quantize 0.256  jobs 0.358  run 55.156 ms/round
+resident RAM             41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+expert tiers             decode: RAM 17711 blobs, files 0 blobs, 0.0 MB read from the files (0.00 MB/round, 0.0 ms/round of reading, 0.00 GB/s per reading thread); prompt copies 23503.6 MB
+io path                  file reads: page cache held 41233.2 MB, not 3213.7 MB (mincore at the read); io prefetch on: 0 read ahead, 0 used, 0 unused, 0 skipped (cached), 0 dropped; pread 5678.9 MB in 2054 calls (15.91 ms each); decode waited 0.0 ms/round in the fetches
+routing prefetch         0 experts warmed, 0 of the file tier's 0 blob reads had been warmed (0.0%); predictor 26.9 ms/round on its thread, 48 layers skipped (still busy)
+mtp                      10.973 ms/round drafting (17 rounds), MTP prompt 60.4 ms, 1310 MiB of VRAM
+prompt  : 248045 846 198 11762 279 1414 1881 361 1272 29 9212 6681 11 1973 9212 466 29611 13 198 27 1272 15877 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 3786 1272 29 248046 198 248045 74455 198 248068 271 248069 271
+output  : 760 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 248046
+decode                   65 tokens in 2085.5 ms  ->  31.17 tok/s
+prefill                  95 tokens in 8205.2 ms  ->  11.58 tok/s  (time to first token 60120.4 ms)
+mtp budget: 5 observations; T1=1@0ms/1tok T2=1@0ms/1.49934tok T3=1@0ms/1.99869tok T4=1@0ms/2.48587tok T5=1@0ms/2.48587tok
+GENERATED TEXT: The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river.

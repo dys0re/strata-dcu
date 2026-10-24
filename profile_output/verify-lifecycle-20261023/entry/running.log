@@ -1,0 +1,14 @@
+    PID     ELAPSED STAT COMMAND         COMMAND
+  41013       02:00 Ssl  python3         python3 -u /root/private_data/strata-dcu/verify-lifecycle-20261023/run.py --engine /root/private_data/strata-dcu/verify-lifecycle-20261023/strata-profile --out /root/private_data/strata-dcu/verify-lifecycle-20261023/mtp-profile --mode adaptive --width 5 --repeat 1 --timing-only --lifecycle --checks
+  41089       01:54 Rl   strata-profile  /root/private_data/strata-dcu/verify-lifecycle-20261023/strata-profile --native /root/private_data/strata-dcu/autoround/dense.gguf --pack /root/private_data/strata-dcu/autoround/pack --ple-gguf /root/private_data/strata-dcu/autoround/ple.gguf --tokens-file /root/private_data/strata-dcu/autoround/prompt.ids --max-new 16 --eos-ids 248046,248044 --max-context 512 --prefill 32 --spec 5 --mtp-max-t 5 --expert-profile /root/strata-dcu/Strata/data/expert-profile.bin --expert-cache 8500 --mmap-experts --resident-cpu-experts --pool-workers 12 --vram-reserve-mib 4096 --kv int8 --suffix-draft 0 --adapt-every 0 --ple-io direct --ple-row-cache 65536 --serve --prompt-cache 0 --conversation-cache-mib 0 --pcie-frac 0 --adapt-swaps 0 --mtp /root/strata-dcu/autoround/mtp --mtp-adaptive --serve --prompt-cache 0 --conversation-cache-mib 0 --pcie-frac 0 --adapt-swaps 0
+
+================================= System Management Interface ==================================
+================================================================================================
+HCU[0]		: HCU use (%): 1.2
+================================================================================================
+================================================================================================
+HCU[0]		: vram Total Memory (MiB): 65520
+HCU[0]		: vram Total Used Memory (MiB): 32900
+================================================================================================
+======================================== End of SMI Log ========================================
+

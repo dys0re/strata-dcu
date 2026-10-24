@@ -352,3 +352,25 @@ DFlash2 目前为独立 PyTorch 草稿进程＋Strata 验证器，支持单卡�
 工作区已移除未提交的专家预测、训练/TTT、临时分流和生命周期插桩，保留原生 DFlash2。HIP 完整构建通过；新增 DFlash CUDA 翻译单元使用 CUDA 13.3 / g++-15、sm_80 编译通过。重新执行 14 项端到端 QA、2100-token 长提示及请求恢复，以及原生 graph/eager、重复/重置、增量和环形缓存检查，均通过。增强 MTP 的 4 项回归通过。采样 token 完全一致只作为记录，答案、格式和代码执行作为功能验收依据。
 
 清理后二进制：`/root/private_data/strata-dcu/dflash-native/cleanup-20261023/strata`，SHA-256 `745c912b923cec9696517e9a898609c1e4483fb4baca3b411f1f52c0dc8a154a`；`/root/strata-dcu/build-gfx936/strata` 已指向它。原生 DFlash2 的 8300 常驻专家及草稿权重加上已有的 16 个临时专家槽后，完整 GPU 权重为 32827238400 字节（47.781584%）。原始结果见 `profile_output/dflash-native/cleanup-20261023/`。本轮没有重新进行性能对比，不新增速度提升结论。
+
+### Q4_0 多 token CPU 与 DFlash2 小 batch 投影（2026-10-23）
+
+实现与验收见 [DCU 内核优化](docs/DCU_KERNEL_OPTIMIZATIONS.md)。本机入口启用 `STRATA_CPU_Q4_MT=1` 和 `STRATA_DFLASH_SMALL_GEMV=1`，可分别设为 0 对照。固定原有 8500/8300 个专家与 50% 权重预算：增强 MTP 英文/中文/代码三次中位数为 31.59/38.88/40.29 TPS，原生 DFlash2 为 29.89/33.19/43.58 TPS。GPU 权重账单不变。14 个真实 QA、代码执行、STOP/恢复、九个 eager/graph 缓存用例及 2100-token 输入后恢复通过。正式二进制与源码哈希、测量范围和原始数据见文档及 `profile_output/q4-multitoken-20261023/`。
+
+### MTP 与 DFlash2 联合草稿（2026-10-23）
+
+标准引擎更新到 `/root/private_data/strata-dcu/joint-draft-20261023/strata-final`，SHA-256 `1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1`。默认仍是增强 MTP；`--dflash2 ... --dflash-mtp-prefix 2` 才联合使用。MTP 产生短前缀，原生 DFlash2 在该前缀条件下补后续候选，统一验证并按接受结果推进两个缓存。固定 8300 GPU 专家、其余 16276 在 RAM；全部 GPU 权重 34,195,377,152 字节（49.772975%），PLE 仍在盘上。
+
+14 项语义/代码/采样 QA、强制拒绝后的同组 QA、STOP/恢复、15 项 eager/graph 前缀和缓存用例、2100-token 输入及后续恢复通过。独立 DFlash2 九项原用例输出与前版逐字节相同。联合模式三次中位数为英文/中文/代码 23.78/27.85/35.28 TPS，均低于本日之前的单独路径；没有切换默认草稿。使用、测量限制与原始记录见 [联合文档](docs/JOINT_DRAFT.md) 和 [验收结果](profile_output/joint-draft-20261023/README.md)。
+
+## HC 修复与 lookup 兼容（2026-10-24）
+
+当前候选已部署到 `/root/private_data/strata-dcu/lookup-compat-20261023/strata-final`，
+公开引擎链接指向此文件；SHA256 为 `1c5b8a268585ab62bfe53a098c114b7e645c8befa91384d58c645fec9a8ff396`。
+严格 HC 自检恢复通过，入口默认 staged。增强 MTP 的英文/中文/代码三次中位数为
+33.55 / 42.21 / 43.13 TPS；原生 DFlash2 为 30.13 / 35.12 / 46.21 TPS。
+这些是 2026-10-23 的固定专家数对照结果；重启后接续完成长上下文、拒绝和 IPC 功能检查。
+
+缓存交换、PCIe 比例和搬运方式、锁页内存、suffix lookup 都已开放配置。
+默认仍是增强 MTP，交换/分流/lookup 关闭；权重限制和专家槽数保持不变。
+具体用法与结果见 [DCU 运行选项](docs/DCU_RUNTIME_OPTIONS.md)；公开入口独立复核已通过，三种模式均正确执行查找草稿；进程全部退出，GPU 回到 2 MiB。

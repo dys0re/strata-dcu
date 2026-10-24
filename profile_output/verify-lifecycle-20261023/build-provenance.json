@@ -1,0 +1,35 @@
+{
+  "engine_sha256": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1",
+  "witness_sha256": "b00819fc846ec5de60f25d9de40d6e706091dae16b485b5e5168843d7a69d969",
+  "source_sha256": {
+    "CMakeLists.txt": "fa4d4b2f1bc7c83affa2366a4bbc2c0127695cf775976bf78e1a7383ccbe4f52",
+    "src/program/generate.cpp": "c4b19b206a320914cb995db8e18ccedca475eff13082b236675d8d3e2e3a050a",
+    "src/prefill/dflash.cu": "a9cc068ff6565e33a27fc7fec3b5ba4f3566d4428e8b108484d7e851449f96fe",
+    "src/prefill/dflash_witness.cpp": "8292e261d150690dccb59e84e3fcaece1a94dd6e52ca5c8490634a8ef7fd4c6a",
+    "src/core/mtp.cpp": "540534277f886f9c9173ccdd4506c008841f2f0f6bfe6a50dff6885ed3203e71",
+    "src/core/verify.cpp": "4a9f0c69890cec5897c7416bf1290c1f2fca92cd98c937a1f511613fc0bf7433",
+    "include/strata/core/dflash_native.hpp": "1cae3eaa69c32aa36c038b9d45eb440874a0a021d5d85d9a91fdf6d384bcc623",
+    "include/strata/core/dflash_bridge.hpp": "fc191a459c8ce329aa6635ec200a4b3bdc76c44d4cba6ff2e09056d495ce9ecb",
+    "include/strata/spec/joint_budget.hpp": "c76ba6aec381f890aa75c88cdb5a17a6e42392ee75349be17ca380e7f998ad92",
+    "src/spec/joint_budget_test.cpp": "0d486f6a2b0a6a0fb5118f8d6f4fcb9774389a35b1a664dbd2c0e4d18d0c954f",
+    "src/kernels/cpu/native_expert.cpp": "c32610f7255bb254eaff73fc2fdcb819b1d9030309d13f4fb9e9de99708aafed",
+    "src/kernels/cpu/q4_avx512.cpp": "023ee54150a93f009938a759ba7a240a3fd5c66a7de6587945144fe982f0c425",
+    "include/strata/kernels/cpu/q4_avx512.hpp": "67a7471e8368d1fa1b0462112730786d8e1a95814a5b5b1278f4aec2975d1822",
+    "src/kernels/cuda/bf16_small.cu": "923f0b5b6805d9dd077ae7165c7425f5e80bf2b192909f1c10b9a70cc6836a00",
+    "include/strata/kernels/bf16_small.hpp": "3407fbdf7d911522dbdc533bbf2b11d89c0cb1ad32c23a4f4e29500f8dd8e114",
+    "tools/autoround_pack.py": "fadca55dabe3170da7c081c73656b95e7df14df94923d823dc4dfd0e881cdf83",
+    "tools/bench_dflash2_native.py": "df37a2a2f73df92f64885a02be954ef59db91737e3bf033fa967fe41952626a8",
+    "tools/test_joint_dflash.py": "f10c22fd20a048993e51d63edec04d2cdaf0e0672b6eb1a092eb620ce0d1fcd5",
+    "strata-test/run-autoround.sh": "c21e68319921b14fab0c77ff0f6a83bbd19a1359b68b7e9b6a80ce06548c8c7c"
+  },
+  "entry": "/root/private_data/strata-dcu/joint-draft-20261023/strata-final",
+  "runtime_spec": "dflash2@52f8bc84",
+  "compiler": "/opt/dtk/llvm/bin/clang++",
+  "backend": "HIP",
+  "arch": "gfx936",
+  "diagnostic_source_sha256": {
+    "src/core/verify.cpp": "ce80fe788ea7b1a3ab31a4dbb43e675c07a8b94dd8e05175d2f9fdbc74aa6d30",
+    "src/program/generate.cpp": "087866b38f37a3ccc8753d7d3ec965bec9e7cf3544c125a4c4942f1fcc98ff96"
+  },
+  "diagnostic_engine_sha256": "7060a916d2954b6904e41faf9617a465d549f70244168fe0e78ea2749394e28e"
+}

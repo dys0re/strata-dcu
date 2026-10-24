@@ -1,0 +1,46 @@
+{
+  "validation": "PASS",
+  "checks": {
+    "ssh_exit_zero": true,
+    "answer_exactly_OK": true,
+    "engine_exit_zero": true,
+    "kernel_options_true_true": true,
+    "draft_method_dflash2": true,
+    "draft_backend_native": true,
+    "draft_graph": true,
+    "draft_adaptive": true,
+    "draft_max_t_8": true,
+    "native_draft_exact": true,
+    "external_draft_zero": true,
+    "staging_exact": true,
+    "weights_exact": true,
+    "limit_exact": true,
+    "weight_component_sum": true,
+    "within_limit": true
+  },
+  "weight_components": {
+    "pack": 1538035200,
+    "dense": 5819596800,
+    "head": 1271398400,
+    "experts": 22947840000,
+    "mtp": 0,
+    "external_draft": 0,
+    "native_draft": 1206131200,
+    "staging": 44236800
+  },
+  "weights": 32827238400,
+  "limit": 34351349760,
+  "remaining_weight_budget": 1524111360,
+  "symlink": "/root/strata-dcu/build-gfx936/strata",
+  "binary": "/root/private_data/strata-dcu/q4-multitoken-20261023/strata-final",
+  "sha256": "d8e293371f4bc399baf7b1562ef516af475b7870791ecd60f2d8f9bb4a1b9ac5",
+  "observed_pids": [
+    28378,
+    28393
+  ],
+  "observed_pids_exited": true,
+  "postflight_inference_processes": [],
+  "vram_before_mib": 2,
+  "vram_after_mib": 2,
+  "doc_vs_reality_divergences": []
+}

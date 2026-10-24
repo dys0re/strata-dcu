@@ -1,0 +1,16 @@
+{
+  "candidate_sha256": "1c5b8a268585ab62bfe53a098c114b7e645c8befa91384d58c645fec9a8ff396",
+  "local_remote_source_equal": true,
+  "current_source_sha256": {
+    "src/kernels/cuda/fused_gr.cu": "3528f1269c35c2c996030fbf29fd46c8f216ab185db9a557f8bb2f970a37091f",
+    "src/program/generate.cpp": "4868af3504e6bed8378e90abc05dc671da49bb4314c0db1404335c322a86a7a1",
+    "src/prefill/dflash.cu": "5c31ee0d57f3fa9ae048e47fb1e396f50e907602f1611b049250236e2b38443e",
+    "src/prefill/dflash_witness.cpp": "4fbe46421b2a3962a5cb860906df2737da6b535095610570acbd1a03c68190c3",
+    "include/strata/core/dflash_native.hpp": "072a0afd5d54bce8dfd748ad6e72d53af0b9c80c43a299f9f0fe7c261df40452",
+    "include/strata/core/dflash_bridge.hpp": "f2d3b1afecaf82820e4d3d93c73fae26fa2b5fc0b9d0e3977f975e6231c60688",
+    "tools/autoround_pack.py": "056ddc78471240cf2680e1db5f6b6a1b5575ff6a264a29cc2c9a60774161ea39",
+    "tools/bench_dflash2_native.py": "28ee0d955970b46f021d68e77ae294909918d8f28d0ea96002b553d27255f59f",
+    "tools/dflash2_worker.py": "883d4f171746528b66676c622c2b84b9eae16a41ff05b1c25ab44a657f7f50b1",
+    "tools/test_joint_dflash.py": "d636f231ecdb29bfdb7e8bb5a4d6803a45e969f375c1effc122f04bb7c805bba"
+  }
+}

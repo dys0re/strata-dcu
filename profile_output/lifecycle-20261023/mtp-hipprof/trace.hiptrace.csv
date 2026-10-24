@@ -1,0 +1,6 @@
+"Name","Calls","TotalDurationNs","AverageNs","Percentage"
+"hipStreamSynchronize","1","1092897","1092897","68.9863977311246"
+"hipMemsetAsync","87","475554","5466","30.0181603450529"
+"hipMemGetInfo","1","15390","15390","0.971455371441232"
+"hipGetDevice","2","380","190","0.023986552381265"
+"Total","91","1584221","17409","100.0"

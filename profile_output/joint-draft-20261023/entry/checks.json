@@ -1,0 +1,168 @@
+{
+  "status": "PASS",
+  "checks": {
+    "text": {
+      "actual": "OK",
+      "expected": "OK",
+      "pass": true
+    },
+    "engine_exit": {
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    "draft_method": {
+      "actual": "mtp+dflash2",
+      "expected": "mtp+dflash2",
+      "pass": true
+    },
+    "joint_mtp_prefix": {
+      "actual": 2,
+      "expected": 2,
+      "pass": true
+    },
+    "mtp_mode": {
+      "actual": "adaptive",
+      "expected": "adaptive",
+      "pass": true
+    },
+    "mtp_max_t": {
+      "actual": 5,
+      "expected": 5,
+      "pass": true
+    },
+    "draft_backend": {
+      "actual": "native",
+      "expected": "native",
+      "pass": true
+    },
+    "draft_graph": {
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    "draft_adaptive": {
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    "draft_max_t": {
+      "actual": 8,
+      "expected": 8,
+      "pass": true
+    },
+    "kernel_options.cpu_q4_mt": {
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    "kernel_options.dflash_small_gemv": {
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    "weight_vram.native_draft": {
+      "actual": 1206131200,
+      "expected": 1206131200,
+      "pass": true
+    },
+    "weight_vram.mtp": {
+      "actual": 1368138752,
+      "expected": 1368138752,
+      "pass": true
+    },
+    "weight_vram.external_draft": {
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    "weight_vram.staging": {
+      "actual": 44236800,
+      "expected": 44236800,
+      "pass": true
+    },
+    "weight_vram.experts": {
+      "actual": 22947840000,
+      "expected": 22947840000,
+      "pass": true
+    },
+    "weight_vram.weights": {
+      "actual": 34195377152,
+      "expected": 34195377152,
+      "pass": true
+    },
+    "weight_vram.limit": {
+      "actual": 34351349760,
+      "expected": 34351349760,
+      "pass": true
+    },
+    "complete_weight_sum": {
+      "components": {
+        "pack": 1538035200,
+        "dense": 5819596800,
+        "head": 1271398400,
+        "experts": 22947840000,
+        "mtp": 1368138752,
+        "external_draft": 0,
+        "native_draft": 1206131200,
+        "staging": 44236800
+      },
+      "sum": 34195377152,
+      "weights": 34195377152,
+      "pass": true
+    },
+    "weight_limit": {
+      "weights": 34195377152,
+      "limit": 34351349760,
+      "headroom": 155972608,
+      "pass": true
+    },
+    "controller_exit": {
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    "mtp_loaded": {
+      "pass": true
+    },
+    "actual_joint_execution": {
+      "pass": true
+    },
+    "native_draft_execution": {
+      "pass": true
+    },
+    "pre_engine_identity": {
+      "expected_target": "/root/private_data/strata-dcu/joint-draft-20261023/strata-final",
+      "expected_sha256": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1",
+      "pass": true
+    },
+    "post_engine_identity": {
+      "expected_target": "/root/private_data/strata-dcu/joint-draft-20261023/strata-final",
+      "expected_sha256": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1",
+      "pass": true
+    },
+    "pre_idle_vram": {
+      "used_mib": 2,
+      "pass": true
+    },
+    "pre_inference_processes_absent": {
+      "pass": true
+    },
+    "post_idle_vram": {
+      "used_mib": 2,
+      "pass": true
+    },
+    "post_inference_processes_absent": {
+      "pass": true
+    },
+    "no_independent_python_drafter": {
+      "pass": true,
+      "note": "Only AutoRound controller and native engine were present in during-run capture."
+    }
+  },
+  "divergences": [],
+  "notes": [
+    "hy-smi --showpids reports a platform process-directory error; independent ps captures establish process absence before/after and no Python drafter during execution.",
+    "Initial exploratory symlink read used /root/strata-dcu/Strata/build-gfx936/strata, which does not exist; wrapper read identified actual /root/strata-dcu/build-gfx936/strata. This path was not prescribed by the joint documentation."
+  ]
+}

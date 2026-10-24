@@ -1,0 +1,22 @@
+[
+  {
+    "name": "native-lookup-long-resume",
+    "returncode": 0
+  },
+  {
+    "name": "joint-lookup-long",
+    "returncode": 0
+  },
+  {
+    "name": "joint-lookup-reject",
+    "returncode": 0
+  },
+  {
+    "name": "ipc-lookup",
+    "returncode": 0
+  },
+  {
+    "name": "dma-smoke",
+    "returncode": 0
+  }
+]

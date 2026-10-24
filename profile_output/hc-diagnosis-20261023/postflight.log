@@ -1,0 +1,16 @@
+
+================================= System Management Interface ==================================
+================================================================================================
+HCU[0]		: vram Total Memory (MiB): 65520
+HCU[0]		: vram Total Used Memory (MiB): 2
+================================================================================================
+======================================== End of SMI Log ========================================
+
+1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1  /root/strata-dcu/build-gfx936/strata
+47914eae6d64809b1ad600cfc3d9960c1c4074911d9ff4de303ec9fd2af5e94b  /root/strata-dcu/Strata/src/kernels/cuda/fused_gr.cu
+low 0
+high 0
+max 0
+oom 0
+oom_kill 0
+    PID COMMAND

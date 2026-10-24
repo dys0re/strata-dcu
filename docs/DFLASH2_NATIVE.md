@@ -46,7 +46,7 @@ python3 tools/dflash2_pack.py \
 --suffix-draft 0 --adapt-every 0 --pcie-frac 0 --adapt-swaps 0
 ```
 
-不得同时开启 MTP、lookup drafting、批量请求、窗口流水或输出头借用。当前原生草稿只接受该固定 checkpoint 和 BF16 目标 head/embedding。位置上限为 checkpoint 的 262144；实际验证过的上下文范围以测试报告为准，不能将接口上限当作已测试上限。HIP/gfx936 是运行验证平台。
+MTP 通过 `--dflash-mtp-prefix` 显式组成 [联合模式](JOINT_DRAFT.md)；lookup drafting 通过 `--suffix-draft 3` 开启，见 [DCU 运行选项](DCU_RUNTIME_OPTIONS.md)。批量请求、窗口流水和输出头借用仍不支持。当前原生草稿只接受该固定 checkpoint 和 BF16 目标 head/embedding。位置上限为 checkpoint 的 262144；实际验证过的上下文范围以测试报告为准，不能将接口上限当作已测试上限。HIP/gfx936 是运行验证平台。
 
 旧的独立 PyTorch 路径保留为显式诊断入口：`--dflash-backend ipc --dflash-max-t 4`，其上下文仍限制为 512，见 [IPC 实现](DFLASH2_IPC.md)。
 

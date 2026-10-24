@@ -1,0 +1,7 @@
+{
+  "inference_processes": [],
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n",
+  "cpu_max": "1500000 100000\n",
+  "root_disk": "954M\t/root",
+  "selected_entry": "/root/private_data/strata-dcu/q4-multitoken-20261023/strata-final"
+}

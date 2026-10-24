@@ -1,0 +1,5 @@
+{
+  "utc": "2026-10-23T10:59:39.804927+00:00",
+  "command": "ssh -S /tmp/strata-dcu-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'source /opt/dtk/env.sh >/dev/null 2>&1; rocm-smi --showuse --showmeminfo vram; ps -eo pid,comm,args | grep -E \"[s]trata|[d]flash2_worker|[r]un.py\"; readlink -f /root/strata-dcu/Strata/build-gfx936/strata; sha256sum /root/strata-dcu/Strata/build-gfx936/strata /root/private_data/strata-dcu/verify-lifecycle-20261023/strata-profile'",
+  "exit_code": 1
+}

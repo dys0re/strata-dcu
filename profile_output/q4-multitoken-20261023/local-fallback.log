@@ -1,0 +1,2 @@
+SKIP direct AVX-512 checks; testing public dispatch fallback
+Q4 CPU: checks=0 worst_scaled_error=0 whole_expert_relative_L2=0 failures=0

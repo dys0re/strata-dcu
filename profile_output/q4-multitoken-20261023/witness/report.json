@@ -1,0 +1,392 @@
+{
+  "seed": 1729,
+  "modes": {
+    "eager": [
+      {
+        "name": "short3",
+        "pos": 4,
+        "k": 3,
+        "reference_ids": [
+          16,
+          15,
+          8
+        ],
+        "ids": [
+          16,
+          15,
+          8
+        ],
+        "relative_l2": 0.042698197066783905,
+        "max_abs": 0.875,
+        "tokens_equal": true
+      },
+      {
+        "name": "repeat3",
+        "pos": 4,
+        "k": 3,
+        "reference_ids": [
+          16,
+          15,
+          8
+        ],
+        "ids": [
+          16,
+          15,
+          8
+        ],
+        "relative_l2": 0.042698197066783905,
+        "max_abs": 0.875,
+        "tokens_equal": true
+      },
+      {
+        "name": "increment1",
+        "pos": 6,
+        "k": 1,
+        "reference_ids": [
+          727
+        ],
+        "ids": [
+          17
+        ],
+        "relative_l2": 0.03851228579878807,
+        "max_abs": 0.65625,
+        "tokens_equal": false
+      },
+      {
+        "name": "full7",
+        "pos": 7,
+        "k": 7,
+        "reference_ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          4598,
+          38523
+        ],
+        "ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          1472,
+          38523
+        ],
+        "relative_l2": 0.028640517964959145,
+        "max_abs": 0.625,
+        "tokens_equal": false
+      },
+      {
+        "name": "recompute7",
+        "pos": 7,
+        "k": 7,
+        "reference_ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          4598,
+          38523
+        ],
+        "ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          1472,
+          38523
+        ],
+        "relative_l2": 0.027642754837870598,
+        "max_abs": 0.5,
+        "tokens_equal": false
+      },
+      {
+        "name": "window-edge",
+        "pos": 2045,
+        "k": 7,
+        "reference_ids": [
+          17,
+          17,
+          96786,
+          908,
+          13,
+          220,
+          1866
+        ],
+        "ids": [
+          17,
+          17,
+          96786,
+          908,
+          13,
+          220,
+          1866
+        ],
+        "relative_l2": 0.04482099786400795,
+        "max_abs": 1.75,
+        "tokens_equal": true
+      },
+      {
+        "name": "ring-wrap",
+        "pos": 2054,
+        "k": 7,
+        "reference_ids": [
+          17,
+          17,
+          92,
+          413,
+          821,
+          2018,
+          314
+        ],
+        "ids": [
+          17,
+          17,
+          92,
+          413,
+          821,
+          2018,
+          314
+        ],
+        "relative_l2": 0.05163181573152542,
+        "max_abs": 1.5,
+        "tokens_equal": true
+      },
+      {
+        "name": "after-wrap",
+        "pos": 2071,
+        "k": 3,
+        "reference_ids": [
+          579,
+          958,
+          1076
+        ],
+        "ids": [
+          579,
+          958,
+          1076
+        ],
+        "relative_l2": 0.05802283436059952,
+        "max_abs": 1.0625,
+        "tokens_equal": true
+      },
+      {
+        "name": "reset-short3",
+        "pos": 4,
+        "k": 3,
+        "reference_ids": [
+          16,
+          15,
+          8
+        ],
+        "ids": [
+          16,
+          15,
+          8
+        ],
+        "relative_l2": 0.042698197066783905,
+        "max_abs": 0.875,
+        "tokens_equal": true
+      }
+    ],
+    "graph": [
+      {
+        "name": "short3",
+        "pos": 4,
+        "k": 3,
+        "reference_ids": [
+          16,
+          15,
+          8
+        ],
+        "ids": [
+          16,
+          15,
+          8
+        ],
+        "relative_l2": 0.042698197066783905,
+        "max_abs": 0.875,
+        "tokens_equal": true
+      },
+      {
+        "name": "repeat3",
+        "pos": 4,
+        "k": 3,
+        "reference_ids": [
+          16,
+          15,
+          8
+        ],
+        "ids": [
+          16,
+          15,
+          8
+        ],
+        "relative_l2": 0.042698197066783905,
+        "max_abs": 0.875,
+        "tokens_equal": true
+      },
+      {
+        "name": "increment1",
+        "pos": 6,
+        "k": 1,
+        "reference_ids": [
+          727
+        ],
+        "ids": [
+          17
+        ],
+        "relative_l2": 0.03851228579878807,
+        "max_abs": 0.65625,
+        "tokens_equal": false
+      },
+      {
+        "name": "full7",
+        "pos": 7,
+        "k": 7,
+        "reference_ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          4598,
+          38523
+        ],
+        "ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          1472,
+          38523
+        ],
+        "relative_l2": 0.028640517964959145,
+        "max_abs": 0.625,
+        "tokens_equal": false
+      },
+      {
+        "name": "recompute7",
+        "pos": 7,
+        "k": 7,
+        "reference_ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          4598,
+          38523
+        ],
+        "ids": [
+          16,
+          471,
+          710,
+          2933,
+          35000,
+          1472,
+          38523
+        ],
+        "relative_l2": 0.027642754837870598,
+        "max_abs": 0.5,
+        "tokens_equal": false
+      },
+      {
+        "name": "window-edge",
+        "pos": 2045,
+        "k": 7,
+        "reference_ids": [
+          17,
+          17,
+          96786,
+          908,
+          13,
+          220,
+          1866
+        ],
+        "ids": [
+          17,
+          17,
+          96786,
+          908,
+          13,
+          220,
+          1866
+        ],
+        "relative_l2": 0.04482099786400795,
+        "max_abs": 1.75,
+        "tokens_equal": true
+      },
+      {
+        "name": "ring-wrap",
+        "pos": 2054,
+        "k": 7,
+        "reference_ids": [
+          17,
+          17,
+          92,
+          413,
+          821,
+          2018,
+          314
+        ],
+        "ids": [
+          17,
+          17,
+          92,
+          413,
+          821,
+          2018,
+          314
+        ],
+        "relative_l2": 0.05163181573152542,
+        "max_abs": 1.5,
+        "tokens_equal": true
+      },
+      {
+        "name": "after-wrap",
+        "pos": 2071,
+        "k": 3,
+        "reference_ids": [
+          579,
+          958,
+          1076
+        ],
+        "ids": [
+          579,
+          958,
+          1076
+        ],
+        "relative_l2": 0.05802283436059952,
+        "max_abs": 1.0625,
+        "tokens_equal": true
+      },
+      {
+        "name": "reset-short3",
+        "pos": 4,
+        "k": 3,
+        "reference_ids": [
+          16,
+          15,
+          8
+        ],
+        "ids": [
+          16,
+          15,
+          8
+        ],
+        "relative_l2": 0.042698197066783905,
+        "max_abs": 0.875,
+        "tokens_equal": true
+      }
+    ]
+  },
+  "eager_graph_equal": true,
+  "repeat_reset_incremental_equal": true,
+  "reference_numerics_are_diagnostic": true
+}

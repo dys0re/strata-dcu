@@ -1,0 +1,13 @@
+joint-profile story-0 22.7 tok/win 1.94 T 3.61 gpu_ms/token {'gpu_span': 40.296, 'wait_cpu': 13.1, 'wait_plan': 2.49, 'hc0': 2.703, 'hc1': 2.559, 'qkv_or_query': 2.559, 'out_proj': 2.23, 'head': 1.629, 'gpu_experts': 3.207} cpu_ms/token 16.802
+joint-profile chinese-0 25.11 tok/win 2.21 T 4.24 gpu_ms/token {'gpu_span': 36.064, 'wait_cpu': 7.253, 'wait_plan': 2.243, 'hc0': 2.702, 'hc1': 2.563, 'qkv_or_query': 2.605, 'out_proj': 2.282, 'head': 1.676, 'gpu_experts': 4.66} cpu_ms/token 12.099
+joint-profile code-0 29.76 tok/win 3.41 T 5.13 gpu_ms/token {'gpu_span': 30.797, 'wait_cpu': 8.631, 'wait_plan': 1.679, 'hc0': 1.986, 'hc1': 1.902, 'qkv_or_query': 1.977, 'out_proj': 1.707, 'head': 1.277, 'gpu_experts': 3.598} cpu_ms/token 11.075
+mtp-normal story-0 31.55 tok/win 1.63 T 2.09 no GPU instrumentation
+mtp-normal chinese-0 38.7 tok/win 1.95 T 2.45 no GPU instrumentation
+mtp-normal code-0 33.84 tok/win 2.49 T 2.92 no GPU instrumentation
+mtp-profile story-0 27.75 tok/win 1.64 T 2.1 gpu_ms/token {'gpu_span': 34.554, 'wait_cpu': 10.813, 'wait_plan': 3.751, 'hc0': 2.348, 'hc1': 2.223, 'qkv_or_query': 1.837, 'out_proj': 1.611, 'head': 1.162, 'gpu_experts': 2.292} cpu_ms/token 13.493
+mtp-profile chinese-0 34.29 tok/win 2.1 T 2.76 gpu_ms/token {'gpu_span': 27.473, 'wait_cpu': 6.138, 'wait_plan': 2.291, 'hc0': 2.087, 'hc1': 1.972, 'qkv_or_query': 1.798, 'out_proj': 1.572, 'head': 1.136, 'gpu_experts': 3.139} cpu_ms/token 9.41
+mtp-profile code-0 36.62 tok/win 2.67 T 3.09 gpu_ms/token {'gpu_span': 25.638, 'wait_cpu': 7.889, 'wait_plan': 1.708, 'hc0': 1.805, 'hc1': 1.657, 'qkv_or_query': 1.588, 'out_proj': 1.37, 'head': 1.012, 'gpu_experts': 2.5} cpu_ms/token 10.516
+native-profile story-0 27.24 tok/win 1.84 T 2.63 gpu_ms/token {'gpu_span': 34.039, 'wait_cpu': 11.115, 'wait_plan': 2.501, 'hc0': 2.366, 'hc1': 2.223, 'qkv_or_query': 1.974, 'out_proj': 1.732, 'head': 1.253, 'gpu_experts': 2.448} cpu_ms/token 14.006
+native-profile chinese-0 30.66 tok/win 1.8 T 2.43 gpu_ms/token {'gpu_span': 29.933, 'wait_cpu': 5.772, 'wait_plan': 2.533, 'hc0': 2.361, 'hc1': 2.213, 'qkv_or_query': 1.909, 'out_proj': 1.67, 'head': 1.205, 'gpu_experts': 3.348} cpu_ms/token 9.44
+native-profile code-0 39.89 tok/win 3.56 T 4.15 gpu_ms/token {'gpu_span': 23.187, 'wait_cpu': 7.093, 'wait_plan': 1.252, 'hc0': 1.584, 'hc1': 1.486, 'qkv_or_query': 1.52, 'out_proj': 1.325, 'head': 1.0, 'gpu_experts': 2.53} cpu_ms/token 9.383
+PASS VERIFIER_LIFECYCLE_PARTITION 4

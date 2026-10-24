@@ -1,0 +1,46 @@
+[
+  {
+    "label": "hc-plain",
+    "returncode": 0
+  },
+  {
+    "label": "hc-split",
+    "returncode": 0
+  },
+  {
+    "label": "hc-staged",
+    "returncode": 0
+  },
+  {
+    "label": "mtp-lookup",
+    "returncode": 0
+  },
+  {
+    "label": "native-plain",
+    "returncode": 0
+  },
+  {
+    "label": "native-hc",
+    "returncode": 0
+  },
+  {
+    "label": "native-lookup",
+    "returncode": 0
+  },
+  {
+    "label": "joint-plain",
+    "returncode": 0
+  },
+  {
+    "label": "joint-hc",
+    "returncode": 0
+  },
+  {
+    "label": "joint-lookup",
+    "returncode": 0
+  },
+  {
+    "label": "joint-lookup-prob",
+    "returncode": 0
+  }
+]

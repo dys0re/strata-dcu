@@ -1,0 +1,7 @@
+kq_cpu_bench: Hygon C86 Processor (avx2 1, avx512 1), 2048 MB of blobs per format
+
+q4_0/q4_0: 776 experts of 2.765 MB (2145 MB)
+  nt 1 threads 12:   79.3 GB/s of weights (0.418 ms per expert per thread)
+  nt 2 threads 12:   42.4 GB/s of weights (0.782 ms per expert per thread)
+  nt 4 threads 12:   21.4 GB/s of weights (1.549 ms per expert per thread)
+  nt 8 threads 12:   10.7 GB/s of weights (3.095 ms per expert per thread)

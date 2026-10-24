@@ -1,0 +1,79 @@
+WARNING: /opt/hyhal/lib/cmake/rocm_smi doesn't exist, please install the latest driver(version >= 6.3.15)
+The rocm_smi_lib will be used in default
+Starting AutoRound model; 96 prompt tokens
+INFO logit_bias=1 context=512 kv=int8 kv_resident=0 expert_slots=8300 expert_cache_mib=21884 expert_slots_primary=8300 expert_cache_primary_mib=21884 spec=8 mtp_max=5 lookup=3 vram_free_mib=31488 cvec=0 arena_mib=42915 pool_workers=12 pcie_frac=0.00 spec_min_p=0.00 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 conversation_cache_min_tokens=0 tail_role_token=-1 vram_elastic=0 prefill_cap=32 prefill_stages=1 stream_all_min=1024 prefill_pipe=0 engine=0.1.46.3
+READY 512 stop
+RESUME 0
+PP 32 96 3947 8.1
+PP 64 96 6433 9.9
+PP 95 96 9035 10.5
+REUSED 0
+T 760
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 561
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 561
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 561
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 561
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 561
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 561
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 561
+T 22561
+T 50514
+T 30718
+T 279
+T 11012
+T 14367
+T 13
+T 248046
+DONE 65 96 9035.2 1812.0 stop 54 59 0 9843 34080 14220 0 0.0 96 0 chunk=32 experts_streamed=7521
+
+output : 760 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 561 22561 50514 30718 279 11012 14367 13 248046
+GENERATED TEXT: The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river.

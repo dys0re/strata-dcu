@@ -1,0 +1,16 @@
+
+================================= System Management Interface ==================================
+================================================================================================
+HCU[0]		: HCU use (%): 0.0
+================================================================================================
+================================================================================================
+HCU[0]		: vram Total Memory (MiB): 65520
+HCU[0]		: vram Total Used Memory (MiB): 2
+================================================================================================
+======================================== End of SMI Log ========================================
+
+  42008 bash            bash -c source /opt/dtk/env.sh >/dev/null 2>&1; rocm-smi --showuse --showmeminfo vram; ps -eo pid,comm,args | grep -E "[s]trata-profile|[d]flash2_worker.py|python3 -u /root/private_data/strata-dcu/verify-lifecycle-20261023/run.py"; readlink -f /root/strata-dcu/build-gfx936/strata; sha256sum /root/strata-dcu/build-gfx936/strata /root/private_data/strata-dcu/verify-lifecycle-20261023/strata-profile
+  42018 grep            grep -E [s]trata-profile|[d]flash2_worker.py|python3 -u /root/private_data/strata-dcu/verify-lifecycle-20261023/run.py
+/root/private_data/strata-dcu/joint-draft-20261023/strata-final
+1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1  /root/strata-dcu/build-gfx936/strata
+7060a916d2954b6904e41faf9617a465d549f70244168fe0e78ea2749394e28e  /root/private_data/strata-dcu/verify-lifecycle-20261023/strata-profile

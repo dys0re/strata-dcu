@@ -8,12 +8,25 @@ ap=argparse.ArgumentParser(__doc__)
 ap.add_argument('--engine',required=True)
 ap.add_argument('--smoke',action='store_true')
 ap.add_argument('--qa-only',action='store_true',help='functional QA first; no throughput workload warmups')
+ap.add_argument('--qa-after-bench',action='store_true',help='run semantic/code/protocol QA after throughput workloads')
 ap.add_argument('--graph',action='store_true')
 ap.add_argument('--draft-adaptive',action='store_true')
 ap.add_argument('--expert-cache',type=int)
+ap.add_argument('--pcie-mode',choices=['auto','kernel','dma','direct'],default='auto')
+ap.add_argument('--resident-pin',action=argparse.BooleanOptionalAction,default=None)
+ap.add_argument('--adapt-every',type=int,default=0)
+ap.add_argument('--adapt-swaps',type=int,default=96)
+ap.add_argument('--pcie-frac',type=float,default=0,help='-1 uses engine auto policy; 0 CPU-only misses')
+ap.add_argument('--suffix-draft',type=int,default=0)
+ap.add_argument('--lookup-checks',action='store_true',help='exercise repeated-text lookup and recovery')
 ap.add_argument('--out',required=True)
 ap.add_argument('--cols',type=int,choices=[0,2,4],default=4)
-ap.add_argument('--mode',choices=['native','ipc','off','adaptive'],default='native')
+ap.add_argument('--mode',choices=['native','ipc','off','adaptive','joint'],default='native')
+ap.add_argument('--joint-prefix',type=int,choices=[1,2,3],default=2)
+ap.add_argument('--joint-fixed-prefix',action='store_true')
+ap.add_argument('--spec-prob',action='store_true')
+ap.add_argument('--corrupt',type=int,default=0)
+ap.add_argument('--timing-only',action='store_true')
 ap.add_argument('--width',type=int,choices=range(2,9),default=8)
 ap.add_argument('--context',type=int,default=512)
 ap.add_argument('--long-checks',action='store_true')
@@ -23,26 +36,46 @@ ap.add_argument('--profile',action='store_true')
 ap.add_argument('--dump-logits',action='store_true')
 ap.add_argument('--fuse',choices=['off','qfuse','qdedup','both','hc'],default='off')
 a=ap.parse_args()
+if a.resident_pin is None:a.resident_pin=a.pcie_frac!=0
+assert a.adapt_every >= 0 and a.adapt_swaps >= 0 and a.suffix_draft >= 0
+assert a.pcie_frac == -1 or 0 <= a.pcie_frac <= 1
 assert not a.long_checks or a.context>=2300
 out=Path(a.out);out.mkdir(parents=True,exist_ok=False)
 root=Path('/root/strata-dcu'); cache=root/'autoround'
 source_files=['CMakeLists.txt','src/program/generate.cpp','src/core/verify.cpp','src/prefill/prefill.cpp','include/strata/core/dflash_bridge.hpp','include/strata/core/verify.hpp','include/strata/prefill/prefill.hpp','src/kernels/cuda/native_mmvq.cu','include/strata/kernels/native_mmvq.hpp','src/core/mtp.cpp','include/strata/core/mtp.hpp','tools/dflash2_worker.py','tools/strata_dflash2.py','third_party/dflash/model.py','third_party/dflash/LICENSE','third_party/dflash/VERSION','include/strata/core/dflash_native.hpp','src/prefill/dflash.cu','src/prefill/dflash_witness.cpp','tools/dflash2_pack.py','tools/test_dflash2_native.py']
+source_files+=['src/kernels/cpu/native_expert.cpp','src/kernels/cpu/q4_avx512.cpp',
+ 'include/strata/kernels/cpu/q4_avx512.hpp','src/kernels/cuda/bf16_small.cu',
+ 'include/strata/kernels/bf16_small.hpp']
+source_files+=['include/strata/spec/joint_budget.hpp']
 def sha(path):
  with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 (out/'provenance.json').write_text(json.dumps({'engine_sha256':sha(a.engine),'source_sha256':{f:sha(root/'Strata'/f) for f in source_files},'driver_sha256':sha(__file__)},indent=2)+'\n')
 
 cmd=json.loads((cache/'run-command.json').read_text());cmd[0]=a.engine
-for flag,n in [('--mtp',2),('--mtp-adaptive',1),('--dflash2',2),('--dflash-adaptive',1),('--dflash-eager',1)]:
+for flag,n in [('--mtp',2),('--mtp-adaptive',1),('--dflash2',2),('--dflash-adaptive',1),('--dflash-eager',1),('--dflash-mtp-prefix',2)]:
  if flag in cmd:
   i=cmd.index(flag);del cmd[i:i+n]
-for flag,value in [('--spec',str(a.width)),('--mtp-max-t','1' if a.mode=='off' else str(a.width)),('--max-context',str(a.context)),('--expert-cache',str(a.expert_cache or (8500 if a.mode=='adaptive' else 8300)))]:
+for flag,value in [('--spec',str(min(8,a.width+(2 if a.suffix_draft and a.mode=='adaptive' else 0)))),('--mtp-max-t','1' if a.mode=='off' else str(a.width)),('--max-context',str(a.context)),('--expert-cache',str(a.expert_cache or (8500 if a.mode=='adaptive' else 8300)))]:
  cmd[cmd.index(flag)+1]=value
-if a.mode=='adaptive':cmd+=['--mtp',str(cache/'mtp'),'--mtp-adaptive']
-cmd+=['--serve','--prompt-cache','0','--conversation-cache-mib','0','--pcie-frac','0','--adapt-swaps','0']
-if a.mode=='native':
+if a.mode in ['adaptive','joint']:
+ cmd+=['--mtp',str(cache/'mtp')]
+ if a.mode!='joint' or not a.joint_fixed_prefix:cmd+=['--mtp-adaptive']
+# Normalize inherited flags: run-command.json may come from any public entry mode.
+for flag,n in [('--serve',1),('--prompt-cache',2),('--conversation-cache-mib',2),
+               ('--pcie-frac',2),('--pcie-mode',2),('--adapt-every',2),('--adapt-swaps',2),('--suffix-draft',2),
+               ('--resident-cpu-experts',1),('--resident-experts',1)]:
+ while flag in cmd:
+  i=cmd.index(flag);del cmd[i:i+n]
+cmd+=['--resident-experts' if a.resident_pin else '--resident-cpu-experts']
+cmd+=['--serve','--prompt-cache','0','--conversation-cache-mib','0',
+      '--pcie-frac',str(a.pcie_frac),'--pcie-mode',a.pcie_mode,'--adapt-every',str(a.adapt_every),
+      '--adapt-swaps',str(a.adapt_swaps),'--suffix-draft',str(a.suffix_draft)]
+if a.mode in ['native','joint']:
  cmd+=['--dflash2','/root/private_data/strata-dcu/dflash-native/pack']
  if a.draft_adaptive:cmd+=['--dflash-adaptive']
  if not a.graph:cmd+=['--dflash-eager']
+ if a.mode=='joint':cmd+=['--dflash-mtp-prefix',str(a.joint_prefix)]
+if a.corrupt:cmd+=['--spec-corrupt',str(a.corrupt)]
 if a.mode=='ipc':
  cmd=['python3',str(root/'Strata/tools/strata_dflash2.py'),'--checkpoint','/root/private_data/strata-dcu/dflash2/checkpoint','--model','/root/private_data/Qwen3.8-F','--stats-file',str(out/'worker.json')]+(['--graph'] if a.graph else [])+(['--adaptive'] if a.draft_adaptive else [])+['--']+cmd
 env=os.environ.copy()
@@ -51,9 +84,14 @@ for key in ['STRATA_VERIFY_PROFILE','STRATA_DECODE_TIMING','STRATA_DUMP_FIRST_LO
 settings=dict(STRATA_MAX_WEIGHT_VRAM_FRACTION='0.5',STRATA_TRACE='1',STRATA_BF16_Q8_VEC4='1',STRATA_BF16_Q8_COLS=str(a.cols),STRATA_ROUTE_TAIL_SKIP='0',STRATA_SPEC_COUPLED='1',
  STRATA_QFUSE=str(int(a.fuse in ['qfuse','both'])),STRATA_VERIFY_QDEDUP=str(int(a.fuse in ['qdedup','both'])),STRATA_QFUSE_HC=str(int(a.fuse=='hc')))
 env.update(settings)
+for feature in ['STRATA_CPU_Q4_MT','STRATA_DFLASH_SMALL_GEMV']:
+ settings[feature]=env.get(feature,'0')
+ env[feature]=settings[feature]
 if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRATA_SPEC_DEPTH='1')
+if a.timing_only:env['STRATA_DECODE_TIMING']='1'
+if a.spec_prob:env['STRATA_SPEC_PROB']='1'
 if a.checks and (a.profile or a.dump_logits):env['STRATA_DUMP_FIRST_LOGITS']=str(out/'logits.f32')
-(out/'command.json').write_text(json.dumps(dict(command=cmd,overrides=settings,profile=a.profile,checks=a.checks,dump_logits='STRATA_DUMP_FIRST_LOGITS' in env),indent=2)+'\n')
+(out/'command.json').write_text(json.dumps(dict(command=cmd,overrides=settings,hc_environment={k:env.get(k) for k in ['STRATA_HC_SPLIT','STRATA_GR_FAST']},profile=a.profile,timing_only=a.timing_only,spec_prob=a.spec_prob,checks=a.checks,dump_logits='STRATA_DUMP_FIRST_LOGITS' in env),indent=2)+'\n')
 from transformers import AutoTokenizer
 tok=AutoTokenizer.from_pretrained('/root/private_data/Qwen3.8-F',local_files_only=True)
 tok.chat_template=Path('/root/private_data/Qwen3.8-F/chat_template.jinja').read_text()
@@ -69,8 +107,8 @@ if a.long_checks:
  cases=[('window-crossing','Reply with exactly ORBIT.',16,'ORBIT',0),('long-recovery','Reply with exactly OK.',16,'OK',0)]
 if a.smoke:
  cases=[('ok','Reply with exactly OK.',16,'OK',0),('arithmetic','What is 2+2? Answer only the number.',16,'4',0),('capital','中国的首都是哪座城市？只回答城市名称。',16,'北京',0),('story-short',story,64,None,0)]
-if a.qa_only:
- cases=[('ok','Reply with exactly OK.',16,'OK',0),
+if a.qa_only or a.qa_after_bench:
+ qa_cases=[('ok','Reply with exactly OK.',16,'OK',0),
   ('arithmetic','What is 2+2? Answer only the number.',16,'4',0),
   ('multiply','What is 17 times 23? Answer only the integer.',32,'391',0),
   ('sum','What is the sum of the integers from 1 to 100 inclusive? Answer only the integer.',32,'5050',0),
@@ -84,6 +122,13 @@ if a.qa_only:
   ('sample-1','Write a short story about a lost compass and a mountain village.',64,None,.7),
   ('one_token','Reply with exactly OK.',1,None,0),
   ('context_tail','Continue a long story for several paragraphs.',3,None,0)]
+ if a.qa_only:cases=qa_cases
+ else:cases+=qa_cases
+if a.lookup_checks:
+ phrase='The copper owl watches the quiet river.'
+ repeated=' '.join([phrase]*8)
+ cases += [('lookup-copy','Copy the text between <text> tags exactly, without tags or commentary.\n<text>'+repeated+'</text>',128,repeated,0),
+           ('lookup-recovery','What is 17 times 23? Answer only the integer.',32,'391',0)]
 records=[]
 mem=Path('/sys/fs/cgroup')
 def memory_snapshot():
@@ -121,12 +166,13 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
   assert usage['limit']==usage['total']//2 and usage['weights']<=usage['limit']
   assert usage['weights']==sum(usage[k] for k in ['pack','dense','head','experts','mtp'])+usage.get('external_draft',0)+usage.get('native_draft',0)+usage.get('staging',0)
   if a.mode=='ipc':assert usage['external_draft']>0
-  if a.mode=='native':assert usage['native_draft']==1206131200 and usage['external_draft']==0
+  if a.mode in ['native','joint']:assert usage['native_draft']==1206131200 and usage['external_draft']==0
+  if a.mode=='joint':assert usage['mtp']>0
   (out/'weight-usage.json').write_text(json.dumps(usage,indent=2)+'\n')
   print('WEIGHTS',usage,flush=True)
   print('READY',a.mode,a.cols,a.fuse,flush=True)
   for name,prompt,n,expected,temperature in cases:
-   prompt_ids,request=gen(prompt,n,temperature,name in ['context_tail','window-crossing'])
+   prompt_ids,request=gen(prompt,n,temperature,name in ['context_tail','window-crossing'] or (a.long_checks and name=='lookup-copy'))
    (out/(name+'.request.txt')).write_text(request)
    started=time.monotonic();send(request);ids,done=finish();fields=done.split()
    text=tok.decode(ids,skip_special_tokens=True)
@@ -147,10 +193,11 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
     decode_ms=float(fields[4]),decode_tps=1000*len(ids)/float(fields[4]),wall_s=time.monotonic()-started))
    (out/'results.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
    print('DONE',name,len(ids),round(records[-1]['decode_tps'],2),flush=True)
-  if (a.checks or a.qa_only) and not a.smoke and not a.long_checks:
-   seed_repeat=records[-4]['generated_ids']==records[-3]['generated_ids']
+  if (a.checks or a.qa_only or a.qa_after_bench) and not a.smoke and not a.long_checks:
+   by_case={r['case']:r for r in records}
+   seed_repeat=by_case['sample-0']['generated_ids']==by_case['sample-1']['generated_ids']
    print('SEED_REPEAT',seed_repeat,flush=True)
-   assert len(records[-2]['generated_ids'])==1 and len(records[-1]['generated_ids'])<=3
+   assert len(by_case['one_token']['generated_ids'])==1 and len(by_case['context_tail']['generated_ids'])<=3
    _,request=gen(story,256);send(request);ids,done=finish(stop=True);assert done.split()[5]=='cancel'
    _,request=gen('Reply with exactly OK.',16);send(request);ids,recovery=finish();assert tok.decode(ids,skip_special_tokens=True).strip()=='OK'
    (out/'protocol.json').write_text(json.dumps(dict(cancel=done,recovery=recovery,seed_repeat=seed_repeat,one_token_limit=True,context_tail=True),indent=2)+'\n')
@@ -158,7 +205,21 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
  finally:
   if p.poll() is None:p.kill();p.wait()
 errors=(out/'stderr.log').read_text()
+if a.spec_prob and a.mode=='joint':
+ prob=[int(x) for x in re.findall(r'prob_windows=(\d+)',errors)]
+ assert prob and max(prob)>0,'probabilistic verification was not exercised'
+if a.resident_pin and a.pcie_frac!=0 and a.timing_only:
+ moved=[float(x) for x in re.findall(r'VRAM hits [0-9.]+, PCIe ([0-9.]+);',errors)]
+ assert moved and max(moved)>0,'PCIe was requested but no experts used PCIe offload; inspect resident pinning'
+if a.lookup_checks and a.suffix_draft:
+ counts=re.findall(r'suffix drafts: (\d+) windows, (\d+) of (\d+) drafts accepted',errors)
+ assert counts and sum(int(c[0]) for c in counts)>0,'lookup path was not exercised'
+ (out/'lookup-counters.json').write_text(json.dumps(counts)+'\n')
+ if a.mode in ['native','joint']:
+  discarded=re.findall(r'discarded_feedback=(\d+)',errors)
+  assert discarded and int(discarded[-1])==sum(int(c[0]) for c in counts), 'lookup feedback was not discarded exactly once per replaced draft'
+
 assert not any(s in errors for s in ['Launch params','larger than launch bounds','invalid device function','out of memory'])
 (out/'memory-after.json').write_text(json.dumps(memory_snapshot(),indent=2)+'\n')
-(out/'qa-status.json').write_text(json.dumps(dict(functional_assertions_passed=True,engine_rc=p.returncode,token_identity_informational=True))+'\n')
+(out/'qa-status.json').write_text(json.dumps(dict(functional_assertions_passed=True,qa_scope='full' if a.qa_only or a.qa_after_bench else 'smoke' if a.smoke else 'long' if a.long_checks else 'checks' if a.checks else 'throughput',engine_rc=p.returncode,token_identity_informational=True))+'\n')
 print('PASS',flush=True)

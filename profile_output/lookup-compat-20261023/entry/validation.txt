@@ -1,0 +1,27 @@
+PASS fresh documented public-entry validation, 2026-10-24.
+Validator: /root/validate_options_entry. Read run-experiment skill, compute ledger, and ENTRY.md; root confirmed GPU idle.
+Executed once, verbatim from /home/dry/data/strara-dcu/Strata:
+ssh -S /tmp/strata-dcu-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; python3 -u /root/private_data/strata-dcu/lookup-compat-20261023/validate_entry.py'
+Exit 0; stdout:
+PASS ENTRY mtp
+PASS ENTRY native
+PASS ENTRY joint
+PASS ALL PUBLIC ENTRIES
+
+All three modes: answer_correct=true, lookup_exercised=true, staged=true in checks.json.
+Independently checked saved generation.json: exact requested sentence repeated eight times, engine_exit=0, suffix_draft=3, hc_split=2, cpu_q4_mt=true, dflash_small_gemv=true, adapt_every=0, pcie_frac=0.
+MTP: adaptive/max_t=5; weights=33542205952; experts=23500800000; lookup=12 windows, 42/48 accepted (engine.stdout.log).
+Native: native DFlash2, graph/adaptive=true, max_t=8; weights=32827238400; experts=22947840000; lookup=8 windows, 49/56 accepted (engine.stderr.log).
+Joint: mtp+dflash2, prefix=2, adaptive MTP/max_t=5, native graph/adaptive/max_t=8; weights=34195377152; experts=22947840000; lookup=7 windows, 46/49 accepted (engine.stderr.log).
+All weights <= limit 34351349760. Full weight bills preserved in per-mode generation.json; external_draft=0 and staging=44236800 throughout.
+HC staged runtime message present in all three engine.stderr.log files.
+
+Public symlink /root/strata-dcu/build-gfx936/strata resolves to /root/private_data/strata-dcu/lookup-compat-20261023/strata-final.
+SHA256=1c5b8a268585ab62bfe53a098c114b7e645c8befa91384d58c645fec9a8ff396 (matches).
+Postflight ps showed only the inspection shell matching strata/dflash/validate_entry; no remaining engine, drafter, or validator processes.
+After sourcing DTK/HyHAL, hy-smi --showmeminfo vram reported total=65520 MiB, used=2 MiB.
+Non-fatal environment warning: /opt/hyhal/lib/cmake/rocm_smi does not exist; default rocm_smi_lib used. Command exit 0.
+Copied all remote entry results to this local directory via rsync; copy exit 0.
+
+Doc-vs-reality: no runtime outcome divergence. Original ENTRY.md omitted the absolute public symlink path. Validator initially inferred /root/strata-dcu/Strata/build-gfx936/strata, and ancillary sha256sum failed with: sha256sum: /root/strata-dcu/Strata/build-gfx936/strata: No such file or directory
+Correct path outside the source checkout was then checked read-only and matched. Root explicitly confirmed that path and clarified ENTRY.md while the original invocation continued. No experiment was rerun; no source/config/docs changed by validator; no external notifications.

@@ -1,0 +1,9 @@
+Test project /tmp/strara-q4-cpu-build
+    Start 31: q4_cpu_multitoken
+1/2 Test #31: q4_cpu_multitoken ................   Passed    0.11 sec
+    Start 32: q4_cpu_multitoken_fallback
+2/2 Test #32: q4_cpu_multitoken_fallback .......   Passed    0.11 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.22 sec

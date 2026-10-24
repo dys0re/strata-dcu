@@ -1,0 +1,14 @@
+{
+  "source_files_match_remote": true,
+  "entry_passed": true,
+  "semantic_qa": 14,
+  "semantic_output_tokens": 198,
+  "gpu_cases": 104,
+  "cpu_checks": 23562,
+  "cache_cases_per_mode": 9,
+  "long_input_tokens": 2100,
+  "processes_exited": true,
+  "engine_sha256": "d8e293371f4bc399baf7b1562ef516af475b7870791ecd60f2d8f9bb4a1b9ac5",
+  "root_disk": "954M\t/root",
+  "runtime_spec_unchanged": "dflash2@52f8bc84"
+}

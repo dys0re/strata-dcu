@@ -1,0 +1,101 @@
+{
+  "checks": {
+    "hc-staged": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.4882225325401595
+    },
+    "mtp-lookup": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.4882225325401595
+    },
+    "native-plain": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.4778158446371337
+    },
+    "native-hc": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.4778158446371337
+    },
+    "native-lookup": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.4778158446371337
+    },
+    "joint-plain": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.49772974556910105
+    },
+    "joint-hc": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.49772974556910105
+    },
+    "joint-lookup": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.49772974556910105
+    },
+    "joint-lookup-prob": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.49772974556910105
+    },
+    "joint-lookup-reject": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.49772974556910105
+    },
+    "ipc-lookup": {
+      "full_qa": true,
+      "cancel_recovery": true,
+      "weight_fraction": 0.49632164439293347
+    },
+    "native-lookup-long-resume": {
+      "long_lookup_2100": true,
+      "recovery": true
+    },
+    "joint-lookup-long": {
+      "long_lookup_2100": true,
+      "recovery": true
+    }
+  },
+  "seeded_cache_witness": true,
+  "public_entry": "passed",
+  "public_entry_checks": [
+    {
+      "mode": "mtp",
+      "answer_correct": true,
+      "lookup_exercised": true,
+      "weights": 33542205952,
+      "staged": true
+    },
+    {
+      "mode": "native",
+      "answer_correct": true,
+      "lookup_exercised": true,
+      "weights": 32827238400,
+      "staged": true
+    },
+    {
+      "mode": "joint",
+      "answer_correct": true,
+      "lookup_exercised": true,
+      "weights": 34195377152,
+      "staged": true
+    }
+  ],
+  "postflight": "validator confirmed no engine/draft processes and 2 MiB GPU use",
+  "defaults": {
+    "hc": "staged",
+    "draft": "adaptive MTP",
+    "adapt_every": 0,
+    "pcie_frac": 0,
+    "suffix_draft": 0
+  },
+  "quantization_and_cpu_pool_unchanged": true
+}

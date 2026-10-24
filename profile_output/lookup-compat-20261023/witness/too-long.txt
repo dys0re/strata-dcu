@@ -1,0 +1,3 @@
+reset
+append /root/private_data/strata-dcu/dflash-native/witness/features-0-4.f32 4 0
+seed 4 553 1 393,85 rejected

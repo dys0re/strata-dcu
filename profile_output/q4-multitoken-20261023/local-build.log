@@ -1,0 +1,47 @@
+[1/47] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
+[2/47] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
+[3/47] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
+[4/47] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
+[5/47] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
+[6/47] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
+[7/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
+[8/47] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
+[9/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
+[10/47] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+[11/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/iqp.cpp.o
+[12/47] Building CXX object ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
+[13/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
+[14/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
+[15/47] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
+[16/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
+[17/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
+[18/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
+[19/47] Building C object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/quants.c.o
+[20/47] Building C object ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
+[21/47] Linking CXX static library ggml/src/libggml-base.a
+[22/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
+[23/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
+[24/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/expert_layout.cpp.o
+[25/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/x86/repack.cpp.o
+[26/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/native_expert.cpp.o
+[27/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/expert.cpp.o
+[28/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/hadamard.cpp.o
+[29/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/q2_avx2.cpp.o
+[30/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/kq_avx1.cpp.o
+[31/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/pool.cpp.o
+[32/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/kq_avx2.cpp.o
+[33/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/q2_avx1.cpp.o
+[34/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/nvfp4_avx512.cpp.o
+[35/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/iq_avx512.cpp.o
+[36/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/q4_avx512.cpp.o
+[37/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/tq_cpu.cpp.o
+[38/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/nvfp4_avx2.cpp.o
+[39/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/tq_avx2.cpp.o
+[40/47] Building CXX object ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
+[41/47] Linking CXX static library ggml/src/libggml-cpu.a
+[42/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/tq_avx512.cpp.o
+[43/47] Building CXX object CMakeFiles/q4_avx512_parity.dir/src/kernels/cpu/q4_avx512_parity.cpp.o
+[44/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/iq_avx1.cpp.o
+[45/47] Building CXX object CMakeFiles/strata_kernels_cpu.dir/src/kernels/cpu/iq_avx2.cpp.o
+[46/47] Linking CXX static library libstrata_kernels_cpu.a
+[47/47] Linking CXX executable q4_avx512_parity

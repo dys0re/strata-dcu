@@ -1,0 +1,18 @@
+[
+  {
+    "label": "baseline",
+    "returncode": 0
+  },
+  {
+    "label": "cache",
+    "returncode": 0
+  },
+  {
+    "label": "pcie",
+    "returncode": 0
+  },
+  {
+    "label": "both",
+    "returncode": 0
+  }
+]

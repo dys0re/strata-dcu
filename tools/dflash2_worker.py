@@ -184,6 +184,8 @@ class Dflash2Worker:
                     if self.adaptive:self.budget.observe(rows,time.monotonic())
                     self.append(features,pos);self.totals['feature_rows']+=rows;result=np.empty(0,dtype=np.int32)
                 elif kind==2:result=self.propose(pos,anchor,k)
+                elif kind==3:
+                    self.budget.last=None;result=np.empty(0,dtype=np.int32)
                 else:raise ValueError('invalid IPC command')
                 channel.sendall(struct.pack('<2q',MAGIC,len(result))+result.tobytes())
         except (EOFError,ConnectionResetError,BrokenPipeError):pass

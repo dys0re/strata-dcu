@@ -17,15 +17,24 @@ int main(int argc,char** argv){
     while(std::getline(script,line)){
         std::istringstream in(line);std::string op;in>>op;bool ok=false;
         if(op=="reset")ok=draft.reset(err);
+        else if(op=="discard"){draft.discard_feedback();ok=true;}
         else if(op=="append"){
             std::string path;int rows;int64_t pos;in>>path>>rows>>pos;
             if(rows<1||rows>262144)return 2;
             std::vector<float> f(size_t(rows)*12800);std::ifstream input(path,std::ios::binary);
             if(!input.read((char*)f.data(),f.size()*4))return 2;
             ok=draft.append_host(f.data(),rows,pos,err);
-        }else if(op=="draft"){
+        }else if(op=="draft"||op=="seed"){
             int64_t pos;int anchor,count,got=0;std::string name;in>>pos>>anchor>>count>>name;
-            int32_t ids[7];ok=draft.draft(pos,anchor,count,ids,got,err);
+            std::vector<int32_t> prefix;
+            if(op=="seed"){
+                const std::string text=name;in>>name;
+                if(text!="-"){std::istringstream values(text);std::string token;
+                    while(std::getline(values,token,','))prefix.push_back(std::stoi(token));}
+            }
+            int32_t ids[7];
+            ok=op=="seed"?draft.draft_seeded(pos,anchor,count,prefix.data(),(int)prefix.size(),0,ids,got,err):
+                          draft.draft(pos,anchor,count,ids,got,err);
             if(ok){std::vector<float> hidden(size_t(got)*2560);ok=draft.hidden(hidden.data(),got,err);
                 std::ofstream f(std::string(argv[6])+"/"+name+".f32",std::ios::binary);f.write((char*)hidden.data(),hidden.size()*4);
                 std::ofstream tokens(std::string(argv[6])+"/"+name+".ids");

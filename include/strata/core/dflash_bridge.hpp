@@ -134,6 +134,12 @@ public:
 #endif
         return !enabled()||command(0,0,0,0,0,nullptr,nullptr,nullptr,err);
     }
+    bool discard_feedback(std::string& err) {
+#if !defined(STRATA_GPU_METAL)
+        if(native_){native_->discard_feedback();return true;}
+#endif
+        return !enabled()||command(3,0,0,0,0,nullptr,nullptr,nullptr,err);
+    }
     bool append(const DflashFeatures& source,int rows,int64_t pos,std::string& err) {
 #if !defined(STRATA_GPU_METAL)
         if(native_)return native_->append(source.device_data(),source.capacity(),rows,pos,err);
@@ -150,6 +156,13 @@ public:
         if(native_)return native_->draft(pos,anchor,k,ids,got,err);
 #endif
         return command(2,0,pos,anchor,k,nullptr,ids,&got,err);
+    }
+    bool draft_seeded(int64_t pos,int anchor,int k,const int32_t* prefix,int n_prefix,double preparation_ms,
+                      int32_t* ids,int& got,std::string& err) {
+#if !defined(STRATA_GPU_METAL)
+        if(native_)return native_->draft_seeded(pos,anchor,k,prefix,n_prefix,preparation_ms,ids,got,err);
+#endif
+        err="joint MTP/DFlash2 requires the native DFlash2 backend";return false;
     }
 };
 } // namespace strata::core

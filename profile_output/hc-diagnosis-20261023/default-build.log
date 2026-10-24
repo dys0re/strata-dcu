@@ -1,0 +1,1850 @@
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:292:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:850:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:910:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:922:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:927:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:932:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:937:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:960:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1064:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1071:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaDeviceGetAttribute(&optin, cudaDevAttrMaxSharedMemoryPerBlockOptin, dev);
+        ^~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:96:32: note: expanded from macro 'cudaDeviceGetAttribute'
+#define cudaDeviceGetAttribute strata_device_get_attribute
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1096:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<1280>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1097:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<1280, kFusedGrMaxT, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1098:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<1280, 4, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1100:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<2560>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1101:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<2560, kFusedGrMaxT, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1102:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<2560, 4, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1108:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, ws);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1111:24: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::down_chunk(bool, int *)::(anonymous class)::operator()<void (*)(strata::kernels::(anonymous namespace)::GrMulti)>' requested here
+        set_staged_attr(gr_down_staged_kernel<1, true>, 1);
+                       ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1109:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(kernel, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1119:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();      // drop any error the attempt left behind
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1368:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1444:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1519:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2089:16: warning: argument to '#pragma unroll' should not be in parentheses in CUDA C/C++ [-Wcuda-compat]
+#pragma unroll(PF ? RPW8 : 2)
+               ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2181:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2200:50: warning: void function is missing a return statement [-Wreturn-type]
+void fused_gr_set_fast(int on) { g_gr_fast = on; }
+                                                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2242:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetDevice(&dev3);
+        ^~~~~~~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2245:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceGetAttribute(&optin, cudaDevAttrMaxSharedMemoryPerBlockOptin, dev3);
+            ^~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:96:32: note: expanded from macro 'cudaDeviceGetAttribute'
+#define cudaDeviceGetAttribute strata_device_get_attribute
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2254:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 1, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2255:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 2, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2256:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 3, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2257:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 4, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2258:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 5, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2259:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 6, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2260:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 4, false>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2261:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, kFusedGrMaxT, false>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2268:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetLastError();   // drop any error the attempts left behind
+            ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2367:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2371:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2427:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2533:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaStreamSynchronize(st);
+        ^~~~~~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2534:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaStreamDestroy(st);
+        ^~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:133:27: note: expanded from macro 'cudaStreamDestroy'
+#define cudaStreamDestroy hipStreamDestroy
+                          ^~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2536:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(base);
+    ^~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2537:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetLastError();
+    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2546:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2556:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2603:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2883:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2894:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2899:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDeviceProperties(&prop, dev);
+    ^~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:87:33: note: expanded from macro 'cudaGetDeviceProperties'
+#define cudaGetDeviceProperties hipGetDeviceProperties
+                                ^~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2918:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2942:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dR, R.size() * 4); cudaMalloc((void**) &dbo, bo.size() * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2942:45: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dR, R.size() * 4); cudaMalloc((void**) &dbo, bo.size() * 4);
+                                            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2943:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dinj, inj.size() * 4); cudaMalloc((void**) &dwn, wn.size() * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2943:49: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dinj, inj.size() * 4); cudaMalloc((void**) &dwn, wn.size() * 4);
+                                                ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2944:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dxn, (size_t) TM * D * 4); cudaMalloc((void**) &dlo, (size_t) TM * LR * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2944:53: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dxn, (size_t) TM * D * 4); cudaMalloc((void**) &dlo, (size_t) TM * LR * 4);
+                                                    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2945:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &drs, (size_t) TM * HC * 4); cudaMalloc((void**) &dio, (size_t) TM * HC * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2945:54: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &drs, (size_t) TM * HC * 4); cudaMalloc((void**) &dio, (size_t) TM * HC * 4);
+                                                     ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2946:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dmix, (size_t) TM * N * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2947:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dwd, wd.size() * 2); cudaMalloc((void**) &dwu, wu.size() * 2); cudaMalloc((void**) &dwi, wi.size() * 2);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2947:47: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dwd, wd.size() * 2); cudaMalloc((void**) &dwu, wu.size() * 2); cudaMalloc((void**) &dwi, wi.size() * 2);
+                                              ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2947:89: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dwd, wd.size() * 2); cudaMalloc((void**) &dwu, wu.size() * 2); cudaMalloc((void**) &dwi, wi.size() * 2);
+                                                                                        ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2948:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dbo, bo.data(), bo.size() * 4, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2949:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dinj, inj.data(), inj.size() * 4, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2950:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwn, wn.data(), wn.size() * 4, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2951:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwd, wd.data(), wd.size() * 2, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2952:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwu, wu.data(), wu.size() * 2, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2953:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwi, wi.data(), wi.size() * 2, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2969:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(dR, R.data(), R.size() * 4, cudaMemcpyHostToDevice);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2970:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemset(dmix, 0xff, (size_t) TM * N * 4);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2971:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemset(dio, 0xff, (size_t) TM * HC * 4);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2972:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceSynchronize();
+            ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2975:59: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (cudaDeviceSynchronize() != cudaSuccess) { cudaGetLastError(); return 2; }
+                                                          ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2978:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaMemcpy(&abort_word, st.bar + 48, sizeof abort_word, cudaMemcpyDeviceToHost);
+                ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2980:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaMemset(st.bar, 0, 64 * sizeof(unsigned));
+                    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2981:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaDeviceSynchronize();
+                    ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2986:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(out[which].data(), dmix, (size_t) T * N * 4, cudaMemcpyDeviceToHost);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2987:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(out[which].data() + (size_t) T * N, dio, (size_t) T * HC * 4, cudaMemcpyDeviceToHost);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2988:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(out[which].data() + (size_t) T * (N + HC), dR, (size_t) T * D * 4, cudaMemcpyDeviceToHost);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+    ^~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:19: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                  ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:34: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                 ^~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:50: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                 ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:65: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                                ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:80: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                                               ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:95: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                                                              ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+    ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:20: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                   ^~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:36: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                                   ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:51: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                                                  ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:66: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                                                                 ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3010:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemset(st.bar, 0, 64 * sizeof(unsigned));
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3011:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaDeviceSynchronize();
+    ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3012:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetLastError();
+    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3033:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1340:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<1, true, true>' requested here
+            case 1: gr_up_multi_kernel<1, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1341:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<2, true, true>' requested here
+            case 2: gr_up_multi_kernel<2, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1342:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<3, true, true>' requested here
+            case 3: gr_up_multi_kernel<3, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1343:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<4, true, true>' requested here
+            case 4: gr_up_multi_kernel<4, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1344:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<5, true, true>' requested here
+            case 5: gr_up_multi_kernel<5, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1345:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<6, true, true>' requested here
+            case 6: gr_up_multi_kernel<6, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1346:22: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<8, false, true>' requested here
+            default: gr_up_multi_kernel<kFusedGrMaxT, false, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                     ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1350:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<1, true>' requested here
+            case 1: gr_up75_kernel<1, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1351:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<2, true>' requested here
+            case 2: gr_up75_kernel<2, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1352:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<3, true>' requested here
+            case 3: gr_up75_kernel<3, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1353:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<4, true>' requested here
+            case 4: gr_up75_kernel<4, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1354:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<5, true>' requested here
+            case 5: gr_up75_kernel<5, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1355:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<6, true>' requested here
+            case 6: gr_up75_kernel<6, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1356:22: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<8, false>' requested here
+            default: gr_up75_kernel<kFusedGrMaxT, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                     ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1360:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<1, true, false>' requested here
+        case 1: gr_up_multi_kernel<1, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1361:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<2, true, false>' requested here
+        case 2: gr_up_multi_kernel<2, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1362:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<3, true, false>' requested here
+        case 3: gr_up_multi_kernel<3, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1363:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<4, true, false>' requested here
+        case 4: gr_up_multi_kernel<4, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1364:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<5, true, false>' requested here
+        case 5: gr_up_multi_kernel<5, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1365:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<6, true, false>' requested here
+        case 6: gr_up_multi_kernel<6, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1366:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<8, false, false>' requested here
+        default: gr_up_multi_kernel<kFusedGrMaxT, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2172:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<1>' requested here
+        case 1: launch_q8_t<1>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<1, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2172:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<1>' requested here
+        case 1: launch_q8_t<1>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<1>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2172:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<1>' requested here
+        case 1: launch_q8_t<1>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2173:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<2>' requested here
+        case 2: launch_q8_t<2>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<2, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2173:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<2>' requested here
+        case 2: launch_q8_t<2>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<2>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2173:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<2>' requested here
+        case 2: launch_q8_t<2>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2174:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<3>' requested here
+        case 3: launch_q8_t<3>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<3, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2174:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<3>' requested here
+        case 3: launch_q8_t<3>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<3>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2174:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<3>' requested here
+        case 3: launch_q8_t<3>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2175:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<4>' requested here
+        case 4: launch_q8_t<4>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<4, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2175:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<4>' requested here
+        case 4: launch_q8_t<4>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<4>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2175:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<4>' requested here
+        case 4: launch_q8_t<4>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2176:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<5>' requested here
+        case 5: launch_q8_t<5>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<5, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2176:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<5>' requested here
+        case 5: launch_q8_t<5>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<5>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2176:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<5>' requested here
+        case 5: launch_q8_t<5>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2177:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<6>' requested here
+        case 6: launch_q8_t<6>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<6, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2177:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<6>' requested here
+        case 6: launch_q8_t<6>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<6>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2177:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<6>' requested here
+        case 6: launch_q8_t<6>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2178:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<7>' requested here
+        case 7: launch_q8_t<7>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<7, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2178:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<7>' requested here
+        case 7: launch_q8_t<7>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<7>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2178:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<7>' requested here
+        case 7: launch_q8_t<7>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2179:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<8>' requested here
+        default: launch_q8_t<8>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<8, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2179:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<8>' requested here
+        default: launch_q8_t<8>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<8>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2179:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<8>' requested here
+        default: launch_q8_t<8>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2287:25: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<2, 8, false>' requested here
+        if (split == 2) gr_up_v3_kernel<2><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                        ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2288:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 1, true>' requested here
+        else if (n_tok == 1) gr_up_v3_kernel<1, 1, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2289:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 2, true>' requested here
+        else if (n_tok == 2) gr_up_v3_kernel<1, 2, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2290:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 3, true>' requested here
+        else if (n_tok == 3) gr_up_v3_kernel<1, 3, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2291:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 4, true>' requested here
+        else if (n_tok == 4) gr_up_v3_kernel<1, 4, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2292:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 5, true>' requested here
+        else if (n_tok == 5) gr_up_v3_kernel<1, 5, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2293:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 6, true>' requested here
+        else if (n_tok == 6) gr_up_v3_kernel<1, 6, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2294:14: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 8, false>' requested here
+        else gr_up_v3_kernel<1, kFusedGrMaxT, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:209:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2387:9: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_kernel<true>' requested here
+        gr_up_kernel<true><<<UP_BLOCKS, THREADS, 0, st>>>(a);
+        ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:209:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2390:9: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_kernel<false>' requested here
+        gr_up_kernel<<<UP_BLOCKS, THREADS, 0, st>>>(a);
+        ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:533:79: warning: unused variable 'Q32_BLOCKS' [-Wunused-const-variable]
+constexpr int Q32_COLS = 32, Q32_THREADS = 512, Q32_WARPS = Q32_THREADS / 32, Q32_BLOCKS = N / Q32_COLS;
+                                                                              ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:618:15: warning: unused variable 'TQ3' [-Wunused-const-variable]
+constexpr int TQ3 = N / 8 / 32;                    // uint4 weight chunks per lane in one stream's slice (10)
+              ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:940:34: warning: unused function 'dot8v' [-Wunused-function]
+__device__ __forceinline__ float dot8v(const uint4 w, const float4 x0, const float4 x1) {
+                                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1038:6: warning: unused function 'cur_dev_volta' [-Wunused-function]
+bool cur_dev_volta() {
+     ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1187:6: warning: unused function 'qfuse_hc_local' [-Wunused-function]
+bool qfuse_hc_local() {
+     ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1458:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_up_fast_kernel(GrMulti m) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1458:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1536:50: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(GS_WAVES * 64) gr_down_split_kernel(GrMulti m) {
+                                                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:367:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_up_multi_kernel(GrMulti m) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:367:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_fast_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1937:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_q8_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1620:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:621:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_down_v3_kernel(GrMulti m, float* __restrict__ part, float* __restrict__ ssg) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:621:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:621:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:621:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:621:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:621:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) gr_up_v3_kernel(GrMulti m, const float* __restrict__ part,
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:699:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+__global__ void __launch_bounds__(THREADS) persist_kernel(PArgs f) {
+                                           ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2686:44: warning: loop not unrolled: the optimizer was unable to perform the requested transformation; the transformation might be disabled or specified as part of an unsupported transformation ordering [-Wpass-failed=transform-warning]
+230 warnings generated when compiling for gfx936.
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:292:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:850:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:910:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:922:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:927:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:932:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:937:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:960:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1064:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1071:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaDeviceGetAttribute(&optin, cudaDevAttrMaxSharedMemoryPerBlockOptin, dev);
+        ^~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:96:32: note: expanded from macro 'cudaDeviceGetAttribute'
+#define cudaDeviceGetAttribute strata_device_get_attribute
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1096:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<1280>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1097:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<1280, kFusedGrMaxT, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1098:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<1280, 4, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1100:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<2560>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1101:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<2560, kFusedGrMaxT, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1102:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(gr_down_multi_kernel<2560, 4, true>, cudaFuncAttributeMaxDynamicSharedMemorySize, want);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1108:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, ws);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1111:24: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::down_chunk(bool, int *)::(anonymous class)::operator()<void (*)(strata::kernels::(anonymous namespace)::GrMulti)>' requested here
+        set_staged_attr(gr_down_staged_kernel<1, true>, 1);
+                       ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1109:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaFuncSetAttribute(kernel, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+            ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1119:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();      // drop any error the attempt left behind
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1368:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1444:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1519:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2089:16: warning: argument to '#pragma unroll' should not be in parentheses in CUDA C/C++ [-Wcuda-compat]
+#pragma unroll(PF ? RPW8 : 2)
+               ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2181:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2200:50: warning: void function is missing a return statement [-Wreturn-type]
+void fused_gr_set_fast(int on) { g_gr_fast = on; }
+                                                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2242:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetDevice(&dev3);
+        ^~~~~~~~~~~~~ ~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2245:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceGetAttribute(&optin, cudaDevAttrMaxSharedMemoryPerBlockOptin, dev3);
+            ^~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:96:32: note: expanded from macro 'cudaDeviceGetAttribute'
+#define cudaDeviceGetAttribute strata_device_get_attribute
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2254:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 1, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2255:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 2, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2256:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 3, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2257:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 4, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2258:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 5, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2259:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 6, true>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2260:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, 4, false>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2261:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaFuncSetAttribute(gr_down_v3_kernel<1, kFusedGrMaxT, false>, cudaFuncAttributePreferredSharedMemoryCarveout, 100);
+                ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2268:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaGetLastError();   // drop any error the attempts left behind
+            ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2367:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2371:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2427:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2533:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaStreamSynchronize(st);
+        ^~~~~~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:134:31: note: expanded from macro 'cudaStreamSynchronize'
+#define cudaStreamSynchronize hipStreamSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2534:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaStreamDestroy(st);
+        ^~~~~~~~~~~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:133:27: note: expanded from macro 'cudaStreamDestroy'
+#define cudaStreamDestroy hipStreamDestroy
+                          ^~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2536:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(base);
+    ^~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2537:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetLastError();
+    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2546:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2556:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2603:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2883:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2894:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2899:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDeviceProperties(&prop, dev);
+    ^~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:87:33: note: expanded from macro 'cudaGetDeviceProperties'
+#define cudaGetDeviceProperties hipGetDeviceProperties
+                                ^~~~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2918:9: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+        cudaGetLastError();
+        ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2942:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dR, R.size() * 4); cudaMalloc((void**) &dbo, bo.size() * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2942:45: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dR, R.size() * 4); cudaMalloc((void**) &dbo, bo.size() * 4);
+                                            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2943:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dinj, inj.size() * 4); cudaMalloc((void**) &dwn, wn.size() * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2943:49: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dinj, inj.size() * 4); cudaMalloc((void**) &dwn, wn.size() * 4);
+                                                ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2944:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dxn, (size_t) TM * D * 4); cudaMalloc((void**) &dlo, (size_t) TM * LR * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2944:53: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dxn, (size_t) TM * D * 4); cudaMalloc((void**) &dlo, (size_t) TM * LR * 4);
+                                                    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2945:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &drs, (size_t) TM * HC * 4); cudaMalloc((void**) &dio, (size_t) TM * HC * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2945:54: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &drs, (size_t) TM * HC * 4); cudaMalloc((void**) &dio, (size_t) TM * HC * 4);
+                                                     ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2946:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dmix, (size_t) TM * N * 4);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2947:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dwd, wd.size() * 2); cudaMalloc((void**) &dwu, wu.size() * 2); cudaMalloc((void**) &dwi, wi.size() * 2);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2947:47: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dwd, wd.size() * 2); cudaMalloc((void**) &dwu, wu.size() * 2); cudaMalloc((void**) &dwi, wi.size() * 2);
+                                              ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2947:89: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMalloc((void**) &dwd, wd.size() * 2); cudaMalloc((void**) &dwu, wu.size() * 2); cudaMalloc((void**) &dwi, wi.size() * 2);
+                                                                                        ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:104:20: note: expanded from macro 'cudaMalloc'
+#define cudaMalloc hipMalloc
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2948:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dbo, bo.data(), bo.size() * 4, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2949:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dinj, inj.data(), inj.size() * 4, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2950:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwn, wn.data(), wn.size() * 4, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2951:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwd, wd.data(), wd.size() * 2, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2952:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwu, wu.data(), wu.size() * 2, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2953:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemcpy(dwi, wi.data(), wi.size() * 2, cudaMemcpyHostToDevice);
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2969:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(dR, R.data(), R.size() * 4, cudaMemcpyHostToDevice);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2970:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemset(dmix, 0xff, (size_t) TM * N * 4);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2971:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemset(dio, 0xff, (size_t) TM * HC * 4);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2972:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaDeviceSynchronize();
+            ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2975:59: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            if (cudaDeviceSynchronize() != cudaSuccess) { cudaGetLastError(); return 2; }
+                                                          ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2978:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                cudaMemcpy(&abort_word, st.bar + 48, sizeof abort_word, cudaMemcpyDeviceToHost);
+                ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2980:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaMemset(st.bar, 0, 64 * sizeof(unsigned));
+                    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2981:21: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+                    cudaDeviceSynchronize();
+                    ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2986:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(out[which].data(), dmix, (size_t) T * N * 4, cudaMemcpyDeviceToHost);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2987:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(out[which].data() + (size_t) T * N, dio, (size_t) T * HC * 4, cudaMemcpyDeviceToHost);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2988:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+            cudaMemcpy(out[which].data() + (size_t) T * (N + HC), dR, (size_t) T * D * 4, cudaMemcpyDeviceToHost);
+            ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:107:20: note: expanded from macro 'cudaMemcpy'
+#define cudaMemcpy hipMemcpy
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+    ^~~~~~~~ ~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:19: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                  ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:34: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                 ^~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:50: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                 ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:65: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                                ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:80: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                                               ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3008:95: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dR); cudaFree(dbo); cudaFree(dinj); cudaFree(dwn); cudaFree(dxn); cudaFree(dlo); cudaFree(drs);
+                                                                                              ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+    ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:20: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                   ^~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:36: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                                   ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:51: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                                                  ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3009:66: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaFree(dio); cudaFree(dmix); cudaFree(dwd); cudaFree(dwu); cudaFree(dwi);
+                                                                 ^~~~~~~~ ~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:105:18: note: expanded from macro 'cudaFree'
+#define cudaFree hipFree
+                 ^~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3010:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaMemset(st.bar, 0, 64 * sizeof(unsigned));
+    ^~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:112:20: note: expanded from macro 'cudaMemset'
+#define cudaMemset hipMemset
+                   ^~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3011:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaDeviceSynchronize();
+    ^~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:97:31: note: expanded from macro 'cudaDeviceSynchronize'
+#define cudaDeviceSynchronize hipDeviceSynchronize
+                              ^~~~~~~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3012:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetLastError();
+    ^~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:82:26: note: expanded from macro 'cudaGetLastError'
+#define cudaGetLastError hipGetLastError
+                         ^~~~~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:3033:5: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    cudaGetDevice(&dev);
+    ^~~~~~~~~~~~~ ~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:84:23: note: expanded from macro 'cudaGetDevice'
+#define cudaGetDevice hipGetDevice
+                      ^~~~~~~~~~~~
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1340:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<1, true, true>' requested here
+            case 1: gr_up_multi_kernel<1, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1341:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<2, true, true>' requested here
+            case 2: gr_up_multi_kernel<2, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1342:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<3, true, true>' requested here
+            case 3: gr_up_multi_kernel<3, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1343:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<4, true, true>' requested here
+            case 4: gr_up_multi_kernel<4, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1344:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<5, true, true>' requested here
+            case 5: gr_up_multi_kernel<5, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1345:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<6, true, true>' requested here
+            case 6: gr_up_multi_kernel<6, true, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1346:22: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<8, false, true>' requested here
+            default: gr_up_multi_kernel<kFusedGrMaxT, false, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                     ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1350:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<1, true>' requested here
+            case 1: gr_up75_kernel<1, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1351:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<2, true>' requested here
+            case 2: gr_up75_kernel<2, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1352:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<3, true>' requested here
+            case 3: gr_up75_kernel<3, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1353:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<4, true>' requested here
+            case 4: gr_up75_kernel<4, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1354:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<5, true>' requested here
+            case 5: gr_up75_kernel<5, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1355:21: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<6, true>' requested here
+            case 6: gr_up75_kernel<6, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                    ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:527:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1356:22: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up75_kernel<8, false>' requested here
+            default: gr_up75_kernel<kFusedGrMaxT, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                     ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1360:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<1, true, false>' requested here
+        case 1: gr_up_multi_kernel<1, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1361:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<2, true, false>' requested here
+        case 2: gr_up_multi_kernel<2, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1362:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<3, true, false>' requested here
+        case 3: gr_up_multi_kernel<3, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1363:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<4, true, false>' requested here
+        case 4: gr_up_multi_kernel<4, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1364:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<5, true, false>' requested here
+        case 5: gr_up_multi_kernel<5, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1365:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<6, true, false>' requested here
+        case 6: gr_up_multi_kernel<6, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:431:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1366:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_multi_kernel<8, false, false>' requested here
+        default: gr_up_multi_kernel<kFusedGrMaxT, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2172:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<1>' requested here
+        case 1: launch_q8_t<1>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<1, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2172:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<1>' requested here
+        case 1: launch_q8_t<1>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<1>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2172:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<1>' requested here
+        case 1: launch_q8_t<1>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2173:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<2>' requested here
+        case 2: launch_q8_t<2>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<2, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2173:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<2>' requested here
+        case 2: launch_q8_t<2>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<2>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2173:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<2>' requested here
+        case 2: launch_q8_t<2>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2174:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<3>' requested here
+        case 3: launch_q8_t<3>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<3, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2174:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<3>' requested here
+        case 3: launch_q8_t<3>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<3>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2174:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<3>' requested here
+        case 3: launch_q8_t<3>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2175:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<4>' requested here
+        case 4: launch_q8_t<4>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<4, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2175:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<4>' requested here
+        case 4: launch_q8_t<4>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<4>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2175:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<4>' requested here
+        case 4: launch_q8_t<4>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2176:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<5>' requested here
+        case 5: launch_q8_t<5>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<5, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2176:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<5>' requested here
+        case 5: launch_q8_t<5>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<5>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2176:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<5>' requested here
+        case 5: launch_q8_t<5>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2177:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<6>' requested here
+        case 6: launch_q8_t<6>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<6, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2177:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<6>' requested here
+        case 6: launch_q8_t<6>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<6>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2177:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<6>' requested here
+        case 6: launch_q8_t<6>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2178:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<7>' requested here
+        case 7: launch_q8_t<7>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<7, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2178:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<7>' requested here
+        case 7: launch_q8_t<7>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<7>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2178:17: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<7>' requested here
+        case 7: launch_q8_t<7>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2167:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2179:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<8>' requested here
+        default: launch_q8_t<8>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2150:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2165:13: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_fast_kernel<8, false>' requested here
+    if (ts) gr_up_q8_fast_kernel<T, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+            ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2179:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<8>' requested here
+        default: launch_q8_t<8>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1807:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2166:10: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_q8_kernel<8>' requested here
+    else gr_up_q8_kernel<T><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+         ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2179:18: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::launch_q8_t<8>' requested here
+        default: launch_q8_t<8>(m, part, ssg, st, stamp_buf, stamp_i0); break;
+                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2287:25: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<2, 8, false>' requested here
+        if (split == 2) gr_up_v3_kernel<2><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                        ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2288:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 1, true>' requested here
+        else if (n_tok == 1) gr_up_v3_kernel<1, 1, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2289:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 2, true>' requested here
+        else if (n_tok == 2) gr_up_v3_kernel<1, 2, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2290:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 3, true>' requested here
+        else if (n_tok == 3) gr_up_v3_kernel<1, 3, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2291:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 4, true>' requested here
+        else if (n_tok == 4) gr_up_v3_kernel<1, 4, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2292:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 5, true>' requested here
+        else if (n_tok == 5) gr_up_v3_kernel<1, 5, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2293:30: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 6, true>' requested here
+        else if (n_tok == 6) gr_up_v3_kernel<1, 6, true><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+                             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:788:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2294:14: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_v3_kernel<1, 8, false>' requested here
+        else gr_up_v3_kernel<1, kFusedGrMaxT, false><<<UPM_BLOCKS, THREADS, 0, st>>>(m, part, ssg);
+             ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:209:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2387:9: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_kernel<true>' requested here
+        gr_up_kernel<true><<<UP_BLOCKS, THREADS, 0, st>>>(a);
+        ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:209:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:2390:9: note: in instantiation of function template specialization 'strata::kernels::(anonymous namespace)::gr_up_kernel<false>' requested here
+        gr_up_kernel<<<UP_BLOCKS, THREADS, 0, st>>>(a);
+        ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:533:79: warning: unused variable 'Q32_BLOCKS' [-Wunused-const-variable]
+constexpr int Q32_COLS = 32, Q32_THREADS = 512, Q32_WARPS = Q32_THREADS / 32, Q32_BLOCKS = N / Q32_COLS;
+                                                                              ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:618:15: warning: unused variable 'TQ3' [-Wunused-const-variable]
+constexpr int TQ3 = N / 8 / 32;                    // uint4 weight chunks per lane in one stream's slice (10)
+              ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:940:34: warning: unused function 'dot8v' [-Wunused-function]
+__device__ __forceinline__ float dot8v(const uint4 w, const float4 x0, const float4 x1) {
+                                 ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1038:6: warning: unused function 'cur_dev_volta' [-Wunused-function]
+bool cur_dev_volta() {
+     ^
+/root/private_data/strata-dcu/hc-diagnosis-20261023/hc_probe.cu:1187:6: warning: unused function 'qfuse_hc_local' [-Wunused-function]
+bool qfuse_hc_local() {
+     ^
+155 warnings generated when compiling for host.
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]

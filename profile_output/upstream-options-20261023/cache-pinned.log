@@ -1,0 +1,28 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 23500800000, 'mtp': 1368138752, 'weights': 33542205952, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.48822253, 'device_used': 34770780160, 'external_draft': 0, 'native_draft': 0, 'staging': 44236800}
+READY adaptive 4 off
+DONE warmup 128 13.56
+DONE story-0 256 13.79
+DONE chinese-0 256 17.69
+DONE code-0 256 28.53
+DONE story-1 256 13.25
+DONE chinese-1 256 13.72
+DONE code-1 256 20.27
+DONE story-2 256 15.21
+DONE chinese-2 256 11.39
+DONE code-2 256 13.99
+DONE ok 2 5.84
+DONE arithmetic 2 33.17
+DONE multiply 4 16.45
+DONE sum 5 18.72
+DONE capital 2 18.47
+DONE uppercase 2 33.84
+DONE sort-json 13 17.57
+DONE json 12 26.96
+DONE code-function 21 20.68
+DONE multi-turn 3 12.39
+DONE sample-0 64 6.93
+DONE sample-1 64 4.49
+DONE one_token 1 37.74
+DONE context_tail 3 21.66
+SEED_REPEAT False
+PASS

@@ -441,13 +441,16 @@ def run_model(ck, out, a):
            # Run only the real token, rather than verifying an unused zero draft.
            "--max-context", str(a.context), "--prefill", "32", "--spec", "2", "--mtp-max-t", "1",
            "--expert-profile", str(HERE.parent / "data" / "expert-profile.bin"),
-           "--expert-cache", str(a.expert_cache if a.expert_cache is not None else (8300 if a.dflash2 else 8500)), "--mmap-experts", "--resident-cpu-experts",
+           "--expert-cache", str(a.expert_cache if a.expert_cache is not None else (8300 if a.dflash2 else 8500)), "--mmap-experts", "--resident-experts" if a.resident_pin else "--resident-cpu-experts",
            "--pool-workers", str(a.pool_workers), "--vram-reserve-mib", "4096",
-           "--kv", "int8", "--suffix-draft", "0", "--adapt-every", "0",
+           "--kv", "int8", "--suffix-draft", str(a.suffix_draft),
+           "--adapt-every", str(a.adapt_every), "--adapt-swaps", str(a.adapt_swaps),
+           "--pcie-mode", a.pcie_mode,
            "--ple-io", "direct", "--ple-row-cache", "65536"]
-    if a.mtp_mode != "off" and not a.dflash2:
+    cmd += ["--pcie-frac", str(a.pcie_frac)]
+    if a.mtp_mode != "off" and (not a.dflash2 or a.dflash_mtp_prefix):
         runtime = check_mtp(ck, out)
-        cmd[cmd.index("--spec") + 1] = str(a.mtp_max_t)
+        cmd[cmd.index("--spec") + 1] = str(min(8, a.mtp_max_t + (2 if a.suffix_draft else 0)))
         cmd[cmd.index("--mtp-max-t") + 1] = str(a.mtp_max_t)
         cmd += ["--mtp", str(runtime)]
         if a.mtp_mode == "adaptive":
@@ -455,8 +458,8 @@ def run_model(ck, out, a):
     native_cmd = list(cmd)
     if a.dflash2:
         cmd[cmd.index("--spec") + 1] = str(a.dflash_max_t)
-        cmd[cmd.index("--mtp-max-t") + 1] = str(a.dflash_max_t)
-        cmd += ["--serve", "--prompt-cache", "0", "--conversation-cache-mib", "0", "--pcie-frac", "0", "--adapt-swaps", "0"]
+        cmd[cmd.index("--mtp-max-t") + 1] = str(a.mtp_max_t if a.dflash_mtp_prefix else a.dflash_max_t)
+        cmd += ["--serve", "--prompt-cache", "0", "--conversation-cache-mib", "0"]
         native_cmd = list(cmd)
         if a.dflash_backend == "native":
             from dflash2_pack import prepare, WEIGHT_SHA
@@ -469,6 +472,8 @@ def run_model(ck, out, a):
             if not ready:
                 prepare(a.dflash2, draft_pack)
             cmd += ["--dflash2", str(draft_pack)]
+            if a.dflash_mtp_prefix:
+                cmd += ["--dflash-mtp-prefix",str(a.dflash_mtp_prefix)]
             if not a.dflash_fixed:
                 cmd += ["--dflash-adaptive"]
             if a.dflash_eager:
@@ -483,6 +488,8 @@ def run_model(ck, out, a):
         (out / "dflash2-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
     print("Starting AutoRound model;", len(ids), "prompt tokens", flush=True)
     env = dict(os.environ, STRATA_MAX_WEIGHT_VRAM_FRACTION="0.5")
+    # gfx936 measurements: staged passes strict HC parity and improves decode.
+    env.setdefault("STRATA_HC_SPLIT", "2")
     if a.dflash2:
         env.update(STRATA_ROUTE_TAIL_SKIP="0", STRATA_QFUSE="0", STRATA_VERIFY_QDEDUP="0", STRATA_QFUSE_HC="0")
         env.setdefault("STRATA_BF16_Q8_VEC4", "1")
@@ -517,11 +524,18 @@ def run_model(ck, out, a):
     decoded = tokenizer.decode(generated, skip_special_tokens=True)
     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
+              "expert_execution": {"resident_pin": a.resident_pin, "adapt_every": a.adapt_every, "adapt_swaps": a.adapt_swaps,
+                                   "pcie_mode": a.pcie_mode, "pcie_frac": a.pcie_frac},
+              "suffix_draft": a.suffix_draft,
+              "kernel_options": {"hc_split": env.get("STRATA_HC_SPLIT", "auto"), "cpu_q4_mt": env.get("STRATA_CPU_Q4_MT") == "1",
+                                 "dflash_small_gemv": env.get("STRATA_DFLASH_SMALL_GEMV") == "1"},
               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
     if a.dflash2:
-        report.update(draft_method="dflash2", draft_backend=a.dflash_backend,
+        report.update(draft_method="mtp+dflash2" if a.dflash_mtp_prefix else "dflash2", draft_backend=a.dflash_backend,
                       draft_graph=not a.dflash_eager, draft_adaptive=not a.dflash_fixed,
                       draft_max_t=a.dflash_max_t)
+        if a.dflash_mtp_prefix:
+            report.update(joint_mtp_prefix=a.dflash_mtp_prefix,mtp_mode=a.mtp_mode,mtp_max_t=a.mtp_max_t)
         if a.dflash_backend == "ipc":
             report["draft_worker"] = json.loads((out / "dflash2-worker.json").read_text())
     elif a.mtp_mode != "off":
@@ -550,23 +564,40 @@ def main():
     ap.add_argument("--max-new", type=int, default=32)
     ap.add_argument("--context", type=int, default=512)
     ap.add_argument("--pool-workers", type=int, default=12)
-    ap.add_argument("--expert-cache", type=int, default=None, help="fixed GPU expert slots; still subject to the 50% total weight budget")
+    ap.add_argument("--expert-cache", type=int, default=None, help="fixed GPU expert slots; still subject to the 50%% total weight budget")
+    ap.add_argument("--pcie-mode", choices=["auto", "kernel", "dma", "direct"], default="auto", help="auto uses the GPU copy kernel; dma uses the copy engine")
+    ap.add_argument("--resident-pin", action=argparse.BooleanOptionalAction, default=None, help="page-lock resident CPU experts for PCIe offload; automatic with explicit nonzero pcie-frac")
+    ap.add_argument("--adapt-every", type=int, default=0, help="cache exchange interval in verify windows; 0 disables, upstream 4")
+    ap.add_argument("--adapt-swaps", type=int, default=96, help="maximum exchanges per interval; upstream 96")
+    ap.add_argument("--pcie-frac", type=float, default=0, help="fraction of cache misses sent to GPU; -1 engine auto, 0 CPU only")
+    ap.add_argument("--suffix-draft", type=int, default=0, help="minimum prompt lookup match; 0 disables, upstream 3")
     ap.add_argument("--dflash2", help="trained Flash-Next DFlash2 checkpoint; native GPU execution with shared target head/embedding")
     ap.add_argument("--dflash-backend", choices=["native", "ipc"], default="native")
     ap.add_argument("--dflash-max-t", type=int, choices=range(2,9), default=8, help="anchor plus 1..7 draft proposals")
+    ap.add_argument("--dflash-mtp-prefix",type=int,choices=range(4),default=0,
+                    help="joint mode: MTP prefix of up to N tokens and DFlash2 continuation (0 disables)")
     ap.add_argument("--dflash-fixed", action="store_true", help="always use the full requested draft window")
     ap.add_argument("--dflash-eager", action="store_true", help="disable draft GPU graphs for diagnostics")
     ap.add_argument("--mtp-mode", choices=["off", "fixed", "adaptive"], default="adaptive")
     ap.add_argument("--mtp-max-t", type=int, default=5, help="verification cap, including the real token (2..8)")
     a = ap.parse_args()
+    if a.resident_pin is None:
+        a.resident_pin = a.pcie_frac is not None and a.pcie_frac != 0
     if not 1 <= a.workers <= 16 or a.verify_experts < 1:
         ap.error("workers must be 1..16 and verify-experts positive")
     if a.max_new < 1 or a.context < 1 or a.pool_workers < 1:
         ap.error("max-new, context and pool-workers must be positive")
     if a.expert_cache is not None and a.expert_cache < 1:
         ap.error("expert-cache must be positive")
+    if a.adapt_every < 0 or a.adapt_swaps < 0 or a.suffix_draft < 0:
+        ap.error("adapt-every, adapt-swaps and suffix-draft must be nonnegative")
+    if a.pcie_frac is not None and not (a.pcie_frac == -1 or 0 <= a.pcie_frac <= 1):
+        ap.error("pcie-frac must be -1 (auto) or 0..1")
     if not 2 <= a.mtp_max_t <= 8:
         ap.error("mtp-max-t must be 2..8")
+    if a.dflash_mtp_prefix and (not a.dflash2 or a.dflash_backend!="native" or a.mtp_mode=="off" or
+                               a.dflash_mtp_prefix>a.dflash_max_t-2):
+        ap.error("joint mode needs native --dflash2, MTP enabled, and room for a DFlash2 tail")
     if a.dflash2 and a.dflash_backend == "ipc" and (a.context > 512 or (not a.dflash_eager and a.dflash_max_t > 4)):
         ap.error("DFlash2 IPC supports context <=512 and graph --dflash-max-t <=4; use native for full windows")
     converter_path(a.llama)

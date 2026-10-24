@@ -1,0 +1,510 @@
+{
+  "qa-prob-v2": {
+    "cases": 14,
+    "tokens": 198,
+    "status": {
+      "functional_assertions_passed": true,
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35685138432,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "counters": {
+      "windows": 88,
+      "mtp_offered": 108,
+      "mtp_accepted": 72,
+      "dflash_offered": 213,
+      "dflash_accepted": 42,
+      "prob_windows": 60
+    }
+  },
+  "qa-reject": {
+    "cases": 14,
+    "tokens": 198,
+    "status": {
+      "functional_assertions_passed": true,
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35685138432,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "counters": {
+      "windows": 192,
+      "mtp_offered": 217,
+      "mtp_accepted": 0,
+      "dflash_offered": 397,
+      "dflash_accepted": 0,
+      "prob_windows": 0
+    }
+  },
+  "long": {
+    "cases": 2,
+    "tokens": 5,
+    "status": {
+      "functional_assertions_passed": true,
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35743858688,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "counters": {
+      "windows": 2,
+      "mtp_offered": 2,
+      "mtp_accepted": 2,
+      "dflash_offered": 2,
+      "dflash_accepted": 1,
+      "prob_windows": 0
+    }
+  },
+  "bench": {
+    "cases": 10,
+    "tokens": 2432,
+    "status": {
+      "functional_assertions_passed": true,
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "weights": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 22947840000,
+      "mtp": 1368138752,
+      "weights": 34195377152,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.49772975,
+      "device_used": 35685138432,
+      "external_draft": 0,
+      "native_draft": 1206131200,
+      "staging": 44236800
+    },
+    "counters": {
+      "windows": 1037,
+      "mtp_offered": 1260,
+      "mtp_accepted": 846,
+      "dflash_offered": 1949,
+      "dflash_accepted": 539,
+      "prob_windows": 0
+    },
+    "workloads": {
+      "story": {
+        "values": [
+          23.616236162361623,
+          24.10478046759508,
+          23.783422211486652
+        ],
+        "median_tps": 23.783422211486652
+      },
+      "chinese": {
+        "values": [
+          27.189498056375726,
+          27.850001631836033,
+          28.25544689962694
+        ],
+        "median_tps": 27.850001631836033
+      },
+      "code": {
+        "values": [
+          35.16097132183276,
+          35.27725719325322,
+          35.84179208960448
+        ],
+        "median_tps": 35.27725719325322
+      }
+    },
+    "preparation_ms": {
+      "append_ms": 497.795,
+      "mtp_ms": 2100.568,
+      "dflash_ms": 5073.012
+    }
+  },
+  "same_day_previous_build": {
+    "mtp-on": {
+      "story": {
+        "median_tps": 31.592847181942712,
+        "min_tps": 31.45542790440499,
+        "max_tps": 32.018410586087,
+        "values": [
+          31.45542790440499,
+          31.592847181942712,
+          32.018410586087
+        ]
+      },
+      "chinese": {
+        "median_tps": 38.88154797162862,
+        "min_tps": 38.18217071606485,
+        "max_tps": 39.410080359616984,
+        "values": [
+          38.18217071606485,
+          38.88154797162862,
+          39.410080359616984
+        ]
+      },
+      "code": {
+        "median_tps": 40.287679209354295,
+        "min_tps": 36.472951602102896,
+        "max_tps": 41.61857228788347,
+        "values": [
+          40.287679209354295,
+          36.472951602102896,
+          41.61857228788347
+        ]
+      }
+    },
+    "native-both": {
+      "story": {
+        "median_tps": 29.89431891165995,
+        "min_tps": 29.535621574848573,
+        "max_tps": 29.959040374488005,
+        "values": [
+          29.89431891165995,
+          29.959040374488005,
+          29.535621574848573
+        ]
+      },
+      "chinese": {
+        "median_tps": 33.19243834763893,
+        "min_tps": 32.63640999490056,
+        "max_tps": 33.264465494614015,
+        "values": [
+          32.63640999490056,
+          33.19243834763893,
+          33.264465494614015
+        ]
+      },
+      "code": {
+        "median_tps": 43.58262823677625,
+        "min_tps": 41.190667739340306,
+        "max_tps": 45.90281513358436,
+        "values": [
+          41.190667739340306,
+          45.90281513358436,
+          43.58262823677625
+        ]
+      }
+    }
+  },
+  "comparison_scope": "Same-host BS=1, three 256-token repetitions per task per engine start. Prior optimized baselines are from the same day but an earlier binary; MTP uses 8500 GPU experts, DFlash/joint 8300. All GPU weights <=50%. No statistical-significance claim.",
+  "cache": {
+    "cases": 15,
+    "modes": {
+      "eager": {
+        "prefix_locked": true,
+        "prefix_conditions_network": true,
+        "repeat_reset_recompute": true,
+        "ids": {
+          "plain": [
+            15958,
+            283,
+            220,
+            471,
+            220,
+            16,
+            8
+          ],
+          "zero": [
+            15958,
+            283,
+            220,
+            471,
+            220,
+            16,
+            8
+          ],
+          "prefix2": [
+            393,
+            85,
+            8,
+            318,
+            15,
+            15,
+            15
+          ],
+          "repeat2": [
+            393,
+            85,
+            8,
+            318,
+            15,
+            15,
+            15
+          ],
+          "prefix3": [
+            17,
+            42,
+            99,
+            565,
+            4254,
+            1593,
+            279
+          ],
+          "increment": [
+            393,
+            85,
+            318,
+            82,
+            2007,
+            8,
+            1690
+          ],
+          "full": [
+            393,
+            85,
+            318,
+            82,
+            2007,
+            8,
+            1690
+          ],
+          "recompute": [
+            393,
+            85,
+            318,
+            82,
+            2007,
+            8,
+            1690
+          ],
+          "short": [
+            393,
+            86
+          ],
+          "all": [
+            393,
+            85,
+            17,
+            42,
+            99,
+            100,
+            101
+          ],
+          "edge": [
+            393,
+            85,
+            220,
+            16,
+            15,
+            11,
+            551
+          ],
+          "wrap": [
+            393,
+            85,
+            220,
+            17,
+            15,
+            11,
+            3749
+          ],
+          "wrap-repeat": [
+            393,
+            85,
+            220,
+            17,
+            15,
+            11,
+            3749
+          ],
+          "after-wrap": [
+            393,
+            85,
+            478
+          ],
+          "reset2": [
+            393,
+            85,
+            8,
+            318,
+            15,
+            15,
+            15
+          ]
+        }
+      },
+      "graph": {
+        "prefix_locked": true,
+        "prefix_conditions_network": true,
+        "repeat_reset_recompute": true,
+        "ids": {
+          "plain": [
+            15958,
+            283,
+            220,
+            471,
+            220,
+            16,
+            8
+          ],
+          "zero": [
+            15958,
+            283,
+            220,
+            471,
+            220,
+            16,
+            8
+          ],
+          "prefix2": [
+            393,
+            85,
+            8,
+            318,
+            15,
+            15,
+            15
+          ],
+          "repeat2": [
+            393,
+            85,
+            8,
+            318,
+            15,
+            15,
+            15
+          ],
+          "prefix3": [
+            17,
+            42,
+            99,
+            565,
+            4254,
+            1593,
+            279
+          ],
+          "increment": [
+            393,
+            85,
+            318,
+            82,
+            2007,
+            8,
+            1690
+          ],
+          "full": [
+            393,
+            85,
+            318,
+            82,
+            2007,
+            8,
+            1690
+          ],
+          "recompute": [
+            393,
+            85,
+            318,
+            82,
+            2007,
+            8,
+            1690
+          ],
+          "short": [
+            393,
+            86
+          ],
+          "all": [
+            393,
+            85,
+            17,
+            42,
+            99,
+            100,
+            101
+          ],
+          "edge": [
+            393,
+            85,
+            220,
+            16,
+            15,
+            11,
+            551
+          ],
+          "wrap": [
+            393,
+            85,
+            220,
+            17,
+            15,
+            11,
+            3749
+          ],
+          "wrap-repeat": [
+            393,
+            85,
+            220,
+            17,
+            15,
+            11,
+            3749
+          ],
+          "after-wrap": [
+            393,
+            85,
+            478
+          ],
+          "reset2": [
+            393,
+            85,
+            8,
+            318,
+            15,
+            15,
+            15
+          ]
+        }
+      }
+    },
+    "eager_graph_equal": true,
+    "invalid_prefix_rejected": 2
+  },
+  "legacy_cache": {
+    "cases": 9,
+    "modes": [
+      "eager",
+      "graph"
+    ],
+    "byte_equal_previous": true,
+    "reference": "/root/private_data/strata-dcu/q4-multitoken-20261023/witness"
+  }
+}

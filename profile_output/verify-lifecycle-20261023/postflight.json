@@ -1,0 +1,10 @@
+{
+  "inference_processes": [],
+  "entry_sha256": {
+    "/root/strata-dcu/build-gfx936/strata": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1",
+    "/root/private_data/strata-dcu/p1/build/strata": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1"
+  },
+  "production_target": "/root/private_data/strata-dcu/joint-draft-20261023/strata-final",
+  "gpu": "\n================================= System Management Interface ==================================\n================================================================================================\nHCU[0]\t\t: vram Total Memory (MiB): 65520\nHCU[0]\t\t: vram Total Used Memory (MiB): 2\n================================================================================================\n======================================== End of SMI Log ========================================\n\n",
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+}

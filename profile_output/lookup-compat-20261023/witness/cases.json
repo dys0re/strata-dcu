@@ -1,0 +1,121 @@
+[
+  {
+    "name": "plain",
+    "k": 7,
+    "prefix": []
+  },
+  {
+    "name": "zero",
+    "k": 7,
+    "prefix": []
+  },
+  {
+    "name": "prefix2",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "repeat2",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "prefix3",
+    "k": 7,
+    "prefix": [
+      17,
+      42,
+      99
+    ]
+  },
+  {
+    "name": "increment",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "full",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "recompute",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "short",
+    "k": 2,
+    "prefix": [
+      393
+    ]
+  },
+  {
+    "name": "all",
+    "k": 7,
+    "prefix": [
+      393,
+      85,
+      17,
+      42,
+      99,
+      100,
+      101
+    ]
+  },
+  {
+    "name": "edge",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "wrap",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "wrap-repeat",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "after-wrap",
+    "k": 3,
+    "prefix": [
+      393,
+      85
+    ]
+  },
+  {
+    "name": "reset2",
+    "k": 7,
+    "prefix": [
+      393,
+      85
+    ]
+  }
+]

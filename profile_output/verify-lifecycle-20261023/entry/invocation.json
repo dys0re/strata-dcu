@@ -1,0 +1,7 @@
+{
+  "start_utc": "2026-10-23T10:59:53.377655+00:00",
+  "command": "ssh -S /tmp/strata-dcu-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; source /opt/dtk/env.sh >/dev/null 2>&1; source /opt/hyhal/env.sh >/dev/null 2>&1; STRATA_CPU_Q4_MT=1 STRATA_DFLASH_SMALL_GEMV=1 python3 -u /root/private_data/strata-dcu/verify-lifecycle-20261023/run.py --engine /root/private_data/strata-dcu/verify-lifecycle-20261023/strata-profile --out /root/private_data/strata-dcu/verify-lifecycle-20261023/mtp-profile --mode adaptive --width 5 --repeat 1 --timing-only --lifecycle --checks'",
+  "cwd": "/home/dry/data/strara-dcu/Strata",
+  "exit_code": 0,
+  "end_utc": "2026-10-23T11:02:45.085373+00:00"
+}

@@ -1,0 +1,109 @@
+{
+  "seed": 1729,
+  "cases": [
+    {
+      "name": "short3",
+      "pos": 4,
+      "k": 3,
+      "reference_ids": [
+        16,
+        15,
+        8
+      ]
+    },
+    {
+      "name": "repeat3",
+      "pos": 4,
+      "k": 3,
+      "reference_ids": [
+        16,
+        15,
+        8
+      ]
+    },
+    {
+      "name": "increment1",
+      "pos": 6,
+      "k": 1,
+      "reference_ids": [
+        727
+      ]
+    },
+    {
+      "name": "full7",
+      "pos": 7,
+      "k": 7,
+      "reference_ids": [
+        16,
+        471,
+        710,
+        2933,
+        35000,
+        4598,
+        38523
+      ]
+    },
+    {
+      "name": "recompute7",
+      "pos": 7,
+      "k": 7,
+      "reference_ids": [
+        16,
+        471,
+        710,
+        2933,
+        35000,
+        4598,
+        38523
+      ]
+    },
+    {
+      "name": "window-edge",
+      "pos": 2045,
+      "k": 7,
+      "reference_ids": [
+        17,
+        17,
+        96786,
+        908,
+        13,
+        220,
+        1866
+      ]
+    },
+    {
+      "name": "ring-wrap",
+      "pos": 2054,
+      "k": 7,
+      "reference_ids": [
+        17,
+        17,
+        92,
+        413,
+        821,
+        2018,
+        314
+      ]
+    },
+    {
+      "name": "after-wrap",
+      "pos": 2071,
+      "k": 3,
+      "reference_ids": [
+        579,
+        958,
+        1076
+      ]
+    },
+    {
+      "name": "reset-short3",
+      "pos": 4,
+      "k": 3,
+      "reference_ids": [
+        16,
+        15,
+        8
+      ]
+    }
+  ]
+}

@@ -855,6 +855,11 @@ __global__ void __launch_bounds__(THREADS) gr_norm_split_kernel(GrMulti m) {
 // bitwise the same; what goes is the loop's one-iteration-at-a-time loads and the second pass that read xn back from
 // global memory (a write, a barrier, a read: two memory latencies).
 __global__ void __launch_bounds__(THREADS) gr_norm_split_fast_kernel(GrMulti m) {
+#if defined(__clang__) && defined(STRATA_HIP_GFX906)
+    // Keep the same FP32 rounding in plain and split normalization.
+    // DTK otherwise contracts these expressions differently across kernels.
+#pragma clang fp contract(off)
+#endif
     __shared__ float part[WARPS];
     __shared__ float s_rs;
     const FusedGrArgs& a = m.a[blockIdx.x];
@@ -1389,6 +1394,11 @@ std::atomic<int> g_variant[64];
 constexpr int NQ = D / (THREADS * 4);   // 10 float4 per thread
 static_assert(D % (THREADS * 4) == 0, "whole float4 per thread");
 __global__ void __launch_bounds__(THREADS) gr_norm_fast_kernel(GrMulti m) {
+#if defined(__clang__) && defined(STRATA_HIP_GFX906)
+    // Keep the same FP32 rounding in plain and split normalization.
+    // DTK otherwise contracts these expressions differently across kernels.
+#pragma clang fp contract(off)
+#endif
     __shared__ float part[WARPS][HC];
     __shared__ float s_rs[HC];
     const FusedGrArgs& a = m.a[blockIdx.x];

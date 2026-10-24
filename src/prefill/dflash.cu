@@ -4,11 +4,13 @@
 #include "strata/core/native_head.hpp"
 #include "strata/prefill/gemm.hpp"
 #include "strata/kernels/bf16_bits.hpp"
+#include "strata/kernels/bf16_small.hpp"
 #include <cuda_runtime.h>
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <cstdio>
 #include <fstream>
 #include <map>
@@ -121,10 +123,12 @@ __global__ void top_merge(const float* scores,const int32_t* ids,float* best,int
 }
 __global__ void select_path(const uint16_t* hidden,const float* unary,const int32_t* candidates,
                            const uint16_t* pred,const uint16_t* succ,const int32_t* anchor,
-                           int32_t* out,int rows) {
+                           const int32_t* forced,const int32_t* n_forced,int32_t* out,int rows) {
     __shared__ float partial[256];__shared__ float scores[TOP];__shared__ int previous;
     int l=threadIdx.x;if(l==0)previous=*anchor;__syncthreads();
-    for(int t=0;t<rows;++t){for(int k=0;k<TOP;++k){int id=candidates[t*TOP+k];
+    for(int t=0;t<rows;++t){
+        if(t<*n_forced){if(l==0){previous=forced[t];out[t]=previous;}__syncthreads();continue;}
+        for(int k=0;k<TOP;++k){int id=candidates[t*TOP+k];
             // The codebook product and einsum output are BF16 in the reference selector.
             bool valid=id>=0&&id<V&&previous>=0&&previous<V;
             float v=valid?bf(f32_from_bf16(pred[previous*RANK+l])*f32_from_bf16(hidden[t*RANK+l])):0;
@@ -150,24 +154,28 @@ struct DflashNative::Impl {
     uint16_t *logits=nullptr,*selector=nullptr;
     float *tmp=nullptr,*embedf=nullptr,*partscores=nullptr,*best=nullptr;
     int32_t *partids=nullptr,*candidates=nullptr,*tokens=nullptr,*anchor_dev=nullptr;
+    int32_t *forced=nullptr,*n_forced=nullptr;
     int64_t* position=nullptr;
     const NativeHead* head=nullptr;const NativeEmbed* embed=nullptr;
     uint64_t bytes=0;int max_context=0;int64_t received=0;cudaStream_t cs=nullptr;
     strata::prefill::Gemm gemm;
-    cudaGraphExec_t graphs[8]={};bool graph=true,adaptive=false;
-    Clock::time_point last_start;int last_k=0,rounds=0;
+    cudaGraphExec_t graphs[8]={};bool graph=true,adaptive=false,small_gemv=false;
+    Clock::time_point last_start;int last_k=0,rounds=0;double last_preparation_ms=0;
     std::array<std::vector<std::pair<int,double>>,8> samples;
-    uint64_t calls=0,feature_rows=0;double elapsed_ms=0;
+    uint64_t calls=0,feature_rows=0,discarded_feedback=0;double elapsed_ms=0;
     ~Impl(){if(cs)cudaStreamSynchronize(cs);for(auto g:graphs)if(g)cudaGraphExecDestroy(g);
         for(auto a:allocations)cudaFree(a);if(cs)cudaStreamDestroy(cs);
-        if(calls)std::fprintf(stderr,"strata dflash native: calls=%llu feature_rows=%llu draft_ms=%.3f graphs=%d\n",
-            (unsigned long long)calls,(unsigned long long)feature_rows,elapsed_ms,graph?7:0);}
+        if(calls)std::fprintf(stderr,"strata dflash native: calls=%llu feature_rows=%llu draft_ms=%.3f graphs=%d discarded_feedback=%llu\n",
+            (unsigned long long)calls,(unsigned long long)feature_rows,elapsed_ms,graph?7:0,(unsigned long long)discarded_feedback);}
     template<class T> bool alloc(T*& ptr,size_t n,std::string& err){if(!check(cudaMalloc((void**)&ptr,n*sizeof(T)),"allocate",err))return false;allocations.push_back(ptr);return true;}
     const uint16_t* weight(const std::string& name,std::initializer_list<int> shape){
         auto i=tensors.find(name);if(i==tensors.end()||i->second.dims!=std::vector<int>(shape))throw std::runtime_error("DFlash2: missing/invalid tensor "+name);
         return weights+i->second.off/2;
     }
     void linear(const uint16_t* in,const uint16_t* w,uint16_t* dst,int rows,int n,int k){
+        // The full-vocabulary head favors BLAS above two rows on gfx936.
+        if(small_gemv && (n!=V || rows<=2) &&
+           strata::kernels::bf16_small_mm(in,w,dst,rows,n,k,cs))return;
         gemm.bf16(in,w,tmp,rows,n,k);cast16<<<(rows*n+255)/256,256,0,cs>>>(tmp,dst,rows*n);
     }
     void norm(const uint16_t* in,const uint16_t* w,uint16_t* dst,int rows,int cols){rms<<<rows,256,0,cs>>>(in,w,dst,cols);}
@@ -211,7 +219,7 @@ struct DflashNative::Impl {
         top_merge<<<count,256,0,cs>>>(partscores,partids,best,candidates,parts);
         select_path<<<1,256,0,cs>>>(selector,best,candidates,
             weight("candidate_selector.predecessor_codebook",{V,RANK}),
-            weight("candidate_selector.successor_codebook",{V,RANK}),anchor_dev,tokens,count);
+            weight("candidate_selector.successor_codebook",{V,RANK}),anchor_dev,forced,n_forced,tokens,count);
     }
     int choose(int cap){
         if(!adaptive)return cap;
@@ -222,7 +230,7 @@ struct DflashNative::Impl {
             if(ms>0&&n/ms>bestscore){bestscore=n/ms;bestk=k;}}
         return bestk;
     }
-    void observe(int rows){if(!last_k)return;double ms=std::chrono::duration<double,std::milli>(Clock::now()-last_start).count();
+    void observe(int rows){if(!last_k)return;double ms=std::chrono::duration<double,std::milli>(Clock::now()-last_start).count()+last_preparation_ms;
         auto& s=samples[last_k];s.push_back({rows,ms});if(s.size()>12)s.erase(s.begin());last_k=0;++rounds;}
 };
 
@@ -235,6 +243,8 @@ bool DflashNative::load(const std::string& dir,const NativeHead& head,const Nati
     if(!head.loaded()||head.type()!=30||embed.type()!=30||max_context<2||max_context>262144){
         err="DFlash2 native requires unchanged BF16 target head/embedding and context 2..262144";return false;}
     p.head=&head;p.embed=&embed;p.max_context=max_context;p.graph=graph;p.adaptive=adaptive;
+    const char* small=std::getenv("STRATA_DFLASH_SMALL_GEMV");
+    p.small_gemv=small && small[0]=='1' && small[1]=='\0';
     std::ifstream manifest(dir+"/manifest.txt");std::string line;
     if(!std::getline(manifest,line)||line!="STRATA_DFLASH2 1"||!std::getline(manifest,line)||
        line!="source d6723f2a359eaf33ec0c95f22ae8edda896774020c552296a85e1913b4d3186f"){
@@ -277,10 +287,12 @@ bool DflashNative::load(const std::string& dir,const NativeHead& head,const Nati
         p.alloc(p.tmp,std::max(CHUNK*H,7*V),err)&&p.alloc(p.embedf,8*H,err)&&
         p.alloc(p.partscores,7*((V+255)/256)*TOP,err)&&p.alloc(p.partids,7*((V+255)/256)*TOP,err)&&
         p.alloc(p.best,7*TOP,err)&&p.alloc(p.candidates,7*TOP,err)&&p.alloc(p.tokens,7,err)&&
-        p.alloc(p.anchor_dev,1,err)&&p.alloc(p.position,1,err)&&p.gemm.init(p.cs,0,err);
+        p.alloc(p.anchor_dev,1,err)&&p.alloc(p.position,1,err)&&
+        p.alloc(p.forced,7,err)&&p.alloc(p.n_forced,1,err)&&p.gemm.init(p.cs,0,err);
     if(!ok)return false;
     int64_t zero=0;int32_t anchor=0;
     cudaMemcpy(p.position,&zero,8,cudaMemcpyHostToDevice);cudaMemcpy(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice);
+    cudaMemsetAsync(p.n_forced,0,sizeof(int32_t),p.cs);
     cudaMemsetAsync(p.x,0,8*H*2,p.cs);
     for(auto& l:p.layers){cudaMemsetAsync(l.kc,0,size_t(RING)*KV*2,p.cs);cudaMemsetAsync(l.vc,0,size_t(RING)*KV*2,p.cs);}
     if(graph)for(int count=1;count<=7;++count){
@@ -298,10 +310,11 @@ bool DflashNative::load(const std::string& dir,const NativeHead& head,const Nati
 }
 bool DflashNative::reset(std::string& err){auto& p=*p_;
     if(!check(cudaStreamSynchronize(p.cs),"reset",err))return false;
-    p.received=0;p.last_k=0;p.rounds=0;for(auto& s:p.samples)s.clear();
+    p.received=0;p.last_k=0;p.rounds=0;p.last_preparation_ms=0;for(auto& s:p.samples)s.clear();
     // Logical length masks all old rows; each visible row is overwritten before reading.
     return true;
 }
+void DflashNative::discard_feedback(){auto& p=*p_;if(p.last_k)++p.discarded_feedback;p.last_k=0;p.last_preparation_ms=0;}
 bool DflashNative::append(const float* source,int cap,int rows,int64_t pos,std::string& err){auto& p=*p_;
     if(!source||rows<1||rows>cap||pos!=p.received||pos+rows>p.max_context){err="DFlash2: noncontiguous/out-of-range target features";return false;}
     p.observe(rows);
@@ -323,15 +336,26 @@ bool DflashNative::append_host(const float* f,int rows,int64_t pos,std::string& 
 }
 bool DflashNative::draft(int64_t pos,int anchor,int cap,int32_t* ids,int& got,std::string& err){auto& p=*p_;got=0;
     if(pos!=p.received||anchor<0||anchor>=V||cap<1||cap>7||pos+cap>=p.max_context){err="DFlash2: invalid draft request";return false;}
-    int count=p.choose(cap);p.last_start=Clock::now();
+    return draft_seeded(pos,anchor,p.choose(cap),nullptr,0,0,ids,got,err);
+}
+bool DflashNative::draft_seeded(int64_t pos,int anchor,int count,const int32_t* prefix,int n_prefix,
+                                double preparation_ms,int32_t* ids,int& got,std::string& err){auto& p=*p_;got=0;
+    if(pos!=p.received||anchor<0||anchor>=V||count<1||count>7||pos+count>=p.max_context||
+       n_prefix<0||n_prefix>count||(n_prefix>0&&!prefix)||!std::isfinite(preparation_ms)||preparation_ms<0){
+        err="DFlash2: invalid seeded draft request";return false;}
+    for(int i=0;i<n_prefix;++i)if(prefix[i]<0||prefix[i]>=V){err="DFlash2: invalid prefix token";return false;}
+    p.last_start=Clock::now();p.last_preparation_ms=preparation_ms;
     cudaMemcpyAsync(p.position,&pos,8,cudaMemcpyHostToDevice,p.cs);cudaMemcpyAsync(p.anchor_dev,&anchor,4,cudaMemcpyHostToDevice,p.cs);
+    cudaMemcpyAsync(p.n_forced,&n_prefix,4,cudaMemcpyHostToDevice,p.cs);
+    if(n_prefix)cudaMemcpyAsync(p.forced,prefix,n_prefix*4,cudaMemcpyHostToDevice,p.cs);
     p.embed->gather_one(anchor,p.embedf,p.cs);
-    for(int i=1;i<=count;++i)p.embed->gather_one(248077,p.embedf+i*H,p.cs);
+    for(int i=1;i<=count;++i)p.embed->gather_one(i<=n_prefix?prefix[i-1]:248077,p.embedf+i*H,p.cs);
     cast16<<<((count+1)*H+255)/256,256,0,p.cs>>>(p.embedf,p.x,(count+1)*H);
     if(p.graph)cudaGraphLaunch(p.graphs[count],p.cs);else p.forward(count);
     cudaMemcpyAsync(ids,p.tokens,count*4,cudaMemcpyDeviceToHost,p.cs);
     if(!check(cudaStreamSynchronize(p.cs),"draft",err))return false;
     for(int i=0;i<count;++i)if(ids[i]<0||ids[i]>=V){err="DFlash2: invalid proposal ID";return false;}
+    for(int i=0;i<n_prefix;++i)if(ids[i]!=prefix[i]){err="DFlash2: selector changed the MTP prefix";return false;}
     got=count;p.last_k=count;++p.calls;p.elapsed_ms+=std::chrono::duration<double,std::milli>(Clock::now()-p.last_start).count();return true;
 }
 bool DflashNative::hidden(float* out,int rows,std::string& err)const{auto& p=*p_;

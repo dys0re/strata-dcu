@@ -1,0 +1,16 @@
+{
+  "baseline_commit": "c4932aa022869e2ba8441a2665a5d1a130c30d1f",
+  "source_restored": {
+    "src/core/verify.cpp": "4a9f0c69890cec5897c7416bf1290c1f2fca92cd98c937a1f511613fc0bf7433",
+    "src/prefill/dflash.cu": "915c5c7f8e9f8f186a589798f5d211b492a3491d86364a9a0884fabd7f3cc4b6"
+  },
+  "diagnostic_request_windows_checked": {
+    "mtp-live": 11,
+    "native-live": 11
+  },
+  "read_bandwidth_checksums_passed": true,
+  "production_entry_unchanged": true,
+  "inference_and_profiler_processes_exited": true,
+  "oom_kills": 0,
+  "system_root_mib": 954
+}

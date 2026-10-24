@@ -83,6 +83,7 @@
 #include "strata/program/message_boundary.hpp"
 #include "strata/spec/draft_policy.hpp"
 #include "strata/spec/mtp_budget.hpp"
+#include "strata/spec/joint_budget.hpp"
 #include "strata/spec/draft_source.hpp"
 #include "strata/spec/suffix_drafter.hpp"
 #include "strata/program/batch_groups.hpp"
@@ -769,6 +770,7 @@ struct Options {
     int mtp_max_t = 0;
     bool mtp_adaptive = false;
     std::string dflash2;
+    int dflash_mtp_prefix = 0;
     bool dflash_adaptive = false;
     bool dflash_graph = true;
     /// --lookup-chain K (opt-in, 0 = off): prompt lookup CHAINED after the MTP's proposal.  The suffix drafter matches
@@ -924,9 +926,10 @@ void usage() {
                  "  --suffix-draft N     prompt lookup: draft from an earlier repeat of the last N+ tokens of context\n"
                  "                       when it pays (default 3; 0 = MTP only)\n"
                  "  --mtp-max-t M        cap the MTP's windows at M tokens (0 = --spec; longer ones come from suffixes)\n"
-                 "  --mtp-adaptive       single-request MTP: select window by measured tokens/ms; needs --suffix-draft 0\n"
+                 "  --mtp-adaptive       single-request MTP: select window by measured tokens/ms; supports prompt lookup\n"
                  "  --dflash2 DIR        native Flash-Next DFlash2 pack (tools/dflash2_pack.py); shares BF16 target head\n"
                  "  --dflash-adaptive    select 1..(--spec - 1) draft proposals using completed-round cost\n"
+                 "  --dflash-mtp-prefix N  joint native drafting: MTP prefix of up to N tokens (1..3), DFlash2 tail\n"
                  "  --dflash-eager       disable DFlash GPU graphs (diagnostic)\n"
                  "  --spec N             the MTP drafter's verify window: how many tokens it proposes per check (setup\n"
                  "                       writes 4; --suffix-draft lets it grow by 2, up to 8, where a repeat is likely)\n"
@@ -2590,6 +2593,12 @@ int main(int argc, char** argv) {
         else if (a == "--spec-follow") o.spec_follow = next("--spec-follow");
         else if (a == "--window-hashes") o.window_hashes = next("--window-hashes");
         else if (a == "--dflash2") o.dflash2 = next("--dflash2");
+        else if (a == "--dflash-mtp-prefix") {
+            const char* value=next("--dflash-mtp-prefix");char* end=nullptr;
+            const long n=std::strtol(value,&end,10);
+            if(end==value||*end||n<0||n>3){std::fprintf(stderr,"--dflash-mtp-prefix must be 0..3\n");return 2;}
+            o.dflash_mtp_prefix=(int)n;
+        }
         else if (a == "--dflash-adaptive") o.dflash_adaptive = true;
         else if (a == "--dflash-eager") o.dflash_graph = false;
         else if (a == "--mtp") o.mtp = next("--mtp");
@@ -3145,8 +3154,12 @@ int main(int argc, char** argv) {
     // Prompt lookup (the suffix drafter, on by default): the MTP keeps its --spec windows and a lookup window may be
     // up to 2 tokens longer; the draft policy (strata/spec/draft_policy.hpp) takes one only where it pays. Code
     // edits +6-11%, ordinary text unchanged (bench/results/2026-09-27-spec). --suffix-draft 0 turns it off.
+    const bool joint_draft=o.dflash_mtp_prefix>0;
+    if(joint_draft && (!o.serve||o.dflash2.empty()||o.mtp.empty()||o.dflash_mtp_prefix>o.spec-2||o.mtp_max_t==1)) {
+        std::fprintf(stderr,"joint drafting requires --dflash2, --mtp, and room for an MTP prefix plus DFlash2 tail\n");return 2;
+    }
     if (!o.dflash2.empty()) {
-        if (std::getenv("STRATA_DFLASH_FD") || !o.mtp.empty() || o.mtp_adaptive || o.prefill_head_alias ||
+        if (std::getenv("STRATA_DFLASH_FD") || ((!o.mtp.empty() || o.mtp_adaptive) && !joint_draft) || o.prefill_head_alias ||
             o.spec < 2 || o.spec > 8 || o.max_context > 262144) {
             std::fprintf(stderr,"strata: --dflash2 requires --spec 2..8, context <=262144, no MTP/IPC/head alias\n");return 2;
         }
@@ -3158,7 +3171,7 @@ int main(int argc, char** argv) {
     } else if (o.dflash_adaptive || !o.dflash_graph) {
         std::fprintf(stderr,"strata: DFlash graph/adaptive options require --dflash2\n");return 2;
     }
-    if (o.mtp_adaptive && [] {
+    if (o.mtp_adaptive && !joint_draft && [] {
         const char* v = std::getenv("STRATA_SPEC_PROB");
         return v != nullptr && std::atoi(v) != 0;
     }()) {
@@ -3173,9 +3186,9 @@ int main(int argc, char** argv) {
 #endif
     if (o.mtp_adaptive && (o.mtp.empty() || o.spec < 2 || o.spec > 8 || o.batch != 0 ||
         !o.layer_split.empty() || o.peer_device >= 0 || o.pipeline_windows >= 2 ||
-        o.suffix_draft != 0 || o.lookup_chain != 0 || o.spec_min_p != 0 ||
+        o.lookup_chain != 0 || o.spec_min_p != 0 ||
         o.expert_cache_remote[0] > 0 || o.expert_cache_remote[1] > 0 || o.expert_cache_remote[2] > 0)) {
-        std::fprintf(stderr, "strata: --mtp-adaptive needs single-GPU --mtp, --spec 2..8, --suffix-draft 0, "
+        std::fprintf(stderr, "strata: --mtp-adaptive needs single-GPU --mtp, --spec 2..8, "
                              "no lookup chain, batch, pipeline or spec-min-p override\n");
         return 2;
     }
@@ -5477,10 +5490,10 @@ int main(int argc, char** argv) {
                      std::chrono::duration<double>(std::chrono::steady_clock::now() - head_t0).count());
     }
     strata::core::DflashBridge dflash;
-    if (strata::core::dflash_enabled() && (!o.serve || multi_gpu || !o.mtp.empty() || o.mtp_adaptive ||
-        o.pipeline_windows > 0 || o.suffix_draft > 0 || o.lookup_chain > 0 || o.prompt_cache != 0 ||
+    if (strata::core::dflash_enabled() && (!o.serve || multi_gpu || ((!o.mtp.empty() || o.mtp_adaptive) && !joint_draft) ||
+        o.pipeline_windows > 0 || o.lookup_chain > 0 || o.prompt_cache != 0 ||
         o.batch != 0 || (o.dflash2.empty() && o.max_context > 512))) {
-        std::fprintf(stderr, "DFlash2 requires solo --serve, --prompt-cache 0, without MTP, pipeline or lookup drafting (IPC context <=512)\n");
+        std::fprintf(stderr, "DFlash2 requires solo --serve, --prompt-cache 0, no pipeline/lookup-chain; MTP needs --dflash-mtp-prefix (IPC context <=512)\n");
         return 2;
     }
     if ((!o.dflash2.empty() && !dflash.init_native(o.dflash2,native_head,native_embed,(int)o.max_context,
@@ -14066,6 +14079,17 @@ int main(int argc, char** argv) {
             if (o.mtp_adaptive) mtp_budget.begin_request();
             int mtp_planned_t = 1;
             int dflash_t = 1;
+            int joint_prefix_ready=0,joint_budget_prefix=0;
+            double joint_prepared_ms=0;
+            std::vector<int32_t> mtp_prefix(DS,0);
+            std::unique_ptr<strata::spec::JointDraftBudget> joint_budget;
+            if(joint_draft)joint_budget=std::make_unique<strata::spec::JointDraftBudget>(
+                std::min(o.dflash_mtp_prefix,S_mtp-1),o.mtp_adaptive,o.dflash_adaptive);
+            int64_t joint_windows=0,joint_mtp_offered=0,joint_mtp_accepted=0,
+                    joint_df_offered=0,joint_df_accepted=0;
+            int64_t joint_corrupt_counter=0;
+            double joint_mtp_ms=0,joint_append_ms=0,joint_df_ms=0;
+            const int64_t joint_spec_start=ver.spec_windows;
             double mtp_prepared_ms = 0;
             bool first_window = true;
             int64_t produced_n = 0, sfx_windows = 0, sfx_drafts = 0, sfx_ok = 0;
@@ -14081,7 +14105,7 @@ int main(int argc, char** argv) {
             consumed.reserve((size_t) (n + max_new + S));
             for (int64_t i = 0; i < p; ++i) consumed.push_back((int32_t) ids[(size_t) i]);
             const char* finish = "length";
-            if (o.mtp_adaptive && (!ver.capture_all(err) || !mtp.prepare_adaptive(err))) {
+            if ((o.mtp_adaptive || joint_draft) && (!ver.capture_all(err) || !mtp.prepare_adaptive(err))) {
                 std::printf("ERR preparing MTP budget graphs: %s\n", err.c_str());
                 return 1;
             }
@@ -14768,9 +14792,10 @@ int main(int argc, char** argv) {
                 }
             }
             while (!pl_ran && !cancelled && produced_n < max_new) {
+                const int64_t emitted_before_window=produced_n;
                 int T = dflash.enabled() ? dflash_t : use_mtp ? (o.mtp_adaptive ? mtp_planned_t : S_mtp) : 1;
                 if (dflash.enabled()) T = (int)std::min<int64_t>({T,max_new-produced_n,o.max_context-p});
-                if (use_mtp && req_spec_min_p > 0.0) {
+                if (use_mtp && req_spec_min_p > 0.0 && !joint_draft) {
                     T = 1;
                     while (T < S_mtp && dprob[(size_t) T - 1] >= (float) req_spec_min_p) ++T;
                 }
@@ -14781,9 +14806,10 @@ int main(int argc, char** argv) {
                 bool from_sfx = false;
                 int sfx_match = 0;
                 if (o.suffix_draft > 0 && !first_window) {
-                    const int k = sfx.propose(S - 1, sbuf.data());
+                    const int room = (int)std::min<int64_t>({S, max_new-produced_n, o.max_context-p});
+                    const int k = sfx.propose(std::max(0, room - 1), sbuf.data());
                     sfx_match = sfx.last_match();
-                    if (k > 0 && (!use_mtp || sbuf[0] == drafts[0])) {
+                    if (k > 0 && (!use_mtp || T <= 1 || sbuf[0] == drafts[0])) {
                         const strata::spec::DraftPolicy::Pick pk = policy.choose(T, k, sfx_match);
                         if (pk.lookup) { T = pk.t; from_sfx = true; }
                     }
@@ -14803,8 +14829,9 @@ int main(int argc, char** argv) {
                         chain_n = policy.chain(T, p_mtp, chain_n, cm);
                     }
                 }
-                const int T_mtp = T;
-                T += chain_n;
+                const int T_mtp = joint_draft && !first_window && !from_sfx ? std::min(T,joint_prefix_ready+1) : T;
+                if(joint_draft)chain_n=T-T_mtp;
+                else T += chain_n;
                 const bool timed_round = !first_window;
                 const Clock::time_point round0 = Clock::now();
                 if (p + T > o.max_context) break;
@@ -14813,7 +14840,11 @@ int main(int argc, char** argv) {
                     window[(size_t) i] = merged     ? (int32_t) ids[(size_t) (p + i)]
                                          : from_sfx ? sbuf[(size_t) i - 1]
                                                     : drafts[(size_t) i - 1];
-                for (int i = 0; i < chain_n; ++i) window[(size_t) (T_mtp + i)] = cbuf[(size_t) i];
+                for (int i = 0; i < chain_n; ++i)
+                    window[(size_t) (T_mtp + i)] = joint_draft ? drafts[(size_t)(T_mtp+i-1)] : cbuf[(size_t) i];
+                if(joint_draft && o.spec_corrupt>0)
+                    for(int i=1;i<T;++i)if(++joint_corrupt_counter%o.spec_corrupt==0)
+                        window[(size_t)i]=(window[(size_t)i]+1)%(int32_t)n_vocab;
                 drive.d.layers = 0;
                 drive.d.experts = 0;
                 drive.d.failed = false;
@@ -14972,7 +15003,8 @@ int main(int argc, char** argv) {
                 // STRATA_SPEC_PROB: the MTP drafts' distributions q, judged by rejection sampling (core/spec_prob.hpp);
                 // a suffix window and the lookup chain's tail are point masses and keep the exact-match rule
                 // (never on a first window: a merged one holds prompt tokens, not drafts)
-                if (use_mtp && mtp.prob() && !from_sfx && !first_window && T_mtp > 1) ver.set_spec_q(mtp.spec_q(), T_mtp - 1);
+                if (use_mtp && mtp.prob() && !from_sfx && !first_window && T_mtp > 1 &&
+                    !(joint_draft && o.spec_corrupt>0)) ver.set_spec_q(mtp.spec_q(), T_mtp - 1);
                 if (!ver.run(T, window.data(), p, win_pool_fn, win_pool_user, outv.data(), err) || drive.d.failed) {
                     std::printf("ERR %s\n", drive.d.failed && drive.d.fail ? drive.d.fail : err.c_str());
                     return 1;
@@ -14995,7 +15027,7 @@ int main(int argc, char** argv) {
                 int a = merged ? T - 1 : 0;   // a merged window commits every row, as the prompt windows do
                 while (a < T - 1 && window[(size_t) a + 1] == outv[(size_t) a]) ++a;
                 if (from_sfx) { ++sfx_windows; sfx_drafts += T - 1; sfx_ok += a; }
-                if (chain_n > 0) { ++chain_windows; chain_drafts += chain_n; chain_ok += std::max(0, a - (T_mtp - 1)); }
+                if (chain_n > 0 && !joint_draft) { ++chain_windows; chain_drafts += chain_n; chain_ok += std::max(0, a - (T_mtp - 1)); }
                 if (!from_sfx && !first_window)
                     for (int d = 0; d < T_mtp - 1 && d < 8 && d <= a; ++d) { ++dp_tested[d]; dp_ok[d] += d < a; }
                 if (strata::core::MtpDrafter::top2_env() && !from_sfx && !first_window && a < T_mtp - 1 && a < 8) {
@@ -15052,8 +15084,17 @@ int main(int argc, char** argv) {
                 // commit, outv[a] is its row 0) - the drafts extend it on the device as the verify rows will
                 if (use_mtp && hist_n > 0 && mtp.coupled() && !eos && produced_n < max_new)
                     mtp.set_draft_history(consumed.data(), (int64_t) consumed.size(), outv[(size_t) a]);
-                if (o.mtp_adaptive) {
-                    if (timed_round && !eos)
+                if(joint_draft && timed_round && !from_sfx) {
+                    const int emitted=(int)(produced_n-emitted_before_window);
+                    ++joint_windows;joint_mtp_offered+=T_mtp-1;joint_df_offered+=chain_n;
+                    joint_mtp_accepted+=std::min({a,T_mtp-1,emitted});
+                    joint_df_accepted+=std::max(0,std::min(a,emitted)-(T_mtp-1));
+                    if(joint_budget_prefix>0 && T-1>joint_budget_prefix)
+                        joint_budget->observe(joint_budget_prefix,T-1,emitted,joint_prepared_ms+
+                            std::chrono::duration<double,std::milli>(tw2-round0).count());
+                }
+                if (o.mtp_adaptive && !joint_draft) {
+                    if (timed_round && !eos && !from_sfx)
                         mtp_budget.observe(T, a, std::chrono::duration<double, std::milli>(tw2 - round0).count(),
                                            mtp_prepared_ms);
                     if (!eos && produced_n < max_new) {
@@ -15062,9 +15103,48 @@ int main(int argc, char** argv) {
                         mtp.set_max_drafts(mtp_planned_t - 1);
                     }
                 }
-                bool drafted = !use_mtp || eos || produced_n >= max_new ||
+                // Lookup replaced the prepared neural proposal. Catch up both KV caches
+                // from committed target rows, but do not score that unused proposal.
+                if (from_sfx && dflash.enabled() && !dflash.discard_feedback(err)) {
+                    if (adapt_thr.joinable()) adapt_thr.join();
+                    std::printf("ERR %s\n", err.c_str());
+                    return 1;
+                }
+                bool drafted = joint_draft || !use_mtp || eos || produced_n >= max_new ||
                                mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p);
-                if (dflash.enabled() && drafted && !eos && produced_n < max_new) {
+                if(joint_draft && !eos && produced_n<max_new) {
+                    const auto prep0=Clock::now();
+                    const int room=(int)std::min<int64_t>({S,max_new-produced_n,o.max_context-(p+a+1)});
+                    const auto pick=joint_budget->choose(std::max(0,room-1));
+                    joint_budget_prefix=pick.prefix;
+                    drafted=dflash.append(ver.dflash_features(),a+1,p,err);
+                    const auto prep1=Clock::now();
+                    mtp.set_max_drafts(pick.prefix);
+                    int actual_prefix=0;
+                    if(drafted)drafted=mtp.draft(T,outv.data(),p,a,mtp_prefix.data(),err,dprob.data(),
+                                                (float)req_spec_min_p,&actual_prefix);
+                    if(req_spec_min_p>0)
+                        for(int j=0;j<actual_prefix;++j)if(dprob[(size_t)j]<(float)req_spec_min_p){actual_prefix=j;break;}
+                    const auto prep2=Clock::now();
+                    joint_prefix_ready=actual_prefix;
+                    if(drafted && pick.candidates>actual_prefix) {
+                        int got=0;
+                        drafted=dflash.draft_seeded(p+a+1,outv[(size_t)a],pick.candidates,
+                            mtp_prefix.data(),actual_prefix,std::chrono::duration<double,std::milli>(prep2-prep0).count(),
+                            drafts.data(),got,err);
+                        dflash_t=got+1;
+                    } else if(drafted) {
+                        std::copy_n(mtp_prefix.data(),actual_prefix,drafts.data());dflash_t=actual_prefix+1;
+                    }
+                    const auto prep3=Clock::now();
+                    joint_append_ms+=std::chrono::duration<double,std::milli>(prep1-prep0).count();
+                    joint_mtp_ms+=std::chrono::duration<double,std::milli>(prep2-prep1).count();
+                    joint_df_ms+=std::chrono::duration<double,std::milli>(prep3-prep2).count();
+                    joint_prepared_ms=std::chrono::duration<double,std::milli>(prep3-prep0).count();
+                    if(drafted && !std::equal(mtp_prefix.begin(),mtp_prefix.begin()+actual_prefix,drafts.begin())) {
+                        err="joint draft prefix was overwritten";drafted=false;
+                    }
+                } else if (dflash.enabled() && drafted && !eos && produced_n < max_new) {
                     int got=0;
                     const int cap=(int)std::min<int64_t>({S,max_new-produced_n,o.max_context-(p+a+1)});
                     drafted=dflash.append(ver.dflash_features(),a+1,p,err);
@@ -15095,6 +15175,9 @@ int main(int argc, char** argv) {
                 if (timed_round && !eos && chain_n == 0)
                     policy.observe(from_sfx, T, a, sfx_match,
                                    std::chrono::duration<double, std::milli>(Clock::now() - round0).count());
+                else if (joint_draft && timed_round && !eos)
+                    policy.observe(false, T, a, 0,
+                                   std::chrono::duration<double, std::milli>(Clock::now() - round0).count());
                 else if (timed_round && !eos)   // a chained window: its MTP part, its chain, its cost
                     policy.observe_chain(T_mtp, chain_n, a, cm,
                                          std::chrono::duration<double, std::milli>(Clock::now() - round0).count());
@@ -15104,7 +15187,13 @@ int main(int argc, char** argv) {
                 p += a + 1;
             }
             const double decode_ms = std::chrono::duration<double, std::milli>(Clock::now() - d0).count();
-            if (o.mtp_adaptive) std::fprintf(stderr, "%s\n", mtp_budget.report().c_str());
+            if(joint_draft)std::fprintf(stderr,"strata joint draft: windows=%lld mtp_offered=%lld mtp_accepted=%lld "
+                "dflash_offered=%lld dflash_accepted=%lld append_ms=%.3f mtp_ms=%.3f dflash_ms=%.3f prob_windows=%lld\n",
+                (long long)joint_windows,(long long)joint_mtp_offered,(long long)joint_mtp_accepted,
+                (long long)joint_df_offered,(long long)joint_df_accepted,joint_append_ms,joint_mtp_ms,joint_df_ms,
+                (long long)(ver.spec_windows-joint_spec_start));
+            if(joint_draft)std::fprintf(stderr,"%s\n",joint_budget->report().c_str());
+            else if (o.mtp_adaptive) std::fprintf(stderr, "%s\n", mtp_budget.report().c_str());
             // the last commit (set_commit_async): the session is complete before anything reads or copies it
             if (!ver.wait_commit(err)) {
                 std::printf("ERR %s\n", err.c_str());
@@ -16318,7 +16407,7 @@ int main(int argc, char** argv) {
             if (o.suffix_draft > 0 && !first_window) {
                 const int k = sfx.propose(o.spec - 1, sbuf.data());
                 sfx_match = sfx.last_match();
-                if (k > 0 && (!use_mtp || sbuf[0] == drafts[0])) {
+                if (k > 0 && (!use_mtp || T <= 1 || sbuf[0] == drafts[0])) {
                     const strata::spec::DraftPolicy::Pick pk = policy.choose(T, k, sfx_match);
                     if (pk.lookup) { T = pk.t; from_sfx = true; }
                 }
@@ -16437,7 +16526,7 @@ int main(int argc, char** argv) {
                 eos = o.stop_eos && std::find(o.eos_ids.begin(), o.eos_ids.end(), (int64_t) outv[(size_t) i]) != o.eos_ids.end();
                 if (!follow.empty()) { follow_differ += fdiff[(size_t) i]; ++follow_emitted; }
             }
-            if (o.mtp_adaptive && timed_round && !eos)
+            if (o.mtp_adaptive && timed_round && !eos && !from_sfx)
                 mtp_budget.observe(T, a, std::chrono::duration<double, std::milli>(Clock::now() - t0).count(),
                                    mtp_prepared_ms);
             if (eos) {

@@ -1,0 +1,167 @@
+{
+  "pass": true,
+  "checks": {
+    "expected_files": true,
+    "eleven_request_records": true,
+    "expected_cases": true,
+    "three_256_token_workloads": true,
+    "semantic_qa": true,
+    "samples": true,
+    "output_context_limits": true,
+    "qa_status": true,
+    "cancellation": true,
+    "recovery_done": true,
+    "protocol_limits": true,
+    "weights_within_50_percent": true,
+    "weight_sum": true,
+    "8500_gpu_experts": true,
+    "kernel_flags_1": true,
+    "lifecycle_without_verify_profile": true,
+    "fusion_defaults": true,
+    "diagnostic_sha_matches_build_provenance": true,
+    "driver_recorded_actual_diagnostic_sha": true,
+    "production_sha_unchanged": true,
+    "production_symlink_unchanged": true,
+    "lifecycle_43_integer_columns": true,
+    "lifecycle_49_rows_each_window": true,
+    "lifecycle_host_timestamps_ordered": true,
+    "cpu_named_columns": true,
+    "cpu_nonempty_valid_timings": true,
+    "inference_processes_exited": true
+  },
+  "details": {
+    "files": {
+      "stderr.log": 54848,
+      "weight-usage.json": 314,
+      "cpu.csv": 2911756,
+      "story-0.request.txt": 233,
+      "chinese-0.request.txt": 252,
+      "arithmetic.request.txt": 141,
+      "capital.request.txt": 160,
+      "sample-0.request.txt": 185,
+      "one_token.request.txt": 116,
+      "provenance.json": 3014,
+      "command.json": 1820,
+      "memory-before.json": 137,
+      "stdout.log": 9614,
+      "warmup.request.txt": 233,
+      "lifecycle.csv": 15372537,
+      "results.json": 30598,
+      "code-0.request.txt": 215,
+      "ok.request.txt": 117,
+      "sample-1.request.txt": 185,
+      "context_tail.request.txt": 2535,
+      "protocol.json": 279,
+      "memory-after.json": 137,
+      "qa-status.json": 93
+    },
+    "requests": [
+      {
+        "case": "warmup",
+        "tokens": 128,
+        "decode_tps": 25.3621034694565
+      },
+      {
+        "case": "story-0",
+        "tokens": 256,
+        "decode_tps": 27.7548896309467
+      },
+      {
+        "case": "chinese-0",
+        "tokens": 256,
+        "decode_tps": 34.2901536359618
+      },
+      {
+        "case": "code-0",
+        "tokens": 256,
+        "decode_tps": 36.61746195216844
+      },
+      {
+        "case": "ok",
+        "tokens": 2,
+        "decode_tps": 26.63115845539281
+      },
+      {
+        "case": "arithmetic",
+        "tokens": 2,
+        "decode_tps": 26.954177897574123
+      },
+      {
+        "case": "capital",
+        "tokens": 2,
+        "decode_tps": 24.3605359317905
+      },
+      {
+        "case": "sample-0",
+        "tokens": 64,
+        "decode_tps": 21.804306350504227
+      },
+      {
+        "case": "sample-1",
+        "tokens": 64,
+        "decode_tps": 27.09682882425166
+      },
+      {
+        "case": "one_token",
+        "tokens": 1,
+        "decode_tps": 30.211480362537763
+      },
+      {
+        "case": "context_tail",
+        "tokens": 3,
+        "decode_tps": 18.270401948842874
+      }
+    ],
+    "weight_usage": {
+      "pack": 1538035200,
+      "dense": 5819596800,
+      "head": 1271398400,
+      "experts": 23500800000,
+      "mtp": 1368138752,
+      "weights": 33542205952,
+      "total": 68702699520,
+      "limit": 34351349760,
+      "fraction": 0.48822253,
+      "device_used": 34770780160,
+      "external_draft": 0,
+      "native_draft": 0,
+      "staging": 44236800
+    },
+    "protocol": {
+      "cancel": "DONE 8 42 876.4 319.6 cancel 3 6 0 2323 5280 2015 0 0.0 42 0 chunk=0 experts_streamed=0",
+      "recovery": "DONE 2 17 323.0 73.2 stop 0 0 0 561 960 399 0 0.0 17 0 chunk=0 experts_streamed=0",
+      "seed_repeat": true,
+      "one_token_limit": true,
+      "context_tail": true
+    },
+    "qa_status": {
+      "functional_assertions_passed": true,
+      "engine_rc": 0,
+      "token_identity_informational": true
+    },
+    "lifecycle_rows": 30821,
+    "lifecycle_windows": 629,
+    "lifecycle_widths": {
+      "43": 30821
+    },
+    "cpu_rows": 30192,
+    "cpu_header": [
+      "begin_ns",
+      "end_ns",
+      "layer",
+      "T",
+      "plan_ms",
+      "actq_ms",
+      "jobs_ms",
+      "compute_ms",
+      "cpu_experts",
+      "cpu_entries",
+      "gpu_hits",
+      "pcie_experts"
+    ],
+    "diagnostic_sha256": "7060a916d2954b6904e41faf9617a465d549f70244168fe0e78ea2749394e28e",
+    "production_sha256": "1551c2b1cc1624a29ab9b17f2276599c2a35648c58babc417e2c6ad98947b1b1",
+    "production_target": "/root/private_data/strata-dcu/joint-draft-20261023/strata-final",
+    "remaining_processes": []
+  }
+}

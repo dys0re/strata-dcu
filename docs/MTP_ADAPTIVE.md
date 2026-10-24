@@ -43,7 +43,7 @@ python3 /root/strata-dcu/Strata/tools/autoround_pack.py mtp \
 - 候选包含 T=1，也就是不验证草稿。此时仍运行 MTP 的前端来补齐已提交位置的 KV，以后可以恢复投机；它不等于卸载 MTP，仍有驻留显存和维护开销。
 - EOS 终止轮不参与收益学习，避免把没有发出的 bonus token 计作收益。窗口受剩余输出和上下文预算约束。
 
-本版使用原 exact-match verifier，支持 greedy 和普通采样，包括 coupled draft 模式。实验性的 `STRATA_SPEC_PROB=1` 与自适应模式互斥；固定置信度阈值、suffix/lookup chain、batch slots、流水线窗口及多 GPU 也不与这个单请求策略混用。冲突会明确报错。
+本版使用原 exact-match verifier，支持 greedy 和普通采样，包括 coupled draft 模式。实验性的 `STRATA_SPEC_PROB=1` 与自适应模式互斥；suffix prompt lookup 现可通过 `--suffix-draft 3` 与增强 MTP 并用，查找窗口不会更新 MTP 的接受率统计，见 [DCU 运行选项](DCU_RUNTIME_OPTIONS.md)。固定置信度阈值、lookup chain、batch slots、流水线窗口及多 GPU 仍不与这个单请求策略混用。冲突会明确报错。
 
 ## 常驻服务配置
 

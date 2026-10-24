@@ -1,0 +1,1 @@
+sha256sum: /root/strata-dcu/Strata/build-gfx936/strata: No such file or directory

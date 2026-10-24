@@ -1,0 +1,12 @@
+[
+  "bash",
+  "/root/strata-dcu/run-autoround.sh",
+  "--dflash2",
+  "/root/private_data/strata-dcu/dflash2/checkpoint",
+  "--suffix-draft",
+  "3",
+  "--prompt",
+  "Copy the text between <text> tags exactly, without tags or commentary.\n<text>The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river.</text>",
+  "--max-new",
+  "128"
+]
