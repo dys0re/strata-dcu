@@ -12,6 +12,7 @@
 #include "strata/core/peer_experts.hpp"
 #include "strata/platform/memory.hpp"
 #include "strata/kernels/bf16_gemv.hpp"
+#include "strata/kernels/draft_head_proxy.hpp"
 #include "strata/kernels/cpu/expert.hpp"
 #include "strata/kernels/elementwise.hpp"
 #include "strata/kernels/fused_gr.hpp"
@@ -160,6 +161,8 @@ MtpDrafter::~MtpDrafter() {
     if (state_arena_) cudaFree(state_arena_);
     if (arena_) cudaFree(arena_);
     if (head_logits_) cudaFree(head_logits_);
+    if (draft_proxy_) cudaFree(draft_proxy_);
+    if (draft_proxy_scratch_) cudaFree(draft_proxy_scratch_);
     if (owns_draft_head_ && dhead_) { strata::kernels::native_q6_k_unpack(dhead_); cudaFree(dhead_); }
     if (owns_draft_head_ && dvocab_) cudaFree(dvocab_);
     if (ev_chain_) cudaEventDestroy(ev_chain_);
@@ -515,6 +518,10 @@ bool full_head_env() {
     static const bool on = [] { const char* v = std::getenv("STRATA_MTP_FULL_HEAD"); return v && v[0] == '1'; }();
     return on;
 }
+bool draft_proxy_env() {
+    const char* v = std::getenv("STRATA_DRAFT_HEAD_PROXY");
+    return v && std::strcmp(v, "1") == 0;
+}
 }  // namespace
 
 bool MtpDrafter::top2_env() {
@@ -544,14 +551,23 @@ void MtpDrafter::record_top2(int j) {
 
 uint64_t MtpDrafter::bind_bytes(uint64_t head_row_bytes, int64_t n_vocab) const {
     uint64_t bytes = head_logits_ ? 0 : (uint64_t) max_t_ * (uint64_t) n_vocab * sizeof(float);
+    int64_t proxy_rows = dhead_ ? n_dvocab_ : n_vocab;
     if (dhead_ == nullptr && owns_draft_head_ && !full_head_env()) {
         if (FILE* f = std::fopen(vocab_file().c_str(), "rb")) {
             std::fseek(f, 0, SEEK_END);
             const long size = std::ftell(f);
             std::fclose(f);
-            if (size >= 4 && size % 4 == 0) bytes += (uint64_t) (size / 4) * head_row_bytes + (uint64_t) size;
+            if (size >= 4 && size % 4 == 0) {
+                bytes += (uint64_t) (size / 4) * head_row_bytes + (uint64_t) size;
+                proxy_rows = size / 4;
+            }
         }
     }
+#ifdef STRATA_HAS_DRAFT_HEAD_PROXY
+    if (draft_proxy_env() && !draft_proxy_)
+        bytes += strata::kernels::draft_head_proxy_bytes((int) proxy_rows) +
+                 strata::kernels::draft_head_proxy_scratch_bytes((int) proxy_rows);
+#endif
     // coupled draft sampling (STRATA_SPEC_COUPLED=1 only): an upper bound - the id -> subset map, the penalty ring,
     // the split scratch (64 lists of 64 entries at most) and the parameters
     if (coupled_draft_env() && cparams_ == nullptr)
@@ -748,6 +764,26 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
                                                   "MTP draft head");
         }
     }
+#ifdef STRATA_HAS_DRAFT_HEAD_PROXY
+    if (draft_proxy_env() && !draft_proxy_) {
+        const int type = dhead_ ? dhead_type_ : head_->type();
+        const int rows = (int) (dhead_ ? n_dvocab_ : n_vocab_);
+        if (g_->n_embd != 2560 || (type != 30 && type != 8)) {
+            err = "MTP draft head proxy requires width2560 and BF16 or Q8_0 head"; return false;
+        }
+        const size_t wb = strata::kernels::draft_head_proxy_bytes(rows);
+        const size_t sb = strata::kernels::draft_head_proxy_scratch_bytes(rows);
+        if (cudaMalloc(&draft_proxy_, wb) != cudaSuccess || cudaMalloc(&draft_proxy_scratch_, sb) != cudaSuccess) {
+            err = "MTP draft head proxy allocation failed"; return false;
+        }
+        strata::kernels::draft_head_proxy_pack(type, dhead_ ? dhead_ : head_->weights(), draft_proxy_, rows, cs_);
+        if (cudaStreamSynchronize(cs_) != cudaSuccess) { err = "MTP draft head proxy packing failed"; return false; }
+        draft_proxy_bytes_ = wb; weight_bytes_ += wb; vram_ += wb + sb;
+        std::fprintf(stderr, "strata mtp: draft-only 2-bit head screening, rows=%d weights=%zu scratch=%zu exact<=64\n", rows, wb, sb);
+    }
+#else
+    if (draft_proxy_env()) { err = "MTP draft head proxy was not built for this backend"; return false; }
+#endif
     if (coupled_draft_env() && cparams_ == nullptr && !setup_coupled(err)) return false;
     return true;
 }
@@ -1198,8 +1234,16 @@ bool MtpDrafter::record_rest(int step_row, cudaStream_t cs, std::string& err) {
         native_quantize_q8_1(sample_, xq_, (int) N, T, cs);
         const bool sub = dhead_ != nullptr;
         const int64_t nv = sub ? n_dvocab_ : n_vocab_;
-        native_mmvq(sub ? dhead_type_ : head_->type(), sub ? dhead_ : head_->weights(), xq_, head_logits_, (int) N,
-                    (int) nv, T, cs);
+        bool screened = false;
+#ifdef STRATA_HAS_DRAFT_HEAD_PROXY
+        if (draft_proxy_)
+            screened = draft_head_proxy_logits(sub ? dhead_type_ : head_->type(), draft_proxy_,
+                sub ? dhead_ : head_->weights(), xq_, head_logits_, (int) nv, T,
+                sub ? dvocab_ : nullptr, draft_proxy_scratch_, cs);
+#endif
+        if (!screened)
+            native_mmvq(sub ? dhead_type_ : head_->type(), sub ? dhead_ : head_->weights(), xq_, head_logits_, (int) N,
+                        (int) nv, T, cs);
         g_mp.stamp(14, cs);
         if (coupled_rec_) {
             // coupled draft sampling: the target's chain and Philox draw for the row that will verify this draft

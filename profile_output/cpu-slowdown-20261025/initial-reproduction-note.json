@@ -1,0 +1,37 @@
+{
+  "initial_smoke_decode_tps": 9.46,
+  "initial_story_wall_seconds": 6.765054212883115,
+  "initial_story_worker_scheduled_fractions": [
+    0.664,
+    0.664,
+    0.679,
+    0.78,
+    0.755,
+    0.835,
+    0.753,
+    0.694,
+    0.869,
+    0.799,
+    0.864,
+    0.856
+  ],
+  "initial_story_worker_runqueue_fractions": [
+    0.271,
+    0.27,
+    0.25,
+    0.154,
+    0.176,
+    0.1,
+    0.181,
+    0.247,
+    0.062,
+    0.131,
+    0.067,
+    0.076
+  ],
+  "initial_story_main_scheduled_fraction": 0.845,
+  "initial_story_main_runqueue_fraction": 0.123,
+  "initial_decode_cgroup_nr_throttled_delta": 0,
+  "initial_decode_cgroup_throttled_usec_delta": 0,
+  "note": "Derived immediately from first run samples. A failed affinity harness preparation then overwrote reproduce-samples.json and top-level reproduce.log/status/pid; original reproduce/ engine logs and thread-usage.json remain intact. Subsequent affinity-aba-v1 stores independent raw samples and must provide authoritative cgroup corroboration."
+}

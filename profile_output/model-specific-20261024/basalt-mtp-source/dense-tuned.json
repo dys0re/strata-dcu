@@ -1,0 +1,8 @@
+{
+ "section": "mtp/dense",
+ "size": 116099072,
+ "md5": "152fe6e371f6eb51d9a1ae960c12b524",
+ "sha256": "dfe18647e0c95d05302907be88f021590119645a1567fcd770c8d309df852d75",
+ "source": "/mnt/nvme/mtplayer/IQ3_S-mtl.basalt (identical md5 in IQ3_XXS-mtl, Q2_0-mtl)",
+ "note": "self-distilled on IQ3_S output; replaces mtp/dense of the original packs"
+}

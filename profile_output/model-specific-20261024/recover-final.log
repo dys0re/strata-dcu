@@ -1,0 +1,12 @@
+START baseline-qa-recheck
+END baseline-qa-recheck 0
+START q8-qa-recheck
+END q8-qa-recheck 0
+START q8-tuned-qa-recheck
+END q8-tuned-qa-recheck 0
+SELECTION {"chosen": "hc-q8-tuned", "flags": {"STRATA_HC_Q8": "1"}, "dense_gguf": "/root/private_data/strata-dcu/model-specific-20261024/dense-q8.gguf", "mtp_runtime": "/root/private_data/strata-dcu/model-specific-20261024/mtp-tuned", "baseline": {"story": 33.71526405900171, "chinese": 42.005775794171704, "code": 44.62184727475554}, "medians": {"q8": {"story": 36.62794025067247, "chinese": 46.15606519544209, "code": 56.042031523642734}, "q8-tuned": {"story": 37.19470556612957, "chinese": 46.09871607872796, "code": 56.222959172468315}, "hc-q8-tuned": {"story": 36.20421439683213, "chinese": 48.50873536211013, "code": 56.97878875559216}, "q8-tuned-proxy": {"story": 36.54271643708515, "chinese": 48.14835712539262, "code": 56.589592820195406}}, "effective_qa_pass": {"baseline": true, "q8": true, "q8-tuned": true, "hc-q8-tuned": true, "q8-tuned-proxy": true}, "engine_sha256": "3ae138ead7fdbab0324bb17b423022d32c497eb18e3fb5aa82901011b98c9450", "selection_rule": "All task medians >= baseline; highest geometric ratio; proxy needs >=1% over best non-proxy; not significance. Full QA rechecked after semantic Markdown-wrapper correction; original return codes preserved."}
+START native-projections-qa
+END native-projections-qa 0
+START joint-proxy-reject-qa
+END joint-proxy-reject-qa 0
+RECOVERY_COMPLETE; ALL QA PASS

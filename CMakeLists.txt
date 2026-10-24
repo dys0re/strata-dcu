@@ -393,6 +393,7 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
                           src/kernels/cuda/bf16_gemv.cu
                           src/kernels/cuda/native_mmvq.cu
                           src/kernels/cuda/bf16_small.cu
+                          src/kernels/cuda/draft_head_proxy.cu
                           src/kernels/cuda/native_bf16.cu
                           src/kernels/cuda/native_gr_norm.cu
                           src/kernels/cuda/native_moe.cu
@@ -585,6 +586,7 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
     src/core/arch_defaults.cpp src/core/nv_defaults.cpp src/core/vmm.cpp src/core/conversation_file.cpp)
   target_include_directories(strata_engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
   target_link_libraries(strata_engine PUBLIC strata_core strata_kernels strata_kernels_cpu ${_strata_gpu_runtime_target})
+  target_compile_definitions(strata_engine PRIVATE STRATA_HAS_DRAFT_HEAD_PROXY=1)
   if(STRATA_BUILD_TESTS AND STRATA_ENABLE_CUDA AND NOT STRATA_HIP_GFX906)
     add_executable(host_graph_launch_test tests/core/host_graph_launch_test.cu)
     target_include_directories(host_graph_launch_test PRIVATE include)
@@ -1190,6 +1192,10 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
   target_include_directories(resident_plan_parity PRIVATE ${_strata_gpu_include_directories})
   target_link_libraries(resident_plan_parity PRIVATE strata_kernels ${_strata_gpu_runtime_target})
   add_test(NAME resident_plan_parity COMMAND resident_plan_parity)
+  add_executable(draft_head_proxy_test src/kernels/draft_head_proxy_test.cpp)
+  target_include_directories(draft_head_proxy_test PRIVATE ${_strata_gpu_include_directories})
+  target_link_libraries(draft_head_proxy_test PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+  add_test(NAME draft_head_proxy_test COMMAND draft_head_proxy_test)
   # #783 PR-g: the multi-token hyper-connection read/write (exact-T projections under them) against the single-token calls
   add_executable(gr_multi_parity src/kernels/gr_multi_parity.cpp)
   target_include_directories(gr_multi_parity PRIVATE ${_strata_gpu_include_directories})

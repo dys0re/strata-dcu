@@ -1,0 +1,9 @@
+[0/2] Re-checking globbed directories...
+[1/6] Linking HIP static library libstrata_kernels.a
+[2/6] Linking HIP static library libstrata_engine.a
+[3/6] Linking HIP static library libstrata_prefill.a
+[4/6] Linking HIP executable strata
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]
+[5/6] Building CXX object CMakeFiles/draft_head_proxy_test.dir/src/kernels/draft_head_proxy_test.cpp.o
+[6/6] Linking HIP executable draft_head_proxy_test
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]

@@ -6157,14 +6157,15 @@ int main(int argc, char** argv) {
         size_t free_b = 0, total_b = 0;
         if (cudaMemGetInfo(&free_b, &total_b) != cudaSuccess) return false;
         std::fprintf(stderr, "strata weight usage: pack=%llu dense=%llu head=%llu experts=%llu mtp=%llu "
-                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu external_draft=%llu native_draft=%llu staging=%llu\n",
+                             "weights=%llu total=%llu limit=%llu fraction=%.8f device_used=%llu external_draft=%llu native_draft=%llu staging=%llu mtp_proxy=%llu\n",
                      (unsigned long long) pool_bytes, (unsigned long long) native_dense.weight_bytes(),
                      (unsigned long long) native_head.weight_bytes(), (unsigned long long) expert_b,
                      (unsigned long long) mtp_b, (unsigned long long) weights,
                      (unsigned long long) weight_vram_total, (unsigned long long) weight_vram_limit,
                      (double) weights / weight_vram_total, (unsigned long long) (total_b - free_b),
                      (unsigned long long)(dflash.native()?0:dflash.weight_bytes()),
-                     (unsigned long long)(dflash.native()?dflash.weight_bytes():0), (unsigned long long)staging_weight_bytes);
+                     (unsigned long long)(dflash.native()?dflash.weight_bytes():0), (unsigned long long)staging_weight_bytes,
+                     (unsigned long long)mtp.draft_proxy_weight_bytes());
         if (weights <= weight_vram_limit) return true;
         std::fprintf(stderr, "strata generate: weight VRAM budget exceeded; refusing generation\n");
         return false;

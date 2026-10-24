@@ -1,0 +1,16 @@
+{
+  "pack": 279744000,
+  "dense": 3760128000,
+  "head": 1271398400,
+  "experts": 22947840000,
+  "mtp": 1453181952,
+  "weights": 30962660352,
+  "total": 68702699520,
+  "limit": 34351349760,
+  "fraction": 0.45067604,
+  "device_used": 32581353472,
+  "external_draft": 0,
+  "native_draft": 1206131200,
+  "staging": 44236800,
+  "mtp_proxy": 85043200
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "label": "plain-qa",
+    "returncode": 0
+  },
+  {
+    "label": "baseline",
+    "returncode": 0
+  },
+  {
+    "label": "hc-q8",
+    "returncode": 0
+  },
+  {
+    "label": "dense-q8",
+    "returncode": 0
+  },
+  {
+    "label": "tuned",
+    "returncode": 0
+  },
+  {
+    "label": "proxy",
+    "returncode": 0
+  },
+  {
+    "label": "quant-tuned",
+    "returncode": 0
+  },
+  {
+    "label": "all",
+    "returncode": 0
+  }
+]

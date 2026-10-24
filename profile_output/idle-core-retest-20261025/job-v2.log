@@ -1,0 +1,10 @@
+PREDECESSOR_DONE {'functional_assertions_passed': True, 'qa_scope': 'full', 'extended_qa': True, 'engine_rc': 0, 'token_identity_informational': True}
+START idle-bf16
+END idle-bf16 0
+START idle-bf16-proxy
+END idle-bf16-proxy 0
+START idle-selected
+END idle-selected 0
+START idle-selected-proxy
+END idle-selected-proxy 0
+ALL_COMPLETE

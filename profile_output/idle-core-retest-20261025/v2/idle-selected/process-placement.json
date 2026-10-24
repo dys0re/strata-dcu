@@ -1,0 +1,58 @@
+{
+  "pid": 102119,
+  "status": [
+    "VmRSS:\t47905584 kB",
+    "VmSwap:\t       0 kB",
+    "Cpus_allowed_list:\t0",
+    "Mems_allowed_list:\t0-7"
+  ],
+  "anonymous_nodes": {
+    "N1": 1306334,
+    "N0": 10193153,
+    "N6": 39186,
+    "N4": 880,
+    "N2": 200,
+    "N3": 166,
+    "N5": 296,
+    "N7": 398852
+  },
+  "large_regions": [
+    {
+      "anon_pages": 140989,
+      "nodes": {
+        "N0": 23,
+        "N1": 107963,
+        "N2": 200,
+        "N3": 166,
+        "N4": 713,
+        "N5": 291,
+        "N6": 31440,
+        "N7": 193
+      },
+      "policy": "default"
+    },
+    {
+      "anon_pages": 10851301,
+      "nodes": {
+        "N0": 10186780,
+        "N1": 664521
+      },
+      "policy": "default"
+    },
+    {
+      "anon_pages": 112128,
+      "nodes": {
+        "N1": 112128
+      },
+      "policy": "default"
+    },
+    {
+      "anon_pages": 310400,
+      "nodes": {
+        "N7": 310400
+      },
+      "policy": "prefer=static:7"
+    }
+  ],
+  "cpu_stat": "usage_usec 57951165111\nuser_usec 49922377523\nsystem_usec 8028787587\nnr_periods 145247\nnr_throttled 373\nthrottled_usec 439709095\n"
+}

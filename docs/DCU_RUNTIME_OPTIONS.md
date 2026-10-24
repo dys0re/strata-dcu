@@ -47,3 +47,10 @@ DFlash2 与联合模式总上限仍为 8 行。剩余输出长度和上下文会
 
 性能与完整验证记录见 [本轮记录](../profile_output/lookup-compat-20261023/README.md)
 和 [原生选项测量](../profile_output/upstream-options-20261023/README.md)。
+
+
+2026-10-24 的 [模型权重优化](DCU_MODEL_OPTIMIZATIONS.md) 已加入本机增强 MTP 默认入口：
+HC Q8、Q8 非专家投影/输出头、发布的蒸馏 MTP。草稿筛选仍默认关闭。
+`--dense-gguf FILE`、`--mtp-runtime DIR` 显式选择准备好的变体；原生 DFlash2 的共享输出头须保留 BF16。
+`STRATA_DCU_MODEL_DEFAULTS=0` 恢复此前权重选择，原有层内交接默认仍保留。
+配置路径由 `STRATA_DCU_MODEL_CONFIG` 指定，当前文件在持久盘 `model-specific-20261024/selected-model.json`。

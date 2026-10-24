@@ -1,0 +1,1532 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 6585,
+      "sha256": "07d6caca0d1357d20d6c44be66c35d8bc70816a96ebc3bc07b22fa8a7dfd4258"
+    },
+    {
+      "path": "active.json",
+      "bytes": 522,
+      "sha256": "6d4bf8cb65cc1d9c7eba1f168d89bafca014a55342a80ef87a5c4b7bb1d11a0f"
+    },
+    {
+      "path": "analyze.py",
+      "bytes": 2610,
+      "sha256": "2ff049175406a62b9bde3f93658605fbf00d208635ba38b9609750417ac963ac"
+    },
+    {
+      "path": "audit.py",
+      "bytes": 3052,
+      "sha256": "7b910f4b333fd78484f8c9e0e1c90505034962f01d731508c4257075f83d15fd"
+    },
+    {
+      "path": "driver-source.json",
+      "bytes": 192,
+      "sha256": "26093ea342d6f3ffa06e18ded15f64bc4a0c73ecbca76ca0944d50a1eda7406e"
+    },
+    {
+      "path": "fixed-bf16-smoke/arithmetic.request.txt",
+      "bytes": 141,
+      "sha256": "3cb0491a658b0ca8f50f72c0381a81e08f944d6b2340277cdc50ee5fcf0a1f8f"
+    },
+    {
+      "path": "fixed-bf16-smoke/capital.request.txt",
+      "bytes": 160,
+      "sha256": "8da738c1f01787eacdbda99bc6b8b859084d79b75e13274aa49df07609dbe6b0"
+    },
+    {
+      "path": "fixed-bf16-smoke/command.json",
+      "bytes": 1933,
+      "sha256": "8fd9ec6f8da1aab66886f24beaa8ae39d1f4911781f068ad957d5a90a5652567"
+    },
+    {
+      "path": "fixed-bf16-smoke/memory-after.json",
+      "bytes": 137,
+      "sha256": "80197bd702f2040918bf394118ed8f594d6507d96c61bb7b5a072168b35e9db8"
+    },
+    {
+      "path": "fixed-bf16-smoke/memory-before.json",
+      "bytes": 137,
+      "sha256": "63a1172bf1234d6dc94a6837154e20b72059a9c3232308f3c8ec72623991d8af"
+    },
+    {
+      "path": "fixed-bf16-smoke/ok.request.txt",
+      "bytes": 117,
+      "sha256": "a72436e786b50389c8e4b8fea21a93d699aefb3b31a82105259819cb1e986739"
+    },
+    {
+      "path": "fixed-bf16-smoke/process-placement.json",
+      "bytes": 1075,
+      "sha256": "dfc7c44341fbe1b5485e124b0db699700364ebbec33a81a02a6fb10b66bbeee6"
+    },
+    {
+      "path": "fixed-bf16-smoke/provenance.json",
+      "bytes": 3014,
+      "sha256": "ebf557cbd869f43944d898f4a0e7d7229f50bb8666c34018e39c9c8c5d96951b"
+    },
+    {
+      "path": "fixed-bf16-smoke/qa-status.json",
+      "bytes": 136,
+      "sha256": "fa76d7f412e9e49146dd128e9f97eae6244e8fd2297c502a96357400db9d6a4b"
+    },
+    {
+      "path": "fixed-bf16-smoke/results.json",
+      "bytes": 3596,
+      "sha256": "f60f2392eba35ef1de17b4cb08f64a522e6a61ecb1cbfa13551f66cb7303a897"
+    },
+    {
+      "path": "fixed-bf16-smoke/stderr.log",
+      "bytes": 15047,
+      "sha256": "560da87736ef9c123ce19e3655a29733198e6aee21732d68e0208797fcab31a8"
+    },
+    {
+      "path": "fixed-bf16-smoke/stdout.log",
+      "bytes": 1490,
+      "sha256": "9b288b97096ba0a8f91519134820ffafa7c519a202e300d60b1133af5a6ac8b9"
+    },
+    {
+      "path": "fixed-bf16-smoke/story-short.request.txt",
+      "bytes": 232,
+      "sha256": "b1d49711bb1b68dd8c3d5851eb8b5ab22e58a6a352f9ec2b58bff39b7b5d946b"
+    },
+    {
+      "path": "fixed-bf16-smoke/thread-usage.json",
+      "bytes": 48099,
+      "sha256": "e9a98dbdeaec78c5f0a71951e55e2f31dc49bbd71537862808cf7adf725594e6"
+    },
+    {
+      "path": "fixed-bf16-smoke/weight-usage.json",
+      "bytes": 332,
+      "sha256": "6dd6a962ff7616083882798b7a2405e9abeacc059fabf290cce2b01681cd2c6f"
+    },
+    {
+      "path": "fixed-bf16-smoke.log",
+      "bytes": 420,
+      "sha256": "9269477e79def88070696b2d67f63cf5197f7dcdc1aa841582c1698e160517be"
+    },
+    {
+      "path": "idle-bf16/arithmetic.request.txt",
+      "bytes": 141,
+      "sha256": "3cb0491a658b0ca8f50f72c0381a81e08f944d6b2340277cdc50ee5fcf0a1f8f"
+    },
+    {
+      "path": "idle-bf16/capital.request.txt",
+      "bytes": 160,
+      "sha256": "8da738c1f01787eacdbda99bc6b8b859084d79b75e13274aa49df07609dbe6b0"
+    },
+    {
+      "path": "idle-bf16/chinese-0.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "idle-bf16/chinese-1.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "idle-bf16/chinese-2.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "idle-bf16/code-0.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "idle-bf16/code-1.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "idle-bf16/code-2.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "idle-bf16/code-encoding.request.txt",
+      "bytes": 254,
+      "sha256": "02941b787de1cde21ed665f23753afe30655b6336962e062a95623b26e50b61b"
+    },
+    {
+      "path": "idle-bf16/code-function.request.txt",
+      "bytes": 199,
+      "sha256": "63319f088fd91fa496f10a32297f3440d338e128de511905be34995830883877"
+    },
+    {
+      "path": "idle-bf16/code-intervals.request.txt",
+      "bytes": 322,
+      "sha256": "ee46c1dbc22262eaf9199233dbbc8bcbe45eb9e0e58abe5094885ea25ef6d07f"
+    },
+    {
+      "path": "idle-bf16/code-search.request.txt",
+      "bytes": 308,
+      "sha256": "0e5cfb99117a738dfb6daada64c8825bb6ef2213a2896b2b7ffaefe59bf66b58"
+    },
+    {
+      "path": "idle-bf16/command.json",
+      "bytes": 1933,
+      "sha256": "8fd9ec6f8da1aab66886f24beaa8ae39d1f4911781f068ad957d5a90a5652567"
+    },
+    {
+      "path": "idle-bf16/context_tail.request.txt",
+      "bytes": 2535,
+      "sha256": "16597cc9f2e86862b895777dbba3e1a6e5ff93fe6fc7ad5d1bb42fca7bf23a15"
+    },
+    {
+      "path": "idle-bf16/data-transform.request.txt",
+      "bytes": 294,
+      "sha256": "b401236c7f033818f47af14e52071b34ac7e78cd2c3bebfa189e83a472a38e36"
+    },
+    {
+      "path": "idle-bf16/idle-core-selection.json",
+      "bytes": 330591,
+      "sha256": "8518530201ac3d3a4275e530adf33d0c12a2f2e460e44c669cc3033f20a5b3ae"
+    },
+    {
+      "path": "idle-bf16/idle-core-selection.json.numa-before.txt",
+      "bytes": 52528,
+      "sha256": "f6fb79325e7a8922bfc7d24751eaa399c312c25a77871fdb0c1546a4dbed32f0"
+    },
+    {
+      "path": "idle-bf16/json.request.txt",
+      "bytes": 199,
+      "sha256": "f27bd05fa8dafa0fcc7c75c1c45cec95ea5cfc3005761cd8f35277e50d8c2e35"
+    },
+    {
+      "path": "idle-bf16/memory-after.json",
+      "bytes": 137,
+      "sha256": "06649053cddfdc5c0020d82999be13241e7d745bf4b84013a337bc717d565eff"
+    },
+    {
+      "path": "idle-bf16/memory-before.json",
+      "bytes": 137,
+      "sha256": "c3946104234688388d14b85ad9fc1dcfaa2bd133f83e47dcab17cc2559fe1d4e"
+    },
+    {
+      "path": "idle-bf16/multi-turn.request.txt",
+      "bytes": 298,
+      "sha256": "ae6e0b997092989c2bd3fcd1418077dde03dd80146e26ca3c320a24ef15ab303"
+    },
+    {
+      "path": "idle-bf16/multiply.request.txt",
+      "bytes": 153,
+      "sha256": "599ceeadf31fe1ff05fbde43b54e726753ddd57a76794d46cf97283c27ddc9ef"
+    },
+    {
+      "path": "idle-bf16/ok.request.txt",
+      "bytes": 117,
+      "sha256": "a72436e786b50389c8e4b8fea21a93d699aefb3b31a82105259819cb1e986739"
+    },
+    {
+      "path": "idle-bf16/one_token.request.txt",
+      "bytes": 116,
+      "sha256": "2f120d9656e75348aaf40a315ca70bbc51c00822e5a2186fe221d8a75da4f68c"
+    },
+    {
+      "path": "idle-bf16/process-placement.json",
+      "bytes": 1095,
+      "sha256": "058390d3e82716c177c9802c6bfe538a8f61d481a1c67bd8a9fa66ab89429d3d"
+    },
+    {
+      "path": "idle-bf16/protocol.json",
+      "bytes": 279,
+      "sha256": "7e3d5748a12cf71457eeff22d64e34c21de3d602c3c5764d34bd2d2537abd4c2"
+    },
+    {
+      "path": "idle-bf16/provenance.json",
+      "bytes": 3014,
+      "sha256": "d5e48152f2c0f8c44acc1386e011ed17a0fc290c2b39e7134d68f3094d40a9a3"
+    },
+    {
+      "path": "idle-bf16/qa-status.json",
+      "bytes": 134,
+      "sha256": "049635b7e09fa14fbb705d090a3c7e1f5444a4e119b7aff45f726b7ad888565d"
+    },
+    {
+      "path": "idle-bf16/results.json",
+      "bytes": 74142,
+      "sha256": "044be0d6f3a972e6307735b3444065ef7fd353d55c15d84305cffb0755aa2d58"
+    },
+    {
+      "path": "idle-bf16/sample-0.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "idle-bf16/sample-1.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "idle-bf16/sort-json.request.txt",
+      "bytes": 164,
+      "sha256": "b828b941d1fd7e4868ebb5049a6d5b230a09c80e6eabf238260288f1df75fd8f"
+    },
+    {
+      "path": "idle-bf16/stderr.log",
+      "bytes": 98416,
+      "sha256": "79e465d265243913dc5bd9e72cfbfde151183fe789042e94ba21551ba09b9b49"
+    },
+    {
+      "path": "idle-bf16/stdout.log",
+      "bytes": 24763,
+      "sha256": "6c364c7d4d1e223df94952af2e97a7334f0c4c6b1138757db2905ae0600bb390"
+    },
+    {
+      "path": "idle-bf16/story-0.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "idle-bf16/story-1.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "idle-bf16/story-2.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "idle-bf16/sum.request.txt",
+      "bytes": 185,
+      "sha256": "53e9e97564477443db4da0cc8ae345015773689a599562e447ad12f22a81c61c"
+    },
+    {
+      "path": "idle-bf16/thread-usage.json",
+      "bytes": 364514,
+      "sha256": "f450fed8900ad84b40b3c69ee53232bcd16d970c7848ecb26e24f3ed1ca45746"
+    },
+    {
+      "path": "idle-bf16/uppercase.request.txt",
+      "bytes": 140,
+      "sha256": "c7c850d82ac09aa841428f52848ba790131f81d5fdc9b2302f03091a0c015eac"
+    },
+    {
+      "path": "idle-bf16/warmup.request.txt",
+      "bytes": 233,
+      "sha256": "672e6dbdeb952bcb5c4f25187e442e050077f4eaeab8e7fcd0590cc4a3c48c6b"
+    },
+    {
+      "path": "idle-bf16/weight-usage.json",
+      "bytes": 332,
+      "sha256": "6dd6a962ff7616083882798b7a2405e9abeacc059fabf290cce2b01681cd2c6f"
+    },
+    {
+      "path": "idle-bf16-proxy/arithmetic.request.txt",
+      "bytes": 141,
+      "sha256": "3cb0491a658b0ca8f50f72c0381a81e08f944d6b2340277cdc50ee5fcf0a1f8f"
+    },
+    {
+      "path": "idle-bf16-proxy/capital.request.txt",
+      "bytes": 160,
+      "sha256": "8da738c1f01787eacdbda99bc6b8b859084d79b75e13274aa49df07609dbe6b0"
+    },
+    {
+      "path": "idle-bf16-proxy/chinese-0.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "idle-bf16-proxy/chinese-1.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "idle-bf16-proxy/chinese-2.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "idle-bf16-proxy/code-0.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "idle-bf16-proxy/code-1.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "idle-bf16-proxy/code-2.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "idle-bf16-proxy/code-encoding.request.txt",
+      "bytes": 254,
+      "sha256": "02941b787de1cde21ed665f23753afe30655b6336962e062a95623b26e50b61b"
+    },
+    {
+      "path": "idle-bf16-proxy/code-function.request.txt",
+      "bytes": 199,
+      "sha256": "63319f088fd91fa496f10a32297f3440d338e128de511905be34995830883877"
+    },
+    {
+      "path": "idle-bf16-proxy/code-intervals.request.txt",
+      "bytes": 322,
+      "sha256": "ee46c1dbc22262eaf9199233dbbc8bcbe45eb9e0e58abe5094885ea25ef6d07f"
+    },
+    {
+      "path": "idle-bf16-proxy/code-search.request.txt",
+      "bytes": 308,
+      "sha256": "0e5cfb99117a738dfb6daada64c8825bb6ef2213a2896b2b7ffaefe59bf66b58"
+    },
+    {
+      "path": "idle-bf16-proxy/command.json",
+      "bytes": 1933,
+      "sha256": "1c6ce76c8d06492911cc32490fc11b309b5799db2ee7164a709225fb603e205d"
+    },
+    {
+      "path": "idle-bf16-proxy/context_tail.request.txt",
+      "bytes": 2535,
+      "sha256": "16597cc9f2e86862b895777dbba3e1a6e5ff93fe6fc7ad5d1bb42fca7bf23a15"
+    },
+    {
+      "path": "idle-bf16-proxy/data-transform.request.txt",
+      "bytes": 294,
+      "sha256": "b401236c7f033818f47af14e52071b34ac7e78cd2c3bebfa189e83a472a38e36"
+    },
+    {
+      "path": "idle-bf16-proxy/idle-core-selection.json",
+      "bytes": 330100,
+      "sha256": "bd82893129f142383250ea6af0ff0206754bbbfb12e82f6e36300079a8ac6312"
+    },
+    {
+      "path": "idle-bf16-proxy/idle-core-selection.json.numa-before.txt",
+      "bytes": 52689,
+      "sha256": "31dc2cfe2d75cd0dd22ed2a50ad5e9d92220f594a8733c0bcf3ac2a2573567e1"
+    },
+    {
+      "path": "idle-bf16-proxy/json.request.txt",
+      "bytes": 199,
+      "sha256": "f27bd05fa8dafa0fcc7c75c1c45cec95ea5cfc3005761cd8f35277e50d8c2e35"
+    },
+    {
+      "path": "idle-bf16-proxy/memory-after.json",
+      "bytes": 137,
+      "sha256": "395f2916edbbc0dabb69cbbfd58e3b89874f7ef0bdc70bf7be419dd82dde422b"
+    },
+    {
+      "path": "idle-bf16-proxy/memory-before.json",
+      "bytes": 137,
+      "sha256": "fa57997d002cb62c5e8d6fbe55803e0c9c235fd873c8d9ba906d7259a66e4a85"
+    },
+    {
+      "path": "idle-bf16-proxy/multi-turn.request.txt",
+      "bytes": 298,
+      "sha256": "ae6e0b997092989c2bd3fcd1418077dde03dd80146e26ca3c320a24ef15ab303"
+    },
+    {
+      "path": "idle-bf16-proxy/multiply.request.txt",
+      "bytes": 153,
+      "sha256": "599ceeadf31fe1ff05fbde43b54e726753ddd57a76794d46cf97283c27ddc9ef"
+    },
+    {
+      "path": "idle-bf16-proxy/ok.request.txt",
+      "bytes": 117,
+      "sha256": "a72436e786b50389c8e4b8fea21a93d699aefb3b31a82105259819cb1e986739"
+    },
+    {
+      "path": "idle-bf16-proxy/one_token.request.txt",
+      "bytes": 116,
+      "sha256": "2f120d9656e75348aaf40a315ca70bbc51c00822e5a2186fe221d8a75da4f68c"
+    },
+    {
+      "path": "idle-bf16-proxy/process-placement.json",
+      "bytes": 1019,
+      "sha256": "3a87cfdaf8a31840a719a4709d661fe470c20332e620c56cf740107032b89710"
+    },
+    {
+      "path": "idle-bf16-proxy/protocol.json",
+      "bytes": 281,
+      "sha256": "28f500272dac2aeeed313c042baad4ee33df1bfbe654a2a54a377c4bc192e815"
+    },
+    {
+      "path": "idle-bf16-proxy/provenance.json",
+      "bytes": 3014,
+      "sha256": "d5e48152f2c0f8c44acc1386e011ed17a0fc290c2b39e7134d68f3094d40a9a3"
+    },
+    {
+      "path": "idle-bf16-proxy/qa-status.json",
+      "bytes": 134,
+      "sha256": "049635b7e09fa14fbb705d090a3c7e1f5444a4e119b7aff45f726b7ad888565d"
+    },
+    {
+      "path": "idle-bf16-proxy/results.json",
+      "bytes": 74142,
+      "sha256": "4127267e4c3e1b0707d741c79529126ffd65e70e624646cfb4877473121d8827"
+    },
+    {
+      "path": "idle-bf16-proxy/sample-0.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "idle-bf16-proxy/sample-1.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "idle-bf16-proxy/sort-json.request.txt",
+      "bytes": 164,
+      "sha256": "b828b941d1fd7e4868ebb5049a6d5b230a09c80e6eabf238260288f1df75fd8f"
+    },
+    {
+      "path": "idle-bf16-proxy/stderr.log",
+      "bytes": 98505,
+      "sha256": "82594818ef9c691025e30aed0bda2bdaa757d0a2c6f5451b23a3eb4cba9bb89f"
+    },
+    {
+      "path": "idle-bf16-proxy/stdout.log",
+      "bytes": 24774,
+      "sha256": "d787b2ffc41e823acd033a46e59e42e7e6060a1e3077e955b10ed0369642d531"
+    },
+    {
+      "path": "idle-bf16-proxy/story-0.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "idle-bf16-proxy/story-1.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "idle-bf16-proxy/story-2.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "idle-bf16-proxy/sum.request.txt",
+      "bytes": 185,
+      "sha256": "53e9e97564477443db4da0cc8ae345015773689a599562e447ad12f22a81c61c"
+    },
+    {
+      "path": "idle-bf16-proxy/thread-usage.json",
+      "bytes": 364026,
+      "sha256": "37f56ebc8f209a3275b44ba4d1734b3eadf8e1bc1a8bb29ce6370b25d37b5400"
+    },
+    {
+      "path": "idle-bf16-proxy/uppercase.request.txt",
+      "bytes": 140,
+      "sha256": "c7c850d82ac09aa841428f52848ba790131f81d5fdc9b2302f03091a0c015eac"
+    },
+    {
+      "path": "idle-bf16-proxy/warmup.request.txt",
+      "bytes": 233,
+      "sha256": "672e6dbdeb952bcb5c4f25187e442e050077f4eaeab8e7fcd0590cc4a3c48c6b"
+    },
+    {
+      "path": "idle-bf16-proxy/weight-usage.json",
+      "bytes": 339,
+      "sha256": "66f859dab784bd9b6b2fec69c9881e8f4024c9af25a33c84d6759aca831c9b6c"
+    },
+    {
+      "path": "idle-bf16-proxy.log",
+      "bytes": 1222,
+      "sha256": "e6fd06882f1d568b2097b9c60de1c5b9ad28987f702ec6586d537e6bfcd8cb20"
+    },
+    {
+      "path": "idle-bf16.log",
+      "bytes": 1213,
+      "sha256": "d3afc2cb0a52dcd5be539331af17f2a8d14b531c326f3ee570df970b03390fa5"
+    },
+    {
+      "path": "idle_bench.py",
+      "bytes": 20992,
+      "sha256": "f8bc8de1657d6c4e4cd7af617930b465fef30da47dc7f29c37c7718cd86c3483"
+    },
+    {
+      "path": "idle_cores.py",
+      "bytes": 3363,
+      "sha256": "abf8a0a51cd055f3903c96d4b81b19a4b684739e3d26fb7160404d2a438bb9e9"
+    },
+    {
+      "path": "idle_cores_v2.py",
+      "bytes": 3332,
+      "sha256": "50e8c808cf0206242db37b0aef93d8924682b6644b875a3a1a7794790b304faa"
+    },
+    {
+      "path": "job-v2.log",
+      "bytes": 332,
+      "sha256": "e565c2fb5106241e3ad201de843a4ef56ac20ef2377210b8ec4b134514d713e8"
+    },
+    {
+      "path": "job.log",
+      "bytes": 100,
+      "sha256": "a8f1301095fec95c72f8ae1f0df6a0d7dff05ac03d31e1fc3da050dcf77ca931"
+    },
+    {
+      "path": "launch_v2.py",
+      "bytes": 787,
+      "sha256": "dcf0be5e947daf0e8717d457eca5ad4084e00cfa5f46111bae715b4d3d34f503"
+    },
+    {
+      "path": "postflight.json",
+      "bytes": 681,
+      "sha256": "b28dd36dbd6cb649f2472eabb34158c1f1a42277d7072c0cfea25f2a31658672"
+    },
+    {
+      "path": "preflight.json",
+      "bytes": 825,
+      "sha256": "9d2cdedd8830d6ef771d0073fe8803c0e888fa546c296cdbcb46394bbca5869e"
+    },
+    {
+      "path": "prepare.py",
+      "bytes": 1100,
+      "sha256": "918841149f2ec62d97bb7cdaa5662dcd33279165ab18340e8781b09ac9e88770"
+    },
+    {
+      "path": "prepare_v2.py",
+      "bytes": 1103,
+      "sha256": "8f127f0a425f5405c6b1dc89cb313821e26ab865caca88d865789a8670cea86a"
+    },
+    {
+      "path": "run.py",
+      "bytes": 2430,
+      "sha256": "2a27b4b5f7b8fa54bc59870a239ed44de431e57dc1bdb7a3f7d4d52ecf2f8290"
+    },
+    {
+      "path": "run_v2.py",
+      "bytes": 2400,
+      "sha256": "3e9cfd4b0bb9272cfa2559ddf434a248fb004673d340bb5bb7e0ac00a63e2960"
+    },
+    {
+      "path": "script-manifest.json",
+      "bytes": 1203,
+      "sha256": "60a8ce7c6221a9f62d3be6b9dbe6b7418e67f033473691c03bcd92ec51d6284c"
+    },
+    {
+      "path": "selector-v1-stop.json",
+      "bytes": 473,
+      "sha256": "c1653dfb7ee3914455a874c8aa786aaf3a1df3454b8dfc8d2f2a06b5207b10ac"
+    },
+    {
+      "path": "status.json",
+      "bytes": 200,
+      "sha256": "d79e8ec1a4b898f6fc029875908ac8bed8810a6dfe6982bf1f242c5a768aa685"
+    },
+    {
+      "path": "v2/active.json",
+      "bytes": 708,
+      "sha256": "070167bc82ed00ad6db65e3dcf1914aac469651b96188efa2dd7d622b29c8150"
+    },
+    {
+      "path": "v2/analysis.json",
+      "bytes": 281619,
+      "sha256": "f56d93c5517a92c2dcce48a19508ae6f66d7c59a59b3e4f1fbb1cccb14924e72"
+    },
+    {
+      "path": "v2/audit.json",
+      "bytes": 7334,
+      "sha256": "fbb198d96ad19691c36936523be1e17d9cebdacc20d62473d00b1e729fbd413a"
+    },
+    {
+      "path": "v2/cohort-cores.json",
+      "bytes": 246,
+      "sha256": "2427d3fcaac8fe3586b355c1d803dad050e0387eb8e2179fa47e86eae9000c4b"
+    },
+    {
+      "path": "v2/driver-source.json",
+      "bytes": 192,
+      "sha256": "26093ea342d6f3ffa06e18ded15f64bc4a0c73ecbca76ca0944d50a1eda7406e"
+    },
+    {
+      "path": "v2/idle-bf16/arithmetic.request.txt",
+      "bytes": 141,
+      "sha256": "3cb0491a658b0ca8f50f72c0381a81e08f944d6b2340277cdc50ee5fcf0a1f8f"
+    },
+    {
+      "path": "v2/idle-bf16/capital.request.txt",
+      "bytes": 160,
+      "sha256": "8da738c1f01787eacdbda99bc6b8b859084d79b75e13274aa49df07609dbe6b0"
+    },
+    {
+      "path": "v2/idle-bf16/chinese-0.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-bf16/chinese-1.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-bf16/chinese-2.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-bf16/code-0.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-bf16/code-1.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-bf16/code-2.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-bf16/code-encoding.request.txt",
+      "bytes": 254,
+      "sha256": "02941b787de1cde21ed665f23753afe30655b6336962e062a95623b26e50b61b"
+    },
+    {
+      "path": "v2/idle-bf16/code-function.request.txt",
+      "bytes": 199,
+      "sha256": "63319f088fd91fa496f10a32297f3440d338e128de511905be34995830883877"
+    },
+    {
+      "path": "v2/idle-bf16/code-intervals.request.txt",
+      "bytes": 322,
+      "sha256": "ee46c1dbc22262eaf9199233dbbc8bcbe45eb9e0e58abe5094885ea25ef6d07f"
+    },
+    {
+      "path": "v2/idle-bf16/code-search.request.txt",
+      "bytes": 308,
+      "sha256": "0e5cfb99117a738dfb6daada64c8825bb6ef2213a2896b2b7ffaefe59bf66b58"
+    },
+    {
+      "path": "v2/idle-bf16/command.json",
+      "bytes": 1933,
+      "sha256": "8fd9ec6f8da1aab66886f24beaa8ae39d1f4911781f068ad957d5a90a5652567"
+    },
+    {
+      "path": "v2/idle-bf16/context_tail.request.txt",
+      "bytes": 2535,
+      "sha256": "16597cc9f2e86862b895777dbba3e1a6e5ff93fe6fc7ad5d1bb42fca7bf23a15"
+    },
+    {
+      "path": "v2/idle-bf16/data-transform.request.txt",
+      "bytes": 294,
+      "sha256": "b401236c7f033818f47af14e52071b34ac7e78cd2c3bebfa189e83a472a38e36"
+    },
+    {
+      "path": "v2/idle-bf16/idle-core-selection.json",
+      "bytes": 331677,
+      "sha256": "16ccf58612d042be304f820b63ea31ef9477bd876b449330ca45fb3c8ad18be9"
+    },
+    {
+      "path": "v2/idle-bf16/idle-core-selection.json.numa-before.txt",
+      "bytes": 52686,
+      "sha256": "5b9e4aaae61472706320b7bbd9e6b5e6454a4f85c0c9ba42e9c10a5c8b2550a1"
+    },
+    {
+      "path": "v2/idle-bf16/json.request.txt",
+      "bytes": 199,
+      "sha256": "f27bd05fa8dafa0fcc7c75c1c45cec95ea5cfc3005761cd8f35277e50d8c2e35"
+    },
+    {
+      "path": "v2/idle-bf16/memory-after.json",
+      "bytes": 137,
+      "sha256": "2028400b41dafbb0ee80c29afb29326de74f0a95b4c34a0bfa7d48732b1f1c52"
+    },
+    {
+      "path": "v2/idle-bf16/memory-before.json",
+      "bytes": 137,
+      "sha256": "70891fd8ee594c95ece00c43718390fe4bddf329bee78ed836156182ccaccbaf"
+    },
+    {
+      "path": "v2/idle-bf16/multi-turn.request.txt",
+      "bytes": 298,
+      "sha256": "ae6e0b997092989c2bd3fcd1418077dde03dd80146e26ca3c320a24ef15ab303"
+    },
+    {
+      "path": "v2/idle-bf16/multiply.request.txt",
+      "bytes": 153,
+      "sha256": "599ceeadf31fe1ff05fbde43b54e726753ddd57a76794d46cf97283c27ddc9ef"
+    },
+    {
+      "path": "v2/idle-bf16/ok.request.txt",
+      "bytes": 117,
+      "sha256": "a72436e786b50389c8e4b8fea21a93d699aefb3b31a82105259819cb1e986739"
+    },
+    {
+      "path": "v2/idle-bf16/one_token.request.txt",
+      "bytes": 116,
+      "sha256": "2f120d9656e75348aaf40a315ca70bbc51c00822e5a2186fe221d8a75da4f68c"
+    },
+    {
+      "path": "v2/idle-bf16/process-placement.json",
+      "bytes": 1091,
+      "sha256": "76c24620f6a564248405a3a62f81287393543177e9cfd148891c396618e7a942"
+    },
+    {
+      "path": "v2/idle-bf16/protocol.json",
+      "bytes": 279,
+      "sha256": "d9d46e8e9efd0b174a35874b31e56f6df0375f5f23ce248c215242a4ca461d8e"
+    },
+    {
+      "path": "v2/idle-bf16/provenance.json",
+      "bytes": 3014,
+      "sha256": "d5e48152f2c0f8c44acc1386e011ed17a0fc290c2b39e7134d68f3094d40a9a3"
+    },
+    {
+      "path": "v2/idle-bf16/qa-status.json",
+      "bytes": 134,
+      "sha256": "049635b7e09fa14fbb705d090a3c7e1f5444a4e119b7aff45f726b7ad888565d"
+    },
+    {
+      "path": "v2/idle-bf16/results.json",
+      "bytes": 74133,
+      "sha256": "0f713106ecf63678fee03b2abdf652eb0df3f0c8460bf47ea109b3831c5712e8"
+    },
+    {
+      "path": "v2/idle-bf16/sample-0.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-bf16/sample-1.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-bf16/sort-json.request.txt",
+      "bytes": 164,
+      "sha256": "b828b941d1fd7e4868ebb5049a6d5b230a09c80e6eabf238260288f1df75fd8f"
+    },
+    {
+      "path": "v2/idle-bf16/stderr.log",
+      "bytes": 97919,
+      "sha256": "f2ba6fe488d18e04edbc9058968ca540e4b0efcf2890845b5bdd159401daa014"
+    },
+    {
+      "path": "v2/idle-bf16/stdout.log",
+      "bytes": 24763,
+      "sha256": "f7d80839b6a8bdcf89d8ca49c8d53e0101be0cf19130c8adcdb3bd315b697ff4"
+    },
+    {
+      "path": "v2/idle-bf16/story-0.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-bf16/story-1.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-bf16/story-2.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-bf16/sum.request.txt",
+      "bytes": 185,
+      "sha256": "53e9e97564477443db4da0cc8ae345015773689a599562e447ad12f22a81c61c"
+    },
+    {
+      "path": "v2/idle-bf16/thread-usage.json",
+      "bytes": 366914,
+      "sha256": "8e902eef5d60ce35a4f3d1b2ee71a7854c66f1f1eb027ad33510558589c84988"
+    },
+    {
+      "path": "v2/idle-bf16/uppercase.request.txt",
+      "bytes": 140,
+      "sha256": "c7c850d82ac09aa841428f52848ba790131f81d5fdc9b2302f03091a0c015eac"
+    },
+    {
+      "path": "v2/idle-bf16/warmup.request.txt",
+      "bytes": 233,
+      "sha256": "672e6dbdeb952bcb5c4f25187e442e050077f4eaeab8e7fcd0590cc4a3c48c6b"
+    },
+    {
+      "path": "v2/idle-bf16/weight-usage.json",
+      "bytes": 332,
+      "sha256": "6dd6a962ff7616083882798b7a2405e9abeacc059fabf290cce2b01681cd2c6f"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/arithmetic.request.txt",
+      "bytes": 141,
+      "sha256": "3cb0491a658b0ca8f50f72c0381a81e08f944d6b2340277cdc50ee5fcf0a1f8f"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/capital.request.txt",
+      "bytes": 160,
+      "sha256": "8da738c1f01787eacdbda99bc6b8b859084d79b75e13274aa49df07609dbe6b0"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/chinese-0.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/chinese-1.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/chinese-2.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/code-0.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/code-1.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/code-2.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/code-encoding.request.txt",
+      "bytes": 254,
+      "sha256": "02941b787de1cde21ed665f23753afe30655b6336962e062a95623b26e50b61b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/code-function.request.txt",
+      "bytes": 199,
+      "sha256": "63319f088fd91fa496f10a32297f3440d338e128de511905be34995830883877"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/code-intervals.request.txt",
+      "bytes": 322,
+      "sha256": "ee46c1dbc22262eaf9199233dbbc8bcbe45eb9e0e58abe5094885ea25ef6d07f"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/code-search.request.txt",
+      "bytes": 308,
+      "sha256": "0e5cfb99117a738dfb6daada64c8825bb6ef2213a2896b2b7ffaefe59bf66b58"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/command.json",
+      "bytes": 1933,
+      "sha256": "1c6ce76c8d06492911cc32490fc11b309b5799db2ee7164a709225fb603e205d"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/context_tail.request.txt",
+      "bytes": 2535,
+      "sha256": "16597cc9f2e86862b895777dbba3e1a6e5ff93fe6fc7ad5d1bb42fca7bf23a15"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/data-transform.request.txt",
+      "bytes": 294,
+      "sha256": "b401236c7f033818f47af14e52071b34ac7e78cd2c3bebfa189e83a472a38e36"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/idle-core-selection.json",
+      "bytes": 331925,
+      "sha256": "2109f5ff8c129cfb18823d09686473df7e27e3448ddce85ba4a1644b5145b36b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/idle-core-selection.json.numa-before.txt",
+      "bytes": 52721,
+      "sha256": "46215057e917fcbfeaf3818a98016dd50a61312e63671f064d174b0d98daa454"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/json.request.txt",
+      "bytes": 199,
+      "sha256": "f27bd05fa8dafa0fcc7c75c1c45cec95ea5cfc3005761cd8f35277e50d8c2e35"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/memory-after.json",
+      "bytes": 137,
+      "sha256": "4628d1c167d2b5bcb58d67898f5508eb68e232990ec64f34a85f1f88c149a9bf"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/memory-before.json",
+      "bytes": 137,
+      "sha256": "d4e32ba4d6c7619c81376495da5a37e62a1f8b66bcc2f7409e7220472b20254b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/multi-turn.request.txt",
+      "bytes": 298,
+      "sha256": "ae6e0b997092989c2bd3fcd1418077dde03dd80146e26ca3c320a24ef15ab303"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/multiply.request.txt",
+      "bytes": 153,
+      "sha256": "599ceeadf31fe1ff05fbde43b54e726753ddd57a76794d46cf97283c27ddc9ef"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/ok.request.txt",
+      "bytes": 117,
+      "sha256": "a72436e786b50389c8e4b8fea21a93d699aefb3b31a82105259819cb1e986739"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/one_token.request.txt",
+      "bytes": 116,
+      "sha256": "2f120d9656e75348aaf40a315ca70bbc51c00822e5a2186fe221d8a75da4f68c"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/process-placement.json",
+      "bytes": 895,
+      "sha256": "990081928051296f3d79e081ea99ce4ed23426d979dc38a690afe25f7223837b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/protocol.json",
+      "bytes": 279,
+      "sha256": "d329fa2058b0531774f7ae082e49dae0e92b12f03fb42c95f10d679645870d6c"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/provenance.json",
+      "bytes": 3014,
+      "sha256": "d5e48152f2c0f8c44acc1386e011ed17a0fc290c2b39e7134d68f3094d40a9a3"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/qa-status.json",
+      "bytes": 134,
+      "sha256": "049635b7e09fa14fbb705d090a3c7e1f5444a4e119b7aff45f726b7ad888565d"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/results.json",
+      "bytes": 74143,
+      "sha256": "5c3bb6bcde6cec0ab8d79460c8ad87f1b671858ea199b7bde07b61384de54a23"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/sample-0.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/sample-1.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/sort-json.request.txt",
+      "bytes": 164,
+      "sha256": "b828b941d1fd7e4868ebb5049a6d5b230a09c80e6eabf238260288f1df75fd8f"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/stderr.log",
+      "bytes": 95139,
+      "sha256": "d39c138fc97619c3bb3f73d444cf5bbd4824e057f1b357c626e206a19de4e049"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/stdout.log",
+      "bytes": 24769,
+      "sha256": "3cf5101d6c75e5c3f7da85ba40983d3c207fd94fc863251f8bf5f26832c62bc2"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/story-0.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/story-1.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/story-2.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/sum.request.txt",
+      "bytes": 185,
+      "sha256": "53e9e97564477443db4da0cc8ae345015773689a599562e447ad12f22a81c61c"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/thread-usage.json",
+      "bytes": 366851,
+      "sha256": "707491baf37eb39832efc9fbfd736b87ea429609ea8056d29d21cfa42c8f4173"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/uppercase.request.txt",
+      "bytes": 140,
+      "sha256": "c7c850d82ac09aa841428f52848ba790131f81d5fdc9b2302f03091a0c015eac"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/warmup.request.txt",
+      "bytes": 233,
+      "sha256": "672e6dbdeb952bcb5c4f25187e442e050077f4eaeab8e7fcd0590cc4a3c48c6b"
+    },
+    {
+      "path": "v2/idle-bf16-proxy/weight-usage.json",
+      "bytes": 339,
+      "sha256": "66f859dab784bd9b6b2fec69c9881e8f4024c9af25a33c84d6759aca831c9b6c"
+    },
+    {
+      "path": "v2/idle-bf16-proxy.log",
+      "bytes": 1230,
+      "sha256": "d0a270e84caaaf3b16e002b603a7f79e38fbcc629cefe721dd51ea5e2cf25fea"
+    },
+    {
+      "path": "v2/idle-bf16.log",
+      "bytes": 1207,
+      "sha256": "4939a6ae7cc77efbdae237cec9bf09ddf413e8c32bdecd6c9f48c6c86b234862"
+    },
+    {
+      "path": "v2/idle-selected/arithmetic.request.txt",
+      "bytes": 141,
+      "sha256": "3cb0491a658b0ca8f50f72c0381a81e08f944d6b2340277cdc50ee5fcf0a1f8f"
+    },
+    {
+      "path": "v2/idle-selected/capital.request.txt",
+      "bytes": 160,
+      "sha256": "8da738c1f01787eacdbda99bc6b8b859084d79b75e13274aa49df07609dbe6b0"
+    },
+    {
+      "path": "v2/idle-selected/chinese-0.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-selected/chinese-1.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-selected/chinese-2.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-selected/code-0.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-selected/code-1.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-selected/code-2.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-selected/code-encoding.request.txt",
+      "bytes": 254,
+      "sha256": "02941b787de1cde21ed665f23753afe30655b6336962e062a95623b26e50b61b"
+    },
+    {
+      "path": "v2/idle-selected/code-function.request.txt",
+      "bytes": 199,
+      "sha256": "63319f088fd91fa496f10a32297f3440d338e128de511905be34995830883877"
+    },
+    {
+      "path": "v2/idle-selected/code-intervals.request.txt",
+      "bytes": 322,
+      "sha256": "ee46c1dbc22262eaf9199233dbbc8bcbe45eb9e0e58abe5094885ea25ef6d07f"
+    },
+    {
+      "path": "v2/idle-selected/code-search.request.txt",
+      "bytes": 308,
+      "sha256": "0e5cfb99117a738dfb6daada64c8825bb6ef2213a2896b2b7ffaefe59bf66b58"
+    },
+    {
+      "path": "v2/idle-selected/command.json",
+      "bytes": 2032,
+      "sha256": "b48875b7b6dd6a5cb8a9c40d0892fc5753eac46c6d5ead242a278c0ac4a18399"
+    },
+    {
+      "path": "v2/idle-selected/context_tail.request.txt",
+      "bytes": 2535,
+      "sha256": "16597cc9f2e86862b895777dbba3e1a6e5ff93fe6fc7ad5d1bb42fca7bf23a15"
+    },
+    {
+      "path": "v2/idle-selected/data-transform.request.txt",
+      "bytes": 294,
+      "sha256": "b401236c7f033818f47af14e52071b34ac7e78cd2c3bebfa189e83a472a38e36"
+    },
+    {
+      "path": "v2/idle-selected/idle-core-selection.json",
+      "bytes": 331664,
+      "sha256": "7e885a3d25973c2ad91e2b0885d90fad188901d0f33c734b8a886dcffc187c45"
+    },
+    {
+      "path": "v2/idle-selected/idle-core-selection.json.numa-before.txt",
+      "bytes": 61763,
+      "sha256": "bae36b5a7d41affb4d05e38534abcf6da987d3cbcd5e8ccfd7c8aca9f8da7c7f"
+    },
+    {
+      "path": "v2/idle-selected/json.request.txt",
+      "bytes": 199,
+      "sha256": "f27bd05fa8dafa0fcc7c75c1c45cec95ea5cfc3005761cd8f35277e50d8c2e35"
+    },
+    {
+      "path": "v2/idle-selected/memory-after.json",
+      "bytes": 137,
+      "sha256": "cef5832626dda7c3a6657982aff42b27d02a4a764315c7527b819aea2786654c"
+    },
+    {
+      "path": "v2/idle-selected/memory-before.json",
+      "bytes": 137,
+      "sha256": "31f34d051cb36fca5f2327062a2c5cdf18ce6342b8aceb8ebd20e18c9b19af2b"
+    },
+    {
+      "path": "v2/idle-selected/multi-turn.request.txt",
+      "bytes": 298,
+      "sha256": "ae6e0b997092989c2bd3fcd1418077dde03dd80146e26ca3c320a24ef15ab303"
+    },
+    {
+      "path": "v2/idle-selected/multiply.request.txt",
+      "bytes": 153,
+      "sha256": "599ceeadf31fe1ff05fbde43b54e726753ddd57a76794d46cf97283c27ddc9ef"
+    },
+    {
+      "path": "v2/idle-selected/ok.request.txt",
+      "bytes": 117,
+      "sha256": "a72436e786b50389c8e4b8fea21a93d699aefb3b31a82105259819cb1e986739"
+    },
+    {
+      "path": "v2/idle-selected/one_token.request.txt",
+      "bytes": 116,
+      "sha256": "2f120d9656e75348aaf40a315ca70bbc51c00822e5a2186fe221d8a75da4f68c"
+    },
+    {
+      "path": "v2/idle-selected/process-placement.json",
+      "bytes": 1115,
+      "sha256": "320e33d2b8672a23491222ebcdb01904fb3a029ca17a04290e71786f6ffc3ae2"
+    },
+    {
+      "path": "v2/idle-selected/protocol.json",
+      "bytes": 279,
+      "sha256": "8b18ba4d9f9dfbcefd17204d1280274b9934121714747d220b4f9ad6d00c8053"
+    },
+    {
+      "path": "v2/idle-selected/provenance.json",
+      "bytes": 3014,
+      "sha256": "d5e48152f2c0f8c44acc1386e011ed17a0fc290c2b39e7134d68f3094d40a9a3"
+    },
+    {
+      "path": "v2/idle-selected/qa-status.json",
+      "bytes": 134,
+      "sha256": "049635b7e09fa14fbb705d090a3c7e1f5444a4e119b7aff45f726b7ad888565d"
+    },
+    {
+      "path": "v2/idle-selected/results.json",
+      "bytes": 73931,
+      "sha256": "3ecef4c2243aa1b776e6f70ebf6494a6d50aa0af4482725d400c577161b1c496"
+    },
+    {
+      "path": "v2/idle-selected/sample-0.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-selected/sample-1.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-selected/sort-json.request.txt",
+      "bytes": 164,
+      "sha256": "b828b941d1fd7e4868ebb5049a6d5b230a09c80e6eabf238260288f1df75fd8f"
+    },
+    {
+      "path": "v2/idle-selected/stderr.log",
+      "bytes": 95419,
+      "sha256": "03683c0374fef56df222a636191d9ae66a0be7a6384aaa46ef6b69915fb88e30"
+    },
+    {
+      "path": "v2/idle-selected/stdout.log",
+      "bytes": 24690,
+      "sha256": "fca9b044f1e4f24e3a6b572832795997f630b2fa3d434f95c90558f4250d6867"
+    },
+    {
+      "path": "v2/idle-selected/story-0.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-selected/story-1.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-selected/story-2.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-selected/sum.request.txt",
+      "bytes": 185,
+      "sha256": "53e9e97564477443db4da0cc8ae345015773689a599562e447ad12f22a81c61c"
+    },
+    {
+      "path": "v2/idle-selected/thread-usage.json",
+      "bytes": 367163,
+      "sha256": "073c303d8b5a56d263961f2ef55469091f12adf4ce385a2dc7bc01d36f408410"
+    },
+    {
+      "path": "v2/idle-selected/uppercase.request.txt",
+      "bytes": 140,
+      "sha256": "c7c850d82ac09aa841428f52848ba790131f81d5fdc9b2302f03091a0c015eac"
+    },
+    {
+      "path": "v2/idle-selected/warmup.request.txt",
+      "bytes": 233,
+      "sha256": "672e6dbdeb952bcb5c4f25187e442e050077f4eaeab8e7fcd0590cc4a3c48c6b"
+    },
+    {
+      "path": "v2/idle-selected/weight-usage.json",
+      "bytes": 330,
+      "sha256": "43e7b6f2f24afe9ab61591d64fea8186ba3135a563cc586148a7a01d59a0798a"
+    },
+    {
+      "path": "v2/idle-selected-proxy/arithmetic.request.txt",
+      "bytes": 141,
+      "sha256": "3cb0491a658b0ca8f50f72c0381a81e08f944d6b2340277cdc50ee5fcf0a1f8f"
+    },
+    {
+      "path": "v2/idle-selected-proxy/capital.request.txt",
+      "bytes": 160,
+      "sha256": "8da738c1f01787eacdbda99bc6b8b859084d79b75e13274aa49df07609dbe6b0"
+    },
+    {
+      "path": "v2/idle-selected-proxy/chinese-0.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-selected-proxy/chinese-1.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-selected-proxy/chinese-2.request.txt",
+      "bytes": 252,
+      "sha256": "f204e041890b3d3be8832ca138e205633315094e0838d42d56712af93fbda32b"
+    },
+    {
+      "path": "v2/idle-selected-proxy/code-0.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-selected-proxy/code-1.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-selected-proxy/code-2.request.txt",
+      "bytes": 215,
+      "sha256": "83b20df08b6792d0995d38d352da9c6dfabf60a9774e7fab65c23db2cd230f81"
+    },
+    {
+      "path": "v2/idle-selected-proxy/code-encoding.request.txt",
+      "bytes": 254,
+      "sha256": "02941b787de1cde21ed665f23753afe30655b6336962e062a95623b26e50b61b"
+    },
+    {
+      "path": "v2/idle-selected-proxy/code-function.request.txt",
+      "bytes": 199,
+      "sha256": "63319f088fd91fa496f10a32297f3440d338e128de511905be34995830883877"
+    },
+    {
+      "path": "v2/idle-selected-proxy/code-intervals.request.txt",
+      "bytes": 322,
+      "sha256": "ee46c1dbc22262eaf9199233dbbc8bcbe45eb9e0e58abe5094885ea25ef6d07f"
+    },
+    {
+      "path": "v2/idle-selected-proxy/code-search.request.txt",
+      "bytes": 308,
+      "sha256": "0e5cfb99117a738dfb6daada64c8825bb6ef2213a2896b2b7ffaefe59bf66b58"
+    },
+    {
+      "path": "v2/idle-selected-proxy/command.json",
+      "bytes": 2032,
+      "sha256": "a27641c94b06bfc79284bd8f6653052276f2421a696af8acfe7d54ffd5933942"
+    },
+    {
+      "path": "v2/idle-selected-proxy/context_tail.request.txt",
+      "bytes": 2535,
+      "sha256": "16597cc9f2e86862b895777dbba3e1a6e5ff93fe6fc7ad5d1bb42fca7bf23a15"
+    },
+    {
+      "path": "v2/idle-selected-proxy/data-transform.request.txt",
+      "bytes": 294,
+      "sha256": "b401236c7f033818f47af14e52071b34ac7e78cd2c3bebfa189e83a472a38e36"
+    },
+    {
+      "path": "v2/idle-selected-proxy/idle-core-selection.json",
+      "bytes": 331859,
+      "sha256": "b0a697c7215626ca4565bc2fdb2e9e9b643cdf275bdf77cd9d1e73a3a6efc325"
+    },
+    {
+      "path": "v2/idle-selected-proxy/idle-core-selection.json.numa-before.txt",
+      "bytes": 61640,
+      "sha256": "3510eeff453a9ea980c85157ce5219cf41d6f462a5a8adc014e3f4d47a399351"
+    },
+    {
+      "path": "v2/idle-selected-proxy/json.request.txt",
+      "bytes": 199,
+      "sha256": "f27bd05fa8dafa0fcc7c75c1c45cec95ea5cfc3005761cd8f35277e50d8c2e35"
+    },
+    {
+      "path": "v2/idle-selected-proxy/memory-after.json",
+      "bytes": 137,
+      "sha256": "ba70b02efaf465de88a95873993abf2538cc9b3faaa52282f0d3e65765cc72d5"
+    },
+    {
+      "path": "v2/idle-selected-proxy/memory-before.json",
+      "bytes": 137,
+      "sha256": "2ef5e2376e945c19663b7297cb91a7c9641e5546266bf3bf8ae1968137fbb0be"
+    },
+    {
+      "path": "v2/idle-selected-proxy/multi-turn.request.txt",
+      "bytes": 298,
+      "sha256": "ae6e0b997092989c2bd3fcd1418077dde03dd80146e26ca3c320a24ef15ab303"
+    },
+    {
+      "path": "v2/idle-selected-proxy/multiply.request.txt",
+      "bytes": 153,
+      "sha256": "599ceeadf31fe1ff05fbde43b54e726753ddd57a76794d46cf97283c27ddc9ef"
+    },
+    {
+      "path": "v2/idle-selected-proxy/ok.request.txt",
+      "bytes": 117,
+      "sha256": "a72436e786b50389c8e4b8fea21a93d699aefb3b31a82105259819cb1e986739"
+    },
+    {
+      "path": "v2/idle-selected-proxy/one_token.request.txt",
+      "bytes": 116,
+      "sha256": "2f120d9656e75348aaf40a315ca70bbc51c00822e5a2186fe221d8a75da4f68c"
+    },
+    {
+      "path": "v2/idle-selected-proxy/process-placement.json",
+      "bytes": 1050,
+      "sha256": "7ef7b6be181f1d020ee457c67b206d2e0927b4caeaca88affd65fcb33347b36e"
+    },
+    {
+      "path": "v2/idle-selected-proxy/protocol.json",
+      "bytes": 279,
+      "sha256": "82c7fd9c332ca600fbeba07dfb9e553480737bc37d638fb26b0edfc1b0327dcf"
+    },
+    {
+      "path": "v2/idle-selected-proxy/provenance.json",
+      "bytes": 3014,
+      "sha256": "d5e48152f2c0f8c44acc1386e011ed17a0fc290c2b39e7134d68f3094d40a9a3"
+    },
+    {
+      "path": "v2/idle-selected-proxy/qa-status.json",
+      "bytes": 134,
+      "sha256": "049635b7e09fa14fbb705d090a3c7e1f5444a4e119b7aff45f726b7ad888565d"
+    },
+    {
+      "path": "v2/idle-selected-proxy/results.json",
+      "bytes": 73919,
+      "sha256": "ffabf5186eca09a0d32296f4c06b7a92d4b6af202bff6989e4ca88ff5b033bf6"
+    },
+    {
+      "path": "v2/idle-selected-proxy/sample-0.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-selected-proxy/sample-1.request.txt",
+      "bytes": 185,
+      "sha256": "20898311958ff9dcaaa72710255983f6329de2686b9f5c8d391b12a1b1f41851"
+    },
+    {
+      "path": "v2/idle-selected-proxy/sort-json.request.txt",
+      "bytes": 164,
+      "sha256": "b828b941d1fd7e4868ebb5049a6d5b230a09c80e6eabf238260288f1df75fd8f"
+    },
+    {
+      "path": "v2/idle-selected-proxy/stderr.log",
+      "bytes": 93860,
+      "sha256": "f8d9f50ce36946edbd9c67f695b38c4e353c9cf41a709718562530e839087642"
+    },
+    {
+      "path": "v2/idle-selected-proxy/stdout.log",
+      "bytes": 24688,
+      "sha256": "b21db28986b3d28c38073caf6521f7db93b6eba2fa08f5d579cf12b67b91c938"
+    },
+    {
+      "path": "v2/idle-selected-proxy/story-0.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-selected-proxy/story-1.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-selected-proxy/story-2.request.txt",
+      "bytes": 233,
+      "sha256": "29077ff037ecabf073676c1f0a29d557f38ac823aa8275e65b39d95732e4d774"
+    },
+    {
+      "path": "v2/idle-selected-proxy/sum.request.txt",
+      "bytes": 185,
+      "sha256": "53e9e97564477443db4da0cc8ae345015773689a599562e447ad12f22a81c61c"
+    },
+    {
+      "path": "v2/idle-selected-proxy/thread-usage.json",
+      "bytes": 366934,
+      "sha256": "6ceea2907cf04ccf4994c176daaa1d6ac61390b7fbafa9ebdeb358152fc70f5d"
+    },
+    {
+      "path": "v2/idle-selected-proxy/uppercase.request.txt",
+      "bytes": 140,
+      "sha256": "c7c850d82ac09aa841428f52848ba790131f81d5fdc9b2302f03091a0c015eac"
+    },
+    {
+      "path": "v2/idle-selected-proxy/warmup.request.txt",
+      "bytes": 233,
+      "sha256": "672e6dbdeb952bcb5c4f25187e442e050077f4eaeab8e7fcd0590cc4a3c48c6b"
+    },
+    {
+      "path": "v2/idle-selected-proxy/weight-usage.json",
+      "bytes": 337,
+      "sha256": "5d503a7b225c2fa756dd4cc95dfa57a175ca7d159fda1d8c476b678fbe8a4c93"
+    },
+    {
+      "path": "v2/idle-selected-proxy.log",
+      "bytes": 1226,
+      "sha256": "7cac47051332ca9feca350aa3c1f2fab6d8dbbd7c57c36118f1c7aba8b055779"
+    },
+    {
+      "path": "v2/idle-selected.log",
+      "bytes": 1203,
+      "sha256": "5ad20211e1921585623046f49eb2f7b373916bd53143b1627154e679dac3916a"
+    },
+    {
+      "path": "v2/idle_bench.py",
+      "bytes": 20992,
+      "sha256": "f8bc8de1657d6c4e4cd7af617930b465fef30da47dc7f29c37c7718cd86c3483"
+    },
+    {
+      "path": "v2/idle_cores.py",
+      "bytes": 4057,
+      "sha256": "578a0d425678e78b77913c5fa23cf14bf260bbd080ecc93328df83d40436efb9"
+    },
+    {
+      "path": "v2/job-status.json",
+      "bytes": 18,
+      "sha256": "df4d721d233a2334088d2d2e0110346ae9e509ff46bf0b379fbcfa85c715af4d"
+    },
+    {
+      "path": "v2/prepare.py",
+      "bytes": 1103,
+      "sha256": "8f127f0a425f5405c6b1dc89cb313821e26ab865caca88d865789a8670cea86a"
+    },
+    {
+      "path": "v2/run.py",
+      "bytes": 2400,
+      "sha256": "3e9cfd4b0bb9272cfa2559ddf434a248fb004673d340bb5bb7e0ac00a63e2960"
+    },
+    {
+      "path": "v2/status.json",
+      "bytes": 402,
+      "sha256": "cf46a02eb181593c8335b220d8aa67384cd0bc82f4a51806be7e38ad592fe88e"
+    }
+  ],
+  "prior_engine_sources_unchanged": true,
+  "executed_scripts_match_remote_manifest": true,
+  "scan": "No model/ELF/private-key/notebook-token or supplied SSH password found."
+}

@@ -1,0 +1,22 @@
+{
+  "base_commit": "faf59ad50bde250e16738ecee4f9d715a02fe63a",
+  "engine_sha256": "3ae138ead7fdbab0324bb17b423022d32c497eb18e3fb5aa82901011b98c9450",
+  "local_remote_sources_equal": true,
+  "files": {
+    "CMakeLists.txt": "28e06645a6392c45a8d678e726a240808117713b4025b73dd0714aea29ebb745",
+    "include/strata/core/mtp.hpp": "d6f0a9dabefe6a953ea84e951a17986ccb50cf7edccd00b9d045506374ed54af",
+    "include/strata/kernels/draft_head_proxy.hpp": "2d1584bc79addbfc1c75af3ffbfb9d208f7203e643f48387577721403031c614",
+    "src/core/mtp.cpp": "3dfa82196513940208b173b86f617e62bde39b6f7b3076368972fba1bd043ab9",
+    "src/core/native_dense.cpp": "60903c23be9c313e775ddc80bca145dc7d623c70642614e10ec2296a345ea912",
+    "src/program/generate.cpp": "b8b2a7a4240e932998a69f65d6cf575ad96928d2d1897a0735b25efdad0c1eff",
+    "src/kernels/cuda/draft_head_proxy.cu": "cb4a5aa044a8eafe29de07a270efe2bed24bb2b2e799e43a26c2ee2e5e3ba3db",
+    "src/kernels/cuda/draft_head_proxy.cuh": "4507182d1d8189fb85b56ea633336132652f47d7765a9fc1bb8c77b0ff5c0aa9",
+    "src/kernels/draft_head_proxy_test.cpp": "80ebcf698219a9ab1b1ec66af3625f9491501f7d2bc2d3f883e05b7f27971cdc",
+    "tools/dcu_model_variants.py": "71f32eca557797e90331b449edd15a29d0fdb8705f8e597b9c5ec29910174c57",
+    "tools/test_dcu_model_variants.py": "899c88a0c3dbd91884a8d3fa45b0a5a5d44f41f77b45ab730af29089577e594e",
+    "tools/dcu_functional_qa.py": "cb8b975db8228c0916319ea9f16920102585b64cc9ca716741f6ccb7c2d7a14b",
+    "tools/autoround_pack.py": "9b8e125a40bbd95e059b8f902a9904d9508b3b55d8a3604e8b8bf055ff438fdd",
+    "tools/bench_dflash2_native.py": "beaac3fab566a5627c624fe72b6203774270960bedd814dd11e41861554b040a",
+    "strata-test/run-autoround.sh": "fe76057374a0a69be135a2ab92f0ddcd13f741af559cd4a3fb3d2db3f3a85df1"
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "label": "baseline-qa-recheck",
+    "returncode": 0
+  },
+  {
+    "label": "q8-qa-recheck",
+    "returncode": 0
+  },
+  {
+    "label": "q8-tuned-qa-recheck",
+    "returncode": 0
+  },
+  {
+    "label": "native-projections-qa",
+    "returncode": 0
+  },
+  {
+    "label": "joint-proxy-reject-qa",
+    "returncode": 0
+  }
+]

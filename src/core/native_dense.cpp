@@ -37,6 +37,11 @@ uint64_t alloc_bytes(uint64_t bytes) {
     return bytes < kSmallAlloc ? bytes : (bytes + kAllocGranule - 1) / kAllocGranule * kAllocGranule;
 }
 int g_layer_lb = -1, g_layer_le = -1;   // set_layer_range; -1: every layer
+bool q8_variant(const WeightRef& ref, int type) {
+    const char* v = std::getenv("STRATA_DENSE_Q8_VARIANT");
+    return v && std::strcmp(v, "1") == 0 && type == 8 &&
+           ref.kind == WeightKind::Bf16InF32 && ref.code_bits == 0;
+}
 bool in_range(const std::string& name) {
     if (g_layer_lb < 0 || name.rfind("blk.", 0) != 0) return true;
     const int l = std::atoi(name.c_str() + 4);
@@ -207,7 +212,7 @@ bool NativeDense::weight_bytes_for(const std::vector<std::string>& shards, Weigh
                 if (!strata::kernels::native_mmvq_supported(tensor.type)) continue;
                 if (tensor.name == "blk.1.ple_key.weight" && !ref.quantized()) continue;
                 const bool bf16 = tensor.type == 30 && ref.kind == WeightKind::Bf16InF32 && ref.code_bits == 0;
-                if ((!ref.quantized() && !bf16) || tensor.shape.size() != 2 ||
+                if ((!ref.quantized() && !bf16 && !q8_variant(ref, tensor.type)) || tensor.shape.size() != 2 ||
                     ref.ne0 <= 0 || ref.ne0 > INT_MAX || ref.ne1 <= 0 || ref.ne1 > INT_MAX ||
                     tensor.shape[0] != (uint64_t) ref.ne0 || tensor.shape[1] != (uint64_t) ref.ne1) {
                     err = "native dense: incompatible matrix " + tensor.name;
@@ -344,7 +349,7 @@ bool NativeDense::load(const std::vector<std::string>& shards, WeightTable& tabl
                 // #326: the pack keeps an unquantized (--compat-bf16) key, which the PLE reads from the arena
                 if (tensor.name == "blk.1.ple_key.weight" && !ref.quantized()) continue;
                 const bool bf16 = tensor.type == 30 && ref.kind == WeightKind::Bf16InF32 && ref.code_bits == 0;
-                if ((!ref.quantized() && !bf16) || tensor.shape.size() != 2 ||
+                if ((!ref.quantized() && !bf16 && !q8_variant(ref, tensor.type)) || tensor.shape.size() != 2 ||
                     ref.ne0 <= 0 || ref.ne0 > INT_MAX || ref.ne1 <= 0 || ref.ne1 > INT_MAX ||
                     tensor.shape[0] != (uint64_t) ref.ne0 || tensor.shape[1] != (uint64_t) ref.ne1) {
                     err = "native dense: incompatible matrix " + tensor.name; return false;

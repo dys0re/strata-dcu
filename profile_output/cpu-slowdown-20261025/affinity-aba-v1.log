@@ -1,0 +1,12 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 23500800000, 'mtp': 1368138752, 'weights': 33542205952, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.48822253, 'device_used': 34770780160, 'external_draft': 0, 'native_draft': 0, 'staging': 44236800, 'mtp_proxy': 0}
+READY adaptive 4 off
+DONE ok 2 9.83
+DONE arithmetic 2 12.34
+DONE capital 2 8.13
+DONE base0-0 64 7.39
+DONE base0-1 64 9.95
+DONE away0-0 64 25.71
+DONE away0-1 64 26.68
+DONE base1-0 64 10.29
+DONE base1-1 64 14.3
+PASS

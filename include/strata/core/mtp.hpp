@@ -73,6 +73,7 @@ public:
     uint64_t vram_bytes() const { return vram_; }
     /// Owned GPU weight allocations only (including the subset head and optional Q4 copies).
     uint64_t weight_bytes() const { return weight_bytes_; }
+    uint64_t draft_proxy_weight_bytes() const { return draft_proxy_bytes_; }
     /// The draft layer's K/V state (read-only: --serve's STRATA_STATE_HASH check hashes it)
     const QsaState& kv_state() const { return st_; }
     /// KV streaming: refill the ring of the drafter's window from its host copy for a sequence that continues at
@@ -269,6 +270,9 @@ private:
     uint8_t* dhead_ = nullptr;
     int32_t* dvocab_ = nullptr;
     int64_t n_dvocab_ = 0;
+    void* draft_proxy_ = nullptr;
+    void* draft_proxy_scratch_ = nullptr;
+    uint64_t draft_proxy_bytes_ = 0;
     std::string rt_dir_;
     int64_t window_ = 0;        // attention over the last window_ cells (0 = every cell)
     int64_t prompt_len_ = 0;

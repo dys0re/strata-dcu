@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/root/strata-dcu/Strata/tools/bench_dflash2_native.py", line 196, in <module>
+    while not line().startswith('READY '):pass
+              ^^^^^^
+  File "/root/strata-dcu/Strata/tools/bench_dflash2_native.py", line 168, in line
+    if not s:raise RuntimeError(f'engine EOF: {p.poll()}')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: engine EOF: 1

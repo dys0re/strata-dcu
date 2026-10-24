@@ -388,3 +388,46 @@ SHA256 `a2ac48e5fe51fb18d93db50de4bfdb9fdf1d3682877284b1a7b2d4ff217336c2`。
 功能 QA、强制搬运、联合草稿拒绝后恢复、底层并发检查和三种公开入口独立复核通过。
 结束时 GPU 2 MiB，无推理进程；系统目录 `/root/strata-dcu` 895 MiB、`/root/.cache` 59 MiB。
 实现及完整范围见 [层内交接](docs/DCU_LAYER_SCHEDULING.md) 和 [本轮记录](profile_output/layer-scheduling-20261024/README.md)。
+
+
+## 模型权重与 MTP 更新（2026-10-24）
+
+本机公开链接现指向 `/root/private_data/strata-dcu/model-specific-20261024/final-v1/strata-final`，
+SHA256 `3ae138ead7fdbab0324bb17b423022d32c497eb18e3fb5aa82901011b98c9450`。
+环境依赖沿用 dflash2@52f8bc84，无新增安装。增强 MTP 默认 HC Q8＋Q8非专家投影/输出头＋发布的蒸馏MTP，
+筛选头保留开关、默认关闭；原生DFlash2/联合默认权重继续沿用此前配置。
+选择文件在持久盘 `model-specific-20261024/selected-model.json`，设 `STRATA_DCU_MODEL_DEFAULTS=0` 恢复此前权重选择。
+
+专家仍固定8500/8300，主专家INT4不改；选定MTP全部模型权重29373360352B，低于34351349760B上限。
+三任务各三次decode中位数：英文36.20、中文48.51、代码56.98TPS；同组旧二进制33.72、42.01、44.62。
+五配置18项QA及恢复通过，原生Q8投影、联合强制拒绝QA通过，三个公开入口独立复核通过。
+后续诊断期间旧版和新版都出现CPU专家明显减速，短英文约9TPS，原因未定位；不能保证当前持续达到前表速度。
+
+PLE、Q8派生权重、MTP、构建和日志均在持久盘。结束时GPU2MiB，无推理/构建进程，OOM0；
+系统目录/root/strata-dcu为896MiB、/root/.cache为59MiB。
+完整实现、失败记录和测量范围见 [专项文档](docs/DCU_MODEL_OPTIMIZATIONS.md) 和 [本轮报告](profile_output/model-specific-20261024/README.md)。
+
+
+2026-10-25 已定位上述后段骤降的主要原因：默认固定CPU0–12遭遇宿主用户态争用。
+同一默认权重进程的256-token英文生成，原核心9.72TPS，移到CPU16–28为33.24TPS，移回12.18TPS；
+全部decode阶段无限流，专家大区页分布保持相同，线程排队等待随换核消失/恢复。
+本轮未改生产默认绑核或引擎；最终GPU2MiB、所有推理进程退出。见 [原因与原始证据](profile_output/cpu-slowdown-20261025/README.md)。
+
+
+2026-10-25 CPU独占权限检查：容器cgroup2只读，cpuset为member且不可写，
+无CAP_SYS_NICE/CAP_SYS_ADMIN，RLIMIT_RTPRIO/NICE为0，自有子进程nice(-1)实测EPERM。
+因此当前无法在容器内申请宿主独占核心，需要平台侧分配；未修改生产入口或调度优先级。
+证据见 [权限检查](profile_output/cpu-reservation-20261025/README.md)。
+
+
+## 自动选空闲核心重测（2026-10-25）
+
+在模型载入后、首次请求前，按内核同胞掩码和三秒CPU负载采样选13个核心，
+优先同节点及靠近专家内存；后续配置重新检查负载，安静才沿用原组。
+增强MTP各任务三次256token中位数：原权重32.90/41.29/44.32TPS；
+原权重加筛选29.53/41.77/44.26；当前Q8+HCQ8+蒸馏组合33.84/43.27/53.88；
+当前组合加筛选31.97/44.23/51.25。四配置18项QA、代码执行及STOP/恢复全部通过。
+专家仍8500/16076，权重均<=50%，筛选继续默认关闭。
+这是外部bench的自动选核重测，生产wrapper默认未切换；不构成独占。
+结束GPU2MiB、无推理进程、OOM0，系统目录896MiB/cache59MiB。
+原始记录及方法见 [重测报告](profile_output/idle-core-retest-20261025/README.md)。

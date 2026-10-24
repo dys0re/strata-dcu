@@ -1,0 +1,33 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 23500800000, 'mtp': 1368138752, 'weights': 33542205952, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.48822253, 'device_used': 34770780160, 'external_draft': 0, 'native_draft': 0, 'staging': 44236800, 'mtp_proxy': 0}
+READY adaptive 4 off
+IDLE_CORE_SELECTION {'node': 3, 'cores': [48, 49, 50, 51, 52, 56, 57, 58, 59, 60, 61, 62, 63], 'max_busy': 0.043333333333333335, 'mean_busy': 0.008451372710201487, 'weighted_expert_distance': 15.0}
+DONE warmup 128 25.45
+DONE story-0 256 30.09
+DONE chinese-0 256 37.31
+DONE code-0 256 28.54
+DONE story-1 256 32.9
+DONE chinese-1 256 41.29
+DONE code-1 256 44.32
+DONE story-2 256 33.32
+DONE chinese-2 256 41.96
+DONE code-2 256 45.6
+DONE ok 2 30.77
+DONE arithmetic 2 31.95
+DONE multiply 4 33.73
+DONE sum 5 24.91
+DONE capital 2 29.07
+DONE uppercase 2 31.06
+DONE sort-json 13 32.89
+DONE json 12 31.56
+DONE code-function 21 40.55
+DONE multi-turn 3 26.76
+DONE sample-0 64 23.1
+DONE sample-1 64 25.92
+DONE one_token 1 35.84
+DONE context_tail 3 23.64
+DONE code-search 74 38.79
+DONE code-intervals 115 41.24
+DONE code-encoding 105 44.14
+DONE data-transform 15 42.64
+SEED_REPEAT True
+PASS

@@ -1,0 +1,7 @@
+{
+  "reason": "Stop queue between configurations: core_id repeats across distinct single-thread sibling groups; v1 considered only64 of128 physical CPUs. Preserve active BF16 full QA and all prior results. V2 uses sibling masks and5pct threshold.",
+  "terminated_driver": 97290,
+  "active_bench": 98220,
+  "observed_successor_already_started": 99180,
+  "action": "Preserve already-started proxy run to completion; v2 launcher waits its live handle, full QA and GPU idle."
+}

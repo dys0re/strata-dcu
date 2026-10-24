@@ -1,0 +1,23 @@
+PASS type=30 rows=1 rescored=1 pick_proxy=0 pick_reference=0
+PASS type=8 rows=1 rescored=1 pick_proxy=0 pick_reference=0
+PASS type=30 rows=31 rescored=4 pick_proxy=4 pick_reference=4
+PASS type=8 rows=31 rescored=4 pick_proxy=4 pick_reference=4
+PASS type=30 rows=32 rescored=4 pick_proxy=14 pick_reference=14
+PASS type=8 rows=32 rescored=4 pick_proxy=14 pick_reference=14
+PASS type=30 rows=33 rescored=5 pick_proxy=6 pick_reference=6
+PASS type=8 rows=33 rescored=5 pick_proxy=6 pick_reference=6
+PASS type=30 rows=257 rescored=33 pick_proxy=10 pick_reference=10
+PASS type=8 rows=257 rescored=33 pick_proxy=10 pick_reference=10
+PASS type=30 rows=4097 rescored=64 pick_proxy=679 pick_reference=679
+PASS type=8 rows=4097 rescored=64 pick_proxy=679 pick_reference=679
+PASS type=30 rows=106299 rescored=64 pick_proxy=98193 pick_reference=98193
+MICROBENCH type=30 full_us=919.775 proxy_us=570.906
+STAGE type=30 stage=0 us=247.840
+STAGE type=30 stage=1 us=323.360
+STAGE type=30 stage=2 us=14.080
+PASS type=8 rows=106299 rescored=64 pick_proxy=98193 pick_reference=98193
+MICROBENCH type=8 full_us=296.288 proxy_us=562.693
+STAGE type=8 stage=0 us=242.560
+STAGE type=8 stage=1 us=323.679
+STAGE type=8 stage=2 us=6.880
+draft_head_proxy_test: 16 cases passed

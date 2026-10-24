@@ -1,0 +1,17 @@
+START plain-qa
+END plain-qa 0
+START baseline
+END baseline 0
+START hc-q8
+END hc-q8 0
+START dense-q8
+END dense-q8 0
+START tuned
+END tuned 0
+START proxy
+END proxy 0
+START quant-tuned
+END quant-tuned 0
+START all
+END all 0
+PILOT_COMPLETE

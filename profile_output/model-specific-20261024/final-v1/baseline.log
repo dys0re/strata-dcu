@@ -1,0 +1,44 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 23500800000, 'mtp': 1368138752, 'weights': 33542205952, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.48822253, 'device_used': 34770780160, 'external_draft': 0, 'native_draft': 0, 'staging': 44236800}
+READY adaptive 4 off
+DONE warmup 128 30.22
+DONE story-0 256 34.87
+DONE chinese-0 256 41.73
+DONE code-0 256 44.62
+DONE story-1 256 33.47
+DONE chinese-1 256 42.59
+DONE code-1 256 44.12
+DONE story-2 256 33.72
+DONE chinese-2 256 42.01
+DONE code-2 256 44.85
+DONE ok 2 31.1
+DONE arithmetic 2 32.41
+DONE multiply 4 35.27
+DONE sum 5 26.43
+DONE capital 2 29.11
+DONE uppercase 2 33.33
+DONE sort-json 13 34.06
+DONE json 12 32.03
+DONE code-function 21 41.31
+DONE multi-turn 3 27.2
+DONE sample-0 64 26.61
+DONE sample-1 64 32.8
+DONE one_token 1 33.33
+DONE context_tail 3 24.83
+DONE code-search 74 34.54
+DONE code-intervals 115 38.55
+DONE code-encoding 105 41.84
+Traceback (most recent call last):
+  File "/root/strata-dcu/Strata/tools/bench_dflash2_native.py", line 227, in <module>
+    check_answer(name,text)
+  File "/root/strata-dcu/Strata/tools/dcu_functional_qa.py", line 30, in check
+    assert json.loads(text) == ['a', 'b', 'c'], text
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

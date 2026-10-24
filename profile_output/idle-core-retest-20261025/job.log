@@ -1,0 +1,5 @@
+START fixed-bf16-smoke
+END fixed-bf16-smoke 0
+START idle-bf16
+END idle-bf16 0
+START idle-bf16-proxy

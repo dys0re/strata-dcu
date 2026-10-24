@@ -1,0 +1,797 @@
+[
+  {
+    "case": "ok",
+    "tps": 8.94854586129754,
+    "wall_seconds": 0.27505472814664245,
+    "threads": [
+      {
+        "tid": "94849",
+        "affinity": "0",
+        "cpu_fraction": 0.4968551310528279,
+        "runqueue_fraction": 0.49778705468027185
+      },
+      {
+        "tid": "94852",
+        "affinity": "0-127",
+        "cpu_fraction": 0.17370783378981602,
+        "runqueue_fraction": 3.8323282319219684e-05
+      },
+      {
+        "tid": "96414",
+        "affinity": "1",
+        "cpu_fraction": 0.8601381390319793,
+        "runqueue_fraction": 0.07729173442408796
+      },
+      {
+        "tid": "96415",
+        "affinity": "2",
+        "cpu_fraction": 0.38021577271067386,
+        "runqueue_fraction": 0.4898993335179461
+      },
+      {
+        "tid": "96416",
+        "affinity": "3",
+        "cpu_fraction": 0.4809937494674365,
+        "runqueue_fraction": 0.3813940545827354
+      },
+      {
+        "tid": "96417",
+        "affinity": "4",
+        "cpu_fraction": 0.8610639438771308,
+        "runqueue_fraction": 0.00015633616004257335
+      },
+      {
+        "tid": "96418",
+        "affinity": "5",
+        "cpu_fraction": 0.849214949235372,
+        "runqueue_fraction": 0.01203768799871262
+      },
+      {
+        "tid": "96419",
+        "affinity": "6",
+        "cpu_fraction": 0.7140396942941896,
+        "runqueue_fraction": 0.14080448375114674
+      },
+      {
+        "tid": "96420",
+        "affinity": "7",
+        "cpu_fraction": 0.7181196605160453,
+        "runqueue_fraction": 0.14741882196761272
+      },
+      {
+        "tid": "96421",
+        "affinity": "8",
+        "cpu_fraction": 0.7653993131423649,
+        "runqueue_fraction": 0.12182059630742262
+      },
+      {
+        "tid": "96422",
+        "affinity": "9",
+        "cpu_fraction": 0.6368346335301425,
+        "runqueue_fraction": 0.2996751975703355
+      },
+      {
+        "tid": "96423",
+        "affinity": "10",
+        "cpu_fraction": 0.3955854376078581,
+        "runqueue_fraction": 0.469543046470174
+      },
+      {
+        "tid": "96424",
+        "affinity": "11",
+        "cpu_fraction": 0.8613459641155128,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96425",
+        "affinity": "12",
+        "cpu_fraction": 0.7753833807441255,
+        "runqueue_fraction": 0.08585984018209387
+      },
+      {
+        "tid": "96428",
+        "affinity": "0-127",
+        "cpu_fraction": 0.11222355350148085,
+        "runqueue_fraction": 0.0
+      }
+    ],
+    "cgroup_delta": {},
+    "large_anon": [
+      {
+        "anon": 140989,
+        "N0": 86471,
+        "N1": 40281,
+        "N3": 8174,
+        "N4": 522,
+        "N5": 166,
+        "N6": 663,
+        "N7": 4712
+      },
+      {
+        "anon": 10851301,
+        "N0": 9682028,
+        "N1": 1169273
+      },
+      {
+        "anon": 103934,
+        "N1": 103934
+      },
+      {
+        "anon": 310400,
+        "N7": 310400
+      }
+    ],
+    "timing": "strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 111.75 ms/window = verify 111.36 (GPU-reach wait 61.28 + per-layer host 45.02 [plan 0.14 actq 0.07 jobs 0.10 CPU 44.32] + stage 0.04) + commit/emit 0.24 + draft 0.14; per layer-window: CPU experts 4.17 (4.17 entries), VRAM hits 5.83, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window",
+    "node0_busy_cpu_equivalents": null,
+    "node1_busy_cpu_equivalents": null,
+    "all_container_cpu_equivalents": null
+  },
+  {
+    "case": "arithmetic",
+    "tps": 12.430080795525171,
+    "wall_seconds": 0.16097156191244721,
+    "threads": [
+      {
+        "tid": "94849",
+        "affinity": "0",
+        "cpu_fraction": 0.6614174002853307,
+        "runqueue_fraction": 0.33490382002581154
+      },
+      {
+        "tid": "94852",
+        "affinity": "0-127",
+        "cpu_fraction": 0.29882470188220533,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96414",
+        "affinity": "1",
+        "cpu_fraction": 0.18316452079924878,
+        "runqueue_fraction": 0.8100623392778112
+      },
+      {
+        "tid": "96415",
+        "affinity": "2",
+        "cpu_fraction": 0.9931349804939567,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96416",
+        "affinity": "3",
+        "cpu_fraction": 0.9929220857466308,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96417",
+        "affinity": "4",
+        "cpu_fraction": 0.9929286086379262,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96418",
+        "affinity": "5",
+        "cpu_fraction": 0.9930467661545337,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96419",
+        "affinity": "6",
+        "cpu_fraction": 0.9892845115500254,
+        "runqueue_fraction": 0.0036778918770882627
+      },
+      {
+        "tid": "96420",
+        "affinity": "7",
+        "cpu_fraction": 0.9927384508259728,
+        "runqueue_fraction": 0.0002383029619906657
+      },
+      {
+        "tid": "96421",
+        "affinity": "8",
+        "cpu_fraction": 0.9928994730568068,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96422",
+        "affinity": "9",
+        "cpu_fraction": 0.9928317592328835,
+        "runqueue_fraction": 0.00013095480810123132
+      },
+      {
+        "tid": "96423",
+        "affinity": "10",
+        "cpu_fraction": 0.4315435234316906,
+        "runqueue_fraction": 0.43734771013957735
+      },
+      {
+        "tid": "96424",
+        "affinity": "11",
+        "cpu_fraction": 0.9930970856016692,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96425",
+        "affinity": "12",
+        "cpu_fraction": 0.7553336350561819,
+        "runqueue_fraction": 0.23783830848844847
+      },
+      {
+        "tid": "96428",
+        "affinity": "0-127",
+        "cpu_fraction": 0.19482449339130736,
+        "runqueue_fraction": 0.00039908291400527515
+      }
+    ],
+    "cgroup_delta": {},
+    "large_anon": [
+      {
+        "anon": 146402,
+        "N0": 86471,
+        "N1": 45694,
+        "N3": 8186,
+        "N4": 509,
+        "N5": 166,
+        "N6": 663,
+        "N7": 4713
+      },
+      {
+        "anon": 10851301,
+        "N0": 9682028,
+        "N1": 1169273
+      },
+      {
+        "anon": 103934,
+        "N1": 103934
+      },
+      {
+        "anon": 310400,
+        "N7": 310400
+      }
+    ],
+    "timing": "strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 80.45 ms/window = verify 80.07 (GPU-reach wait 19.40 + per-layer host 56.58 [plan 0.12 actq 0.06 jobs 0.08 CPU 55.99] + stage 0.03) + commit/emit 0.23 + draft 0.14; per layer-window: CPU experts 4.64 (4.64 entries), VRAM hits 5.36, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window",
+    "node0_busy_cpu_equivalents": null,
+    "node1_busy_cpu_equivalents": null,
+    "all_container_cpu_equivalents": null
+  },
+  {
+    "case": "capital",
+    "tps": 12.66624445851805,
+    "wall_seconds": 0.15785295702517033,
+    "threads": [
+      {
+        "tid": "94849",
+        "affinity": "0",
+        "cpu_fraction": 0.7809558168767348,
+        "runqueue_fraction": 0.217119537358651
+      },
+      {
+        "tid": "94852",
+        "affinity": "0-127",
+        "cpu_fraction": 0.32329546409360294,
+        "runqueue_fraction": 0.00039853545467614357
+      },
+      {
+        "tid": "96414",
+        "affinity": "1",
+        "cpu_fraction": 0.9054653881283271,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96415",
+        "affinity": "2",
+        "cpu_fraction": 0.9055500935418461,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96416",
+        "affinity": "3",
+        "cpu_fraction": 0.8416599315197825,
+        "runqueue_fraction": 0.06387907575524317
+      },
+      {
+        "tid": "96417",
+        "affinity": "4",
+        "cpu_fraction": 0.5742915983863698,
+        "runqueue_fraction": 0.331842323306287
+      },
+      {
+        "tid": "96418",
+        "affinity": "5",
+        "cpu_fraction": 0.3912431680969542,
+        "runqueue_fraction": 0.4189165552942777
+      },
+      {
+        "tid": "96419",
+        "affinity": "6",
+        "cpu_fraction": 0.9055061855902269,
+        "runqueue_fraction": 0.00014146076463071507
+      },
+      {
+        "tid": "96420",
+        "affinity": "7",
+        "cpu_fraction": 0.9056716560412863,
+        "runqueue_fraction": 0.0
+      },
+      {
+        "tid": "96421",
+        "affinity": "8",
+        "cpu_fraction": 0.6969354966372782,
+        "runqueue_fraction": 0.2664707889716177
+      },
+      {
+        "tid": "96422",
+        "affinity": "9",
+        "cpu_fraction": 0.5450717846627375,
+        "runqueue_fraction": 0.36063048214499277
+      },
+      {
+        "tid": "96423",
+        "affinity": "10",
+        "cpu_fraction": 0.5953580013392757,
+        "runqueue_fraction": 0.3248819152106388
+      },
+      {
+        "tid": "96424",
+        "affinity": "11",
+        "cpu_fraction": 0.899915805678248,
+        "runqueue_fraction": 0.002761582729999097
+      },
+      {
+        "tid": "96425",
+        "affinity": "12",
+        "cpu_fraction": 0.7719808377144877,
+        "runqueue_fraction": 0.1309046557595059
+      },
+      {
+        "tid": "96428",
+        "affinity": "0-127",
+        "cpu_fraction": 0.21067488140052548,
+        "runqueue_fraction": 0.00014881571078997435
+      }
+    ],
+    "cgroup_delta": {},
+    "large_anon": [
+      {
+        "anon": 146453,
+        "N0": 86471,
+        "N1": 45745,
+        "N3": 8187,
+        "N4": 508,
+        "N5": 166,
+        "N6": 663,
+        "N7": 4713
+      },
+      {
+        "anon": 10851301,
+        "N0": 9682028,
+        "N1": 1169273
+      },
+      {
+        "anon": 103934,
+        "N1": 103934
+      },
+      {
+        "anon": 310400,
+        "N7": 310400
+      }
+    ],
+    "timing": "strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 78.94 ms/window = verify 70.44 (GPU-reach wait 12.05 + per-layer host 53.42 [plan 0.12 actq 0.06 jobs 0.10 CPU 52.77] + stage 0.03) + commit/emit 0.13 + draft 7.70; per layer-window: CPU experts 6.27 (6.27 entries), VRAM hits 3.73, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window",
+    "node0_busy_cpu_equivalents": null,
+    "node1_busy_cpu_equivalents": null,
+    "all_container_cpu_equivalents": null
+  },
+  {
+    "case": "base0-0",
+    "tps": 9.719021567875597,
+    "wall_seconds": 26.340266585815698,
+    "threads": [
+      {
+        "tid": "94849",
+        "affinity": "0",
+        "cpu_fraction": 0.8453144641288557,
+        "runqueue_fraction": 0.1526569319600331
+      },
+      {
+        "tid": "94852",
+        "affinity": "0-127",
+        "cpu_fraction": 0.9298923420991446,
+        "runqueue_fraction": 4.0670393236524074e-05
+      },
+      {
+        "tid": "96414",
+        "affinity": "1",
+        "cpu_fraction": 0.7737916280610346,
+        "runqueue_fraction": 0.2043120390018385
+      },
+      {
+        "tid": "96415",
+        "affinity": "2",
+        "cpu_fraction": 0.7909248442541852,
+        "runqueue_fraction": 0.18587110517842867
+      },
+      {
+        "tid": "96416",
+        "affinity": "3",
+        "cpu_fraction": 0.7721948554595512,
+        "runqueue_fraction": 0.2053625744969842
+      },
+      {
+        "tid": "96417",
+        "affinity": "4",
+        "cpu_fraction": 0.7674390147928718,
+        "runqueue_fraction": 0.21111167500462852
+      },
+      {
+        "tid": "96418",
+        "affinity": "5",
+        "cpu_fraction": 0.7435468570597797,
+        "runqueue_fraction": 0.23403133468358941
+      },
+      {
+        "tid": "96419",
+        "affinity": "6",
+        "cpu_fraction": 0.7636519033877913,
+        "runqueue_fraction": 0.2120214798056515
+      },
+      {
+        "tid": "96420",
+        "affinity": "7",
+        "cpu_fraction": 0.7726136435520734,
+        "runqueue_fraction": 0.2048372784087718
+      },
+      {
+        "tid": "96421",
+        "affinity": "8",
+        "cpu_fraction": 0.7076630303748598,
+        "runqueue_fraction": 0.2703817717560678
+      },
+      {
+        "tid": "96422",
+        "affinity": "9",
+        "cpu_fraction": 0.8443358525451035,
+        "runqueue_fraction": 0.13234973691865703
+      },
+      {
+        "tid": "96423",
+        "affinity": "10",
+        "cpu_fraction": 0.9010207150591387,
+        "runqueue_fraction": 0.07337452279396316
+      },
+      {
+        "tid": "96424",
+        "affinity": "11",
+        "cpu_fraction": 0.9358721753133165,
+        "runqueue_fraction": 0.03974707718272618
+      },
+      {
+        "tid": "96425",
+        "affinity": "12",
+        "cpu_fraction": 0.8685009360276967,
+        "runqueue_fraction": 0.10609685197737936
+      },
+      {
+        "tid": "96428",
+        "affinity": "0-127",
+        "cpu_fraction": 0.12218930672224745,
+        "runqueue_fraction": 0.00020173505012517493
+      }
+    ],
+    "cgroup_delta": {
+      "usage_usec": 302517276,
+      "user_usec": 286369340,
+      "system_usec": 16147936,
+      "nr_periods": 262,
+      "nr_throttled": 0,
+      "throttled_usec": 0
+    },
+    "large_anon": [
+      {
+        "anon": 146801,
+        "N0": 86471,
+        "N1": 46093,
+        "N3": 8188,
+        "N4": 507,
+        "N5": 166,
+        "N6": 663,
+        "N7": 4713
+      },
+      {
+        "anon": 10851301,
+        "N0": 9682028,
+        "N1": 1169273
+      },
+      {
+        "anon": 103934,
+        "N1": 103934
+      },
+      {
+        "anon": 310400,
+        "N7": 310400
+      }
+    ],
+    "timing": "strata decode timing: 141 windows, avg T 2.80, 1.82 tokens/window, 186.81 ms/window = verify 182.03 (GPU-reach wait 24.67 + per-layer host 151.68 [plan 0.35 actq 0.17 jobs 0.25 CPU 149.13] + stage 0.60) + commit/emit 0.93 + draft 3.82; per layer-window: CPU experts 10.88 (17.26 entries), VRAM hits 10.76, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window",
+    "node0_busy_cpu_equivalents": 13.698279395185939,
+    "node1_busy_cpu_equivalents": 0.25331806423653563,
+    "all_container_cpu_equivalents": 11.558535558737523,
+    "node0_user_cpu_equivalents": 13.153435413886841,
+    "node0_irq_cpu_equivalents": 0.03247667490211995,
+    "node0_system_cpu_equivalents": 0.5123673063969748,
+    "container_user_cpu_equivalents": 10.94155759660548
+  },
+  {
+    "case": "away0-0",
+    "tps": 33.23984626571102,
+    "wall_seconds": 7.7017383221536875,
+    "threads": [
+      {
+        "tid": "94849",
+        "affinity": "16",
+        "cpu_fraction": 0.9993382367797375,
+        "runqueue_fraction": 0.0004551799676075835
+      },
+      {
+        "tid": "94852",
+        "affinity": "0-127",
+        "cpu_fraction": 0.9994393622617289,
+        "runqueue_fraction": 4.7158704283065655e-05
+      },
+      {
+        "tid": "96414",
+        "affinity": "17",
+        "cpu_fraction": 0.9994626668707007,
+        "runqueue_fraction": 0.0008295406481966046
+      },
+      {
+        "tid": "96415",
+        "affinity": "18",
+        "cpu_fraction": 0.999619020274261,
+        "runqueue_fraction": 0.00015468352080636
+      },
+      {
+        "tid": "96416",
+        "affinity": "19",
+        "cpu_fraction": 0.9943718548539876,
+        "runqueue_fraction": 0.005401843747447149
+      },
+      {
+        "tid": "96417",
+        "affinity": "20",
+        "cpu_fraction": 0.9978162115550838,
+        "runqueue_fraction": 0.0019574753606773033
+      },
+      {
+        "tid": "96418",
+        "affinity": "21",
+        "cpu_fraction": 0.9997211489064086,
+        "runqueue_fraction": 5.251204118902153e-05
+      },
+      {
+        "tid": "96419",
+        "affinity": "22",
+        "cpu_fraction": 0.9997679492500353,
+        "runqueue_fraction": 5.779214787390151e-06
+      },
+      {
+        "tid": "96420",
+        "affinity": "23",
+        "cpu_fraction": 0.9996570184491872,
+        "runqueue_fraction": 0.00011666197453313976
+      },
+      {
+        "tid": "96421",
+        "affinity": "24",
+        "cpu_fraction": 0.999740173312831,
+        "runqueue_fraction": 3.272157394326116e-05
+      },
+      {
+        "tid": "96422",
+        "affinity": "25",
+        "cpu_fraction": 0.9997708330145922,
+        "runqueue_fraction": 2.0709610392916855e-06
+      },
+      {
+        "tid": "96423",
+        "affinity": "26",
+        "cpu_fraction": 0.9997317415799828,
+        "runqueue_fraction": 4.1166290873323344e-05
+      },
+      {
+        "tid": "96424",
+        "affinity": "27",
+        "cpu_fraction": 0.9997658664734816,
+        "runqueue_fraction": 7.079051211487271e-06
+      },
+      {
+        "tid": "96425",
+        "affinity": "28",
+        "cpu_fraction": 0.9997677155365637,
+        "runqueue_fraction": 5.189737475892705e-06
+      },
+      {
+        "tid": "96428",
+        "affinity": "0-127",
+        "cpu_fraction": 0.2947993738594191,
+        "runqueue_fraction": 3.512895254072242e-05
+      }
+    ],
+    "cgroup_delta": {
+      "usage_usec": 106400243,
+      "user_usec": 100131858,
+      "system_usec": 6268384,
+      "nr_periods": 74,
+      "nr_throttled": 0,
+      "throttled_usec": 0
+    },
+    "large_anon": [
+      {
+        "anon": 150525,
+        "N0": 86497,
+        "N1": 49791,
+        "N3": 8190,
+        "N4": 505,
+        "N5": 166,
+        "N6": 663,
+        "N7": 4713
+      },
+      {
+        "anon": 10851301,
+        "N0": 9682028,
+        "N1": 1169273
+      },
+      {
+        "anon": 103934,
+        "N1": 103934
+      },
+      {
+        "anon": 310400,
+        "N7": 310400
+      }
+    ],
+    "timing": "strata decode timing: 155 windows, avg T 2.12, 1.65 tokens/window, 49.69 ms/window = verify 48.06 (GPU-reach wait 16.83 + per-layer host 26.81 [plan 0.25 actq 0.11 jobs 0.14 CPU 25.77] + stage 0.01) + commit/emit 0.12 + draft 1.48; per layer-window: CPU experts 9.42 (13.18 entries), VRAM hits 8.05, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window",
+    "node0_busy_cpu_equivalents": 3.367380878977094,
+    "node1_busy_cpu_equivalents": 13.004779286101407,
+    "all_container_cpu_equivalents": 14.291589301823548,
+    "node0_user_cpu_equivalents": 3.047701322057848,
+    "node0_irq_cpu_equivalents": 0.02283425406566039,
+    "node0_system_cpu_equivalents": 0.296845302853585,
+    "container_user_cpu_equivalents": 13.44962520963899
+  },
+  {
+    "case": "base1-0",
+    "tps": 12.175228166629411,
+    "wall_seconds": 21.02651330223307,
+    "threads": [
+      {
+        "tid": "94849",
+        "affinity": "0",
+        "cpu_fraction": 0.8955491321521281,
+        "runqueue_fraction": 0.09911649858650914
+      },
+      {
+        "tid": "94852",
+        "affinity": "0-127",
+        "cpu_fraction": 0.9907457572524683,
+        "runqueue_fraction": 5.1983701923795265e-05
+      },
+      {
+        "tid": "96414",
+        "affinity": "1",
+        "cpu_fraction": 0.759260402926838,
+        "runqueue_fraction": 0.22218970044376474
+      },
+      {
+        "tid": "96415",
+        "affinity": "2",
+        "cpu_fraction": 0.7133970679963821,
+        "runqueue_fraction": 0.26944769760749177
+      },
+      {
+        "tid": "96416",
+        "affinity": "3",
+        "cpu_fraction": 0.7459606770531098,
+        "runqueue_fraction": 0.2362682443157324
+      },
+      {
+        "tid": "96417",
+        "affinity": "4",
+        "cpu_fraction": 0.747050617818399,
+        "runqueue_fraction": 0.2368566601801299
+      },
+      {
+        "tid": "96418",
+        "affinity": "5",
+        "cpu_fraction": 0.7544980989461125,
+        "runqueue_fraction": 0.2276248824141327
+      },
+      {
+        "tid": "96419",
+        "affinity": "6",
+        "cpu_fraction": 0.8059323026799835,
+        "runqueue_fraction": 0.17653787561658063
+      },
+      {
+        "tid": "96420",
+        "affinity": "7",
+        "cpu_fraction": 0.6871349990521529,
+        "runqueue_fraction": 0.2971079165720042
+      },
+      {
+        "tid": "96421",
+        "affinity": "8",
+        "cpu_fraction": 0.852835941330109,
+        "runqueue_fraction": 0.12984322629991396
+      },
+      {
+        "tid": "96422",
+        "affinity": "9",
+        "cpu_fraction": 0.9318458501114935,
+        "runqueue_fraction": 0.04843786972002795
+      },
+      {
+        "tid": "96423",
+        "affinity": "10",
+        "cpu_fraction": 0.9493095908526178,
+        "runqueue_fraction": 0.03046371192374403
+      },
+      {
+        "tid": "96424",
+        "affinity": "11",
+        "cpu_fraction": 0.9496704709420044,
+        "runqueue_fraction": 0.029827798170103285
+      },
+      {
+        "tid": "96425",
+        "affinity": "12",
+        "cpu_fraction": 0.9532507095159389,
+        "runqueue_fraction": 0.026737847541289335
+      },
+      {
+        "tid": "96428",
+        "affinity": "0-127",
+        "cpu_fraction": 0.12354572770389438,
+        "runqueue_fraction": 0.00010910862714249218
+      }
+    ],
+    "cgroup_delta": {
+      "usage_usec": 248278450,
+      "user_usec": 233747649,
+      "system_usec": 14530802,
+      "nr_periods": 210,
+      "nr_throttled": 0,
+      "throttled_usec": 0
+    },
+    "large_anon": [
+      {
+        "anon": 154237,
+        "N0": 62128,
+        "N1": 53372,
+        "N3": 32697,
+        "N4": 498,
+        "N5": 166,
+        "N6": 663,
+        "N7": 4713
+      },
+      {
+        "anon": 10851301,
+        "N0": 9682028,
+        "N1": 1169273
+      },
+      {
+        "anon": 103934,
+        "N1": 103934
+      },
+      {
+        "anon": 310400,
+        "N7": 310400
+      }
+    ],
+    "timing": "strata decode timing: 153 windows, avg T 2.76, 1.67 tokens/window, 137.43 ms/window = verify 134.21 (GPU-reach wait 19.33 + per-layer host 109.18 [plan 0.79 actq 0.17 jobs 0.38 CPU 106.70] + stage 0.41) + commit/emit 0.30 + draft 2.88; per layer-window: CPU experts 10.63 (17.14 entries), VRAM hits 10.50, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window",
+    "node0_busy_cpu_equivalents": 13.679894775505643,
+    "node1_busy_cpu_equivalents": 0.7553726757985221,
+    "all_container_cpu_equivalents": 11.869794754405673,
+    "node0_user_cpu_equivalents": 12.755758457582514,
+    "node0_irq_cpu_equivalents": 0.05306732089470631,
+    "node0_system_cpu_equivalents": 0.8710689970284226,
+    "container_user_cpu_equivalents": 11.175100448528088
+  }
+]

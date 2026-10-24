@@ -15,6 +15,9 @@ export STRATA_CPU_Q4_MT="${STRATA_CPU_Q4_MT:-1}"
 export STRATA_DFLASH_SMALL_GEMV="${STRATA_DFLASH_SMALL_GEMV:-1}"
 # This host's enhanced-MTP defaults; individual scheduling variables still override them.
 export STRATA_DCU_SCHEDULING_DEFAULTS="${STRATA_DCU_SCHEDULING_DEFAULTS:-1}"
+# Measured model variants for this host's enhanced MTP; other draft modes keep their current weights.
+export STRATA_DCU_MODEL_DEFAULTS="${STRATA_DCU_MODEL_DEFAULTS:-1}"
+export STRATA_DCU_MODEL_CONFIG="${STRATA_DCU_MODEL_CONFIG:-/root/private_data/strata-dcu/model-specific-20261024/selected-model.json}"
 exec python3 /root/strata-dcu/Strata/tools/autoround_pack.py run \
   --model /root/private_data/Qwen3.8-F \
   --out /root/strata-dcu/autoround \

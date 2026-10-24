@@ -1,0 +1,19 @@
+Independent documented-entry validation
+Started UTC: 2026-10-24T14:08:09.946883+00:00
+Command executed verbatim exactly once:
+ssh -S /tmp/strata-dcu-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; python3 -u /root/private_data/strata-dcu/model-specific-20261024/validate_entry.py'
+
+Complete combined stdout/stderr:
+PASS ENTRY mtp
+PASS ENTRY native
+PASS ENTRY joint
+PASS ALL PUBLIC ENTRIES; GPU idle; no remaining engine
+
+Exit status: 0
+Finished UTC: 2026-10-24T14:13:55.672172+00:00
+
+Independent report:
+Expected exit status: 0. Actual exit status: 0.
+Observed expected markers in order: ['PASS ENTRY mtp', 'PASS ENTRY native', 'PASS ENTRY joint', 'PASS ALL PUBLIC ENTRIES; GPU idle; no remaining engine']
+Actual divergence: None. Exit status and all documented success markers match.
+Executed once, with no retries or modifications to setup/source/docs/configuration. This report is based on the documented validator output.

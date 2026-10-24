@@ -1,0 +1,5 @@
+src/kernels/cuda/draft_head_proxy.cu(21): error: calling a __host__ function("strata::kernels::draft_px::_NV_ANON_NAMESPACE::scales(void *, long)") from a __global__ function("strata::kernels::_NV_ANON_NAMESPACE::pack_kernel") is not allowed
+
+src/kernels/cuda/draft_head_proxy.cu(21): error: identifier "strata::kernels::draft_px::_NV_ANON_NAMESPACE::scales" is undefined in device code
+
+2 errors detected in the compilation of "src/kernels/cuda/draft_head_proxy.cu".

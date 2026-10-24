@@ -1,0 +1,898 @@
+strata generate: memory guard: limit 59.0 GiB (source: cgroup), current 11.7 GiB, reclaimable cache credited 2.0 GiB; available 49.3 GiB (MemAvailable 434.2 GiB), floor 2560 MiB
+strata generate: native pack: /root/private_data/strata-dcu/autoround/pack experts (largest blob 2.76 MB), token embedding BF16 in mapped host memory (1212 MiB, 0.7 s)
+strata trace: 64784 MiB free after the CUDA context and the weight arena
+strata generate: 266 MiB of weights loaded from /root/private_data/strata-dcu/autoround/pack in 0.1 s (494 canonical tensors skipped: served natively)
+strata trace: 64784 MiB free after the pack weights
+strata: STRATA_HC_Q8=1: 0.62 GiB of Q8_0 hyper-connection projections for the verify read
+strata generate: 496 native projection matrices, 3585.94 MiB of weights, in 5.6 s
+strata generate: WARNING: --ple-io direct measures slow here (12479 rows/s, about 51 MB/s of random 4 KiB reads): a prompt can spend minutes reading layer 1 and trip the stall watchdog (#1425, #1629). --ple-io mmap was 40-100x faster on some DRAM-less NVMe drives but 7x slower on a SATA SSD (#2040), so it is not chosen for you; --ple-io ram needs the RAM for the table
+strata generate: the SSD is kept awake while rows are read: one page of the table after 100 ms without a read, until 60 s after the last request (STRATA_SSD_KEEPALIVE=0 turns it off)
+strata generate: profile /root/strata-dcu/Strata/data/expert-profile.bin: 24576 ranked pairs, built for 24576 slots
+strata generate: PLE on, table 320001536 rows of /root/private_data/strata-dcu/autoround/ple.gguf
+strata trace: 60780 MiB free after the session (KV, GDN state, PLE history)
+strata mtp: draft layer loaded, 789 MiB of VRAM (experts 675, dense 111), files read in 0.46 s (1690 MiB/s)
+strata generate: experimental native Q5_K head, 675430400 bytes, in 0.2 s
+strata trace: 59342 MiB free after the native head
+strata generate: GPU 0: BW, compute capability 9.3
+strata generate: experts via mmap (--mmap-experts; the A/B arm of R2.1)
+strata generate: file tier (Linux defaults, experts.bin: its pages are read from the mapping as they are): page-cached experts computed from the mapping (STRATA_COLD_OVERLAP=0), io prefetch with whole-blob preads on 8 I/O threads, the decode's read-ahead only while the page cache has room for it and it pays (STRATA_IO_PF_GATE=1); off: STRATA_COLD_OVERLAP=0, STRATA_IO_PREFETCH=0, STRATA_IO_PF_GATE=0
+strata generate: GPU host-callback thread started before host-core pinning
+strata cpu pool: per-expert gate/up -> quantize -> down pipeline enabled
+strata generate: CPU pool tasks/phase: 39 (automatic), participating threads: 13
+strata generate: 12 pool workers on logical processors 1,2,3,4,5,6,7,8,9,10,11,12, the host thread on 0 (draining too) (--host-core first)
+strata aux cpus: threads that are neither pool workers nor the host go to CPUs 64,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127 (off at start; a request's aux_cpus=1 turns it on)
+strata trace: 59340 MiB free after the weights, the session and the drafter
+strata weight budget: total=68702699520 limit=34351349760 fraction=0.500000 expert_slots=8500
+strata generate: expert cache 8500 slots, 21.89 GiB of VRAM; policy is
+strata trace: 36926 MiB free after opening the expert cache
+strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                 so a reply can differ slightly from a run without the cache (same quality:
+                 bench/results/2026-09-27-cache-parity).
+                 PROFILE, ranked by routing frequency, no eviction.
+strata generate: the profile fill asks for 256 pairs ahead (STRATA_FILL_AHEAD)
+strata trace: 36926 MiB free after the profile fill
+strata generate: pre-filled 8500 of 8500 slots from the profile in 20.6 s (1142 MB/s); slot 0 verified
+strata generate: routing-aware prefetch on (the next layer's router, file tier)
+strata trace: 36926 MiB free after the R4 hit path
+strata generate: R4 hit path ON - resident experts are computed on the GPU
+strata generate: 12 expert-pool workers + the host thread
+strata trace: 36926 MiB free after the expert cache and the graphs
+strata generate: session is up (engine 0.1.46.3)
+strata generate: token graph hit path: 8500 resident experts, decided on the device
+FileExpertSource: allocating 41.39 GiB pageable resident cache complement
+FileExpertSource: copied cache complement through layer 8/48 (9.79 GiB, 10 s)
+FileExpertSource: copied cache complement through layer 16/48 (15.10 GiB, 16 s)
+FileExpertSource: copied cache complement through layer 24/48 (20.53 GiB, 21 s)
+FileExpertSource: copied cache complement through layer 32/48 (29.52 GiB, 28 s)
+FileExpertSource: copied cache complement through layer 40/48 (35.27 GiB, 34 s)
+FileExpertSource: copied cache complement through layer 48/48 (41.39 GiB, 40 s)
+FileExpertSource: pageable resident cache complement ready: resident 41.39 GiB, pinned 0.00 GiB in 40 s
+strata generate: resident RAM mode: 41.39 GiB of experts in RAM (pageable), 8500 in the GPU cache; adaptive swaps off
+strata serve: the prompt path allocates its own buffers (too few cache slots to borrow)
+strata trace: 36926 MiB free after before the prompt path init
+strata trace: 36576 MiB free after the head and the prompt path
+strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)
+strata verify: resident groups start from a separate GPU plan (STRATA_VERIFY_HIT_PLAN)
+strata verify: window up to 5 tokens, 70.3 MiB of device buffers
+strata mtp: draft head over 106299 tokens (275.7 MiB)
+strata mtp: coupled draft sampling on (STRATA_SPEC_COUPLED): sampled requests draft with the target's chain and Philox draw over 106299 tokens
+strata trace: 36216 MiB free after the verifier and the drafter's binding
+strata weight usage: pack=279744000 dense=3760128000 head=675430400 experts=23500800000 mtp=1113021152 weights=29373360352 total=68702699520 limit=34351349760 fraction=0.42754303 device_used=30727471104 external_draft=0 native_draft=0 staging=44236800
+strata serve: adaptive overlap: off: not in the resident RAM mode unless STRATA_ADAPT_OVERLAP_RESIDENT=1
+strata serve: 36216 MiB of VRAM free with everything loaded
+strata trace: request 42 0
+strata trace: prompt start 41 -1
+strata verify: capturing the 5-token window (36216 MiB of VRAM free)
+strata: gfx936: skip DTK hipGraphUpload warm-up; graphs instantiate and launch normally
+strata verify: captured the 5-token window (upload no error, sync no error)
+strata verify: capturing the 1-token window (36123 MiB of VRAM free)
+strata verify: captured the 1-token window (upload no error, sync no error)
+strata trace: read 41 tokens (windows) in 747.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata verify: capturing the 2-token window (36121 MiB of VRAM free)
+strata verify: captured the 2-token window (upload no error, sync no error)
+strata verify: capturing the 3-token window (36119 MiB of VRAM free)
+strata verify: captured the 3-token window (upload no error, sync no error)
+strata verify: capturing the 4-token window (36119 MiB of VRAM free)
+strata verify: captured the 4-token window (upload no error, sync no error)
+strata trace: window 41 1
+strata trace: window 42 1
+strata trace: window 43 2
+strata trace: window 45 3
+strata trace: window 48 4
+strata trace: window 50 5
+strata trace: window 53 1
+strata trace: window 54 2
+strata trace: window 56 3
+strata trace: window 58 4
+strata trace: window 59 5
+strata trace: window 62 1
+strata trace: window 63 2
+strata trace: window 64 3
+strata trace: window 65 4
+strata trace: window 66 5
+strata trace: window 67 1
+strata trace: window 68 2
+strata trace: window 70 3
+strata trace: window 73 4
+strata trace: window 74 5
+strata trace: window 77 2
+strata trace: window 78 2
+strata trace: window 80 2
+strata trace: window 82 2
+strata trace: window 84 2
+strata trace: window 86 2
+strata trace: window 87 2
+strata trace: window 89 2
+strata trace: window 90 2
+strata trace: window 92 2
+strata trace: window 93 4
+strata trace: window 95 4
+strata trace: window 97 4
+strata trace: window 99 2
+strata trace: window 101 2
+strata trace: window 103 2
+strata trace: window 105 2
+strata trace: window 107 2
+strata trace: window 109 2
+strata trace: window 111 2
+strata trace: window 112 2
+strata trace: window 114 2
+strata trace: window 115 2
+strata trace: window 116 2
+strata trace: window 118 2
+strata trace: window 120 2
+strata trace: window 121 2
+strata trace: window 123 2
+strata trace: window 125 2
+strata trace: window 127 2
+strata trace: window 129 2
+strata trace: window 130 2
+strata trace: window 131 2
+strata trace: window 133 2
+strata trace: window 135 2
+strata trace: window 136 2
+strata trace: window 137 2
+strata trace: window 138 2
+strata trace: window 140 2
+strata trace: window 142 2
+strata trace: window 143 2
+strata trace: window 145 2
+strata trace: window 146 2
+strata trace: window 147 2
+strata trace: window 148 2
+strata trace: window 150 2
+strata trace: window 151 2
+strata trace: window 152 2
+strata trace: window 153 2
+strata trace: window 154 2
+strata trace: window 156 2
+strata trace: window 158 2
+strata trace: window 160 2
+strata trace: window 162 2
+strata trace: window 163 2
+strata trace: window 164 2
+strata trace: window 166 2
+strata trace: window 168 1
+mtp budget: 78 observations; T1=5@32.6128ms/1tok T2=58@43.9896ms/1.54374tok T3=4@65.2273ms/1.85019tok T4=7@65.016ms/1.85019tok T5=4@79.0898ms/1.85019tok
+strata decode timing: 79 windows, avg T 2.30, 1.62 tokens/window, 50.52 ms/window = verify 46.80 (GPU-reach wait 17.47 + per-layer host 24.11 [plan 0.27 actq 0.13 jobs 0.15 CPU 22.97] + stage 0.08) + commit/emit 0.29 + draft 3.42; per layer-window: CPU experts 10.42 (15.37 entries), VRAM hits 7.66, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 42 tokens = 0 reused + 42 read in 748 ms (56.1 tok/s), 128 generated in 3991 ms (32.1 tok/s), drafts accepted 49 of 103, 0 checkpoints
+strata serve: decode expert cache hit rate: 33.3% (29065 hits / 87360 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 29065 hits this request; since the start RAM 45181 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 71458.9 MB from storage (4696 major faults) for 23503.6 MB of expert reads; page cache held 40877.8 MB at the read, not 3569.1 MB; io prefetch: 0 read ahead (6771.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 87 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 42 0
+strata trace: prompt start 41 -1
+strata trace: read 41 tokens (windows) in 542.2 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 41 1
+strata trace: window 42 1
+strata trace: window 43 2
+strata trace: window 45 3
+strata trace: window 48 4
+strata trace: window 50 5
+strata trace: window 53 1
+strata trace: window 54 2
+strata trace: window 56 3
+strata trace: window 58 4
+strata trace: window 59 5
+strata trace: window 62 2
+strata trace: window 63 2
+strata trace: window 64 4
+strata trace: window 65 2
+strata trace: window 66 4
+strata trace: window 67 2
+strata trace: window 69 2
+strata trace: window 70 2
+strata trace: window 72 2
+strata trace: window 74 2
+strata trace: window 76 2
+strata trace: window 77 4
+strata trace: window 78 2
+strata trace: window 80 2
+strata trace: window 82 2
+strata trace: window 84 2
+strata trace: window 86 2
+strata trace: window 87 2
+strata trace: window 89 2
+strata trace: window 90 2
+strata trace: window 92 2
+strata trace: window 93 5
+strata trace: window 95 2
+strata trace: window 97 2
+strata trace: window 99 2
+strata trace: window 101 2
+strata trace: window 103 2
+strata trace: window 105 2
+strata trace: window 107 2
+strata trace: window 109 2
+strata trace: window 111 2
+strata trace: window 112 2
+strata trace: window 114 2
+strata trace: window 115 2
+strata trace: window 116 2
+strata trace: window 118 2
+strata trace: window 120 2
+strata trace: window 121 2
+strata trace: window 123 2
+strata trace: window 125 2
+strata trace: window 127 2
+strata trace: window 129 2
+strata trace: window 130 2
+strata trace: window 131 2
+strata trace: window 133 2
+strata trace: window 135 2
+strata trace: window 136 2
+strata trace: window 137 2
+strata trace: window 138 2
+strata trace: window 140 2
+strata trace: window 142 2
+strata trace: window 143 2
+strata trace: window 145 2
+strata trace: window 146 2
+strata trace: window 147 2
+strata trace: window 148 2
+strata trace: window 150 2
+strata trace: window 151 2
+strata trace: window 152 2
+strata trace: window 153 2
+strata trace: window 154 2
+strata trace: window 156 2
+strata trace: window 158 2
+strata trace: window 160 2
+strata trace: window 162 2
+strata trace: window 163 2
+strata trace: window 164 2
+strata trace: window 166 2
+strata trace: window 168 2
+strata trace: window 170 2
+strata trace: window 172 2
+strata trace: window 173 2
+strata trace: window 175 2
+strata trace: window 176 2
+strata trace: window 178 2
+strata trace: window 180 2
+strata trace: window 182 2
+strata trace: window 183 2
+strata trace: window 185 2
+strata trace: window 187 2
+strata trace: window 188 2
+strata trace: window 190 2
+strata trace: window 192 2
+strata trace: window 193 2
+strata trace: window 195 2
+strata trace: window 196 2
+strata trace: window 198 2
+strata trace: window 200 2
+strata trace: window 201 2
+strata trace: window 203 2
+strata trace: window 205 2
+strata trace: window 207 2
+strata trace: window 208 2
+strata trace: window 210 2
+strata trace: window 212 2
+strata trace: window 214 2
+strata trace: window 216 2
+strata trace: window 217 2
+strata trace: window 219 2
+strata trace: window 221 2
+strata trace: window 223 2
+strata trace: window 225 2
+strata trace: window 226 2
+strata trace: window 228 2
+strata trace: window 230 2
+strata trace: window 231 2
+strata trace: window 233 2
+strata trace: window 235 2
+strata trace: window 236 2
+strata trace: window 237 2
+strata trace: window 238 2
+strata trace: window 240 2
+strata trace: window 242 2
+strata trace: window 244 2
+strata trace: window 246 2
+strata trace: window 248 2
+strata trace: window 250 2
+strata trace: window 251 2
+strata trace: window 253 2
+strata trace: window 255 2
+strata trace: window 257 2
+strata trace: window 259 2
+strata trace: window 261 2
+strata trace: window 263 2
+strata trace: window 265 2
+strata trace: window 266 1
+strata trace: window 267 2
+strata trace: window 268 3
+strata trace: window 269 2
+strata trace: window 271 2
+strata trace: window 272 2
+strata trace: window 274 2
+strata trace: window 276 2
+strata trace: window 278 2
+strata trace: window 280 2
+strata trace: window 281 2
+strata trace: window 282 2
+strata trace: window 284 2
+strata trace: window 285 2
+strata trace: window 287 2
+strata trace: window 289 2
+strata trace: window 290 4
+strata trace: window 292 2
+strata trace: window 293 2
+strata trace: window 295 2
+strata trace: window 296 1
+mtp budget: 234 observations; T1=9@32.4791ms/1tok T2=198@40.8685ms/1.60434tok T3=7@62.4934ms/1.82043tok T4=13@63.7571ms/1.82043tok T5=7@77.0332ms/1.82043tok
+strata decode timing: 157 windows, avg T 2.12, 1.63 tokens/window, 43.94 ms/window = verify 42.16 (GPU-reach wait 16.97 + per-layer host 20.62 [plan 0.28 actq 0.11 jobs 0.13 CPU 19.60] + stage 0.02) + commit/emit 0.21 + draft 1.54; per layer-window: CPU experts 9.42 (13.13 entries), VRAM hits 8.08, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 42 tokens = 0 reused + 42 read in 543 ms (77.4 tok/s), 256 generated in 6898 ms (37.1 tok/s), drafts accepted 99 of 176, 0 checkpoints
+strata serve: decode expert cache hit rate: 38.1% (60880 hits / 159840 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 60880 hits this request; since the start RAM 121819 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 11.2 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 253 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 39 0
+strata trace: prompt start 38 -1
+strata trace: read 38 tokens (windows) in 524.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 38 1
+strata trace: window 39 1
+strata trace: window 40 2
+strata trace: window 42 3
+strata trace: window 45 4
+strata trace: window 46 5
+strata trace: window 49 1
+strata trace: window 50 2
+strata trace: window 52 3
+strata trace: window 53 4
+strata trace: window 57 5
+strata trace: window 61 4
+strata trace: window 62 2
+strata trace: window 63 4
+strata trace: window 65 2
+strata trace: window 67 2
+strata trace: window 69 4
+strata trace: window 71 2
+strata trace: window 73 2
+strata trace: window 75 2
+strata trace: window 77 2
+strata trace: window 79 2
+strata trace: window 80 2
+strata trace: window 82 2
+strata trace: window 84 2
+strata trace: window 86 2
+strata trace: window 88 4
+strata trace: window 89 2
+strata trace: window 91 2
+strata trace: window 92 2
+strata trace: window 94 2
+strata trace: window 95 2
+strata trace: window 96 2
+strata trace: window 98 2
+strata trace: window 100 2
+strata trace: window 102 2
+strata trace: window 104 2
+strata trace: window 106 2
+strata trace: window 108 2
+strata trace: window 110 2
+strata trace: window 112 2
+strata trace: window 114 2
+strata trace: window 116 2
+strata trace: window 118 2
+strata trace: window 120 2
+strata trace: window 122 2
+strata trace: window 124 2
+strata trace: window 126 2
+strata trace: window 128 2
+strata trace: window 130 2
+strata trace: window 132 2
+strata trace: window 134 2
+strata trace: window 136 2
+strata trace: window 138 2
+strata trace: window 140 2
+strata trace: window 141 2
+strata trace: window 143 2
+strata trace: window 145 2
+strata trace: window 147 2
+strata trace: window 148 2
+strata trace: window 149 2
+strata trace: window 151 2
+strata trace: window 153 2
+strata trace: window 155 2
+strata trace: window 157 2
+strata trace: window 159 2
+strata trace: window 161 2
+strata trace: window 163 2
+strata trace: window 165 2
+strata trace: window 167 2
+strata trace: window 169 2
+strata trace: window 170 2
+strata trace: window 172 2
+strata trace: window 173 2
+strata trace: window 175 4
+strata trace: window 179 4
+strata trace: window 183 4
+strata trace: window 184 4
+strata trace: window 186 4
+strata trace: window 189 4
+strata trace: window 191 4
+strata trace: window 192 4
+strata trace: window 193 2
+strata trace: window 195 2
+strata trace: window 197 2
+strata trace: window 198 2
+strata trace: window 200 2
+strata trace: window 202 2
+strata trace: window 203 2
+strata trace: window 205 2
+strata trace: window 207 2
+strata trace: window 209 2
+strata trace: window 211 2
+strata trace: window 212 2
+strata trace: window 213 2
+strata trace: window 215 2
+strata trace: window 216 2
+strata trace: window 218 2
+strata trace: window 220 2
+strata trace: window 221 2
+strata trace: window 223 2
+strata trace: window 225 2
+strata trace: window 226 2
+strata trace: window 228 2
+strata trace: window 230 2
+strata trace: window 232 2
+strata trace: window 233 2
+strata trace: window 234 2
+strata trace: window 236 2
+strata trace: window 238 2
+strata trace: window 240 2
+strata trace: window 242 2
+strata trace: window 244 2
+strata trace: window 246 2
+strata trace: window 248 2
+strata trace: window 249 2
+strata trace: window 251 2
+strata trace: window 253 2
+strata trace: window 255 2
+strata trace: window 257 2
+strata trace: window 258 2
+strata trace: window 260 2
+strata trace: window 262 2
+strata trace: window 263 2
+strata trace: window 265 2
+strata trace: window 267 2
+strata trace: window 268 2
+strata trace: window 270 2
+strata trace: window 272 2
+strata trace: window 274 2
+strata trace: window 275 2
+strata trace: window 277 2
+strata trace: window 279 2
+strata trace: window 281 2
+strata trace: window 282 2
+strata trace: window 284 2
+strata trace: window 286 1
+strata trace: window 287 2
+strata trace: window 288 3
+strata trace: window 289 2
+strata trace: window 291 2
+strata trace: window 293 1
+mtp budget: 375 observations; T1=13@26.3134ms/1tok T2=316@36.4839ms/1.70256tok T3=10@55.3285ms/2.02189tok T4=27@54.5732ms/2.23728tok T5=9@77.0332ms/2.23728tok
+strata decode timing: 142 windows, avg T 2.23, 1.80 tokens/window, 39.11 ms/window = verify 37.00 (GPU-reach wait 17.88 + per-layer host 15.01 [plan 0.29 actq 0.12 jobs 0.10 CPU 14.04] + stage 0.02) + commit/emit 0.12 + draft 1.96; per layer-window: CPU experts 6.50 (8.31 entries), VRAM hits 13.94, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 39 tokens = 0 reused + 39 read in 525 ms (74.3 tok/s), 256 generated in 5554 ms (46.1 tok/s), drafts accepted 114 of 174, 0 checkpoints
+strata serve: decode expert cache hit rate: 62.7% (95048 hits / 151680 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 95048 hits this request; since the start RAM 171073 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 21.5 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 403 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 38 0
+strata trace: prompt start 37 -1
+strata trace: read 37 tokens (windows) in 454.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 37 1
+strata trace: window 38 1
+strata trace: window 39 2
+strata trace: window 41 3
+strata trace: window 44 4
+strata trace: window 47 5
+strata trace: window 52 1
+strata trace: window 53 2
+strata trace: window 55 3
+strata trace: window 57 4
+strata trace: window 58 5
+strata trace: window 63 4
+strata trace: window 67 5
+strata trace: window 72 5
+strata trace: window 76 5
+strata trace: window 78 5
+strata trace: window 80 5
+strata trace: window 84 5
+strata trace: window 87 5
+strata trace: window 92 5
+strata trace: window 97 5
+strata trace: window 102 5
+strata trace: window 105 5
+strata trace: window 110 5
+strata trace: window 112 5
+strata trace: window 115 5
+strata trace: window 116 4
+strata trace: window 119 4
+strata trace: window 123 4
+strata trace: window 127 4
+strata trace: window 131 4
+strata trace: window 135 4
+strata trace: window 138 4
+strata trace: window 142 4
+strata trace: window 145 5
+strata trace: window 148 5
+strata trace: window 152 5
+strata trace: window 157 5
+strata trace: window 159 4
+strata trace: window 161 4
+strata trace: window 165 4
+strata trace: window 169 4
+strata trace: window 172 4
+strata trace: window 175 4
+strata trace: window 179 4
+strata trace: window 183 4
+strata trace: window 185 4
+strata trace: window 188 4
+strata trace: window 192 4
+strata trace: window 196 4
+strata trace: window 200 4
+strata trace: window 204 4
+strata trace: window 208 4
+strata trace: window 212 4
+strata trace: window 215 4
+strata trace: window 219 4
+strata trace: window 223 4
+strata trace: window 227 4
+strata trace: window 231 5
+strata trace: window 236 5
+strata trace: window 241 5
+strata trace: window 246 5
+strata trace: window 248 5
+strata trace: window 253 5
+strata trace: window 258 5
+strata trace: window 262 5
+strata trace: window 267 4
+strata trace: window 271 4
+strata trace: window 275 4
+strata trace: window 279 4
+strata trace: window 283 5
+strata trace: window 288 4
+strata trace: window 292 1
+mtp budget: 447 observations; T1=16@27.0994ms/1tok T2=318@36.4839ms/1.99213tok T3=12@55.3285ms/2.9086tok T4=63@69.0529ms/3.72817tok T5=38@80.2296ms/4.2846tok
+strata decode timing: 73 windows, avg T 4.15, 3.51 tokens/window, 62.30 ms/window = verify 57.23 (GPU-reach wait 21.00 + per-layer host 31.81 [plan 0.39 actq 0.21 jobs 0.20 CPU 28.84] + stage 1.39) + commit/emit 0.12 + draft 4.92; per layer-window: CPU experts 12.30 (18.96 entries), VRAM hits 22.55, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 38 tokens = 0 reused + 38 read in 456 ms (83.4 tok/s), 256 generated in 4548 ms (56.3 tok/s), drafts accepted 183 of 230, 0 checkpoints
+strata serve: decode expert cache hit rate: 54.3% (78999 hits / 145440 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 78999 hits this request; since the start RAM 218226 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 18.7 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 484 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 17 0
+strata trace: prompt start 16 -1
+strata trace: read 16 tokens (windows) in 218.2 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 16 1
+strata trace: window 17 1
+mtp budget: 447 observations; T1=16@27.0994ms/1tok T2=318@36.4839ms/1.99213tok T3=12@55.3285ms/2.9086tok T4=63@69.0529ms/3.72817tok T5=38@80.2296ms/4.2846tok
+strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 26.81 ms/window = verify 26.61 (GPU-reach wait 13.10 + per-layer host 9.66 [plan 0.09 actq 0.06 jobs 0.06 CPU 9.16] + stage 0.02) + commit/emit 0.04 + draft 0.14; per layer-window: CPU experts 4.17 (4.17 entries), VRAM hits 5.83, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 17 tokens = 0 reused + 17 read in 219 ms (77.7 tok/s), 2 generated in 54 ms (37.3 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 58.3% (560 hits / 960 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 560 hits this request; since the start RAM 220960 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.5 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 490 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 24 0
+strata trace: prompt start 23 -1
+strata trace: read 23 tokens (windows) in 323.9 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 23 1
+strata trace: window 24 1
+mtp budget: 447 observations; T1=16@27.0994ms/1tok T2=318@36.4839ms/1.99213tok T3=12@55.3285ms/2.9086tok T4=63@69.0529ms/3.72817tok T5=38@80.2296ms/4.2846tok
+strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 28.34 ms/window = verify 27.97 (GPU-reach wait 13.04 + per-layer host 11.09 [plan 0.63 actq 0.06 jobs 0.06 CPU 10.04] + stage 0.02) + commit/emit 0.22 + draft 0.14; per layer-window: CPU experts 4.64 (4.64 entries), VRAM hits 5.36, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 24 tokens = 0 reused + 24 read in 325 ms (73.9 tok/s), 2 generated in 57 ms (35.3 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 53.6% (515 hits / 960 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 515 hits this request; since the start RAM 224692 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.9 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 497 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 27 0
+strata trace: prompt start 26 -1
+strata trace: read 26 tokens (windows) in 352.7 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 26 1
+strata trace: window 27 1
+strata trace: window 28 2
+mtp budget: 448 observations; T1=17@28.0587ms/1tok T2=318@36.4839ms/1.99213tok T3=12@55.3285ms/2.9086tok T4=63@69.0529ms/3.72817tok T5=38@80.2296ms/4.2846tok
+strata decode timing: 3 windows, avg T 1.33, 1.33 tokens/window, 32.89 ms/window = verify 32.23 (GPU-reach wait 14.09 + per-layer host 14.23 [plan 0.11 actq 0.07 jobs 0.09 CPU 13.59] + stage 0.02) + commit/emit 0.24 + draft 0.41; per layer-window: CPU experts 6.40 (6.97 entries), VRAM hits 6.37, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 27 tokens = 0 reused + 27 read in 353 ms (76.4 tok/s), 4 generated in 99 ms (40.5 tok/s), drafts accepted 1 of 1, 0 checkpoints
+strata serve: decode expert cache hit rate: 47.8% (917 hits / 1920 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 917 hits this request; since the start RAM 229500 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.9 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 506 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 34 0
+strata trace: prompt start 33 -1
+strata trace: read 33 tokens (windows) in 460.3 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 33 1
+strata trace: window 34 1
+strata trace: window 35 2
+strata trace: window 37 3
+mtp budget: 450 observations; T1=18@27.6562ms/1tok T2=319@40.217ms/1.99999tok T3=12@55.3285ms/2.91646tok T4=63@69.0529ms/3.73603tok T5=38@80.2296ms/4.29246tok
+strata decode timing: 4 windows, avg T 1.75, 1.25 tokens/window, 43.20 ms/window = verify 42.08 (GPU-reach wait 17.66 + per-layer host 20.47 [plan 0.16 actq 0.09 jobs 0.13 CPU 19.44] + stage 0.02) + commit/emit 0.22 + draft 0.88; per layer-window: CPU experts 8.31 (9.44 entries), VRAM hits 8.06, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 34 tokens = 0 reused + 34 read in 461 ms (73.8 tok/s), 5 generated in 173 ms (28.9 tok/s), drafts accepted 3 of 3, 0 checkpoints
+strata serve: decode expert cache hit rate: 46.1% (1548 hits / 3360 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 1548 hits this request; since the start RAM 235975 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 1.3 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 517 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 22 tokens (windows) in 365.0 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 1
+mtp budget: 450 observations; T1=18@27.6562ms/1tok T2=319@40.217ms/1.99999tok T3=12@55.3285ms/2.91646tok T4=63@69.0529ms/3.73603tok T5=38@80.2296ms/4.29246tok
+strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 29.39 ms/window = verify 29.02 (GPU-reach wait 12.72 + per-layer host 12.53 [plan 0.10 actq 0.07 jobs 0.08 CPU 11.94] + stage 0.02) + commit/emit 0.22 + draft 0.13; per layer-window: CPU experts 6.27 (6.27 entries), VRAM hits 3.73, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 23 tokens = 0 reused + 23 read in 366 ms (62.9 tok/s), 2 generated in 59 ms (34.0 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 37.3% (358 hits / 960 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 358 hits this request; since the start RAM 240715 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.9 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 524 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 22 0
+strata trace: prompt start 21 -1
+strata trace: read 21 tokens (windows) in 284.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 21 1
+strata trace: window 22 1
+mtp budget: 450 observations; T1=18@27.6562ms/1tok T2=319@40.217ms/1.99999tok T3=12@55.3285ms/2.91646tok T4=63@69.0529ms/3.73603tok T5=38@80.2296ms/4.29246tok
+strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 27.73 ms/window = verify 27.29 (GPU-reach wait 13.05 + per-layer host 10.39 [plan 0.10 actq 0.06 jobs 0.08 CPU 9.82] + stage 0.03) + commit/emit 0.22 + draft 0.21; per layer-window: CPU experts 4.66 (4.66 entries), VRAM hits 5.34, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 22 tokens = 0 reused + 22 read in 285 ms (77.2 tok/s), 2 generated in 55 ms (36.1 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 53.4% (513 hits / 960 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 513 hits this request; since the start RAM 244244 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.8 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 531 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 30 0
+strata trace: prompt start 29 -1
+strata trace: read 29 tokens (windows) in 379.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 29 1
+strata trace: window 30 1
+strata trace: window 31 2
+strata trace: window 33 3
+strata trace: window 36 4
+strata trace: window 40 5
+mtp budget: 454 observations; T1=19@28.2903ms/1tok T2=320@42.4251ms/2tok T3=13@62.5003ms/3tok T4=64@72.492ms/4tok T5=38@80.2296ms/4.55643tok
+strata decode timing: 6 windows, avg T 2.67, 2.17 tokens/window, 56.07 ms/window = verify 53.61 (GPU-reach wait 18.64 + per-layer host 30.83 [plan 0.21 actq 0.14 jobs 0.20 CPU 29.52] + stage 0.06) + commit/emit 0.29 + draft 2.15; per layer-window: CPU experts 13.00 (16.73 entries), VRAM hits 9.94, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 30 tokens = 0 reused + 30 read in 381 ms (78.8 tok/s), 13 generated in 336 ms (38.6 tok/s), drafts accepted 10 of 10, 0 checkpoints
+strata serve: decode expert cache hit rate: 37.3% (2863 hits / 7680 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 2863 hits this request; since the start RAM 252270 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 1.8 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 543 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 36 0
+strata trace: prompt start 35 -1
+strata trace: read 35 tokens (windows) in 405.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 35 1
+strata trace: window 36 1
+strata trace: window 37 2
+strata trace: window 39 3
+strata trace: window 42 4
+strata trace: window 46 5
+mtp budget: 458 observations; T1=20@28.7388ms/1tok T2=321@43.8684ms/2tok T3=14@64.7869ms/3tok T4=65@70.7621ms/4tok T5=38@80.2296ms/4.55643tok
+strata decode timing: 6 windows, avg T 2.67, 2.00 tokens/window, 53.54 ms/window = verify 51.10 (GPU-reach wait 18.62 + per-layer host 28.41 [plan 0.21 actq 0.14 jobs 0.20 CPU 27.03] + stage 0.08) + commit/emit 0.28 + draft 2.15; per layer-window: CPU experts 13.07 (16.80 entries), VRAM hits 9.87, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 36 tokens = 0 reused + 36 read in 406 ms (88.6 tok/s), 12 generated in 321 ms (37.4 tok/s), drafts accepted 10 of 10, 0 checkpoints
+strata serve: decode expert cache hit rate: 37.0% (2843 hits / 7680 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 2843 hits this request; since the start RAM 260176 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 2.5 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 556 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 34 0
+strata trace: prompt start 33 -1
+strata trace: read 33 tokens (windows) in 408.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 33 1
+strata trace: window 34 1
+strata trace: window 35 2
+strata trace: window 37 3
+strata trace: window 39 4
+strata trace: window 43 5
+strata trace: window 48 1
+strata trace: window 49 2
+strata trace: window 51 3
+mtp budget: 465 observations; T1=22@28.7388ms/1tok T2=323@43.8684ms/2tok T3=15@63.9464ms/2.70261tok T4=66@69.2378ms/3.40523tok T5=39@82.6037ms/4.10784tok
+strata decode timing: 9 windows, avg T 2.44, 2.33 tokens/window, 49.84 ms/window = verify 47.72 (GPU-reach wait 19.15 + per-layer host 24.51 [plan 0.19 actq 0.13 jobs 0.17 CPU 23.35] + stage 0.02) + commit/emit 0.17 + draft 1.93; per layer-window: CPU experts 11.21 (14.97 entries), VRAM hits 9.47, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 34 tokens = 0 reused + 34 read in 409 ms (83.2 tok/s), 21 generated in 449 ms (46.8 tok/s), drafts accepted 12 of 13, 0 checkpoints
+strata serve: decode expert cache hit rate: 38.8% (4093 hits / 10560 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 4093 hits this request; since the start RAM 269056 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 2.5 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 572 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 54 0
+strata trace: prompt start 53 -1
+strata trace: read 53 tokens (windows) in 673.7 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 53 1
+strata trace: window 54 1
+strata trace: window 55 2
+mtp budget: 466 observations; T1=23@29.2356ms/1tok T2=323@43.8684ms/2tok T3=15@63.9464ms/2.70261tok T4=66@69.2378ms/3.40523tok T5=39@82.6037ms/4.10784tok
+strata decode timing: 3 windows, avg T 1.33, 1.00 tokens/window, 32.80 ms/window = verify 32.13 (GPU-reach wait 14.78 + per-layer host 13.43 [plan 0.12 actq 0.07 jobs 0.09 CPU 12.73] + stage 0.02) + commit/emit 0.24 + draft 0.42; per layer-window: CPU experts 6.68 (6.88 entries), VRAM hits 6.45, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 54 tokens = 0 reused + 54 read in 674 ms (80.1 tok/s), 3 generated in 98 ms (30.5 tok/s), drafts accepted 1 of 1, 0 checkpoints
+strata serve: decode expert cache hit rate: 48.4% (929 hits / 1920 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 929 hits this request; since the start RAM 276433 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 2.1 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.18 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 586 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 25 0
+strata trace: prompt start 24 -1
+strata trace: read 24 tokens (windows) in 368.7 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 24 1
+strata trace: window 25 1
+strata trace: window 26 2
+strata trace: window 27 3
+strata trace: window 28 4
+strata trace: window 29 5
+strata trace: window 30 1
+strata trace: window 31 2
+strata trace: window 33 3
+strata trace: window 35 4
+strata trace: window 36 5
+strata trace: window 40 2
+strata trace: window 42 4
+strata trace: window 43 4
+strata trace: window 46 4
+strata trace: window 48 4
+strata trace: window 49 1
+strata trace: window 50 1
+strata trace: window 51 5
+strata trace: window 53 1
+strata trace: window 54 1
+strata trace: window 55 1
+strata trace: window 56 1
+strata trace: window 57 4
+strata trace: window 58 4
+strata trace: window 59 4
+strata trace: window 60 1
+strata trace: window 61 4
+strata trace: window 63 4
+strata trace: window 65 4
+strata trace: window 69 4
+strata trace: window 72 4
+strata trace: window 73 4
+strata trace: window 75 4
+strata trace: window 76 5
+strata trace: window 77 1
+strata trace: window 78 1
+strata trace: window 79 4
+strata trace: window 80 5
+strata trace: window 82 1
+strata trace: window 83 1
+strata trace: window 84 1
+strata trace: window 85 1
+strata trace: window 86 1
+strata trace: window 87 1
+mtp budget: 510 observations; T1=40@33.0628ms/1tok T2=326@55.6596ms/1.49376tok T3=17@83.8604ms/1.65447tok T4=83@64.491ms/1.73589tok T5=44@78.2937ms/1.7376tok
+strata decode timing: 45 windows, avg T 2.73, 1.42 tokens/window, 59.00 ms/window = verify 47.24 (GPU-reach wait 17.69 + per-layer host 24.81 [plan 0.34 actq 0.15 jobs 0.16 CPU 23.38] + stage 0.12) + commit/emit 0.26 + draft 11.48; per layer-window: CPU experts 10.48 (16.82 entries), VRAM hits 10.52, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 25 tokens = 0 reused + 25 read in 369 ms (67.7 tok/s), 64 generated in 2655 ms (24.1 tok/s), drafts accepted 19 of 78, 0 checkpoints
+strata serve: decode expert cache hit rate: 38.5% (22716 hits / 59040 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 22716 hits this request; since the start RAM 303102 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 8.7 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.17 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 636 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 25 0
+strata trace: prompt start 24 -1
+strata trace: read 24 tokens (windows) in 330.5 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 24 1
+strata trace: window 25 1
+strata trace: window 26 2
+strata trace: window 27 3
+strata trace: window 28 4
+strata trace: window 29 5
+strata trace: window 30 1
+strata trace: window 31 2
+strata trace: window 33 3
+strata trace: window 35 4
+strata trace: window 36 5
+strata trace: window 40 4
+strata trace: window 42 2
+strata trace: window 43 4
+strata trace: window 46 2
+strata trace: window 48 4
+strata trace: window 49 2
+strata trace: window 50 2
+strata trace: window 52 2
+strata trace: window 53 4
+strata trace: window 54 2
+strata trace: window 55 2
+strata trace: window 57 2
+strata trace: window 58 2
+strata trace: window 59 3
+strata trace: window 60 5
+strata trace: window 63 4
+strata trace: window 65 2
+strata trace: window 67 4
+strata trace: window 71 4
+strata trace: window 72 4
+strata trace: window 73 2
+strata trace: window 75 2
+strata trace: window 76 3
+strata trace: window 77 1
+strata trace: window 78 4
+strata trace: window 80 5
+strata trace: window 82 2
+strata trace: window 83 2
+strata trace: window 85 2
+strata trace: window 87 1
+mtp budget: 550 observations; T1=44@32.8524ms/1tok T2=343@45.7571ms/1.52064tok T3=21@62.4014ms/1.72392tok T4=94@63.06ms/1.85018tok T5=48@75.4012ms/1.85033tok
+strata decode timing: 41 windows, avg T 2.80, 1.56 tokens/window, 50.93 ms/window = verify 48.16 (GPU-reach wait 18.71 + per-layer host 24.50 [plan 0.31 actq 0.15 jobs 0.17 CPU 23.14] + stage 0.02) + commit/emit 0.16 + draft 2.58; per layer-window: CPU experts 10.91 (17.23 entries), VRAM hits 10.82, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 25 tokens = 0 reused + 25 read in 331 ms (75.5 tok/s), 64 generated in 2088 ms (30.7 tok/s), drafts accepted 23 of 74, 0 checkpoints
+strata serve: decode expert cache hit rate: 38.6% (21285 hits / 55200 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 21285 hits this request; since the start RAM 328597 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 1.1 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.17 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 682 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 17 0
+strata trace: prompt start 16 -1
+strata trace: read 16 tokens (windows) in 218.3 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 16 1
+mtp budget: 550 observations; T1=44@32.8524ms/1tok T2=343@45.7571ms/1.52064tok T3=21@62.4014ms/1.72392tok T4=94@63.06ms/1.85018tok T5=48@75.4012ms/1.85033tok
+strata decode timing: 1 windows, avg T 1.00, 1.00 tokens/window, 24.95 ms/window = verify 24.73 (GPU-reach wait 13.14 + per-layer host 7.81 [plan 0.10 actq 0.06 jobs 0.05 CPU 7.28] + stage 0.02) + commit/emit 0.21 + draft 0.00; per layer-window: CPU experts 3.52 (3.52 entries), VRAM hits 6.48, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 17 tokens = 0 reused + 17 read in 219 ms (77.6 tok/s), 1 generated in 25 ms (40.1 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 64.8% (311 hits / 480 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 311 hits this request; since the start RAM 331100 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.0 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.17 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 687 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 501 0
+strata trace: prompt start 500 -1
+strata trace: lent 0 slots for 32 tokens in 0.0 ms
+strata trace: prompt chunk 0 of 500
+strata trace: prompt chunk 32 of 500
+strata trace: prompt chunk 64 of 500
+strata trace: prompt chunk 96 of 500
+strata trace: prompt chunk 128 of 500
+strata trace: prompt chunk 160 of 500
+strata trace: prompt chunk 192 of 500
+strata trace: prompt chunk 224 of 500
+strata trace: prompt chunk 256 of 500
+strata trace: prompt chunk 288 of 500
+strata trace: prompt chunk 320 of 500
+strata trace: prompt chunk 352 of 500
+strata trace: prompt chunk 384 of 500
+strata trace: prompt chunk 416 of 500
+strata trace: prompt chunk 448 of 500
+strata trace: prompt chunk 480 of 500
+strata trace: read 500 tokens (batched) in 34636.2 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 500 1
+strata trace: window 501 1
+strata trace: window 502 1
+mtp budget: 552 observations; T1=46@35.7456ms/1tok T2=343@45.7571ms/1.52064tok T3=21@62.4014ms/1.72392tok T4=94@63.06ms/1.85018tok T5=48@75.4012ms/1.85033tok
+strata decode timing: 3 windows, avg T 1.00, 1.00 tokens/window, 39.41 ms/window = verify 39.05 (GPU-reach wait 13.87 + per-layer host 21.04 [plan 0.41 actq 0.08 jobs 0.10 CPU 20.23] + stage 0.06) + commit/emit 0.17 + draft 0.18; per layer-window: CPU experts 4.80 (4.80 entries), VRAM hits 5.20, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 501 tokens = 0 reused + 501 read in 34637 ms (14.5 tok/s), 3 generated in 118 ms (25.4 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 52.0% (749 hits / 1440 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 749 hits this request; since the start RAM 368542 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 2.3 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.17 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 690 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 42 0
+strata trace: prompt start 41 -1
+strata trace: read 41 tokens (windows) in 619.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 41 1
+strata trace: window 42 1
+strata trace: window 43 2
+strata trace: window 45 3
+strata trace: window 48 4
+mtp budget: 556 observations; T1=47@34.4618ms/1tok T2=344@46.1733ms/1.99755tok T3=22@75.9662ms/2.48303tok T4=95@67.8924ms/2.48438tok T5=48@75.4012ms/2.48454tok
+strata decode timing: 5 windows, avg T 2.20, 1.80 tokens/window, 54.54 ms/window = verify 51.57 (GPU-reach wait 18.08 + per-layer host 28.77 [plan 0.16 actq 0.12 jobs 0.14 CPU 27.81] + stage 0.05) + commit/emit 0.28 + draft 2.67; per layer-window: CPU experts 8.97 (12.53 entries), VRAM hits 9.47, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 42 tokens = 0 reused + 42 read in 620 ms (67.8 tok/s), 9 generated in 273 ms (33.0 tok/s), drafts accepted 4 of 6, 0 checkpoints
+strata serve: decode expert cache hit rate: 43.1% (2274 hits / 5280 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 2274 hits this request; since the start RAM 376369 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.0 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.17 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 704 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata trace: request 17 0
+strata trace: prompt start 16 -1
+strata trace: read 16 tokens (windows) in 224.9 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 16 1
+strata trace: window 17 1
+mtp budget: 556 observations; T1=47@34.4618ms/1tok T2=344@46.1733ms/1.99755tok T3=22@75.9662ms/2.48303tok T4=95@67.8924ms/2.48438tok T5=48@75.4012ms/2.48454tok
+strata decode timing: 2 windows, avg T 1.00, 1.00 tokens/window, 29.69 ms/window = verify 29.33 (GPU-reach wait 13.14 + per-layer host 11.25 [plan 0.09 actq 0.06 jobs 0.06 CPU 10.74] + stage 0.06) + commit/emit 0.22 + draft 0.14; per layer-window: CPU experts 4.17 (4.17 entries), VRAM hits 5.83, PCIe 0.00; adapt wait 0.00 join 0.00, 0.0 swaps/window
+strata serve: prompt 17 tokens = 0 reused + 17 read in 226 ms (75.4 tok/s), 2 generated in 59 ms (33.7 tok/s), drafts accepted 0 of 0, 0 checkpoints
+strata serve: decode expert cache hit rate: 58.3% (560 hits / 960 lookups)
+strata serve: resident RAM: 41.39 GiB of experts in RAM, 0 exchanged with the VRAM tier, 0 blob reads from the file
+strata serve: expert tiers: GPU 560 hits this request; since the start RAM 379103 blobs, files 0 blobs 23503.6 MB read
+strata serve: file tier I/O this request: the OS read 0.0 MB from storage (0 major faults) for 0.0 MB of expert reads; page cache held 0.0 MB at the read, not 0.0 MB; io prefetch: 0 read ahead (0.0 MB by pread), 0 used, 0 unused, 0 skipped (cached), 0 dropped; decode waited 0.0 ms in 0 fetches; decode gate: cache room 0.17 of the experts, read-ahead used 100%, page cache held 0% of the decode's reads (EWMA), closed, closed in 710 windows so far, 1 flips; read ahead 0.0 MB, 0.0 MB of it used; 0 late, 0 not admitted (confidence), 0 (budget 0 MB/window)
+strata cpu pipeline: batches=34010 experts=342352 wall_ms=16012.787

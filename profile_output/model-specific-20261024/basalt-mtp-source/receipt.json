@@ -1,0 +1,43 @@
+{
+  "repo": "jesdga/Qwen3.8-Flash-Next-Basalt",
+  "revision": "a229744b82e18c3e12057ab944062c0c713c7006",
+  "endpoint": "https://hf-mirror.com",
+  "files": {
+    "dense.txt": {
+      "bytes": 1851,
+      "sha256": "991456cf4eb266eb8a888c349e548d11bc640f5dbd9149439aa9786af0f732fd",
+      "source": {
+        "type": "file",
+        "oid": "e726e275f346dfc00e2504bba2696273e881fe99",
+        "size": 1851,
+        "path": "convert/mtp/rt/dense.txt"
+      }
+    },
+    "dense-tuned.json": {
+      "bytes": 346,
+      "sha256": "68c95784b703781092bc6bd348aca2c7dbdeabf7e895b729d5c63e943e6865ce",
+      "source": {
+        "type": "file",
+        "oid": "daad7d58c53158467049ccbcb290c7c393feb87a",
+        "size": 346,
+        "path": "convert/mtp/rt/dense-tuned.json"
+      }
+    },
+    "dense.bin": {
+      "bytes": 116099072,
+      "sha256": "dfe18647e0c95d05302907be88f021590119645a1567fcd770c8d309df852d75",
+      "source": {
+        "type": "file",
+        "oid": "1661e9f85b584b00baac26867a0958ed138ba348",
+        "size": 116099072,
+        "lfs": {
+          "oid": "dfe18647e0c95d05302907be88f021590119645a1567fcd770c8d309df852d75",
+          "size": 116099072,
+          "pointerSize": 134
+        },
+        "xetHash": "d648597d8298ed9e251bd90ba75948b8f933bd6d35b785b2fe9f188c5737b51b",
+        "path": "convert/mtp/rt/dense.bin"
+      }
+    }
+  }
+}

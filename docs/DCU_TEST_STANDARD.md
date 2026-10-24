@@ -6,7 +6,7 @@
 
 KV、状态、激活、临时工作区、运行时读取行、计算图、索引表及驱动开销单独记录，不用“空闲显存 50%”或“专家缓存 50%”代替权重约束。启动日志输出权重字节账单和当时设备总占用；后者减去权重是包含分配器及驱动开销的余量，不能当作精确 KV 用量。
 
-本机启动脚本与 `tools/autoround_pack.py run` 默认固定 8,500 专家，并开启增强 MTP；`strata-test/run-autoround.sh` 固定设置 `STRATA_MAX_WEIGHT_VRAM_FRACTION=0.5`。引擎先按预算约束自动缓存，再在 drafter 绑定完成后核验实际权重分配，超限退出。显式专家数超出预算也退出。该约束当前支持单 GPU native-pack 路径；未覆盖的多卡、批量 drafter、HC Q8 副本等配置会明确拒绝，不发布有效结果。
+本机启动脚本与 `tools/autoround_pack.py run` 默认固定 8,500 专家，并开启增强 MTP；`strata-test/run-autoround.sh` 固定设置 `STRATA_MAX_WEIGHT_VRAM_FRACTION=0.5`。引擎先按预算约束自动缓存，再在 drafter 绑定完成后核验实际权重分配，超限退出。显式专家数超出预算也退出。该约束当前支持单 GPU native-pack 路径；未覆盖的多卡、批量 drafter 等配置会明确拒绝，不发布有效结果。
 
 本轮重测固定 8,500 个 GPU 主模型专家，其余 16,076 个留在 RAM，不扫描专家数。增强 MTP（adaptive）开启，BF16 VEC4 和 COLS=4 开启，QFUSE/QDEDUP 关闭；BS=1、上下文上限 512、INT8 KV、12 个 CPU workers、磁盘 PLE。提示与此前 P1 的英文故事、中文解释、Python LRU 相同，每次生成 256 tokens，预热后每类重复三次。decode 以引擎 DONE 的 decode_ms 计算，排除载入和 prefill。
 
@@ -41,3 +41,12 @@ DFlash2 等外部草稿进程的 GPU 权重也必须计入同一个预算，不�
 测速须同时记录 `STRATA_VERIFY_HIT_PLAN`、`STRATA_CPU_EXPERT_PIPELINE`、`STRATA_CPU_EARLY_RESULT`、
 `STRATA_PCIE_STAGED_MAX` 和 `STRATA_POOL_IDLE_US`。工作线程占用包含忙等；带逐层记录的运行仅用于定位，
 正式吞吐取不加这些记录的运行。不得把不同模式的专家数或草稿权重差异算作调度收益。
+
+
+2026-10-24 的 [模型变体验收](DCU_MODEL_OPTIMIZATIONS.md) 继续固定 8500/8300 个专家。
+当前增强 MTP 的 Q8 组合全部权重为 29,373,360,352 字节；HC Q8 载入替代的副本按实际分配计入，
+草稿筛选额外副本计入 `mtp`，`mtp_proxy` 只是其中的明细，不能重复相加。
+还原工作区独立于模型权重；不建立整套常驻 BF16 投影副本。
+报告须记录 dense 文件摘要、MTP ready.json 来源、`STRATA_DENSE_Q8_VARIANT`、
+`STRATA_HC_Q8`、`STRATA_DRAFT_HEAD_PROXY`，以及原有调度选项。
+本轮加入四项语义与代码执行 QA，共 18 项；不以长输出 token 一致作为通过条件。

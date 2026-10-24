@@ -1,0 +1,83 @@
+[0/2] Re-checking globbed directories...
+[1/4] Building HIP object CMakeFiles/strata_kernels.dir/src/kernels/cuda/draft_head_proxy.cu.o
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:2:
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cuh:8:
+/root/strata-dcu/Strata/include/strata/kernels/dp4a.hpp:53:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:2:
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cuh:9:
+/root/strata-dcu/Strata/include/strata/kernels/pdl.hpp:66:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/kernels/pdl.hpp:72:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:96:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:104:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:119:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:168:53: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    auto mark = [&](int i) { if (diagnostic_events) cudaEventRecord((cudaEvent_t) diagnostic_events[i], cs); };
+                                                    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:2:
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cuh:89:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:73:15: note: in instantiation of function template specialization 'strata::kernels::draft_px::(anonymous namespace)::pack_group<true>' requested here
+    draft_px::pack_group<true>(w, row, group, (uint4*) proxy, draft_px::scales(proxy, rows));
+              ^
+8 warnings generated when compiling for gfx936.
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:2:
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cuh:8:
+/root/strata-dcu/Strata/include/strata/kernels/dp4a.hpp:53:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:2:
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cuh:9:
+/root/strata-dcu/Strata/include/strata/kernels/pdl.hpp:66:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/kernels/pdl.hpp:72:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:96:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:104:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:119:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:168:53: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+    auto mark = [&](int i) { if (diagnostic_events) cudaEventRecord((cudaEvent_t) diagnostic_events[i], cs); };
+                                                    ^~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:144:25: note: expanded from macro 'cudaEventRecord'
+#define cudaEventRecord hipEventRecord
+                        ^~~~~~~~~~~~~~
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:2:
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cuh:89:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:73:15: note: in instantiation of function template specialization 'strata::kernels::draft_px::(anonymous namespace)::pack_group<true>' requested here
+    draft_px::pack_group<true>(w, row, group, (uint4*) proxy, draft_px::scales(proxy, rows));
+              ^
+In file included from /root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cu:2:
+/root/strata-dcu/Strata/src/kernels/cuda/draft_head_proxy.cuh:93:40: warning: unused function 'score_kernel' [-Wunused-function]
+__global__ void __launch_bounds__(128) score_kernel(const uint4* __restrict__ wq, const uint32_t* __restrict__ sc,
+                                       ^
+9 warnings generated when compiling for host.
+[2/4] Linking HIP static library libstrata_kernels.a
+[3/4] Linking HIP executable draft_head_proxy_test
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]
+[4/4] Linking HIP executable strata
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]

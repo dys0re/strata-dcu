@@ -1,0 +1,11 @@
+{
+  "time_ns": 1792846472558173401,
+  "reason": "data-transform semantic result correct but Markdown-fenced; normalize wrapping for this semantic case only; existing strict JSON cases unchanged",
+  "baseline_answer": "```json\\n[\"a\", \"b\", \"c\"]\\n```",
+  "already_started": [
+    "baseline",
+    "q8",
+    "q8-tuned"
+  ],
+  "throughput_workloads_unchanged": true
+}

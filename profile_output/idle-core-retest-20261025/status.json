@@ -1,0 +1,12 @@
+[
+  {
+    "label": "fixed-bf16-smoke",
+    "returncode": 0,
+    "wall_seconds": 112.52469626907259
+  },
+  {
+    "label": "idle-bf16",
+    "returncode": 0,
+    "wall_seconds": 240.48261113883927
+  }
+]

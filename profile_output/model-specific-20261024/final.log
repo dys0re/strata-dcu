@@ -1,0 +1,15 @@
+START baseline
+END baseline 1
+START q8
+END q8 1
+START q8-tuned
+END q8-tuned 1
+START hc-q8-tuned
+END hc-q8-tuned 0
+START q8-tuned-proxy
+END q8-tuned-proxy 0
+Traceback (most recent call last):
+  File "/root/private_data/strata-dcu/model-specific-20261024/run_final.py", line 28, in <module>
+    assert (R/'baseline/qa-status.json').exists(),'Baseline QA must pass before choosing defaults'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Baseline QA must pass before choosing defaults

@@ -1,0 +1,10 @@
+[
+  {
+    "label": "cpu-check-plain",
+    "returncode": 0
+  },
+  {
+    "label": "cpu-check-proxy",
+    "returncode": 0
+  }
+]

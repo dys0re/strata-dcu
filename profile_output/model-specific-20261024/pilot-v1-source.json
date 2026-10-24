@@ -1,0 +1,16 @@
+{
+  "CMakeLists.txt": "28e06645a6392c45a8d678e726a240808117713b4025b73dd0714aea29ebb745",
+  "include/strata/core/mtp.hpp": "d6f0a9dabefe6a953ea84e951a17986ccb50cf7edccd00b9d045506374ed54af",
+  "src/core/mtp.cpp": "3c8179cdefde744225b847ca38ec57a337f803126a121dea153b62995dbfdefd",
+  "src/core/native_dense.cpp": "60903c23be9c313e775ddc80bca145dc7d623c70642614e10ec2296a345ea912",
+  "src/program/generate.cpp": "e2aa04537c6d026026982e7eab22238e224cea9596d8738d62077bcb09a76b89",
+  "tools/autoround_pack.py": "428312882fbf48d80ed299e77adf851050c36b4e618c9d4181541b3b57553071",
+  "tools/bench_dflash2_native.py": "9fa5153a4e7db031061e5a09a8237559818722e27cd4bdcb9c73ff7cde4d12f2",
+  "tools/dcu_model_variants.py": "4cf722e92635cce9b3acbe0c7f3bba2320ec6e072ea14a51e6b17de48082a95c",
+  "tools/test_dcu_model_variants.py": "035be43095a3efd684b24b4f4e01cccfab33036da645187de7c55d38b162af18",
+  "include/strata/kernels/draft_head_proxy.hpp": "4b5d9228c578cda2670bfe35cbc6e025ce14131855f52a58b974c152e517f6fc",
+  "src/kernels/cuda/draft_head_proxy.cu": "0f42638ef66beb4c18904931836b7df23e213e3ca467b86edb9b7a4091b8352f",
+  "src/kernels/cuda/draft_head_proxy.cuh": "9cf5e8fbbbfa7d6cc14bf3bbf4962f687748d179e4df9fa37bb2bc8dee7842c1",
+  "src/kernels/draft_head_proxy_test.cpp": "1bef1b62136632521c549816d74114bb2b204657af0d5082d7226ecbcc9abce6",
+  "third_party/basalt-head-proxy/LICENSE": "93e7240a1399b9cea1a65918ea14baea87d4f1fea60262afaaefca081a80df15"
+}

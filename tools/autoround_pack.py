@@ -320,8 +320,8 @@ def extract_bf16_mtp(ck, folder):
     return manifest
 
 
-def check_mtp(ck, out):
-    directory = out / "mtp"
+def check_mtp(ck, out, runtime=None):
+    directory = Path(runtime).resolve() if runtime else out / "mtp"
     if not (directory / "ready.json").is_file():
         raise ValueError("MTP cache missing; run autoround_pack.py mtp with the same --model and --out first")
     ready = json.loads((directory / "ready.json").read_text())
@@ -416,6 +416,19 @@ def run_serve_once(cmd, env, stderr, ids, max_new):
 
 
 def run_model(ck, out, a):
+    machine_variant = {}
+    if (os.environ.get("STRATA_DCU_MODEL_DEFAULTS") == "1" and
+            not a.dflash2 and a.mtp_mode == "adaptive"):
+        config_path = Path(os.environ["STRATA_DCU_MODEL_CONFIG"])
+        machine_variant = json.loads(config_path.read_text())
+        if (machine_variant.get("schema") != 1 or
+                not isinstance(machine_variant.get("dense_gguf"), str) or
+                (machine_variant.get("mtp_runtime") is not None and not isinstance(machine_variant["mtp_runtime"], str)) or
+                not isinstance(machine_variant.get("hc_q8"), bool) or
+                not isinstance(machine_variant.get("draft_head_proxy"), bool)):
+            raise ValueError("invalid DCU model-default configuration")
+        a.dense_gguf = a.dense_gguf or machine_variant["dense_gguf"]
+        a.mtp_runtime = a.mtp_runtime or machine_variant.get("mtp_runtime")
     (out / "generation.json").unlink(missing_ok=True)
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(ck.dir, local_files_only=True)
@@ -433,7 +446,8 @@ def run_model(ck, out, a):
         raise ValueError("prompt plus output exceeds --context")
     token_file = out / "prompt.ids"
     token_file.write_text(",".join(map(str, ids)) + "\n")
-    cmd = [str(Path(a.engine).resolve()), "--native", str(out / "dense.gguf"),
+    dense_file = Path(a.dense_gguf).resolve() if a.dense_gguf else out / "dense.gguf"
+    cmd = [str(Path(a.engine).resolve()), "--native", str(dense_file),
            "--pack", str(out / "pack"), "--ple-gguf", str(out / "ple.gguf"),
            "--tokens-file", str(token_file), "--max-new", str(a.max_new),
            "--eos-ids", ",".join(map(str, eos)),
@@ -449,7 +463,7 @@ def run_model(ck, out, a):
            "--ple-io", "direct", "--ple-row-cache", "65536"]
     cmd += ["--pcie-frac", str(a.pcie_frac)]
     if a.mtp_mode != "off" and (not a.dflash2 or a.dflash_mtp_prefix):
-        runtime = check_mtp(ck, out)
+        runtime = check_mtp(ck, out, a.mtp_runtime)
         cmd[cmd.index("--spec") + 1] = str(min(8, a.mtp_max_t + (2 if a.suffix_draft else 0)))
         cmd[cmd.index("--mtp-max-t") + 1] = str(a.mtp_max_t)
         cmd += ["--mtp", str(runtime)]
@@ -488,6 +502,11 @@ def run_model(ck, out, a):
         (out / "dflash2-command.json").write_text(json.dumps(cmd, indent=2) + "\n")
     print("Starting AutoRound model;", len(ids), "prompt tokens", flush=True)
     env = dict(os.environ, STRATA_MAX_WEIGHT_VRAM_FRACTION="0.5")
+    if machine_variant:
+        env.setdefault("STRATA_HC_Q8", str(int(machine_variant["hc_q8"])))
+        env.setdefault("STRATA_DRAFT_HEAD_PROXY", str(int(machine_variant["draft_head_proxy"])))
+    if a.dense_gguf:
+        env["STRATA_DENSE_Q8_VARIANT"] = "1"
     # gfx936 measurements: staged passes strict HC parity and improves decode.
     env.setdefault("STRATA_HC_SPLIT", "2")
     # The machine-specific DCU wrapper opts into the combination measured with enhanced MTP. Other entrypoints
@@ -529,6 +548,9 @@ def run_model(ck, out, a):
     raw_text = tokenizer.decode(generated, skip_special_tokens=False)
     decoded = tokenizer.decode(generated, skip_special_tokens=True)
     report = {"prompt": a.prompt, "prompt_ids": ids, "generated_ids": generated,
+              "model_variants": {"dense_gguf": str(dense_file), "mtp_runtime": a.mtp_runtime,
+                                 "hc_q8": env.get("STRATA_HC_Q8") == "1",
+                                 "draft_head_proxy": env.get("STRATA_DRAFT_HEAD_PROXY") == "1"},
               "text": decoded, "raw_text": raw_text, "engine_exit": result.returncode, "weight_vram": usage,
               "expert_execution": {"resident_pin": a.resident_pin, "adapt_every": a.adapt_every, "adapt_swaps": a.adapt_swaps,
                                    "pcie_mode": "dma-staged" if int(env.get("STRATA_PCIE_STAGED_MAX") or "0") > 0 else a.pcie_mode,
@@ -573,6 +595,8 @@ def main():
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--verify-experts", type=int, default=12)
     ap.add_argument("--engine", default=str(HERE.parent / "build" / "strata"))
+    ap.add_argument("--dense-gguf", help="optional prepared non-expert weight variant; expert pack stays fixed")
+    ap.add_argument("--mtp-runtime", help="optional compatible prepared MTP runtime, with source-bound ready.json")
     ap.add_argument("--prompt", default="Reply with exactly OK.")
     ap.add_argument("--max-new", type=int, default=32)
     ap.add_argument("--context", type=int, default=512)
@@ -611,6 +635,8 @@ def main():
     if a.dflash_mtp_prefix and (not a.dflash2 or a.dflash_backend!="native" or a.mtp_mode=="off" or
                                a.dflash_mtp_prefix>a.dflash_max_t-2):
         ap.error("joint mode needs native --dflash2, MTP enabled, and room for a DFlash2 tail")
+    if a.mtp_runtime and (a.mtp_mode == "off" or (a.dflash2 and not a.dflash_mtp_prefix)):
+        ap.error("mtp-runtime requires active MTP")
     if a.dflash2 and a.dflash_backend == "ipc" and (a.context > 512 or (not a.dflash_eager and a.dflash_max_t > 4)):
         ap.error("DFlash2 IPC supports context <=512 and graph --dflash-max-t <=4; use native for full windows")
     converter_path(a.llama)

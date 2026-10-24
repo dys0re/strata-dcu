@@ -137,3 +137,51 @@ Fresh documented-entry validation: PASS, 2026-10-24, validate_layer_entry. Verba
 exit 0; enhanced MTP, native and joint entry checks all passed. No edits/retries or observed divergences.
 Evidence: profile_output/layer-scheduling-20261024/entry-validation.txt and v9/entry/.
 Postflight: GPU2MiB, no remaining engine, memory.events oom/oom_kill both0.
+
+## Model-specific optimizations public entry (2026-10-24)
+
+Software runtime reused: dflash2@52f8bc84, no dependency/package changes. New model artifacts
+are declared in selected-model.json and source-bound MTP ready.json under persistent storage.
+Engine: /root/private_data/strata-dcu/model-specific-20261024/final-v1/strata-final.
+SHA256: 3ae138ead7fdbab0324bb17b423022d32c497eb18e3fb5aa82901011b98c9450.
+Public symlink: /root/strata-dcu/build-gfx936/strata.
+MTP defaults: HC Q8 + Q8 nonexpert projections/head + published self-distilled MTP dense;
+draft-head screening remains opt-in. Expert slots8500, total model weights29373360352B.
+Native/joint defaults retain prior weights/options, slots8300, weights32827238400/34195377152B.
+All <=34351349760B. Main INT4 expert bytes/layout unchanged, PLE stays on persistent disk.
+
+Seeded GPU16cases + weight-layout/digest/quantizer checks passed. Full18 functional/executable
+QA and cancellation/recovery passed for all five measured configurations; baseline/q8/q8-tuned
+were physically rerun after correcting a semantic Markdown-wrapper check (original failures preserved).
+Native Q8 projections and joint proxy + tuned MTP with forced rejection/lookup passed full QA.
+Repeated decode medians baseline33.72/42.01/44.62 versus chosen36.20/48.51/56.98.
+Later diagnostic period had CPU-expert slowdown on old and new binaries (~9TPS short-story);
+not used to claim a proxy speed gain, and cause is not established.
+
+Fresh documented invocation and concrete expected values: profile_output/model-specific-20261024/ENTRY.md.
+Fresh independent public-entry validation: PASS, validate_model_defaults_entry. The documented invocation ran exactly once, exit0; all three entries passed without divergence or retries. Evidence: profile_output/model-specific-20261024/entry-validation.txt and final-v1/entry/. GPU returned to2MiB, no remaining engine.
+
+
+## CPU slowdown diagnosis (2026-10-25)
+
+Runtime reused unchanged dflash2@52f8bc84; no dependency/engine/model/default changes.
+Two within-process affinity ABA tests confirmed host user-space contention on pinnedCPU0–12.
+Original BF16 64token cases7.39/9.95→25.71/26.68→10.29/14.30TPS.
+Selected default256token9.72→33.24→12.18TPS, CPUexpert149.13→25.77→106.70ms/window.
+No decode cgroup throttling; worker runqueue nearly disappears onCPU16–28, returns on0–12.
+Node0 user CPU13.15 exceeds ALL container user CPU10.94 equivalents, confirming outside-container user work.
+Large expert anonymous-page node distribution unchanged in selected ABA. First ABA had automatic NUMA migration, disclosed.
+Evidence: profile_output/cpu-slowdown-20261025/. All processes exited; GPU2MiB; OOM0; binarySHA unchanged3ae138ea…9450.
+
+
+## Idle-core retest (2026-10-25)
+
+Runtime reused unchanged dflash2@52f8bc84, engineSHA3ae138ea…9450. No rebuild/install/production default change.
+External bench chooses13 quiet physical-core groups after load using6x0.5s samples, maxbusy<=5%,
+NUMA proximity and per-launch revalidation. Corrected duplicated core_id grouping with thread_siblings_list.
+Formalv2 three repeats per256token task and full18QA+STOP/recovery allpassed, fourRC0.
+BF16 medians32.90/41.29/44.32; BF16proxy29.53/41.77/44.26; selected33.84/43.27/53.88;
+selectedproxy31.97/44.23/51.25TPS. Expert slots8500, allweights<=34351349760B.
+Worker queue max0.242%, selected main queue max3.731%; startup selection is not exclusivity.
+Postflight GPU2MiB, noengine/buildprocesses, OOM0; systemroot896MiB/cache59MiB.
+Evidence: profile_output/idle-core-retest-20261025/README.md and v2/audit.json.

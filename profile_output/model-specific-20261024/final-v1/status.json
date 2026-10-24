@@ -1,0 +1,22 @@
+[
+  {
+    "label": "baseline",
+    "returncode": 1
+  },
+  {
+    "label": "q8",
+    "returncode": 1
+  },
+  {
+    "label": "q8-tuned",
+    "returncode": 1
+  },
+  {
+    "label": "hc-q8-tuned",
+    "returncode": 0
+  },
+  {
+    "label": "q8-tuned-proxy",
+    "returncode": 0
+  }
+]

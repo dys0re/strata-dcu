@@ -6,9 +6,12 @@ resource.setrlimit(resource.RLIMIT_CORE,(0,0))
 
 ap=argparse.ArgumentParser(__doc__)
 ap.add_argument('--engine',required=True)
+ap.add_argument('--dense-gguf',help='optional non-expert weight variant; expert pack stays fixed')
+ap.add_argument('--mtp-runtime',help='optional compatible MTP runtime variant')
 ap.add_argument('--smoke',action='store_true')
 ap.add_argument('--qa-only',action='store_true',help='functional QA first; no throughput workload warmups')
 ap.add_argument('--qa-after-bench',action='store_true',help='run semantic/code/protocol QA after throughput workloads')
+ap.add_argument('--extended-qa',action='store_true',help='also execute generated search/interval/encoding functions and check a data transform')
 ap.add_argument('--graph',action='store_true')
 ap.add_argument('--draft-adaptive',action='store_true')
 ap.add_argument('--expert-cache',type=int)
@@ -28,6 +31,7 @@ ap.add_argument('--spec-prob',action='store_true')
 ap.add_argument('--corrupt',type=int,default=0)
 ap.add_argument('--timing-only',action='store_true')
 ap.add_argument('--thread-usage',action='store_true',help='sample per-thread scheduled CPU time at decode protocol boundaries')
+ap.add_argument('--process-placement',action='store_true',help='record anonymous NUMA page placement and CPU affinity after load')
 ap.add_argument('--shared-stream',choices=['auto','on','off'],default='auto',help='explicit shared-expert GPU stream placement; auto preserves backend defaults')
 ap.add_argument('--request-pcie-frac',type=float,help='explicit per-request fraction; exercises the fixed bounded-offload path')
 ap.add_argument('--width',type=int,choices=range(2,9),default=8)
@@ -62,7 +66,7 @@ for flag,n in [('--mtp',2),('--mtp-adaptive',1),('--dflash2',2),('--dflash-adapt
 for flag,value in [('--spec',str(min(8,a.width+(2 if a.suffix_draft and a.mode=='adaptive' else 0)))),('--mtp-max-t','1' if a.mode=='off' else str(a.width)),('--max-context',str(a.context)),('--expert-cache',str(a.expert_cache or (8500 if a.mode=='adaptive' else 8300)))]:
  cmd[cmd.index(flag)+1]=value
 if a.mode in ['adaptive','joint']:
- cmd+=['--mtp',str(cache/'mtp')]
+ cmd+=['--mtp',str(Path(a.mtp_runtime).resolve()) if a.mtp_runtime else str(cache/'mtp')]
  if a.mode!='joint' or not a.joint_fixed_prefix:cmd+=['--mtp-adaptive']
 # Normalize inherited flags: run-command.json may come from any public entry mode.
 for flag,n in [('--serve',1),('--prompt-cache',2),('--conversation-cache-mib',2),
@@ -71,6 +75,7 @@ for flag,n in [('--serve',1),('--prompt-cache',2),('--conversation-cache-mib',2)
  while flag in cmd:
   i=cmd.index(flag);del cmd[i:i+n]
 cmd+=['--resident-experts' if a.resident_pin else '--resident-cpu-experts']
+cmd[cmd.index('--native')+1]=str(Path(a.dense_gguf).resolve()) if a.dense_gguf else str(cache/'dense.gguf')
 cmd+=['--serve','--prompt-cache','0','--conversation-cache-mib','0',
       '--pcie-frac',str(a.pcie_frac),'--pcie-mode',a.pcie_mode,'--adapt-every',str(a.adapt_every),
       '--adapt-swaps',str(a.adapt_swaps),'--suffix-draft',str(a.suffix_draft)]
@@ -88,6 +93,9 @@ for key in ['STRATA_VERIFY_PROFILE','STRATA_DECODE_TIMING','STRATA_DUMP_FIRST_LO
 settings=dict(STRATA_MAX_WEIGHT_VRAM_FRACTION='0.5',STRATA_TRACE='1',STRATA_BF16_Q8_VEC4='1',STRATA_BF16_Q8_COLS=str(a.cols),STRATA_ROUTE_TAIL_SKIP='0',STRATA_SPEC_COUPLED='1',
  STRATA_QFUSE=str(int(a.fuse in ['qfuse','both'])),STRATA_VERIFY_QDEDUP=str(int(a.fuse in ['qdedup','both'])),STRATA_QFUSE_HC=str(int(a.fuse=='hc')))
 env.update(settings)
+if a.dense_gguf:
+ settings['STRATA_DENSE_Q8_VARIANT']='1'
+ env['STRATA_DENSE_Q8_VARIANT']='1'
 if a.shared_stream != 'auto':
  settings['STRATA_SH_STREAM']='1' if a.shared_stream=='on' else '0'
  env['STRATA_SH_STREAM']=settings['STRATA_SH_STREAM']
@@ -95,7 +103,8 @@ for feature in ['STRATA_CPU_Q4_MT','STRATA_DFLASH_SMALL_GEMV']:
  settings[feature]=env.get(feature,'0')
  env[feature]=settings[feature]
 for feature in ['STRATA_VERIFY_HIT_PLAN','STRATA_CPU_EXPERT_PIPELINE','STRATA_CPU_EARLY_RESULT',
-                'STRATA_PCIE_STAGED_MAX','STRATA_POOL_IDLE_US','STRATA_POOL_SPIN_US']:
+                'STRATA_PCIE_STAGED_MAX','STRATA_POOL_IDLE_US','STRATA_POOL_SPIN_US',
+                'STRATA_HC_Q8','STRATA_DRAFT_HEAD_PROXY']:
  if feature in env:settings[feature]=env[feature]
 if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRATA_SPEC_DEPTH='1')
 if a.timing_only:env['STRATA_DECODE_TIMING']='1'
@@ -139,6 +148,9 @@ if a.lookup_checks:
  repeated=' '.join([phrase]*8)
  cases += [('lookup-copy','Copy the text between <text> tags exactly, without tags or commentary.\n<text>'+repeated+'</text>',128,repeated,0),
            ('lookup-recovery','What is 17 times 23? Answer only the integer.',32,'391',0)]
+if a.extended_qa:
+ from dcu_functional_qa import CASES as extra_cases
+ cases += extra_cases
 records=[]
 mem=Path('/sys/fs/cgroup')
 def memory_snapshot():
@@ -200,6 +212,16 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
   (out/'weight-usage.json').write_text(json.dumps(usage,indent=2)+'\n')
   print('WEIGHTS',usage,flush=True)
   print('READY',a.mode,a.cols,a.fuse,flush=True)
+  if a.process_placement:
+   proc=Path(f'/proc/{p.pid}');nodes={};large=[]
+   for row in (proc/'numa_maps').read_text().splitlines():
+    fields=dict(s.split('=',1) for s in row.split() if '=' in s)
+    if 'anon' not in fields:continue
+    places={k:int(v) for k,v in fields.items() if re.fullmatch(r'N\d+',k)}
+    for key,value in places.items():nodes[key]=nodes.get(key,0)+value
+    if int(fields['anon'])>100000:large.append(dict(anon_pages=int(fields['anon']),nodes=places,policy=row.split()[1]))
+   status=[s for s in (proc/'status').read_text().splitlines() if s.startswith(('VmRSS:','VmSwap:','Cpus_allowed_list:','Mems_allowed_list:'))]
+   (out/'process-placement.json').write_text(json.dumps(dict(pid=p.pid,status=status,anonymous_nodes=nodes,large_regions=large,cpu_stat=(mem/'cpu.stat').read_text()),indent=2)+'\n')
   for name,prompt,n,expected,temperature in cases:
    prompt_ids,request=gen(prompt,n,temperature,name in ['context_tail','window-crossing'] or (a.long_checks and name=='lookup-copy'))
    (out/(name+'.request.txt')).write_text(request)
@@ -210,6 +232,9 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
    if expected is not None:assert text.strip()==expected,(name,text)
    if name=='sort-json':assert json.loads(text)==[-1,2,2,9],text
    if name=='json':assert json.loads(text)==dict(ok=True,count=3),text
+   if a.extended_qa:
+    from dcu_functional_qa import check as check_answer
+    check_answer(name,text)
    if name=='code-function':
     code=text.strip()
     if code.startswith('```'):code='\n'.join(code.splitlines()[1:-1])
@@ -250,5 +275,5 @@ if a.lookup_checks and a.suffix_draft:
 
 assert not any(s in errors for s in ['Launch params','larger than launch bounds','invalid device function','out of memory'])
 (out/'memory-after.json').write_text(json.dumps(memory_snapshot(),indent=2)+'\n')
-(out/'qa-status.json').write_text(json.dumps(dict(functional_assertions_passed=True,qa_scope='full' if a.qa_only or a.qa_after_bench else 'smoke' if a.smoke else 'long' if a.long_checks else 'checks' if a.checks else 'throughput',engine_rc=p.returncode,token_identity_informational=True))+'\n')
+(out/'qa-status.json').write_text(json.dumps(dict(functional_assertions_passed=True,qa_scope='full' if a.qa_only or a.qa_after_bench else 'smoke' if a.smoke else 'long' if a.long_checks else 'checks' if a.checks else 'throughput',extended_qa=a.extended_qa,engine_rc=p.returncode,token_identity_informational=True))+'\n')
 print('PASS',flush=True)

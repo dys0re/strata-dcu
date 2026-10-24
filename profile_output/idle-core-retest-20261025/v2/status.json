@@ -1,0 +1,22 @@
+[
+  {
+    "label": "idle-bf16",
+    "returncode": 0,
+    "wall_seconds": 235.7637958661653
+  },
+  {
+    "label": "idle-bf16-proxy",
+    "returncode": 0,
+    "wall_seconds": 233.98927541589364
+  },
+  {
+    "label": "idle-selected",
+    "returncode": 0,
+    "wall_seconds": 239.24717528186738
+  },
+  {
+    "label": "idle-selected-proxy",
+    "returncode": 0,
+    "wall_seconds": 230.19455435685813
+  }
+]

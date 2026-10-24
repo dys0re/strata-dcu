@@ -1,0 +1,5 @@
+START cpu-check-plain
+END cpu-check-plain 0
+START cpu-check-proxy
+END cpu-check-proxy 0
+CPU_CHECK_COMPLETE
