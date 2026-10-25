@@ -1,0 +1,9 @@
+START finish_gpu_test
+END finish_gpu_test 0
+START run_modes_qa
+END run_modes_qa 0
+START profile_current
+END profile_current 0
+START analyze_bench
+END analyze_bench 0
+AFTER_BENCH_COMPLETE

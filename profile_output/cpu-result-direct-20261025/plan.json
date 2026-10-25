@@ -1,0 +1,13 @@
+{
+  "order": [
+    "baseline-a",
+    "candidate-b",
+    "candidate-b2",
+    "baseline-a2"
+  ],
+  "normal_throughput": "3 repetitions of 256tokens per workload per cold start; no full-layer tracing",
+  "default_rule": "geometric-mean TPS ratio >=1.01 and no task below 0.97, using pooled 6 samples/task/config; descriptive result only, not statistical significance",
+  "experts_gpu": 8500,
+  "experts_ram": 16076,
+  "weight_limit": 34351349760
+}

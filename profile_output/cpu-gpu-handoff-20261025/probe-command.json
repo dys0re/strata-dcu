@@ -1,0 +1,12 @@
+{
+  "core": 3,
+  "busy": 0.0,
+  "command": [
+    "/root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff-probe"
+  ],
+  "sha256": "262dad75bb12f9f37c1f968a8c8fb483ec87f7288f155028a2365808f3fed636",
+  "flags": {
+    "STRATA_FUSE_WAIT": null,
+    "STRATA_FUSE_HITS": null
+  }
+}

@@ -379,6 +379,18 @@ bool fuse_hits_on() {
 #endif
 }
 
+// Opt-in for the measured gfx936 compatibility build. Other backend dispatch
+// stays unchanged until it has its own hardware validation.
+#if defined(STRATA_HIP_GFX906)
+bool cpu_result_direct_on() {
+    static const bool on = [] {
+        const char* v = std::getenv("STRATA_CPU_RESULT_DIRECT");
+        return v != nullptr && std::atoi(v) != 0;
+    }();
+    return on;
+}
+#endif
+
 bool one_token_self_commit() {
 #if defined(STRATA_USE_HIP)
     static const bool on = [] {
@@ -2064,6 +2076,15 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             }
         };
         bool hits_in_combine = false;
+        bool direct_cpu = false;
+#if defined(STRATA_HIP_GFX906)
+        direct_cpu = cpu_result_direct_on() && !ar_on() && !device_plan_ && !prof_on_ &&
+                                m_bal_ == nullptr && !remote_opt_ && !always_publish_ && !peer_portable() &&
+                                next_ == nullptr && lb_ == 0 && le_ == g.n_layers && lay.native &&
+                                !sg_gated_[grp] && dec_batch && native_moe_combine_enabled() &&
+                                native_moe_combine_mapped_supported(m_ymiss_ + (size_t) tb * K * N, hit_out,
+                                                                  shared_ + tb * N, bo_ + tb * N, N, K, n);
+#endif
         if (ar_on()) {
             stamp(l, 19, grp);
             grouped(p_ptr, p_start, p_counts, 0, parts_out);
@@ -2118,7 +2139,11 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
             // pcie_frac 0), so its launch is kPcieGroupRows block rows striding over the groups, not cap of them
             grouped(p_ptr2, p_start2, p_counts + 2, kPcieGroupRows, hit_out);
             stamp(l, 22, grp);
-            if (device_plan_) {   // no CPU share when the device planned the group: its rows are zeros
+            if (direct_cpu) {
+                // The combine below consumes CPU completion after joining the
+                // shared stream. The original layer-0 PLE gate is retained.
+                stamp(l, 23, grp);
+            } else if (device_plan_) {   // no CPU share when the device planned the group: its rows are zeros
                 wait_flag_ge_or(m_flag_, ring, skip_ + grp, cs);
                 copy_or_zero_from_mapped(parts_out, m_ymiss_ + (size_t) tb * K * N, (long long) n * K * N,
                                          skip_ + grp, ring, cs);
@@ -2142,19 +2167,32 @@ bool Verifier::record_window(int T, cudaStream_t cs, std::string& err) {
                 else
                     copy_from_mapped(parts_out, m_ymiss_ + (size_t) tb * K * N, (int64_t) n * K * N, cs);
             }
-            schedule_stamp(l, 34, grp);
+            if (!direct_cpu) schedule_stamp(l, 34, grp);
             // 143-amdk: the add of the GPU's hit rows is done by the combine that follows (one launch fewer)
             hits_in_combine = fuse_hits_on() && !prof_on_ && !remote_opt_ && !sg_gated_[grp] && dec_batch && n > 1 &&
                               native_moe_combine_enabled() && n <= 8 &&
                               native_moe_combine_hits_supported(parts_ + (size_t) tb * K * N, shared_ + tb * N, bo_ + tb * N, N, K, n);
-            if (!hits_in_combine) moe_hit_add(parts_out, hit_out, p_dst, p_counts + 1, cap, N, cs);
+            if (!direct_cpu && !hits_in_combine) moe_hit_add(parts_out, hit_out, p_dst, p_counts + 1, cap, N, cs);
         }
         // Same condition as `sh_fork` above, which is per group and out of scope here: wait only when the fork
         // actually ran (a wait on an event never recorded is a no-op, but saying it outright reads better).
         if (sh_stream_on() && !prof_on_ && sh_cs_ != nullptr && ev_fork_ != nullptr && ev_join_ != nullptr) {
             cudaStreamWaitEvent(cs, ev_join_, 0);
         }
-        if (sg_gated_[grp]) {   // STRATA_LFUSE: the shared expert's gate was not applied: the combine applies it (all rows are hits)
+        if (direct_cpu) {
+#if defined(STRATA_HIP_GFX906)
+            static std::atomic<bool> noted{false};
+            if (!noted.exchange(true))
+                std::fprintf(stderr, "strata verify: direct CPU result combine selected\n");
+            try {
+                native_moe_combine_mapped_after(m_ymiss_ + (size_t) tb * K * N, hit_out, p_dst, p_counts + 1,
+                                               w_ + tb * K, shared_ + tb * N, bo_ + tb * N, m_flag_, ring, N, K, n, cs);
+            } catch (const std::exception& e) { err = "verify mapped combine: " + std::string(e.what()); return false; }
+#endif
+            // In this mode 23..34 includes wait + direct consume + combine;
+            // 22..24 remains the comparable whole result-return interval.
+            schedule_stamp(l, 34, grp);
+        } else if (sg_gated_[grp]) {   // STRATA_LFUSE: the shared expert's gate was not applied: the combine applies it (all rows are hits)
             try {
                 native_moe_combine_multi_hits_gated(parts_out, w_ + tb * K, shared_ + tb * N, sh_g_ + tb, bo_ + tb * N, N, K, n, cs);
             } catch (const std::exception& e) { err = "verify combine: " + std::string(e.what()); return false; }

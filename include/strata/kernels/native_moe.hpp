@@ -23,6 +23,17 @@ bool native_moe_combine_hits_supported(const float* parts, const float* shared, 
 void native_moe_combine_multi_hits_added(const float* parts, const float* hits, const int32_t* dst, const int32_t* count,
                                          const float* weights, const float* shared, float* output, int64_t n_embd, int64_t k,
                                          int n_tok, void* stream);
+/// Read CPU rows directly from coherent mapped host memory, and GPU rows from hits.
+/// Wait for flag >= value before any CPU payload read. dst[0,*count) lists GPU
+/// rows, relative to this group. Same ordered arithmetic as copy + hit add + combine.
+/// Caller retains both inputs until this stream consumes them, and joins shared's
+/// producer before this call. k=10, aligned F32 rows, 1..8 positions only.
+bool native_moe_combine_mapped_supported(const float* cpu, const float* hits, const float* shared,
+                                        const float* output, int64_t n_embd, int64_t k, int n_tok);
+void native_moe_combine_mapped_after(const float* cpu, const float* hits, const int32_t* dst, const int32_t* count,
+                                    const float* weights, const float* shared, float* output,
+                                    const uint32_t* flag, uint32_t value, int64_t n_embd, int64_t k,
+                                    int n_tok, void* stream);
 void native_moe_combine_multi(const float* parts, const float* weights, const float* shared, float* output,
                               int64_t n_embd, int64_t k, int n_tok, void* stream);
 /// STRATA_VERIFY_RESIDENT: the same, reading every part as `0.0f + hit[i]` - bitwise what a zeroed part row plus

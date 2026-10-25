@@ -1,0 +1,25 @@
+WEIGHTS {'pack': 1538035200, 'dense': 5819596800, 'head': 1271398400, 'experts': 22947840000, 'mtp': 0, 'weights': 32827238400, 'total': 68702699520, 'limit': 34351349760, 'fraction': 0.47781584, 'device_used': 34296823808, 'external_draft': 0, 'native_draft': 1206131200, 'staging': 44236800, 'mtp_proxy': 0}
+READY native 4 off
+IDLE_CORE_SELECTION {'node': 3, 'cores': [48, 50, 51, 52, 53, 54, 55, 56, 57, 58, 60, 62, 63], 'max_busy': 0.006688963210702341, 'mean_busy': 0.0010256524217790454, 'weighted_expert_distance': 15.236573256094113}
+DONE ok 2 9.87
+DONE arithmetic 2 19.44
+DONE multiply 4 24.1
+DONE sum 5 33.72
+DONE capital 2 17.06
+DONE uppercase 2 21.23
+DONE sort-json 13 20.61
+DONE json 12 16.16
+DONE code-function 21 23.97
+DONE multi-turn 3 29.35
+DONE sample-0 64 14.61
+DONE sample-1 64 20.24
+DONE one_token 1 32.47
+DONE context_tail 3 25.53
+DONE lookup-copy 65 29.6
+DONE lookup-recovery 4 29.74
+DONE code-search 74 29.98
+DONE code-intervals 115 39.44
+DONE code-encoding 105 44.53
+DONE data-transform 15 43.47
+SEED_REPEAT True
+PASS

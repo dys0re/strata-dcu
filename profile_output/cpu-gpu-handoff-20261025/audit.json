@@ -1,0 +1,13 @@
+{
+  "objective": "Identify an evidence-supported CPU/GPU handoff optimization direction; no production implementation requested",
+  "current_engine_and_flags_verified": true,
+  "full_layer_trace_verified": true,
+  "raw_wait_and_copy_markers_verified": true,
+  "three_way_probe_verified": true,
+  "fresh_payload_probe_verified": true,
+  "independent_numerical_reference_passed": true,
+  "fixed_experts_and_half_vram_verified": true,
+  "production_sources_unchanged": true,
+  "remote_idle_and_binary_unchanged_verified": true,
+  "implementation_and_decode_tps_gain": "not performed or claimed"
+}

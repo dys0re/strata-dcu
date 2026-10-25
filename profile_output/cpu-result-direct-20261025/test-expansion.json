@@ -1,0 +1,7 @@
+{
+  "changed": [
+    "src/kernels/mapped_moe_parity.cpp"
+  ],
+  "engine_unchanged": "81f79177f7e9b15a1d4506bed0211db95b369594868f51bcc19e64fa4017ce9b",
+  "coverage": "all 1..8 positions; previously1,2,3,5,8"
+}

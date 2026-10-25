@@ -1,0 +1,21 @@
+COMMAND
+ssh -S /tmp/strata-direct-20261025-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; python3 -u /root/private_data/strata-dcu/cpu-result-direct-20261025/validate_entry.py'
+
+STDOUT/STDERR (observed tool output, verbatim)
+Traceback (most recent call last):
+  File "/root/private_data/strata-dcu/cpu-result-direct-20261025/validate_entry.py", line 35, in <module>
+    assert ('strata cpu q4: shared input direct and single-position rows active' in err)==mtp
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+EXIT CODE
+1
+
+OBSERVED PASS OUTPUT
+None.
+
+DOCUMENTATION/RUNTIME DIVERGENCE
+Expected exit 0 and five PASS lines. Actual exit 1 before any PASS output; validate_entry.py line 35 failed assertion:
+assert ('strata cpu q4: shared input direct and single-position rows active' in err)==mtp
+No edits, retries, additional inference, or corrective actions performed.
+

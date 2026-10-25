@@ -1,0 +1,7 @@
+IDLE_CORE_SELECTION {'node': 3, 'cores': [49, 50, 51, 52, 53, 54, 55, 56, 58, 59, 60, 61, 63], 'max_busy': 0.05084745762711865, 'mean_busy': 0.03507353862862898, 'weighted_expert_distance': 15.785859225543554}
+REQUEST_COMPLETE warmup DONE 128 42 1128.0 5527.5 length 52 121 0 31318 94560 39992 0 0.0 42 0 chunk=0 experts_streamed=0
+REQUEST_COMPLETE story DONE 64 42 679.9 2133.8 length 31 67 0 15915 48000 19611 0 0.0 42 0 chunk=0 experts_streamed=0
+REQUEST_COMPLETE chinese DONE 64 39 706.8 1857.5 length 31 54 0 25413 41760 12079 0 0.0 39 0 chunk=0 experts_streamed=0
+REQUEST_COMPLETE code DONE 64 38 591.4 1660.2 length 43 58 0 24096 37920 8468 0 0.0 38 0 chunk=0 experts_streamed=0
+REQUEST_COMPLETE recovery DONE 2 17 289.1 76.8 stop 0 0 0 560 960 400 0 0.0 17 0 chunk=0 experts_streamed=0
+PROFILE_COMPLETE

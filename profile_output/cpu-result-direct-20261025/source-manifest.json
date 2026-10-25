@@ -1,0 +1,9 @@
+{
+  "CMakeLists.txt": "460788c7a5f16691e1f288e6f9fd24a79cf084e51da6d36e5e3012042330293e",
+  "include/strata/kernels/native_moe.hpp": "229caa5f1d8d007a2573fa1397cbabb59e0989e1dea534cc82e4fb4b8d746608",
+  "src/kernels/cuda/native_moe.cu": "bd5d060702737ca1d97014f55b16668847b91ec854f731538dd7f5c8026fe9b8",
+  "src/core/verify.cpp": "bcabfda9295aaf8ec31a5cd1377781e47e41436515f96fa348c14dc770ffc008",
+  "src/kernels/mapped_moe_parity.cpp": "8d880ee773dd16af937538bfcc32116bf466e457cbf09430aaf6d551160ecbaa",
+  "tools/autoround_pack.py": "766aab5bd720f22497bb75471b20297387b0e96d3ba88315d32371521829f89f",
+  "tools/bench_dflash2_native.py": "39a4727f1148d0169d11586ee54af3faef3043532de809d6b1b123f141bea217"
+}

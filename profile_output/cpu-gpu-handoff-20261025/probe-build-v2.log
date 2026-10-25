@@ -1,0 +1,27 @@
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:2:
+In file included from /root/strata-dcu/Strata/include/strata/platform/hip_compat/cuda_runtime.h:2:
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:220:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:228:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:3:
+/root/strata-dcu/Strata/include/strata/kernels/dp4a.hpp:53:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:16:
+/root/private_data/strata-dcu/cpu-gpu-handoff-20261025/production_copy.inc:24:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:135:12: error: use of undeclared identifier 'cudaGraphInstantiateWithFlags'; did you mean 'hipGraphInstantiateWithFlags'?
+        CK(cudaGraphInstantiateWithFlags(&e,g,0));CK(cudaGraphDestroy(g));return e;
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           hipGraphInstantiateWithFlags
+/root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:15:39: note: expanded from macro 'CK'
+#define CK(x) do { auto probe_status=(x); if(probe_status!=cudaSuccess){std::fprintf(stderr,"%s: %s\n",#x,cudaGetErrorString(probe_status));std::exit(2);} } while(0)
+                                      ^
+/opt/dtk-26.04/hip/include/hip/hip_runtime_api.h:7915:12: note: 'hipGraphInstantiateWithFlags' declared here
+hipError_t hipGraphInstantiateWithFlags(hipGraphExec_t* pGraphExec, hipGraph_t graph,
+           ^
+4 warnings and 1 error generated when compiling for gfx936.

@@ -1,0 +1,4 @@
+[0/2] Re-checking globbed directories...
+[1/2] Building CXX object CMakeFiles/mapped_moe_parity.dir/src/kernels/mapped_moe_parity.cpp.o
+[2/2] Linking HIP executable mapped_moe_parity
+clang++: warning: argument unused during compilation: '--offload-arch=gfx936' [-Wunused-command-line-argument]

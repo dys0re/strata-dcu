@@ -1,0 +1,6 @@
+{
+  "src/kernels/cuda/elementwise.cu": "31a6d83d73fe2cb66dad3212a807b70b69dfb5da31e7c85f17837d5690014414",
+  "src/kernels/cuda/native_moe.cu": "ed63f56561673e0ad00fd830b75a4dc912d1963d781a43db566932cb2caa9b6e",
+  "src/kernels/cuda/s2_expert_grouped.cu": "b8e4d6b3dfcb2b35e502b6cd01052779bcf83991aeb25419eeed123cd47ada7e",
+  "src/kernels/cuda/verify_kernels.cu": "834b4018368457650f554ba1d5126d5ba3c29370888c20565caf8a75ce07db1e"
+}

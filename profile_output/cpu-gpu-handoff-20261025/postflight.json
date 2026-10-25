@@ -1,0 +1,48 @@
+{
+  "engine": "/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final",
+  "engine_sha256": "4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd",
+  "gpu_used_mib": 2,
+  "gpu_output": "\n================================= System Management Interface ==================================\n================================================================================================\nHCU[0]\t\t: vram Total Memory (MiB): 65520\nHCU[0]\t\t: vram Total Used Memory (MiB): 2\n================================================================================================\n======================================== End of SMI Log ========================================\n\n",
+  "checked_job_handles": [
+    131158,
+    131155,
+    134200,
+    134186,
+    134401,
+    134387
+  ],
+  "live_job_handles": [],
+  "memory_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0
+  },
+  "engine_or_probe_processes": [],
+  "cpu_max": "1500000 100000",
+  "memory_max": "63350767616",
+  "system_sizes": "896M\t/root/strata-dcu\n59M\t/root/.cache\n",
+  "ple": "/root/private_data/strata-dcu/autoround/ple.gguf",
+  "source_hashes": {
+    "/root/strata-dcu/Strata/src/core/verify.cpp": "e623e8e9cf07d632db9a80e50f80eee30fc11a1da33e4c68726f850f1d60b74c",
+    "/root/strata-dcu/Strata/src/kernels/cuda/elementwise.cu": "31a6d83d73fe2cb66dad3212a807b70b69dfb5da31e7c85f17837d5690014414",
+    "/root/strata-dcu/Strata/src/kernels/cuda/native_moe.cu": "ed63f56561673e0ad00fd830b75a4dc912d1963d781a43db566932cb2caa9b6e",
+    "/root/strata-dcu/Strata/src/kernels/cuda/verify_kernels.cu": "834b4018368457650f554ba1d5126d5ba3c29370888c20565caf8a75ce07db1e",
+    "/root/strata-dcu/Strata/src/kernels/cuda/s2_expert_grouped.cu": "b8e4d6b3dfcb2b35e502b6cd01052779bcf83991aeb25419eeed123cd47ada7e"
+  },
+  "verify_compile_rule": [
+    "build CMakeFiles/strata_engine.dir/src/core/verify.cpp.o: CXX_COMPILER__strata_engine_unscanned_Release /root/strata-dcu/Strata/src/core/verify.cpp || cmake_object_order_depends_target_strata_engine",
+    "  DEFINES = -DSTRATA_HAS_DRAFT_HEAD_PROXY=1 -DSTRATA_HIP_GFX906=1 -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_Q6K_EXPERTS=1 -DSTRATA_VERSION=\\\"0.1.46.3\\\" -D__HIP_PLATFORM_AMD__=1 -D__HIP_PLATFORM_HCC__=1 -D__HIP_ROCclr__=1",
+    "  DEP_FILE = CMakeFiles/strata_engine.dir/src/core/verify.cpp.o.d",
+    "  FLAGS = -O3 -DNDEBUG -std=c++20 -Wall -Wextra",
+    "  INCLUDES = -I/root/strata-dcu/Strata/include -I/root/strata-dcu/llama.cpp/ggml/src/../include -isystem /root/strata-dcu/Strata/include/strata/platform/hip_compat -isystem /opt/dtk-26.04/hip/include",
+    "  OBJECT_DIR = CMakeFiles/strata_engine.dir",
+    "  OBJECT_FILE_DIR = CMakeFiles/strata_engine.dir/src/core"
+  ],
+  "ssh_environment_flags": {
+    "STRATA_FUSE_WAIT": null,
+    "STRATA_FUSE_HITS": null,
+    "STRATA_VERIFY_COHERENT": null
+  }
+}

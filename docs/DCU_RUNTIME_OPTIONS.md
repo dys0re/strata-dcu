@@ -58,3 +58,8 @@ HC Q8、Q8 非专家投影/输出头、发布的蒸馏 MTP。草稿筛选仍默�
 2026-10-25 的 [CPU INT4 输入修正复用](DCU_Q4_INPUT_BIAS.md) 在同一本机模型配置中启用
 `cpu_q4_input_bias=true`，只作用于增强MTP默认入口。显式设置`STRATA_CPU_Q4_INPUT_BIAS=0`可关闭。
 原生DFlash2和联合模式保持显式选择；新算式还需要`STRATA_CPU_Q4_MT=1`及现有CPU能力检查通过。
+
+2026-10-25 的 [CPU 输出直接合并](DCU_CPU_RESULT_DIRECT.md) 可通过
+`STRATA_CPU_RESULT_DIRECT=1` 显式启用，0使用原结果拷贝与合并流程。
+当前gfx936兼容构建的单GPU原生专家路径支持它；全部GPU权重、专家数和量化格式不变。
+本轮正常测速未建立整体收益，本机模型配置`cpu_result_direct=false`，默认仍关闭。

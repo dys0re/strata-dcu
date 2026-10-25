@@ -1,0 +1,11 @@
+COMMAND
+ssh -S /tmp/strata-direct-20261025-control -o BatchMode=yes -p 11754 root@ssh.zzai.scnet.cn 'ulimit -c 0; python3 -u /root/private_data/strata-dcu/cpu-result-direct-20261025/validate_entry.py'
+
+STDOUT (including SSH stderr)
+PASS ENTRY mtp-default
+PASS ENTRY mtp-override
+PASS ENTRY native-opt-in
+PASS ENTRY joint-opt-in
+PASS CPU RESULT DIRECT PUBLIC ENTRIES; GPU idle
+
+EXIT CODE: 0

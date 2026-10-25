@@ -1,0 +1,1014 @@
+00400000 default file=/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final mapped=10 active=0 N0=10 kernelpagesize_kB=4
+0040a000 default file=/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final mapped=1131 active=1053 N0=1069 N1=62 kernelpagesize_kB=4
+00be7000 default file=/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final mapped=1313 active=389 N0=72 N1=520 N2=26 N3=372 N4=323 kernelpagesize_kB=4
+02ef8000 default file=/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+02ef9000 default file=/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final anon=2 dirty=2 mapped=3 active=1 N0=2 N4=1 kernelpagesize_kB=4
+02efc000 default anon=139 dirty=139 active=0 N0=5 N3=134 kernelpagesize_kB=4
+044c6000 default heap anon=140989 dirty=140989 active=1 N0=10492 N1=92594 N2=4 N3=37899 kernelpagesize_kB=4
+7fb2d201b000 default anon=10851301 dirty=10851301 active=0 N0=10208800 N1=642501 kernelpagesize_kB=4
+7fbd2b400000 default file=/dev/dri/renderD133
+7fc2a4400000 default file=/root/private_data/strata-dcu/autoround/pack/experts.bin
+7fd276400000 default file=/dev/dri/renderD133
+7fd31e400000 default file=/dev/dri/renderD133
+7fd32fa00000 default file=/dev/dri/renderD133
+7fd334400000 prefer=static:7 anon=17072 dirty=17072 active=0 N7=17072 kernelpagesize_kB=4
+7fd338800000 default file=/dev/dri/renderD133
+7fd33e000000 default file=/dev/dri/renderD133
+7fd340000000 default anon=587 dirty=587 active=0 N1=587 kernelpagesize_kB=4
+7fd34024b000 default
+7fd3448a6000 default anon=79706 dirty=79706 active=0 N1=79706 kernelpagesize_kB=4
+7fd358000000 default anon=12889 dirty=12889 active=0 N1=12889 kernelpagesize_kB=4
+7fd35b259000 default
+7fd35c000000 default anon=10989 dirty=10989 active=0 N0=126 N1=10863 kernelpagesize_kB=4
+7fd35eaed000 default
+7fd360000000 default anon=10869 dirty=10869 active=0 N0=53 N1=10816 kernelpagesize_kB=4
+7fd362a75000 default
+7fd364002000 default anon=8017 dirty=8017 active=0 N1=8017 kernelpagesize_kB=4
+7fd365f53000 default
+7fd365f54000 default anon=14 dirty=14 active=0 N1=14 kernelpagesize_kB=4
+7fd366754000 default
+7fd366755000 default anon=13 dirty=13 active=0 N1=13 kernelpagesize_kB=4
+7fd366f55000 default
+7fd366f56000 default anon=18615 dirty=18615 active=0 N1=18615 kernelpagesize_kB=4
+7fd36c000000 default anon=16109 dirty=16109 active=0 N1=16109 kernelpagesize_kB=4
+7fd36feed000 default
+7fd370000000 default anon=12277 dirty=12277 active=0 N1=12277 kernelpagesize_kB=4
+7fd372ff5000 default
+7fd374000000 default anon=14668 dirty=14668 active=0 N1=14668 kernelpagesize_kB=4
+7fd37794c000 default
+7fd378000000 default anon=13916 dirty=13916 active=0 N0=126 N1=13790 kernelpagesize_kB=4
+7fd37b65c000 default
+7fd37c000000 default anon=16384 dirty=16384 active=0 N0=325 N1=16059 kernelpagesize_kB=4
+7fd380e00000 default file=/dev/dri/renderD133
+7fd3815bb000 default anon=92741 dirty=92741 active=0 N0=2587 N1=90154 kernelpagesize_kB=4
+7fd398000000 default anon=9394 dirty=9394 active=0 N0=3821 N1=5573 kernelpagesize_kB=4
+7fd39a5b0000 default
+7fd39c200000 default file=/dev/dri/renderD133
+7fd39c666000 default anon=31130 dirty=31130 active=0 N0=11320 N1=19810 kernelpagesize_kB=4
+7fd3a4000000 default anon=16384 dirty=16384 active=0 N0=1957 N1=14427 kernelpagesize_kB=4
+7fd3a8600000 default file=/dev/dri/renderD133
+7fd3a9000000 default file=/dev/dri/renderD133
+7fd3a9413000 default anon=11245 dirty=11245 active=0 N0=11245 kernelpagesize_kB=4
+7fd3ac000000 default anon=16384 dirty=16384 active=0 N0=1762 N1=14622 kernelpagesize_kB=4
+7fd3b0000000 default anon=16384 dirty=16384 active=0 N0=1725 N1=14659 kernelpagesize_kB=4
+7fd3b4000000 default anon=16384 dirty=16384 active=0 N0=1339 N1=15045 kernelpagesize_kB=4
+7fd3b8000000 default anon=16384 dirty=16384 active=0 N0=1366 N1=15018 kernelpagesize_kB=4
+7fd3bc000000 default anon=16384 dirty=16384 active=0 N0=1523 N1=14861 kernelpagesize_kB=4
+7fd3c0000000 default anon=16384 dirty=16384 active=0 N0=2260 N1=14124 kernelpagesize_kB=4
+7fd3c4000000 default anon=16384 dirty=16384 active=0 N0=1826 N1=14558 kernelpagesize_kB=4
+7fd3c8600000 default file=/dev/dri/renderD133
+7fd3c8eb0000 default anon=11080 dirty=11080 active=0 N0=3644 N1=7436 kernelpagesize_kB=4
+7fd3cb9fa000 default anon=8194 dirty=8194 active=0 N1=8194 kernelpagesize_kB=4
+7fd3cdaaf000 default anon=8017 dirty=8017 active=0 N1=8017 kernelpagesize_kB=4
+7fd3cfa00000 default file=/dev/dri/renderD133
+7fd3d3c00000 default file=/dev/dri/renderD133
+7fd3d8000000 default anon=3 dirty=3 active=0 N0=3 kernelpagesize_kB=4
+7fd3d8021000 default
+7fd3dc200000 default file=/dev/dri/renderD133
+7fd3dc5c4000 default anon=3644 dirty=3644 active=0 N0=3644 kernelpagesize_kB=4
+7fd3dd400000 default file=/dev/dri/renderD133
+7fd3dde00000 default file=/dev/dri/renderD133
+7fd3e0000000 default anon=3 dirty=3 active=0 N0=3 kernelpagesize_kB=4
+7fd3e0021000 default
+7fd3e4000000 default anon=3 dirty=3 active=0 N0=3 kernelpagesize_kB=4
+7fd3e4021000 default
+7fd3e8000000 default anon=3 dirty=3 active=0 N0=3 kernelpagesize_kB=4
+7fd3e8021000 default
+7fd3ec000000 default anon=15933 dirty=15933 active=0 N0=12894 N1=3039 kernelpagesize_kB=4
+7fd3eff2d000 default
+7fd3f0000000 default anon=1 dirty=1 active=0 N4=1 kernelpagesize_kB=4
+7fd3f0021000 default
+7fd3f4000000 default anon=6 dirty=6 active=0 N3=6 kernelpagesize_kB=4
+7fd3f4021000 default
+7fd3f8000000 default anon=1 dirty=1 active=0 N4=1 kernelpagesize_kB=4
+7fd3f8021000 default
+7fd3fc000000 default anon=1 dirty=1 active=0 N4=1 kernelpagesize_kB=4
+7fd3fc021000 default
+7fd400000000 default anon=1 dirty=1 active=0 N4=1 kernelpagesize_kB=4
+7fd400021000 default
+7fd404000000 default anon=1 dirty=1 active=0 N4=1 kernelpagesize_kB=4
+7fd404021000 default
+7fd408000000 default anon=1 dirty=1 active=0 N1=1 kernelpagesize_kB=4
+7fd408021000 default
+7fd40c000000 default anon=1 dirty=1 active=0 N1=1 kernelpagesize_kB=4
+7fd40c021000 default
+7fd410000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd410021000 default
+7fd414000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd414021000 default
+7fd418000000 default anon=1 dirty=1 active=0 N1=1 kernelpagesize_kB=4
+7fd418021000 default
+7fd41c000000 default anon=1 dirty=1 active=0 N0=1 kernelpagesize_kB=4
+7fd41c021000 default
+7fd420000000 default anon=1 dirty=1 active=0 N0=1 kernelpagesize_kB=4
+7fd420021000 default
+7fd4241ff000 default
+7fd424200000 default anon=16 dirty=16 active=0 N0=16 kernelpagesize_kB=4
+7fd424a00000 default file=/dev/dri/renderD133
+7fd426e00000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd427200000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd427600000 default file=/dev/dri/renderD133
+7fd451c00000 default file=/dev/dri/renderD133
+7fd459000000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd459400000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd459800000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd459c00000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd45a000000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd45a400000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd45a800000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd45abf6000 default
+7fd45abf7000 default anon=15 dirty=15 active=0 N0=15 kernelpagesize_kB=4
+7fd45b3f7000 default
+7fd45b3f8000 default anon=13 dirty=13 active=0 N0=13 kernelpagesize_kB=4
+7fd45bbf8000 default
+7fd45bbf9000 default anon=15 dirty=15 active=0 N0=15 kernelpagesize_kB=4
+7fd45c3f9000 default
+7fd45c3fa000 default anon=15 dirty=15 active=0 N0=15 kernelpagesize_kB=4
+7fd45cc00000 default file=/dev/dri/renderD133
+7fd45d000000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd45d3fb000 default
+7fd45d3fc000 default anon=12 dirty=12 active=0 N0=1 N3=11 kernelpagesize_kB=4
+7fd45dbfc000 default
+7fd45dbfd000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd45e3fd000 default
+7fd45e3fe000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd45ebfe000 default
+7fd45ebff000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd45f3ff000 default
+7fd45f400000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd45fc00000 default file=/dev/dri/renderD133
+7fd468000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd468021000 default
+7fd46c400000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd46c7f9000 default
+7fd46c7fa000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd46cffa000 default
+7fd46cffb000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd46d7fb000 default
+7fd46d7fc000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd46dffc000 default
+7fd46dffd000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd46e7fd000 default
+7fd46e7fe000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd46effe000 default
+7fd46efff000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd46f7ff000 default
+7fd46f800000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd470000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd470021000 default
+7fd474000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd474021000 default
+7fd478000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd478021000 default
+7fd47c000000 default anon=2 dirty=2 active=0 N3=2 kernelpagesize_kB=4
+7fd47c021000 default
+7fd480000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd480021000 default
+7fd484400000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd4847eb000 default
+7fd4847ec000 default anon=2078 dirty=2078 active=0 N3=2078 kernelpagesize_kB=4
+7fd4857fd000 default
+7fd4857fe000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd485ffe000 default
+7fd485fff000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd4867ff000 default
+7fd486800000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd487000000 prefer=static:7 anon=17072 dirty=17072 active=0 N7=17072 kernelpagesize_kB=4
+7fd48b400000 prefer=static:7 anon=17072 dirty=17072 active=0 N7=17072 kernelpagesize_kB=4
+7fd48f800000 prefer=static:7 anon=310400 dirty=310400 active=0 N7=310400 kernelpagesize_kB=4
+7fd4db800000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd4dbc00000 prefer=static:7 anon=17072 dirty=17072 active=0 N7=17072 kernelpagesize_kB=4
+7fd4e0000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4e0021000 default
+7fd4e4000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4e4021000 default
+7fd4e8000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4e8021000 default
+7fd4ec000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4ec021000 default
+7fd4f0000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4f0021000 default
+7fd4f4000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4f4021000 default
+7fd4f8000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4f8021000 default
+7fd4fc000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd4fc021000 default
+7fd500000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd500021000 default
+7fd504400000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd5047ee000 default
+7fd5047ef000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd504fef000 default
+7fd504ff0000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd5057f0000 default
+7fd5057f1000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd505ff1000 default
+7fd505ff2000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd5067f2000 default
+7fd5067f3000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd506ff3000 default
+7fd506ff4000 default anon=5134 dirty=5134 active=0 N3=5134 kernelpagesize_kB=4
+7fd508bf5000 default
+7fd508bf6000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd5093f6000 default
+7fd5093f7000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd509bf7000 default
+7fd509bf8000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd50a3f8000 default
+7fd50a3f9000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd50abf9000 default
+7fd50abfa000 default anon=13 dirty=13 active=0 N3=13 kernelpagesize_kB=4
+7fd50b3fa000 default
+7fd50b3fb000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd50bbfb000 default
+7fd50bbfc000 default anon=12 dirty=12 active=0 N0=1 N3=11 kernelpagesize_kB=4
+7fd50c3fc000 default
+7fd50c3fd000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd50cbfd000 default
+7fd50cbfe000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd50d3fe000 default
+7fd50d3ff000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd50dbff000 default
+7fd50dc00000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd50e400000 default file=/dev/dri/renderD133
+7fd50ee00000 default file=/dev/dri/renderD133
+7fd50f7e9000 default
+7fd50f7ea000 default anon=13 dirty=13 active=0 N3=13 kernelpagesize_kB=4
+7fd50fff0000 default
+7fd50fff1000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd5107f1000 default
+7fd5107f2000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd511000000 default file=/dev/dri/renderD133
+7fd511600000 default file=/dev/dri/renderD133
+7fd511ffa000 default
+7fd511ffb000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd512a00000 default file=/dev/dri/renderD133
+7fd5133ff000 default
+7fd513400000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd513c00000 default file=/dev/dri/renderD133
+7fd514400000 default file=/dev/dri/renderD133
+7fd514a00000 default file=/dev/dri/renderD133
+7fd515000000 default file=/dev/dri/renderD133
+7fd515800000 default file=/dev/dri/renderD133
+7fd515e00000 default file=/dev/dri/renderD133
+7fd516600000 default file=/dev/dri/renderD133
+7fd516c00000 default file=/dev/dri/renderD133
+7fd517400000 default file=/dev/dri/renderD133
+7fd517a00000 default file=/dev/dri/renderD133
+7fd518000000 default file=/dev/dri/renderD133
+7fd518800000 default file=/dev/dri/renderD133
+7fd518e00000 default file=/dev/dri/renderD133
+7fd519600000 default file=/dev/dri/renderD133
+7fd519c00000 default file=/dev/dri/renderD133
+7fd51a400000 default file=/dev/dri/renderD133
+7fd51aa00000 default file=/dev/dri/renderD133
+7fd51b000000 default file=/dev/dri/renderD133
+7fd51b800000 default file=/dev/dri/renderD133
+7fd51be00000 default file=/dev/dri/renderD133
+7fd51c600000 default file=/dev/dri/renderD133
+7fd51cc00000 default file=/dev/dri/renderD133
+7fd51d400000 default file=/dev/dri/renderD133
+7fd51da00000 default file=/dev/dri/renderD133
+7fd51e000000 default file=/dev/dri/renderD133
+7fd51e800000 default file=/dev/dri/renderD133
+7fd51ee00000 default file=/dev/dri/renderD133
+7fd51f600000 default file=/dev/dri/renderD133
+7fd51fc00000 default file=/dev/dri/renderD133
+7fd520400000 default file=/dev/dri/renderD133
+7fd520a00000 default file=/dev/dri/renderD133
+7fd521000000 default file=/dev/dri/renderD133
+7fd521800000 default file=/dev/dri/renderD133
+7fd521e00000 default file=/dev/dri/renderD133
+7fd522600000 default file=/dev/dri/renderD133
+7fd522c00000 default file=/dev/dri/renderD133
+7fd523400000 default file=/dev/dri/renderD133
+7fd523a00000 default file=/dev/dri/renderD133
+7fd524000000 default file=/dev/dri/renderD133
+7fd524800000 default file=/dev/dri/renderD133
+7fd524e00000 default file=/dev/dri/renderD133
+7fd525600000 default file=/dev/dri/renderD133
+7fd525c00000 default file=/dev/dri/renderD133
+7fd526400000 default file=/dev/dri/renderD133
+7fd526a00000 default file=/dev/dri/renderD133
+7fd527000000 default file=/dev/dri/renderD133
+7fd527800000 default file=/dev/dri/renderD133
+7fd527e00000 default file=/dev/dri/renderD133
+7fd528600000 default file=/dev/dri/renderD133
+7fd528c00000 default file=/dev/dri/renderD133
+7fd529400000 default file=/dev/dri/renderD133
+7fd529a00000 default file=/dev/dri/renderD133
+7fd52a000000 default file=/dev/dri/renderD133
+7fd52a800000 default file=/dev/dri/renderD133
+7fd52ae00000 default file=/dev/dri/renderD133
+7fd52b600000 default file=/dev/dri/renderD133
+7fd52bc00000 default file=/dev/dri/renderD133
+7fd52c400000 default file=/dev/dri/renderD133
+7fd52ca00000 default file=/dev/dri/renderD133
+7fd52d000000 default file=/dev/dri/renderD133
+7fd52d800000 default file=/dev/dri/renderD133
+7fd52de00000 default file=/dev/dri/renderD133
+7fd52e600000 default file=/dev/dri/renderD133
+7fd52ec00000 default file=/dev/dri/renderD133
+7fd52f400000 default file=/dev/dri/renderD133
+7fd52fa00000 default file=/dev/dri/renderD133
+7fd530000000 default file=/dev/dri/renderD133
+7fd530800000 default file=/dev/dri/renderD133
+7fd530e00000 default file=/dev/dri/renderD133
+7fd531600000 default file=/dev/dri/renderD133
+7fd531c00000 default file=/dev/dri/renderD133
+7fd532400000 default file=/dev/dri/renderD133
+7fd532a00000 default file=/dev/dri/renderD133
+7fd533000000 default file=/dev/dri/renderD133
+7fd533800000 default file=/dev/dri/renderD133
+7fd533e00000 default file=/dev/dri/renderD133
+7fd534600000 default file=/dev/dri/renderD133
+7fd534c00000 default file=/dev/dri/renderD133
+7fd535400000 default file=/dev/dri/renderD133
+7fd535a00000 default file=/dev/dri/renderD133
+7fd536000000 default file=/dev/dri/renderD133
+7fd536800000 default file=/dev/dri/renderD133
+7fd536e00000 default file=/dev/dri/renderD133
+7fd537600000 default file=/dev/dri/renderD133
+7fd537c00000 default file=/dev/dri/renderD133
+7fd538400000 default file=/dev/dri/renderD133
+7fd538a00000 default file=/dev/dri/renderD133
+7fd539000000 default file=/dev/dri/renderD133
+7fd539800000 default file=/dev/dri/renderD133
+7fd539e00000 default file=/dev/dri/renderD133
+7fd53a600000 default file=/dev/dri/renderD133
+7fd53ac00000 default file=/dev/dri/renderD133
+7fd53b400000 default file=/dev/dri/renderD133
+7fd53ba00000 default file=/dev/dri/renderD133
+7fd53c000000 default file=/dev/dri/renderD133
+7fd53c800000 default file=/dev/dri/renderD133
+7fd53ce00000 default file=/dev/dri/renderD133
+7fd53d600000 default file=/dev/dri/renderD133
+7fd53dc00000 default file=/dev/dri/renderD133
+7fd53e400000 default file=/dev/dri/renderD133
+7fd53ea00000 default file=/dev/dri/renderD133
+7fd53f000000 default file=/dev/dri/renderD133
+7fd53f800000 default file=/dev/dri/renderD133
+7fd53fe00000 default file=/dev/dri/renderD133
+7fd540600000 default file=/dev/dri/renderD133
+7fd540c00000 default file=/dev/dri/renderD133
+7fd541400000 default file=/dev/dri/renderD133
+7fd541a00000 default file=/dev/dri/renderD133
+7fd542000000 default file=/dev/dri/renderD133
+7fd542800000 default file=/dev/dri/renderD133
+7fd542e00000 default file=/dev/dri/renderD133
+7fd543600000 default file=/dev/dri/renderD133
+7fd543c00000 default file=/dev/dri/renderD133
+7fd544400000 default file=/dev/dri/renderD133
+7fd544a00000 default file=/dev/dri/renderD133
+7fd545000000 default file=/dev/dri/renderD133
+7fd545800000 default file=/dev/dri/renderD133
+7fd545e00000 default file=/dev/dri/renderD133
+7fd546600000 default file=/dev/dri/renderD133
+7fd546c00000 default file=/dev/dri/renderD133
+7fd547400000 default file=/dev/dri/renderD133
+7fd547a00000 default file=/dev/dri/renderD133
+7fd548000000 default file=/dev/dri/renderD133
+7fd548800000 default file=/dev/dri/renderD133
+7fd548e00000 default file=/dev/dri/renderD133
+7fd549600000 default file=/dev/dri/renderD133
+7fd549c00000 default file=/dev/dri/renderD133
+7fd54a400000 default file=/dev/dri/renderD133
+7fd54aa00000 default file=/dev/dri/renderD133
+7fd54b000000 default file=/dev/dri/renderD133
+7fd54b800000 default file=/dev/dri/renderD133
+7fd54be00000 default file=/dev/dri/renderD133
+7fd54c600000 default file=/dev/dri/renderD133
+7fd54cc00000 default file=/dev/dri/renderD133
+7fd54d400000 default file=/dev/dri/renderD133
+7fd54da00000 default file=/dev/dri/renderD133
+7fd54e000000 default file=/dev/dri/renderD133
+7fd54e800000 default file=/dev/dri/renderD133
+7fd54ee00000 default file=/dev/dri/renderD133
+7fd54f600000 default file=/dev/dri/renderD133
+7fd54fc00000 default file=/dev/dri/renderD133
+7fd550400000 default file=/dev/dri/renderD133
+7fd550a00000 default file=/dev/dri/renderD133
+7fd551000000 default file=/dev/dri/renderD133
+7fd551800000 default file=/dev/dri/renderD133
+7fd551e00000 default file=/dev/dri/renderD133
+7fd552600000 default file=/dev/dri/renderD133
+7fd552c00000 default file=/dev/dri/renderD133
+7fd553400000 default file=/dev/dri/renderD133
+7fd553a00000 default file=/dev/dri/renderD133
+7fd554000000 default file=/dev/dri/renderD133
+7fd554800000 default file=/dev/dri/renderD133
+7fd554e00000 default file=/dev/dri/renderD133
+7fd555600000 default file=/dev/dri/renderD133
+7fd555c00000 default file=/dev/dri/renderD133
+7fd556400000 default file=/dev/dri/renderD133
+7fd556a00000 default file=/dev/dri/renderD133
+7fd557000000 default file=/dev/dri/renderD133
+7fd557600000 prefer=static:0 anon=359 dirty=359 active=0 N1=359 kernelpagesize_kB=4
+7fd557800000 default file=/dev/dri/renderD133
+7fd557e00000 default file=/dev/dri/renderD133
+7fd558400000 default file=/dev/dri/renderD133
+7fd558600000 default file=/dev/dri/renderD133
+7fd558c00000 default file=/dev/dri/renderD133
+7fd559400000 default file=/dev/dri/renderD133
+7fd559a00000 default file=/dev/dri/renderD133
+7fd55a000000 prefer=static:7 anon=272 dirty=272 active=0 N7=272 kernelpagesize_kB=4
+7fd55a200000 default file=/dev/dri/renderD133
+7fd55a800000 default file=/dev/dri/renderD133
+7fd55ae00000 default file=/dev/dri/renderD133
+7fd55b400000 default file=/dev/dri/renderD133
+7fd55ba00000 default file=/dev/dri/renderD133
+7fd55c000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd55c021000 default
+7fd560200000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd560600000 default file=/dev/dri/renderD133
+7fd560c00000 default file=/dev/dri/renderD133
+7fd561200000 default file=/dev/dri/renderD133
+7fd561800000 prefer=static:7 anon=675 dirty=675 active=0 N7=675 kernelpagesize_kB=4
+7fd561c00000 default file=/dev/dri/renderD133
+7fd562200000 default file=/dev/dri/renderD133
+7fd562800000 default file=/dev/dri/renderD133
+7fd562e00000 default file=/dev/dri/renderD133
+7fd563400000 default file=/dev/dri/renderD133
+7fd563a00000 default file=/dev/dri/renderD133
+7fd564000000 default anon=15 dirty=15 active=0 N3=15 kernelpagesize_kB=4
+7fd564021000 default
+7fd568200000 default file=/dev/dri/renderD133
+7fd568600000 default file=/dev/dri/renderD133
+7fd568c00000 default file=/dev/dri/renderD133
+7fd569200000 prefer=static:7 anon=256 dirty=256 active=0 N7=256 kernelpagesize_kB=4
+7fd569400000 default file=/dev/dri/renderD133
+7fd569a00000 default file=/dev/dri/renderD133
+7fd56a000000 default file=/dev/dri/renderD133
+7fd56a600000 default file=/dev/dri/renderD133
+7fd56ac00000 default file=/dev/dri/renderD133
+7fd56b200000 default file=/dev/dri/renderD133
+7fd56b800000 prefer=static:7 anon=272 dirty=272 active=0 N7=272 kernelpagesize_kB=4
+7fd56ba00000 default file=/dev/dri/renderD133
+7fd56c000000 default file=/dev/dri/renderD133
+7fd56c600000 default file=/dev/dri/renderD133
+7fd56cc00000 default file=/dev/dri/renderD133
+7fd56d200000 default file=/dev/dri/renderD133
+7fd56d800000 default file=/dev/dri/renderD133
+7fd56de00000 default file=/dev/dri/renderD133
+7fd56e200000 default file=/dev/dri/renderD133
+7fd570400000 default file=/dev/dri/renderD133
+7fd571600000 default file=/dev/dri/renderD133
+7fd571a00000 default file=/dev/dri/renderD133
+7fd571e00000 default file=/dev/dri/renderD133
+7fd572200000 default file=/dev/dri/renderD133
+7fd572600000 default file=/dev/dri/renderD133
+7fd572a00000 default file=/dev/dri/renderD133
+7fd572e00000 default file=/dev/dri/renderD133
+7fd573200000 default file=/dev/dri/renderD133
+7fd574400000 default file=/dev/dri/renderD133
+7fd576200000 default file=/dev/dri/renderD133
+7fd577400000 default file=/dev/dri/renderD133
+7fd577800000 default file=/dev/dri/renderD133
+7fd577c00000 default file=/dev/dri/renderD133
+7fd578000000 default file=/dev/dri/renderD133
+7fd579200000 default file=/dev/dri/renderD133
+7fd57a400000 default file=/dev/dri/renderD133
+7fd57c200000 default file=/dev/dri/renderD133
+7fd57c600000 default file=/dev/dri/renderD133
+7fd57ca00000 default file=/dev/dri/renderD133
+7fd57ce00000 default file=/dev/dri/renderD133
+7fd57e000000 default file=/dev/dri/renderD133
+7fd57f200000 default file=/dev/dri/renderD133
+7fd581000000 default file=/dev/dri/renderD133
+7fd581400000 default file=/dev/dri/renderD133
+7fd583600000 default file=/dev/dri/renderD133
+7fd584800000 default file=/dev/dri/renderD133
+7fd584c00000 default file=/dev/dri/renderD133
+7fd585000000 default file=/dev/dri/renderD133
+7fd585400000 default file=/dev/dri/renderD133
+7fd585800000 default file=/dev/dri/renderD133
+7fd585c00000 default file=/dev/dri/renderD133
+7fd586000000 default file=/dev/dri/renderD133
+7fd586400000 default file=/dev/dri/renderD133
+7fd587600000 default file=/dev/dri/renderD133
+7fd588800000 default file=/dev/dri/renderD133
+7fd58a600000 default file=/dev/dri/renderD133
+7fd58aa00000 default file=/dev/dri/renderD133
+7fd58ae00000 default file=/dev/dri/renderD133
+7fd58b200000 default file=/dev/dri/renderD133
+7fd58c400000 default file=/dev/dri/renderD133
+7fd58d600000 default file=/dev/dri/renderD133
+7fd58f400000 default file=/dev/dri/renderD133
+7fd58f800000 default file=/dev/dri/renderD133
+7fd58fc00000 default file=/dev/dri/renderD133
+7fd590000000 default file=/dev/dri/renderD133
+7fd591200000 default file=/dev/dri/renderD133
+7fd592400000 default file=/dev/dri/renderD133
+7fd594200000 default file=/dev/dri/renderD133
+7fd594600000 default file=/dev/dri/renderD133
+7fd596800000 default file=/dev/dri/renderD133
+7fd597a00000 default file=/dev/dri/renderD133
+7fd597e00000 default file=/dev/dri/renderD133
+7fd598200000 default file=/dev/dri/renderD133
+7fd598600000 default file=/dev/dri/renderD133
+7fd598a00000 default file=/dev/dri/renderD133
+7fd598e00000 default file=/dev/dri/renderD133
+7fd599200000 default file=/dev/dri/renderD133
+7fd599600000 default file=/dev/dri/renderD133
+7fd59a800000 default file=/dev/dri/renderD133
+7fd59ba00000 default file=/dev/dri/renderD133
+7fd59d800000 default file=/dev/dri/renderD133
+7fd59dc00000 default file=/dev/dri/renderD133
+7fd59e000000 default file=/dev/dri/renderD133
+7fd59e400000 default file=/dev/dri/renderD133
+7fd59f600000 default file=/dev/dri/renderD133
+7fd5a0800000 default file=/dev/dri/renderD133
+7fd5a2600000 default file=/dev/dri/renderD133
+7fd5a2a00000 default file=/dev/dri/renderD133
+7fd5a2e00000 default file=/dev/dri/renderD133
+7fd5a3200000 default file=/dev/dri/renderD133
+7fd5a4400000 default file=/dev/dri/renderD133
+7fd5a5600000 default file=/dev/dri/renderD133
+7fd5a7400000 default file=/dev/dri/renderD133
+7fd5a7800000 default file=/dev/dri/renderD133
+7fd5a9a00000 default file=/dev/dri/renderD133
+7fd5aac00000 default file=/dev/dri/renderD133
+7fd5ab000000 default file=/dev/dri/renderD133
+7fd5ab400000 default file=/dev/dri/renderD133
+7fd5ab800000 default file=/dev/dri/renderD133
+7fd5abc00000 default file=/dev/dri/renderD133
+7fd5ac000000 default file=/dev/dri/renderD133
+7fd5ac400000 default file=/dev/dri/renderD133
+7fd5ac800000 default file=/dev/dri/renderD133
+7fd5ada00000 default file=/dev/dri/renderD133
+7fd5aec00000 default file=/dev/dri/renderD133
+7fd5b0a00000 default file=/dev/dri/renderD133
+7fd5b0e00000 default file=/dev/dri/renderD133
+7fd5b1200000 default file=/dev/dri/renderD133
+7fd5b1600000 default file=/dev/dri/renderD133
+7fd5b2800000 default file=/dev/dri/renderD133
+7fd5b3a00000 default file=/dev/dri/renderD133
+7fd5b5800000 default file=/dev/dri/renderD133
+7fd5b5c00000 default file=/dev/dri/renderD133
+7fd5b6000000 default file=/dev/dri/renderD133
+7fd5b6400000 default file=/dev/dri/renderD133
+7fd5b7600000 default file=/dev/dri/renderD133
+7fd5b8800000 default file=/dev/dri/renderD133
+7fd5ba600000 default file=/dev/dri/renderD133
+7fd5baa00000 default file=/dev/dri/renderD133
+7fd5bae00000 default file=/dev/dri/renderD133
+7fd5bb200000 default file=/dev/dri/renderD133
+7fd5bb600000 default file=/dev/dri/renderD133
+7fd5bd800000 default file=/dev/dri/renderD133
+7fd5bea00000 default file=/dev/dri/renderD133
+7fd5bee00000 default file=/dev/dri/renderD133
+7fd5bf200000 default file=/dev/dri/renderD133
+7fd5bf600000 default file=/dev/dri/renderD133
+7fd5bfa00000 default file=/dev/dri/renderD133
+7fd5c0c00000 default file=/dev/dri/renderD133
+7fd5c1e00000 default file=/dev/dri/renderD133
+7fd5c3c00000 default file=/dev/dri/renderD133
+7fd5c4000000 default file=/dev/dri/renderD133
+7fd5c4400000 default file=/dev/dri/renderD133
+7fd5c4800000 default file=/dev/dri/renderD133
+7fd5c5a00000 default file=/dev/dri/renderD133
+7fd5c6c00000 default file=/dev/dri/renderD133
+7fd5c8a00000 default file=/dev/dri/renderD133
+7fd5c8e00000 default file=/dev/dri/renderD133
+7fd5c9200000 default file=/dev/dri/renderD133
+7fd5c9600000 default file=/dev/dri/renderD133
+7fd5ca800000 default file=/dev/dri/renderD133
+7fd5cba00000 default file=/dev/dri/renderD133
+7fd5cd800000 default file=/dev/dri/renderD133
+7fd5cdc00000 default file=/dev/dri/renderD133
+7fd5ce000000 default file=/dev/dri/renderD133
+7fd5ce400000 default file=/dev/dri/renderD133
+7fd5ce800000 default file=/dev/dri/renderD133
+7fd5d0a00000 default file=/dev/dri/renderD133
+7fd5d1c00000 default file=/dev/dri/renderD133
+7fd5d2000000 default file=/dev/dri/renderD133
+7fd5d2400000 default file=/dev/dri/renderD133
+7fd5d2800000 default file=/dev/dri/renderD133
+7fd5d2c00000 default file=/dev/dri/renderD133
+7fd5d3e00000 default file=/dev/dri/renderD133
+7fd5d5000000 default file=/dev/dri/renderD133
+7fd5d6e00000 default file=/dev/dri/renderD133
+7fd5d7200000 default file=/dev/dri/renderD133
+7fd5d7600000 default file=/dev/dri/renderD133
+7fd5d7a00000 default file=/dev/dri/renderD133
+7fd5d8c00000 default file=/dev/dri/renderD133
+7fd5d9e00000 default file=/dev/dri/renderD133
+7fd5dbc00000 default file=/dev/dri/renderD133
+7fd5dc000000 default file=/dev/dri/renderD133
+7fd5dc400000 default file=/dev/dri/renderD133
+7fd5dc800000 default file=/dev/dri/renderD133
+7fd5dda00000 default file=/dev/dri/renderD133
+7fd5dec00000 default file=/dev/dri/renderD133
+7fd5e0a00000 default file=/dev/dri/renderD133
+7fd5e0e00000 default file=/dev/dri/renderD133
+7fd5e3000000 default file=/dev/dri/renderD133
+7fd5e4200000 default file=/dev/dri/renderD133
+7fd5e4600000 default file=/dev/dri/renderD133
+7fd5e4a00000 default file=/dev/dri/renderD133
+7fd5e4e00000 default file=/dev/dri/renderD133
+7fd5e5200000 default file=/dev/dri/renderD133
+7fd5e5600000 default file=/dev/dri/renderD133
+7fd5e5a00000 default file=/dev/dri/renderD133
+7fd5e5e00000 default file=/dev/dri/renderD133
+7fd5e7000000 default file=/dev/dri/renderD133
+7fd5e8200000 default file=/dev/dri/renderD133
+7fd5ea000000 default file=/dev/dri/renderD133
+7fd5ea400000 default file=/dev/dri/renderD133
+7fd5ea800000 default file=/dev/dri/renderD133
+7fd5eac00000 default file=/dev/dri/renderD133
+7fd5ebe00000 default file=/dev/dri/renderD133
+7fd5ed000000 default file=/dev/dri/renderD133
+7fd5eee00000 default file=/dev/dri/renderD133
+7fd5ef200000 default file=/dev/dri/renderD133
+7fd5ef600000 default file=/dev/dri/renderD133
+7fd5efa00000 default file=/dev/dri/renderD133
+7fd5f0c00000 default file=/dev/dri/renderD133
+7fd5f1e00000 default file=/dev/dri/renderD133
+7fd5f3c00000 default file=/dev/dri/renderD133
+7fd5f4000000 default file=/dev/dri/renderD133
+7fd5f6200000 default file=/dev/dri/renderD133
+7fd5f7400000 default file=/dev/dri/renderD133
+7fd5f7800000 default file=/dev/dri/renderD133
+7fd5f7c00000 default file=/dev/dri/renderD133
+7fd5f8000000 default file=/dev/dri/renderD133
+7fd5f8400000 default file=/dev/dri/renderD133
+7fd5f8800000 default file=/dev/dri/renderD133
+7fd5f8c00000 default file=/dev/dri/renderD133
+7fd5f9000000 default file=/dev/dri/renderD133
+7fd5fa200000 default file=/dev/dri/renderD133
+7fd5fb400000 default file=/dev/dri/renderD133
+7fd5fd200000 default file=/dev/dri/renderD133
+7fd5fd600000 default file=/dev/dri/renderD133
+7fd5fda00000 default file=/dev/dri/renderD133
+7fd5fde00000 default file=/dev/dri/renderD133
+7fd5ff000000 default file=/dev/dri/renderD133
+7fd600200000 default file=/dev/dri/renderD133
+7fd602000000 default file=/dev/dri/renderD133
+7fd602400000 default file=/dev/dri/renderD133
+7fd602800000 default file=/dev/dri/renderD133
+7fd602c00000 default file=/dev/dri/renderD133
+7fd603e00000 default file=/dev/dri/renderD133
+7fd605000000 default file=/dev/dri/renderD133
+7fd606e00000 default file=/dev/dri/renderD133
+7fd607200000 default file=/dev/dri/renderD133
+7fd609400000 default file=/dev/dri/renderD133
+7fd60a600000 default file=/dev/dri/renderD133
+7fd60aa00000 default file=/dev/dri/renderD133
+7fd60ae00000 default file=/dev/dri/renderD133
+7fd60b200000 default file=/dev/dri/renderD133
+7fd60b600000 default file=/dev/dri/renderD133
+7fd60ba00000 default file=/dev/dri/renderD133
+7fd60be00000 default file=/dev/dri/renderD133
+7fd60c200000 default file=/dev/dri/renderD133
+7fd60d400000 default file=/dev/dri/renderD133
+7fd60e600000 default file=/dev/dri/renderD133
+7fd610400000 default file=/dev/dri/renderD133
+7fd610800000 default file=/dev/dri/renderD133
+7fd610c00000 default file=/dev/dri/renderD133
+7fd611000000 default file=/dev/dri/renderD133
+7fd612200000 default file=/dev/dri/renderD133
+7fd613400000 default file=/dev/dri/renderD133
+7fd615200000 default file=/dev/dri/renderD133
+7fd615600000 default file=/dev/dri/renderD133
+7fd615a00000 default file=/dev/dri/renderD133
+7fd615e00000 default file=/dev/dri/renderD133
+7fd616200000 default file=/dev/dri/renderD133
+7fd616600000 default file=/dev/dri/renderD133
+7fd616a00000 default file=/dev/dri/renderD133
+7fd617c00000 default file=/dev/dri/renderD133
+7fd618e00000 default file=/dev/dri/renderD133
+7fd61ac00000 default file=/dev/dri/renderD133
+7fd61b000000 default file=/dev/dri/renderD133
+7fd61d200000 default file=/dev/dri/renderD133
+7fd61e400000 default file=/dev/dri/renderD133
+7fd61e800000 default file=/dev/dri/renderD133
+7fd61ec00000 default file=/dev/dri/renderD133
+7fd61f000000 default file=/dev/dri/renderD133
+7fd61f400000 default file=/dev/dri/renderD133
+7fd61f800000 default file=/dev/dri/renderD133
+7fd61fc00000 default file=/dev/dri/renderD133
+7fd620000000 default file=/dev/dri/renderD133
+7fd621200000 default file=/dev/dri/renderD133
+7fd622400000 default file=/dev/dri/renderD133
+7fd624200000 default file=/dev/dri/renderD133
+7fd625400000 default file=/dev/dri/renderD133
+7fd626600000 default file=/dev/dri/renderD133
+7fd628400000 default file=/dev/dri/renderD133
+7fd628800000 default file=/dev/dri/renderD133
+7fd628c00000 default file=/dev/dri/renderD133
+7fd629000000 default file=/dev/dri/renderD133
+7fd62a200000 default file=/dev/dri/renderD133
+7fd62b400000 default file=/dev/dri/renderD133
+7fd62d200000 default file=/dev/dri/renderD133
+7fd62d600000 default file=/dev/dri/renderD133
+7fd62f800000 default file=/dev/dri/renderD133
+7fd630a00000 default file=/dev/dri/renderD133
+7fd630e00000 default file=/dev/dri/renderD133
+7fd631200000 default file=/dev/dri/renderD133
+7fd631600000 default file=/dev/dri/renderD133
+7fd631a00000 default file=/dev/dri/renderD133
+7fd631e00000 default file=/dev/dri/renderD133
+7fd632200000 default file=/dev/dri/renderD133
+7fd632600000 default file=/dev/dri/renderD133
+7fd633800000 default file=/dev/dri/renderD133
+7fd634a00000 default file=/dev/dri/renderD133
+7fd636800000 default file=/dev/dri/renderD133
+7fd636c00000 default file=/dev/dri/renderD133
+7fd637000000 default file=/dev/dri/renderD133
+7fd637400000 default file=/dev/dri/renderD133
+7fd638600000 default file=/dev/dri/renderD133
+7fd639800000 default file=/dev/dri/renderD133
+7fd63b600000 default file=/dev/dri/renderD133
+7fd63ba00000 default file=/dev/dri/renderD133
+7fd63be00000 default file=/dev/dri/renderD133
+7fd63c200000 default file=/dev/dri/renderD133
+7fd63d400000 default file=/dev/dri/renderD133
+7fd63e600000 default file=/dev/dri/renderD133
+7fd640400000 default file=/dev/dri/renderD133
+7fd640800000 default file=/dev/dri/renderD133
+7fd642a00000 default file=/dev/dri/renderD133
+7fd643c00000 default file=/dev/dri/renderD133
+7fd644000000 default file=/dev/dri/renderD133
+7fd644400000 default file=/dev/dri/renderD133
+7fd644800000 default file=/dev/dri/renderD133
+7fd644c00000 default file=/dev/dri/renderD133
+7fd645000000 default file=/dev/dri/renderD133
+7fd645400000 default file=/dev/dri/renderD133
+7fd645800000 default file=/dev/dri/renderD133
+7fd646a00000 default file=/dev/dri/renderD133
+7fd647c00000 default file=/dev/dri/renderD133
+7fd649a00000 default file=/dev/dri/renderD133
+7fd649e00000 default file=/dev/dri/renderD133
+7fd64a200000 default file=/dev/dri/renderD133
+7fd64a600000 default file=/dev/dri/renderD133
+7fd64b800000 default file=/dev/dri/renderD133
+7fd64ca00000 default file=/dev/dri/renderD133
+7fd64e800000 default file=/dev/dri/renderD133
+7fd64ec00000 default file=/dev/dri/renderD133
+7fd64f000000 default file=/dev/dri/renderD133
+7fd650200000 default file=/dev/dri/renderD133
+7fd651400000 default file=/dev/dri/renderD133
+7fd653200000 default file=/dev/dri/renderD133
+7fd664000000 default anon=2 dirty=2 active=0 N3=2 kernelpagesize_kB=4
+7fd664021000 default
+7fd668200000 default file=/dev/dri/renderD133
+7fd668600000 prefer=static:7 anon=256 dirty=256 active=0 N7=256 kernelpagesize_kB=4
+7fd668800000 prefer=static:7 anon=256 dirty=256 active=0 N7=256 kernelpagesize_kB=4
+7fd668a00000 prefer=static:7 anon=272 dirty=272 active=0 N7=272 kernelpagesize_kB=4
+7fd668bff000 default
+7fd668c00000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd669400000 prefer=static:7 anon=1024 dirty=1024 active=0 N7=1024 kernelpagesize_kB=4
+7fd669a00000 prefer=static:7 anon=1024 dirty=1024 active=0 N7=1024 kernelpagesize_kB=4
+7fd66a000000 prefer=static:7 anon=1024 dirty=1024 active=0 N7=1024 kernelpagesize_kB=4
+7fd66a600000 prefer=static:7 anon=1024 dirty=1024 active=0 N7=1024 kernelpagesize_kB=4
+7fd66ac00000 prefer=static:7 anon=1024 dirty=1024 active=0 N7=1024 kernelpagesize_kB=4
+7fd66b200000 prefer=static:7 anon=1024 dirty=1024 active=0 N7=1024 kernelpagesize_kB=4
+7fd66b7ff000 default
+7fd66b800000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd66c000000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd66c021000 default
+7fd670200000 prefer=static:7 anon=1024 dirty=1024 active=0 N7=1024 kernelpagesize_kB=4
+7fd670800000 default file=/dev/dri/renderD133
+7fd679400000 default
+7fd7709ff000 default
+7fd770a00000 default anon=12 dirty=12 active=0 N3=12 kernelpagesize_kB=4
+7fd771200000 prefer=static:0 anon=512 dirty=512 active=0 N0=512 kernelpagesize_kB=4
+7fd771600000 default file=/opt/hyhal/lib/libhydmi.so.1.5 mapped=61 mapmax=9 N2=34 N3=20 N5=6 N7=1 kernelpagesize_kB=4
+7fd771651000 default file=/opt/hyhal/lib/libhydmi.so.1.5
+7fd771851000 default file=/opt/hyhal/lib/libhydmi.so.1.5 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd771852000 default file=/opt/hyhal/lib/libhydmi.so.1.5 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd771900000 prefer=static:0 anon=62 dirty=62 active=0 N1=62 kernelpagesize_kB=4
+7fd771940000 default file=/dev/dri/renderD133
+7fd771980000 prefer=static:7 anon=125 dirty=125 active=0 N7=125 kernelpagesize_kB=4
+7fd771a00000 default file=/opt/hyhal/lib/libhydrm.so.2.4 mapped=47 mapmax=11 N1=5 N2=31 N3=7 N5=4 kernelpagesize_kB=4
+7fd771a3b000 default file=/opt/hyhal/lib/libhydrm.so.2.4
+7fd771c3a000 default file=/opt/hyhal/lib/libhydrm.so.2.4 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd771c3b000 default file=/opt/hyhal/lib/libhydrm.so.2.4 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd771c80000 prefer=static:0 anon=60 dirty=60 active=0 N1=60 kernelpagesize_kB=4
+7fd771cc0000 default file=/dev/dri/renderD133
+7fd771d00000 prefer=static:7 anon=80 dirty=80 active=0 N7=80 kernelpagesize_kB=4
+7fd771d80000 prefer=static:7 anon=80 dirty=80 active=0 N7=80 kernelpagesize_kB=4
+7fd771e00000 default file=/opt/hyhal/lib/librocprofiler-register.so.0.5.0 mapped=140 mapmax=10 N2=51 N5=55 N6=34 kernelpagesize_kB=4
+7fd771ea6000 default file=/opt/hyhal/lib/librocprofiler-register.so.0.5.0
+7fd7720a6000 default file=/opt/hyhal/lib/librocprofiler-register.so.0.5.0 anon=2 dirty=2 active=0 N3=2 kernelpagesize_kB=4
+7fd7720a8000 default file=/opt/hyhal/lib/librocprofiler-register.so.0.5.0 anon=2 dirty=2 active=0 N3=2 kernelpagesize_kB=4
+7fd7720aa000 default anon=4 dirty=4 active=0 N3=4 kernelpagesize_kB=4
+7fd7720d4000 prefer=static:7 anon=4 dirty=4 active=0 N7=4 kernelpagesize_kB=4
+7fd7720da000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720dc000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720de000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720e0000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720e2000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720e4000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720e6000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720e8000 prefer=static:7 anon=13 dirty=13 active=0 N7=13 kernelpagesize_kB=4
+7fd7720f6000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7720f8000 prefer=static:7 anon=13 dirty=13 active=0 N7=13 kernelpagesize_kB=4
+7fd772106000 default anon=250 dirty=250 active=0 N3=250 kernelpagesize_kB=4
+7fd772200000 default file=/opt/hyhal/lib/libhsa-runtime64.so.1.11.0 mapped=509 mapmax=34 N1=19 N2=218 N3=4 N4=88 N5=47 N6=113 N7=20 kernelpagesize_kB=4
+7fd772452000 default file=/opt/hyhal/lib/libhsa-runtime64.so.1.11.0
+7fd772651000 default file=/opt/hyhal/lib/libhsa-runtime64.so.1.11.0 anon=10 dirty=10 active=0 N3=10 kernelpagesize_kB=4
+7fd77265b000 default file=/opt/hyhal/lib/libhsa-runtime64.so.1.11.0 anon=7 dirty=7 mapped=22 mapmax=34 active=15 N0=4 N1=9 N3=3 N5=5 N6=1 kernelpagesize_kB=4
+7fd7726e5000 default anon=3 dirty=3 active=0 N0=3 kernelpagesize_kB=4
+7fd7726ea000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726ec000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726ee000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726f0000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726f2000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726f4000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726f6000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726f8000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7726fa000 default file=/dev/dri/renderD133
+7fd7726fc000 prefer=static:7 anon=3 dirty=3 active=0 N7=3 kernelpagesize_kB=4
+7fd772700000 prefer=static:7 anon=25 dirty=25 active=0 N7=25 kernelpagesize_kB=4
+7fd77271a000 default file=/dev/dri/renderD133
+7fd77271c000 prefer=static:0 anon=1 dirty=1 active=0 N1=1 kernelpagesize_kB=4
+7fd77271e000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772720000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772722000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772724000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772726000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772728000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77272a000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77272c000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77272e000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772730000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772732000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772734000 default file=/dev/dri/renderD133
+7fd772736000 default file=/dev/dri/renderD133
+7fd772738000 prefer=static:0 anon=1 dirty=1 active=0 N0=1 kernelpagesize_kB=4
+7fd77273a000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77273c000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77273e000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772740000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772742000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772744000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772746000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772748000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77274a000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77274c000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77274e000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772750000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772752000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772754000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772756000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772758000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77275a000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77275c000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77275e000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772760000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772762000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772764000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772766000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772768000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77276a000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77276c000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77276e000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772770000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772772000 prefer=static:7 anon=3 dirty=3 active=0 N7=3 kernelpagesize_kB=4
+7fd772776000 default file=/dev/dri/renderD133
+7fd772778000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77277a000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77277c000 prefer=static:7 anon=2 dirty=2 active=0 N7=2 kernelpagesize_kB=4
+7fd772780000 prefer=static:0 anon=13 dirty=13 active=0 N0=13 kernelpagesize_kB=4
+7fd77278e000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772790000 default file=/dev/dri/renderD133
+7fd77279e000 default file=/opt/dtk-26.04/hip/lib/hipkernel.bin.gfx936 mapped=12 N4=12 kernelpagesize_kB=4
+7fd7727aa000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7727ac000 default file=/dev/dri/renderD133
+7fd7727ae000 default file=/dev/dri/renderD133
+7fd7727b0000 prefer=static:0 anon=1 dirty=1 active=0 N0=1 kernelpagesize_kB=4
+7fd7727b2000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd7727b4000 default file=/dev/kfd
+7fd7727b8000 default file=/dev/dri/renderD133
+7fd7727c2000 default file=/dev/dri/renderD133
+7fd7727c4000 default file=/usr/lib/x86_64-linux-gnu/libelf-0.186.so mapped=3 mapmax=6 N5=3 kernelpagesize_kB=4
+7fd7727c7000 default file=/usr/lib/x86_64-linux-gnu/libelf-0.186.so mapped=16 mapmax=6 N5=16 kernelpagesize_kB=4
+7fd7727db000 default file=/usr/lib/x86_64-linux-gnu/libelf-0.186.so mapped=4 mapmax=5 N5=4 kernelpagesize_kB=4
+7fd7727df000 default file=/usr/lib/x86_64-linux-gnu/libelf-0.186.so
+7fd7727e0000 default file=/usr/lib/x86_64-linux-gnu/libelf-0.186.so anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7727e1000 default file=/usr/lib/x86_64-linux-gnu/libelf-0.186.so anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7727e2000 default file=/usr/lib/x86_64-linux-gnu/libz.so.1.2.11 mapped=2 mapmax=22 N5=2 kernelpagesize_kB=4
+7fd7727e4000 default file=/usr/lib/x86_64-linux-gnu/libz.so.1.2.11 mapped=16 mapmax=22 N5=16 kernelpagesize_kB=4
+7fd7727f5000 default file=/usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7fd7727fb000 default file=/usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7fd7727fc000 default file=/usr/lib/x86_64-linux-gnu/libz.so.1.2.11 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7727fd000 default file=/usr/lib/x86_64-linux-gnu/libz.so.1.2.11 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd772800000 default file=/dev/dri/renderD133
+7fd772802000 prefer=static:7 anon=2 dirty=2 active=0 N7=2 kernelpagesize_kB=4
+7fd772805000 prefer=static:0 anon=1 dirty=1 active=0 N0=1 kernelpagesize_kB=4
+7fd772807000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd772809000 prefer=static:7 anon=1 dirty=1 active=0 N7=1 kernelpagesize_kB=4
+7fd77280b000 default file=/dev/kfd
+7fd77280d000 default file=/opt/dtk-26.04/dcc/comgr/lib/libamd_comgr.so.2.6.0 mapped=1864 mapmax=6 N4=15 N6=1849 kernelpagesize_kB=4
+7fd772f55000 default file=/opt/dtk-26.04/dcc/comgr/lib/libamd_comgr.so.2.6.0 mapped=3522 mapmax=6 N1=8 N2=1032 N3=36 N4=904 N5=319 N6=886 N7=337 kernelpagesize_kB=4
+7fd778d28000 default file=/opt/dtk-26.04/dcc/comgr/lib/libamd_comgr.so.2.6.0 mapped=1166 mapmax=6 N2=139 N3=6 N4=664 N5=161 N6=107 N7=89 kernelpagesize_kB=4
+7fd77bb9e000 default file=/opt/dtk-26.04/dcc/comgr/lib/libamd_comgr.so.2.6.0
+7fd77bb9f000 default file=/opt/dtk-26.04/dcc/comgr/lib/libamd_comgr.so.2.6.0 anon=908 dirty=908 active=0 N3=908 kernelpagesize_kB=4
+7fd77bf2b000 default file=/opt/dtk-26.04/dcc/comgr/lib/libamd_comgr.so.2.6.0 anon=20 dirty=20 active=0 N0=2 N3=18 kernelpagesize_kB=4
+7fd77bf79000 default anon=147 dirty=147 active=0 N0=32 N3=115 kernelpagesize_kB=4
+7fd77c012000 default file=/usr/lib/x86_64-linux-gnu/libquadmath.so.0.0.0 mapped=3 mapmax=6 N5=3 kernelpagesize_kB=4
+7fd77c015000 default file=/usr/lib/x86_64-linux-gnu/libquadmath.so.0.0.0 mapped=32 mapmax=6 N2=8 N5=24 kernelpagesize_kB=4
+7fd77c041000 default file=/usr/lib/x86_64-linux-gnu/libquadmath.so.0.0.0 mapped=8 mapmax=6 N4=5 N5=1 N6=2 kernelpagesize_kB=4
+7fd77c058000 default file=/usr/lib/x86_64-linux-gnu/libquadmath.so.0.0.0 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd77c059000 default file=/usr/lib/x86_64-linux-gnu/libquadmath.so.0.0.0 anon=1 dirty=1 active=0 N0=1 kernelpagesize_kB=4
+7fd77c05a000 default anon=2 dirty=2 active=0 N0=2 kernelpagesize_kB=4
+7fd77c05c000 default file=/opt/dtk-26.04/dcc/lib/libomp.so mapped=30 mapmax=6 N2=5 N3=12 N5=11 N6=2 kernelpagesize_kB=4
+7fd77c07a000 default file=/opt/dtk-26.04/dcc/lib/libomp.so mapped=16 mapmax=6 N2=9 N5=7 kernelpagesize_kB=4
+7fd77c122000 default file=/opt/dtk-26.04/dcc/lib/libomp.so
+7fd77c149000 default file=/opt/dtk-26.04/dcc/lib/libomp.so anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd77c14a000 default file=/opt/dtk-26.04/dcc/lib/libomp.so anon=6 dirty=6 active=0 N3=6 kernelpagesize_kB=4
+7fd77c150000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd77c15a000 default file=/opt/dtk-26.04/lib/librocsparse.so.1.0 mapped=5504 mapmax=6 active=5503 N1=112 N2=12 N3=303 N4=4873 N5=139 N6=55 N7=10 kernelpagesize_kB=4
+7fd7a5de0000 default file=/opt/dtk-26.04/lib/librocsparse.so.1.0 mapped=3410 mapmax=6 N2=2744 N5=189 N6=179 N7=298 kernelpagesize_kB=4
+7fd7a8981000 default file=/opt/dtk-26.04/lib/librocsparse.so.1.0 anon=39 dirty=39 active=0 N3=39 kernelpagesize_kB=4
+7fd7a89a8000 default file=/opt/dtk-26.04/lib/librocsparse.so.1.0 anon=3 dirty=3 active=0 N3=3 kernelpagesize_kB=4
+7fd7a89ab000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7a89ac000 default file=/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0 mapped=29 mapmax=6 N2=9 N3=15 N5=4 N6=1 kernelpagesize_kB=4
+7fd7a89c9000 default file=/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0 mapped=48 mapmax=6 N2=28 N5=20 kernelpagesize_kB=4
+7fd7a8c52000 default file=/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0 mapped=16 mapmax=6 N2=5 N5=11 kernelpagesize_kB=4
+7fd7a8c83000 default file=/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0
+7fd7a8c84000 default file=/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7a8c85000 default file=/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0 anon=2 dirty=2 active=0 N3=2 kernelpagesize_kB=4
+7fd7a8c87000 default file=/usr/lib/x86_64-linux-gnu/libdl.so.2 mapped=1 mapmax=12 N6=1 kernelpagesize_kB=4
+7fd7a8c88000 default file=/usr/lib/x86_64-linux-gnu/libdl.so.2 mapped=1 mapmax=12 N6=1 kernelpagesize_kB=4
+7fd7a8c89000 default file=/usr/lib/x86_64-linux-gnu/libdl.so.2
+7fd7a8c8a000 default file=/usr/lib/x86_64-linux-gnu/libdl.so.2 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7a8c8b000 default file=/usr/lib/x86_64-linux-gnu/libdl.so.2 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7a8c8c000 default file=/usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0 mapped=3 mapmax=6 N4=3 kernelpagesize_kB=4
+7fd7a8c8f000 default file=/usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0 mapped=6 mapmax=6 N4=6 kernelpagesize_kB=4
+7fd7a8c95000 default file=/usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0 mapped=2 mapmax=6 N4=2 kernelpagesize_kB=4
+7fd7a8c97000 default file=/usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd7a8c98000 default file=/usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0 anon=1 dirty=1 active=0 N0=1 kernelpagesize_kB=4
+7fd7a8c99000 default anon=2 dirty=2 active=0 N0=2 kernelpagesize_kB=4
+7fd7a8c9b000 default file=/opt/dtk-26.04/lib/librocblas.so.4.3 mapped=1821 mapmax=6 active=1688 N0=74 N1=20 N2=6 N3=239 N4=319 N5=58 N6=1068 N7=37 kernelpagesize_kB=4
+7fd7cff98000 default file=/opt/dtk-26.04/lib/librocblas.so.4.3 mapped=3984 mapmax=10 active=3982 N1=1112 N2=1199 N3=6 N4=46 N5=63 N6=1543 N7=15 kernelpagesize_kB=4
+7fd7d1806000 default file=/opt/dtk-26.04/lib/librocblas.so.4.3 anon=28 dirty=28 active=0 N3=28 kernelpagesize_kB=4
+7fd7d1822000 default file=/opt/dtk-26.04/lib/librocblas.so.4.3 anon=5 dirty=5 active=0 N0=4 N3=1 kernelpagesize_kB=4
+7fd7d1827000 default anon=20 dirty=20 active=0 N0=2 N3=18 kernelpagesize_kB=4
+7fd7d1843000 default file=/opt/dtk-26.04/lib/librocsolver.so.0.1 mapped=7791 mapmax=6 active=7680 N1=16 N2=6 N3=1995 N4=5496 N5=227 N6=11 N7=40 kernelpagesize_kB=4
+7fd816998000 default file=/opt/dtk-26.04/lib/librocsolver.so.0.1 mapped=3032 mapmax=10 N2=2996 N5=35 N6=1 kernelpagesize_kB=4
+7fd8177c3000 default file=/opt/dtk-26.04/lib/librocsolver.so.0.1 anon=32 dirty=32 active=0 N3=32 kernelpagesize_kB=4
+7fd8177e3000 default file=/opt/dtk-26.04/lib/librocsolver.so.0.1 anon=4 dirty=4 active=0 N3=4 kernelpagesize_kB=4
+7fd8177e7000 default anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd8177e8000 default file=/usr/lib/x86_64-linux-gnu/librt.so.1 mapped=1 mapmax=13 N6=1 kernelpagesize_kB=4
+7fd8177e9000 default file=/usr/lib/x86_64-linux-gnu/librt.so.1 mapped=1 mapmax=13 N6=1 kernelpagesize_kB=4
+7fd8177ea000 default file=/usr/lib/x86_64-linux-gnu/librt.so.1
+7fd8177eb000 default file=/usr/lib/x86_64-linux-gnu/librt.so.1 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd8177ec000 default file=/usr/lib/x86_64-linux-gnu/librt.so.1 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd8177ed000 default file=/usr/lib/x86_64-linux-gnu/libpthread.so.0 mapped=1 mapmax=17 N5=1 kernelpagesize_kB=4
+7fd8177ee000 default file=/usr/lib/x86_64-linux-gnu/libpthread.so.0 mapped=1 mapmax=17 N5=1 kernelpagesize_kB=4
+7fd8177ef000 default file=/usr/lib/x86_64-linux-gnu/libpthread.so.0
+7fd8177f0000 default file=/usr/lib/x86_64-linux-gnu/libpthread.so.0 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd8177f1000 default file=/usr/lib/x86_64-linux-gnu/libpthread.so.0 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd8177f2000 default file=/usr/lib/x86_64-linux-gnu/libc.so.6 mapped=40 mapmax=45 N4=29 N5=3 N7=8 kernelpagesize_kB=4
+7fd81781a000 default file=/usr/lib/x86_64-linux-gnu/libc.so.6 mapped=386 mapmax=47 N1=2 N2=21 N3=27 N4=128 N5=131 N6=61 N7=16 kernelpagesize_kB=4
+7fd8179af000 default file=/usr/lib/x86_64-linux-gnu/libc.so.6 mapped=61 mapmax=45 N3=5 N4=8 N5=34 N6=13 N7=1 kernelpagesize_kB=4
+7fd817a07000 default file=/usr/lib/x86_64-linux-gnu/libc.so.6
+7fd817a08000 default file=/usr/lib/x86_64-linux-gnu/libc.so.6 anon=4 dirty=4 active=0 N3=4 kernelpagesize_kB=4
+7fd817a0c000 default file=/usr/lib/x86_64-linux-gnu/libc.so.6 anon=2 dirty=2 active=0 N0=2 kernelpagesize_kB=4
+7fd817a0e000 default anon=6 dirty=6 active=0 N0=5 N3=1 kernelpagesize_kB=4
+7fd817a1b000 default file=/usr/lib/x86_64-linux-gnu/libgcc_s.so.1 mapped=3 mapmax=16 N6=3 kernelpagesize_kB=4
+7fd817a1e000 default file=/usr/lib/x86_64-linux-gnu/libgcc_s.so.1 mapped=23 mapmax=16 N3=7 N6=16 kernelpagesize_kB=4
+7fd817a35000 default file=/usr/lib/x86_64-linux-gnu/libgcc_s.so.1 mapped=4 mapmax=7 N2=1 N4=1 N5=2 kernelpagesize_kB=4
+7fd817a39000 default file=/usr/lib/x86_64-linux-gnu/libgcc_s.so.1 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd817a3a000 default file=/usr/lib/x86_64-linux-gnu/libgcc_s.so.1 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd817a3b000 default anon=2 dirty=2 active=0 N0=2 kernelpagesize_kB=4
+7fd817a3d000 default file=/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30 mapped=154 mapmax=16 N5=32 N6=122 kernelpagesize_kB=4
+7fd817ad7000 default file=/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30 mapped=249 mapmax=16 N1=13 N2=31 N4=82 N5=85 N6=38 kernelpagesize_kB=4
+7fd817be8000 default file=/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30 mapped=32 mapmax=16 N2=11 N5=21 kernelpagesize_kB=4
+7fd817c57000 default file=/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30
+7fd817c58000 default file=/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30 anon=11 dirty=11 active=0 N3=11 kernelpagesize_kB=4
+7fd817c63000 default file=/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30 anon=3 dirty=3 active=0 N0=3 kernelpagesize_kB=4
+7fd817c66000 default anon=3 dirty=3 active=0 N0=3 kernelpagesize_kB=4
+7fd817c69000 default file=/usr/lib/x86_64-linux-gnu/libm.so.6 mapped=14 mapmax=22 N6=14 kernelpagesize_kB=4
+7fd817c77000 default file=/usr/lib/x86_64-linux-gnu/libm.so.6 mapped=89 mapmax=22 N2=5 N4=1 N5=31 N6=52 kernelpagesize_kB=4
+7fd817cf3000 default file=/usr/lib/x86_64-linux-gnu/libm.so.6 mapped=56 mapmax=22 N1=25 N2=7 N4=2 N5=14 N6=2 N7=6 kernelpagesize_kB=4
+7fd817d4e000 default file=/usr/lib/x86_64-linux-gnu/libm.so.6 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd817d4f000 default file=/usr/lib/x86_64-linux-gnu/libm.so.6 anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd817d51000 default file=/opt/dtk-26.04/hipprof_utils/lib/libhipprof_utils.so mapped=5 mapmax=6 N2=5 kernelpagesize_kB=4
+7fd817d56000 default file=/opt/dtk-26.04/hipprof_utils/lib/libhipprof_utils.so mapped=5 mapmax=6 N2=5 kernelpagesize_kB=4
+7fd817d5b000 default file=/opt/dtk-26.04/hipprof_utils/lib/libhipprof_utils.so mapped=2 mapmax=6 N2=2 kernelpagesize_kB=4
+7fd817d5d000 default file=/opt/dtk-26.04/hipprof_utils/lib/libhipprof_utils.so anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd817d5e000 default file=/opt/dtk-26.04/hipprof_utils/lib/libhipprof_utils.so anon=1 dirty=1 active=0 N3=1 kernelpagesize_kB=4
+7fd817d5f000 default file=/opt/dtk-26.04/hip/lib/libgalaxyhip.so.5.2.26113.2065-6699a1f0 mapped=48 mapmax=6 active=47 N3=1 N5=47 kernelpagesize_kB=4
+7fd817d8f000 default file=/opt/dtk-26.04/hip/lib/libgalaxyhip.so.5.2.26113.2065-6699a1f0 mapped=1235 mapmax=6 active=1223 N0=23 N1=57 N2=119 N3=136 N4=222 N5=439 N6=225 N7=14 kernelpagesize_kB=4
+7fd818647000 default file=/opt/dtk-26.04/hip/lib/libgalaxyhip.so.5.2.26113.2065-6699a1f0 mapped=151 mapmax=6 active=128 N0=21 N1=1 N2=15 N3=1 N4=24 N5=70 N6=17 N7=2 kernelpagesize_kB=4
+7fd81890a000 default file=/opt/dtk-26.04/hip/lib/libgalaxyhip.so.5.2.26113.2065-6699a1f0 anon=10 dirty=10 active=0 N3=10 kernelpagesize_kB=4
+7fd818914000 default file=/opt/dtk-26.04/hip/lib/libgalaxyhip.so.5.2.26113.2065-6699a1f0 anon=15 dirty=15 mapped=16 active=1 N0=3 N3=12 N5=1 kernelpagesize_kB=4
+7fd818927000 default anon=12 dirty=12 active=0 N0=9 N3=3 kernelpagesize_kB=4
+7fd818935000 default file=/opt/dtk-26.04/lib/libhipblas.so.2.3 mapped=70 mapmax=6 active=62 N0=8 N2=16 N4=38 N6=7 N7=1 kernelpagesize_kB=4
+7fd8189c2000 default file=/opt/dtk-26.04/lib/libhipblas.so.2.3 mapped=32 mapmax=6 N2=1 N4=1 N5=18 N6=12 kernelpagesize_kB=4
+7fd818a65000 default file=/opt/dtk-26.04/lib/libhipblas.so.2.3 anon=2 dirty=2 active=0 N3=2 kernelpagesize_kB=4
+7fd818a67000 default file=/opt/dtk-26.04/lib/libhipblas.so.2.3 anon=4 dirty=4 active=0 N0=1 N3=3 kernelpagesize_kB=4
+7fd818a6b000 default anon=2 dirty=2 active=0 N0=2 kernelpagesize_kB=4
+7fd818a6d000 default file=/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 mapped=2 mapmax=45 N5=2 kernelpagesize_kB=4
+7fd818a6f000 default file=/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 mapped=42 mapmax=45 N3=7 N4=33 N5=1 N6=1 kernelpagesize_kB=4
+7fd818a99000 default file=/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 mapped=11 mapmax=45 N0=1 N4=9 N6=1 kernelpagesize_kB=4
+7fd818aa4000 default file=/dev/shm/hsakmt_shared_mem dirty=1 active=0 N2=1 kernelpagesize_kB=4
+7fd818aa5000 default file=/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 anon=2 dirty=2 active=0 N3=2 kernelpagesize_kB=4
+7fd818aa7000 default file=/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 anon=2 dirty=2 active=0 N0=2 kernelpagesize_kB=4
+7ffd7e85c000 default stack anon=29 dirty=29 active=1 N0=15 N1=5 N3=9 kernelpagesize_kB=4
+7ffd7e8b4000 default
+7ffd7e8b8000 default

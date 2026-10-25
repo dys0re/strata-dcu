@@ -1,0 +1,34 @@
+[
+  {
+    "label": "build",
+    "command": [
+      "cmake",
+      "--build",
+      "/root/private_data/strata-dcu/p1/build",
+      "--target",
+      "strata",
+      "mapped_moe_parity",
+      "native_multi_parity",
+      "resident_plan_parity",
+      "-j",
+      "4"
+    ],
+    "returncode": 0,
+    "wall_seconds": 283.29813554510474
+  },
+  {
+    "label": "gpu-tests",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/root/private_data/strata-dcu/p1/build",
+      "-R",
+      "^(mapped_moe_parity|native_multi_parity|resident_plan_parity)$",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "returncode": 0,
+    "wall_seconds": 2.457577494904399
+  }
+]

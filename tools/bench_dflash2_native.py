@@ -99,7 +99,7 @@ if a.dense_gguf:
 if a.shared_stream != 'auto':
  settings['STRATA_SH_STREAM']='1' if a.shared_stream=='on' else '0'
  env['STRATA_SH_STREAM']=settings['STRATA_SH_STREAM']
-for feature in ['STRATA_CPU_Q4_MT','STRATA_CPU_Q4_INPUT_BIAS','STRATA_DFLASH_SMALL_GEMV']:
+for feature in ['STRATA_CPU_Q4_MT','STRATA_CPU_Q4_INPUT_BIAS','STRATA_CPU_RESULT_DIRECT','STRATA_DFLASH_SMALL_GEMV']:
  settings[feature]=env.get(feature,'0')
  env[feature]=settings[feature]
 for feature in ['STRATA_VERIFY_HIT_PLAN','STRATA_CPU_EXPERT_PIPELINE','STRATA_CPU_EARLY_RESULT',

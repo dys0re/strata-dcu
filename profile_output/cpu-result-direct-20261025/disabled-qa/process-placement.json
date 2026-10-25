@@ -1,0 +1,63 @@
+{
+  "pid": 148447,
+  "status": [
+    "VmRSS:\t47901396 kB",
+    "VmSwap:\t       0 kB",
+    "Cpus_allowed_list:\t0",
+    "Mems_allowed_list:\t0-7"
+  ],
+  "anonymous_nodes": {
+    "N4": 15844,
+    "N0": 9637280,
+    "N2": 1,
+    "N5": 883,
+    "N1": 1855422,
+    "N6": 7,
+    "N7": 429156,
+    "N3": 1
+  },
+  "large_regions": [
+    {
+      "anon_pages": 140453,
+      "nodes": {
+        "N0": 1068,
+        "N1": 101717,
+        "N4": 6528,
+        "N5": 715,
+        "N6": 4,
+        "N7": 30421
+      },
+      "policy": "default"
+    },
+    {
+      "anon_pages": 10851301,
+      "nodes": {
+        "N0": 9635151,
+        "N1": 1216150
+      },
+      "policy": "default"
+    },
+    {
+      "anon_pages": 132944,
+      "nodes": {
+        "N1": 132944
+      },
+      "policy": "default"
+    },
+    {
+      "anon_pages": 108590,
+      "nodes": {
+        "N1": 108590
+      },
+      "policy": "default"
+    },
+    {
+      "anon_pages": 310400,
+      "nodes": {
+        "N7": 310400
+      },
+      "policy": "prefer=static:7"
+    }
+  ],
+  "cpu_stat": "usage_usec 78205972563\nuser_usec 67468441461\nsystem_usec 10737531102\nnr_periods 188409\nnr_throttled 657\nthrottled_usec 543417135\n"
+}

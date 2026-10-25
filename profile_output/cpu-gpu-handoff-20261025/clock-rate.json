@@ -1,0 +1,7 @@
+{
+  "returncode": 0,
+  "attribute": "hipDeviceAttributeWallClockRate",
+  "attribute_value": 20005,
+  "rate_khz": 25000,
+  "ns_per_tick": 40.0
+}

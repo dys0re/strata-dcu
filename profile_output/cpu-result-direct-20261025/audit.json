@@ -1,0 +1,13 @@
+{
+  "implemented_and_built": true,
+  "actual_gpu_entry_and_960_cases": true,
+  "mtp_four_runs_18qa_and_recovery_each": true,
+  "native_joint_and_fallback_20qa_each": true,
+  "fixed_experts_and_weight_budget": true,
+  "full_layer_execution_record": true,
+  "independent_public_entry_four_cases": true,
+  "source_identity_and_defaults_verified": true,
+  "idle_and_process_exit_verified": true,
+  "speed_claim": "no aggregate TPS benefit established; default follows predeclared gate",
+  "scope": "gfx936 compatibility runtime; CUDA native_moe unit compiled; no SYCL/Metal/multi-GPU runtime claim"
+}

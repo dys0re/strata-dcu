@@ -1,0 +1,15 @@
+{
+  "command": [
+    "bash",
+    "/root/strata-dcu/run-autoround.sh",
+    "--context",
+    "512",
+    "--suffix-draft",
+    "3",
+    "--prompt",
+    "Copy the text between <text> tags exactly, without tags or commentary.\n<text>The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river. The copper owl watches the quiet river.</text>",
+    "--max-new",
+    "128"
+  ],
+  "direct_result_override": null
+}

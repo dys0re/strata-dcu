@@ -1,0 +1,42 @@
+[
+  {
+    "label": "native-qa",
+    "returncode": 0,
+    "environment": {
+      "STRATA_CPU_RESULT_DIRECT": "1",
+      "STRATA_VERIFY_DEVICE_PLAN": null,
+      "STRATA_VERIFY_HIT_PLAN": "0",
+      "STRATA_CPU_Q4_INPUT_BIAS": "1"
+    }
+  },
+  {
+    "label": "joint-reject-qa",
+    "returncode": 0,
+    "environment": {
+      "STRATA_CPU_RESULT_DIRECT": "1",
+      "STRATA_VERIFY_DEVICE_PLAN": null,
+      "STRATA_VERIFY_HIT_PLAN": "0",
+      "STRATA_CPU_Q4_INPUT_BIAS": "1"
+    }
+  },
+  {
+    "label": "disabled-qa",
+    "returncode": 0,
+    "environment": {
+      "STRATA_CPU_RESULT_DIRECT": "0",
+      "STRATA_VERIFY_DEVICE_PLAN": null,
+      "STRATA_VERIFY_HIT_PLAN": "0",
+      "STRATA_CPU_Q4_INPUT_BIAS": "1"
+    }
+  },
+  {
+    "label": "device-plan-fallback-qa",
+    "returncode": 0,
+    "environment": {
+      "STRATA_CPU_RESULT_DIRECT": "1",
+      "STRATA_VERIFY_DEVICE_PLAN": "1",
+      "STRATA_VERIFY_HIT_PLAN": "0",
+      "STRATA_CPU_Q4_INPUT_BIAS": "1"
+    }
+  }
+]

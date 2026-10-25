@@ -1,0 +1,19 @@
+Start testing: Oct 25 02:31 CST
+----------------------------------------------------------
+67/163 Testing: mapped_moe_parity
+67/163 Test: mapped_moe_parity
+Command: "/root/private_data/strata-dcu/p1/build/mapped_moe_parity"
+Directory: /root/private_data/strata-dcu/p1/build
+"mapped_moe_parity" start time: Oct 25 02:31 CST
+Output:
+----------------------------------------------------------
+MAPPED_MOE_PARITY cases=960 failures=0
+<end of output>
+Test time =   1.86 sec
+----------------------------------------------------------
+Test Passed.
+"mapped_moe_parity" end time: Oct 25 02:31 CST
+"mapped_moe_parity" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 25 02:31 CST

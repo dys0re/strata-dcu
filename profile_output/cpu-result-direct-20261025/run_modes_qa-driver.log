@@ -1,0 +1,9 @@
+START native-qa
+END native-qa 0
+START joint-reject-qa
+END joint-reject-qa 0
+START disabled-qa
+END disabled-qa 0
+START device-plan-fallback-qa
+END device-plan-fallback-qa 0
+MODES_QA_COMPLETE

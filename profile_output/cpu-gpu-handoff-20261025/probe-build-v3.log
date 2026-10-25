@@ -1,0 +1,34 @@
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:2:
+In file included from /root/strata-dcu/Strata/include/strata/platform/hip_compat/cuda_runtime.h:2:
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:220:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:228:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:3:
+/root/strata-dcu/Strata/include/strata/kernels/dp4a.hpp:53:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:16:
+/root/private_data/strata-dcu/cpu-gpu-handoff-20261025/production_copy.inc:24:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+4 warnings generated when compiling for gfx936.
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:2:
+In file included from /root/strata-dcu/Strata/include/strata/platform/hip_compat/cuda_runtime.h:2:
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:220:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+/root/strata-dcu/Strata/include/strata/platform/hip_compat/strata_hip.h:228:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:3:
+/root/strata-dcu/Strata/include/strata/kernels/dp4a.hpp:53:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+In file included from /root/private_data/strata-dcu/cpu-gpu-handoff-20261025/handoff_probe.cpp:16:
+/root/private_data/strata-dcu/cpu-gpu-handoff-20261025/production_copy.inc:24:1: warning: void function is missing a return statement [-Wreturn-type]
+}
+^
+4 warnings generated when compiling for host.

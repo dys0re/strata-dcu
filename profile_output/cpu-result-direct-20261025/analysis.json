@@ -1,0 +1,637 @@
+{
+  "runs": {
+    "baseline-a": {
+      "metrics": {
+        "story": {
+          "tps": [
+            31.472443171340405,
+            36.6085601109697,
+            36.54167320895842
+          ],
+          "median_tps": 36.54167320895842,
+          "median_prefill_ms": 541.2,
+          "cpu_ms_per_window": [
+            26.71,
+            20.29,
+            19.2
+          ],
+          "windows": [
+            {
+              "windows": 153,
+              "avg_T": 2.23,
+              "tokens_per_window": 1.67
+            },
+            {
+              "windows": 154,
+              "avg_T": 2.17,
+              "tokens_per_window": 1.66
+            },
+            {
+              "windows": 157,
+              "avg_T": 2.15,
+              "tokens_per_window": 1.63
+            }
+          ],
+          "max_thread_queue_fraction": 0.0063782065785606525
+        },
+        "chinese": {
+          "tps": [
+            35.26899497141282,
+            47.40916330234453,
+            48.533565890003224
+          ],
+          "median_tps": 47.40916330234453,
+          "median_prefill_ms": 499.0,
+          "cpu_ms_per_window": [
+            29.89,
+            16.44,
+            18.79
+          ],
+          "windows": [
+            {
+              "windows": 116,
+              "avg_T": 3.37,
+              "tokens_per_window": 2.21
+            },
+            {
+              "windows": 120,
+              "avg_T": 2.95,
+              "tokens_per_window": 2.13
+            },
+            {
+              "windows": 105,
+              "avg_T": 3.59,
+              "tokens_per_window": 2.44
+            }
+          ],
+          "max_thread_queue_fraction": 0.006801616296307284
+        },
+        "code": {
+          "tps": [
+            50.1027497798219,
+            59.95596983465268,
+            58.12369448733086
+          ],
+          "median_tps": 58.12369448733086,
+          "median_prefill_ms": 441.4,
+          "cpu_ms_per_window": [
+            36.43,
+            25.96,
+            25.95
+          ],
+          "windows": [
+            {
+              "windows": 73,
+              "avg_T": 4.14,
+              "tokens_per_window": 3.51
+            },
+            {
+              "windows": 73,
+              "avg_T": 4.12,
+              "tokens_per_window": 3.51
+            },
+            {
+              "windows": 74,
+              "avg_T": 4.12,
+              "tokens_per_window": 3.46
+            }
+          ],
+          "max_thread_queue_fraction": 0.007196792805633912
+        }
+      },
+      "qa_cases": 18,
+      "protocol_pass": true,
+      "weights": {
+        "pack": 279744000,
+        "dense": 3760128000,
+        "head": 675430400,
+        "experts": 23500800000,
+        "mtp": 1113021152,
+        "weights": 29373360352,
+        "total": 68702699520,
+        "limit": 34351349760,
+        "fraction": 0.42754303,
+        "device_used": 30727471104,
+        "external_draft": 0,
+        "native_draft": 0,
+        "staging": 44236800,
+        "mtp_proxy": 0
+      },
+      "selection": {
+        "node": 3,
+        "cores": [
+          48,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          60,
+          62,
+          63
+        ],
+        "max_busy": 0.0033333333333333335,
+        "mean_busy": 0.0005119686515035352,
+        "weighted_expert_distance": 15.29604791167437
+      },
+      "all_quiet": true,
+      "engine_sha256": "4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd"
+    },
+    "candidate-b": {
+      "metrics": {
+        "story": {
+          "tps": [
+            33.59271458002546,
+            30.21647269894478,
+            34.462797679145964
+          ],
+          "median_tps": 33.59271458002546,
+          "median_prefill_ms": 669.9,
+          "cpu_ms_per_window": [
+            25.28,
+            29.17,
+            24.08
+          ],
+          "windows": [
+            {
+              "windows": 151,
+              "avg_T": 2.25,
+              "tokens_per_window": 1.7
+            },
+            {
+              "windows": 144,
+              "avg_T": 2.64,
+              "tokens_per_window": 1.78
+            },
+            {
+              "windows": 153,
+              "avg_T": 2.22,
+              "tokens_per_window": 1.67
+            }
+          ],
+          "max_thread_queue_fraction": 0.006405358219026963
+        },
+        "chinese": {
+          "tps": [
+            41.55979090230202,
+            40.17766059293438,
+            49.500164356014466
+          ],
+          "median_tps": 41.55979090230202,
+          "median_prefill_ms": 651.9,
+          "cpu_ms_per_window": [
+            22.53,
+            19.6,
+            19.42
+          ],
+          "windows": [
+            {
+              "windows": 121,
+              "avg_T": 2.91,
+              "tokens_per_window": 2.12
+            },
+            {
+              "windows": 137,
+              "avg_T": 2.28,
+              "tokens_per_window": 1.87
+            },
+            {
+              "windows": 106,
+              "avg_T": 3.35,
+              "tokens_per_window": 2.42
+            }
+          ],
+          "max_thread_queue_fraction": 0.0067805272984204
+        },
+        "code": {
+          "tps": [
+            43.756195945714964,
+            50.80070644732403,
+            58.820826248793715
+          ],
+          "median_tps": 50.80070644732403,
+          "median_prefill_ms": 522.5,
+          "cpu_ms_per_window": [
+            40.27,
+            35.75,
+            26.39
+          ],
+          "windows": [
+            {
+              "windows": 76,
+              "avg_T": 4.08,
+              "tokens_per_window": 3.37
+            },
+            {
+              "windows": 74,
+              "avg_T": 4.11,
+              "tokens_per_window": 3.46
+            },
+            {
+              "windows": 75,
+              "avg_T": 4.04,
+              "tokens_per_window": 3.41
+            }
+          ],
+          "max_thread_queue_fraction": 0.0071592628643544
+        }
+      },
+      "qa_cases": 18,
+      "protocol_pass": true,
+      "weights": {
+        "pack": 279744000,
+        "dense": 3760128000,
+        "head": 675430400,
+        "experts": 23500800000,
+        "mtp": 1113021152,
+        "weights": 29373360352,
+        "total": 68702699520,
+        "limit": 34351349760,
+        "fraction": 0.42754303,
+        "device_used": 30727471104,
+        "external_draft": 0,
+        "native_draft": 0,
+        "staging": 44236800,
+        "mtp_proxy": 0
+      },
+      "selection": {
+        "node": 3,
+        "cores": [
+          48,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          60,
+          62,
+          63
+        ],
+        "max_busy": 0.016722408026755852,
+        "mean_busy": 0.00231027638198829,
+        "weighted_expert_distance": 15.377175511028586
+      },
+      "all_quiet": true,
+      "engine_sha256": "81f79177f7e9b15a1d4506bed0211db95b369594868f51bcc19e64fa4017ce9b"
+    },
+    "candidate-b2": {
+      "metrics": {
+        "story": {
+          "tps": [
+            31.606499086374633,
+            36.66728733689503,
+            38.88450088097697
+          ],
+          "median_tps": 36.66728733689503,
+          "median_prefill_ms": 601.5,
+          "cpu_ms_per_window": [
+            28.29,
+            20.78,
+            18.58
+          ],
+          "windows": [
+            {
+              "windows": 145,
+              "avg_T": 2.63,
+              "tokens_per_window": 1.77
+            },
+            {
+              "windows": 155,
+              "avg_T": 2.12,
+              "tokens_per_window": 1.65
+            },
+            {
+              "windows": 155,
+              "avg_T": 2.15,
+              "tokens_per_window": 1.65
+            }
+          ],
+          "max_thread_queue_fraction": 0.007481416928971048
+        },
+        "chinese": {
+          "tps": [
+            38.33884953499169,
+            46.22440504134918,
+            51.50905432595574
+          ],
+          "median_tps": 46.22440504134918,
+          "median_prefill_ms": 566.5,
+          "cpu_ms_per_window": [
+            26.87,
+            19.17,
+            17.84
+          ],
+          "windows": [
+            {
+              "windows": 115,
+              "avg_T": 3.08,
+              "tokens_per_window": 2.23
+            },
+            {
+              "windows": 114,
+              "avg_T": 3.2,
+              "tokens_per_window": 2.25
+            },
+            {
+              "windows": 105,
+              "avg_T": 3.42,
+              "tokens_per_window": 2.44
+            }
+          ],
+          "max_thread_queue_fraction": 0.006516895242022886
+        },
+        "code": {
+          "tps": [
+            42.205918720633086,
+            60.955283584932616,
+            61.08473120332149
+          ],
+          "median_tps": 60.955283584932616,
+          "median_prefill_ms": 464.6,
+          "cpu_ms_per_window": [
+            48.12,
+            26.42,
+            25.49
+          ],
+          "windows": [
+            {
+              "windows": 74,
+              "avg_T": 4.11,
+              "tokens_per_window": 3.46
+            },
+            {
+              "windows": 72,
+              "avg_T": 4.06,
+              "tokens_per_window": 3.56
+            },
+            {
+              "windows": 74,
+              "avg_T": 4.0,
+              "tokens_per_window": 3.46
+            }
+          ],
+          "max_thread_queue_fraction": 0.006837438200479754
+        }
+      },
+      "qa_cases": 18,
+      "protocol_pass": true,
+      "weights": {
+        "pack": 279744000,
+        "dense": 3760128000,
+        "head": 675430400,
+        "experts": 23500800000,
+        "mtp": 1113021152,
+        "weights": 29373360352,
+        "total": 68702699520,
+        "limit": 34351349760,
+        "fraction": 0.42754303,
+        "device_used": 30727471104,
+        "external_draft": 0,
+        "native_draft": 0,
+        "staging": 44236800,
+        "mtp_proxy": 0
+      },
+      "selection": {
+        "node": 3,
+        "cores": [
+          48,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          60,
+          62,
+          63
+        ],
+        "max_busy": 0.023255813953488372,
+        "mean_busy": 0.003835937208419125,
+        "weighted_expert_distance": 15.22334234392724
+      },
+      "all_quiet": true,
+      "engine_sha256": "81f79177f7e9b15a1d4506bed0211db95b369594868f51bcc19e64fa4017ce9b"
+    },
+    "baseline-a2": {
+      "metrics": {
+        "story": {
+          "tps": [
+            28.650729698272002,
+            34.94642003958774,
+            33.96982524117249
+          ],
+          "median_tps": 33.96982524117249,
+          "median_prefill_ms": 638.5,
+          "cpu_ms_per_window": [
+            27.11,
+            22.76,
+            22.4
+          ],
+          "windows": [
+            {
+              "windows": 168,
+              "avg_T": 2.07,
+              "tokens_per_window": 1.52
+            },
+            {
+              "windows": 151,
+              "avg_T": 2.3,
+              "tokens_per_window": 1.7
+            },
+            {
+              "windows": 157,
+              "avg_T": 2.13,
+              "tokens_per_window": 1.63
+            }
+          ],
+          "max_thread_queue_fraction": 0.0069107259169310506
+        },
+        "chinese": {
+          "tps": [
+            39.96128750273173,
+            42.342044326827654,
+            47.434638403527956
+          ],
+          "median_tps": 42.342044326827654,
+          "median_prefill_ms": 642.7,
+          "cpu_ms_per_window": [
+            26.49,
+            19.32,
+            19.3
+          ],
+          "windows": [
+            {
+              "windows": 115,
+              "avg_T": 3.07,
+              "tokens_per_window": 2.23
+            },
+            {
+              "windows": 127,
+              "avg_T": 2.59,
+              "tokens_per_window": 2.02
+            },
+            {
+              "windows": 108,
+              "avg_T": 3.35,
+              "tokens_per_window": 2.37
+            }
+          ],
+          "max_thread_queue_fraction": 0.006541146585099157
+        },
+        "code": {
+          "tps": [
+            47.074399617520506,
+            49.055302188326365,
+            56.37152357254531
+          ],
+          "median_tps": 49.055302188326365,
+          "median_prefill_ms": 572.5,
+          "cpu_ms_per_window": [
+            40.24,
+            37.64,
+            27.1
+          ],
+          "windows": [
+            {
+              "windows": 74,
+              "avg_T": 4.16,
+              "tokens_per_window": 3.46
+            },
+            {
+              "windows": 70,
+              "avg_T": 4.51,
+              "tokens_per_window": 3.66
+            },
+            {
+              "windows": 75,
+              "avg_T": 4.09,
+              "tokens_per_window": 3.41
+            }
+          ],
+          "max_thread_queue_fraction": 0.0068668155053796705
+        }
+      },
+      "qa_cases": 18,
+      "protocol_pass": true,
+      "weights": {
+        "pack": 279744000,
+        "dense": 3760128000,
+        "head": 675430400,
+        "experts": 23500800000,
+        "mtp": 1113021152,
+        "weights": 29373360352,
+        "total": 68702699520,
+        "limit": 34351349760,
+        "fraction": 0.42754303,
+        "device_used": 30727471104,
+        "external_draft": 0,
+        "native_draft": 0,
+        "staging": 44236800,
+        "mtp_proxy": 0
+      },
+      "selection": {
+        "node": 3,
+        "cores": [
+          48,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          60,
+          62,
+          63
+        ],
+        "max_busy": 0.013377926421404682,
+        "mean_busy": 0.002817150789986985,
+        "weighted_expert_distance": 15.40145554897058
+      },
+      "all_quiet": true,
+      "engine_sha256": "4fc8304ec17c7e6b0df4a843f7f60ebe21934e6a7e88004a358e6b2356edb8cd"
+    }
+  },
+  "pooled": {
+    "story": {
+      "baseline_samples": [
+        31.472443171340405,
+        36.6085601109697,
+        36.54167320895842,
+        28.650729698272002,
+        34.94642003958774,
+        33.96982524117249
+      ],
+      "candidate_samples": [
+        33.59271458002546,
+        30.21647269894478,
+        34.462797679145964,
+        31.606499086374633,
+        36.66728733689503,
+        38.88450088097697
+      ],
+      "baseline_median": 34.45812264038011,
+      "candidate_median": 34.02775612958571,
+      "ratio": 0.9875104481086828
+    },
+    "chinese": {
+      "baseline_samples": [
+        35.26899497141282,
+        47.40916330234453,
+        48.533565890003224,
+        39.96128750273173,
+        42.342044326827654,
+        47.434638403527956
+      ],
+      "candidate_samples": [
+        41.55979090230202,
+        40.17766059293438,
+        49.500164356014466,
+        38.33884953499169,
+        46.22440504134918,
+        51.50905432595574
+      ],
+      "baseline_median": 44.87560381458609,
+      "candidate_median": 43.8920979718256,
+      "ratio": 0.9780837301527111
+    },
+    "code": {
+      "baseline_samples": [
+        50.1027497798219,
+        59.95596983465268,
+        58.12369448733086,
+        47.074399617520506,
+        49.055302188326365,
+        56.37152357254531
+      ],
+      "candidate_samples": [
+        43.756195945714964,
+        50.80070644732403,
+        58.820826248793715,
+        42.205918720633086,
+        60.955283584932616,
+        61.08473120332149
+      ],
+      "baseline_median": 53.2371366761836,
+      "candidate_median": 54.81076634805888,
+      "ratio": 1.029558871309081
+    }
+  },
+  "scope": "Four sequential cold starts in ABBA order, 3x256 tokens/task/start, quiet-core selection after load. Descriptive medians, not statistical significance.",
+  "geometric_mean_ratio": 0.9981358162072277,
+  "enable_machine_default": false,
+  "default_rule": "geometric-mean TPS ratio >=1.01 and no task below 0.97, using pooled 6 samples/task/config; descriptive result only, not statistical significance"
+}

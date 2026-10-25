@@ -215,3 +215,35 @@ Evidence: profile_output/q4-input-bias-20261025/entry-validation.txt and entry/.
 After validation, descriptive model-config engine digest refreshed to current SHA; previous weight-selection
 digest retained separately, all runtime options unchanged. Postflight GPU2MiB, noengine/build/queue jobs,
 OOM0,systemroot896MiB/cache59MiB. Final audit PASS.
+
+
+## CPU output direct combine (2026-10-25)
+
+Runtime unchanged dflash2@52f8bc84; no dependency installs or upgrades.
+Current public engine: /root/private_data/strata-dcu/cpu-result-direct-20261025/strata-final.
+SHA256:81f79177f7e9b15a1d4506bed0211db95b369594868f51bcc19e64fa4017ce9b.
+STRATA_CPU_RESULT_DIRECT=1 consumes mapped CPU FP32 rows directly in weighted combine.
+General default off; host model config cpu_result_direct=false because ABBA geometric ratio
+0.9981358 did not pass predeclared >=1.01 default gate. Env1 overrides; native/joint opt-in.
+Existing CPU Q4 input-bias default, Q8/tuned-MTP weights and all production CPU binding remain.
+
+Fixed8500/8300 GPU experts, allweights<=34351349760B, PLE persistent.
+Four normal enhanced-MTP starts all passed18QA+STOP/recovery; pooled medians
+old34.46/44.88/53.24,new34.03/43.89/54.81TPS. No aggregate gain or significance claim.
+Native/joint forced rejection/disabled/device-plan fallback each passed20QA+lookup/recovery.
+Full HIP build, production-entry960 delayed/payload checks, native combine/router and1601plan
+checks passed. CUDA native_moe translation unit compiled; no other backend runtime claim.
+Full-layer trace confirms selected path and remaining CPU wait; not normal TPS evidence.
+
+Fresh documented-entry instructions: profile_output/cpu-result-direct-20261025/ENTRY.md.
+Run only after root confirms deployment and GPU idle. Four actual public wrapper starts
+check machine default, inverse override, native opt-in and joint opt-in, exact copied text,
+lookup, weight bills,13participants, selected marker and current engine digest.
+
+Independent entry validation: corrected helper, fresh validate_direct_result_entry_v2,
+verbatim once,exit0,four PASS entries and final GPU-idle marker, no doc/runtime divergence.
+Earlier fresh pass failed due validator-only Q4 log-string typo; failed script/transcript/raw
+entry-failed-v1 retained. Engine/config unchanged for the correction.
+Postflight source/deployed SHA match,GPU2MiB,noengine/build/testjobs,OOM0/kill0,
+systemroot896MiB/cache59MiB,PLE and alllarge artifacts persistent. Evidence:
+profile_output/cpu-result-direct-20261025/entry-validation.txt and audit.json.

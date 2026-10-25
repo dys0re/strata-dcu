@@ -1,0 +1,8 @@
+{
+  "engine": "/root/private_data/strata-dcu/cpu-result-direct-20261025/strata-final",
+  "sha256": "81f79177f7e9b15a1d4506bed0211db95b369594868f51bcc19e64fa4017ce9b",
+  "previous_engine": "/root/private_data/strata-dcu/q4-input-bias-20261025/strata-final",
+  "mtp_direct_result_default": false,
+  "default_rule": "geometric-mean TPS ratio >=1.01 and no task below 0.97, using pooled 6 samples/task/config; descriptive result only, not statistical significance",
+  "geometric_mean_ratio": 0.9981358162072277
+}

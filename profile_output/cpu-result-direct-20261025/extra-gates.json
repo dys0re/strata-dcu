@@ -1,0 +1,27 @@
+[
+  {
+    "label": "expanded-test-build",
+    "command": [
+      "cmake",
+      "--build",
+      "/root/private_data/strata-dcu/p1/build",
+      "--target",
+      "mapped_moe_parity",
+      "-j",
+      "2"
+    ],
+    "returncode": 0
+  },
+  {
+    "label": "expanded-test",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/root/private_data/strata-dcu/p1/build",
+      "-R",
+      "^mapped_moe_parity$",
+      "--output-on-failure"
+    ],
+    "returncode": 0
+  }
+]

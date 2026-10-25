@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/dry/data/strara-dcu/Strata/profile_output/cpu-result-direct-20261025/audit.py", line 80, in <module>
+    assert (b'-----BEGIN ' + b'OPENSSH PRIVATE KEY-----') not in data, p
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: /home/dry/data/strara-dcu/Strata/profile_output/cpu-result-direct-20261025/__pycache__/audit.cpython-313.pyc

@@ -1,0 +1,8 @@
+Internal ctest changing into directory: /root/private_data/strata-dcu/p1/build
+Test project /root/private_data/strata-dcu/p1/build
+    Start 67: mapped_moe_parity
+1/1 Test #67: mapped_moe_parity ................   Passed    1.86 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.90 sec

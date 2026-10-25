@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/usr/local/cuda/bin/nvcc",
+    "-ccbin",
+    "/usr/bin/g++-15",
+    "-O3",
+    "-std=c++17",
+    "--use_fast_math",
+    "-arch=sm_80",
+    "-Iinclude",
+    "-c",
+    "src/kernels/cuda/native_moe.cu",
+    "-o",
+    "/tmp/strata-direct-native-moe-cuda.o"
+  ],
+  "returncode": 0,
+  "scope": "CUDA translation unit compiled; new compatibility-only kernel excluded; no CUDA runtime validation",
+  "source_sha256": "bd5d060702737ca1d97014f55b16668847b91ec854f731538dd7f5c8026fe9b8"
+}

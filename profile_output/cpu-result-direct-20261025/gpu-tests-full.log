@@ -1,0 +1,62 @@
+Start testing: Oct 25 02:16 CST
+----------------------------------------------------------
+66/163 Testing: native_multi_parity
+66/163 Test: native_multi_parity
+Command: "/root/private_data/strata-dcu/p1/build/native_multi_parity"
+Directory: /root/private_data/strata-dcu/p1/build
+"native_multi_parity" start time: Oct 25 02:16 CST
+Output:
+----------------------------------------------------------
+  router multi == single, random logits                bitwise (19 cases)
+  router multi == single, exact ties                   bitwise (19 cases)
+  router multi == single, NaN logits                   bitwise (19 cases)
+  router_top10 on 256 experts (non-512 fallback)       matches the host reference
+  combine k=10 + shared (float4 kernel)                bitwise (9 cases)
+  combine k=10 + shared, output misaligned             bitwise (9 cases)
+  combine k=10 without shared                          bitwise (9 cases)
+  combine k=9 + shared                                 bitwise (9 cases)
+
+native_multi: 0 failures
+native_multi_parity OK
+<end of output>
+Test time =   0.85 sec
+----------------------------------------------------------
+Test Passed.
+"native_multi_parity" end time: Oct 25 02:16 CST
+"native_multi_parity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+67/163 Testing: mapped_moe_parity
+67/163 Test: mapped_moe_parity
+Command: "/root/private_data/strata-dcu/p1/build/mapped_moe_parity"
+Directory: /root/private_data/strata-dcu/p1/build
+"mapped_moe_parity" start time: Oct 25 02:16 CST
+Output:
+----------------------------------------------------------
+MAPPED_MOE_PARITY cases=600 failures=0
+<end of output>
+Test time =   1.08 sec
+----------------------------------------------------------
+Test Passed.
+"mapped_moe_parity" end time: Oct 25 02:16 CST
+"mapped_moe_parity" time elapsed: 00:00:01
+----------------------------------------------------------
+
+69/163 Testing: resident_plan_parity
+69/163 Test: resident_plan_parity
+Command: "/root/private_data/strata-dcu/p1/build/resident_plan_parity"
+Directory: /root/private_data/strata-dcu/p1/build
+"resident_plan_parity" start time: Oct 25 02:16 CST
+Output:
+----------------------------------------------------------
+resident_plan: 1601 cases, 0 failures
+resident_plan_parity OK
+<end of output>
+Test time =   0.31 sec
+----------------------------------------------------------
+Test Passed.
+"resident_plan_parity" end time: Oct 25 02:16 CST
+"resident_plan_parity" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 25 02:16 CST
