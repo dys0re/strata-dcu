@@ -229,9 +229,11 @@ static __device__ __forceinline__ void strata_nanosleep(unsigned int ns) {
 #define __nanosleep(ns) strata_nanosleep(ns)
 #define __trap() __builtin_trap()
 
-// __dp4a(a, b, c): signed 8-bit dot product plus accumulator; gfx906 has v_dot4_i32_i8.
+// __dp4a(a, b, c): signed 8-bit dot product plus accumulator, modulo 2^32.
+// gfx936 also has v_dot4_i32_i8; STRATA_HIP_GFX906 names this compatibility
+// backend, but does not define the device architecture macro __gfx906__.
 static __device__ __forceinline__ int strata_dp4a(int a, int b, int c) {
-#if defined(__gfx906__) || defined(__gfx908__) || defined(__gfx90a__) || defined(__gfx942__) || defined(__GFX11__) || defined(__GFX12__)
+#if defined(__gfx906__) || defined(__gfx908__) || defined(__gfx90a__) || defined(__gfx936__) || defined(__gfx942__) || defined(__GFX11__) || defined(__GFX12__)
     return __builtin_amdgcn_sdot4(a, b, c, false);
 #else
     const int8_t* va = reinterpret_cast<const int8_t*>(&a);

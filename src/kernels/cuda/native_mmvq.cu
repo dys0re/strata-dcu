@@ -24,6 +24,7 @@
 // SOFTWARE.
 
 #include "strata/kernels/native_mmvq.hpp"
+#include "strata/kernels/q8_mmac.hpp"
 #include "strata/kernels/dp4a.hpp"
 #include "strata/kernels/q8_1_finite.hpp"
 #include "strata/kernels/iq_kernels.hpp"
@@ -778,6 +779,12 @@ __global__ void native_q4_k_mmvq_kernel(const Q4KBlock* __restrict__ w,
 __device__ __forceinline__ float q6_q8_dot_impl(int vl, int vh, const int* __restrict__ u,
                                               const int8_t* __restrict__ scales,
                                               float d, const float* __restrict__ d8) {
+#if defined(__gfx936__)
+    // Native dot4 changes the optimizer's contraction choices at two/three
+    // columns. Keep these scale products and sums separately rounded so the
+    // same row has the same result at every verification width.
+#pragma clang fp contract(off)
+#endif
     float sumf = 0.0f;
 #pragma unroll
     for (int i = 0; i < 2; ++i) {
@@ -1246,8 +1253,18 @@ struct SmallTraits<Q80Block, 8> {
     struct W { int v[2]; float d0; };
     __device__ static W load(const Block* __restrict__ w, int iqs) {
         W r;
+#if defined(__gfx936__)
+        // Q8_0 blocks are only two-byte aligned. Express the adjacent words
+        // as one unaligned-safe copy: separate loads are split by the gfx936
+        // optimizer after native dot4 selection and slow down these GEMVs.
+        uint64_t words;
+        __builtin_memcpy(&words, w->qs + 4 * iqs, sizeof(words));
+        r.v[0] = int(words);
+        r.v[1] = int(words >> 32);
+#else
 #pragma unroll
         for (int i = 0; i < 2; ++i) r.v[i] = load_int_b2(w->qs, iqs + i);
+#endif
         r.d0 = w->d;
         return r;
     }
@@ -3004,6 +3021,7 @@ bool native_mmvq_pair(int ggml_type, const void* w1, const void* w2, const void*
 
 void native_q8_0_mmvq(const void* weights, const void* x_q8_1, float* y,
                        int n_in, int n_out, int ncols, void* stream) {
+    if (q8_mmac_try(weights, x_q8_1, y, n_in, n_out, ncols, stream)) return;
     if (q8_packed_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream)) return;   // STRATA_Q8_PACKED=1 tensors
     small_mmvq<Q80Block, 8>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
 }

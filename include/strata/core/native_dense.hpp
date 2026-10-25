@@ -60,6 +60,7 @@ public:
 private:
     std::vector<void*> weights_;
     std::vector<const void*> packed_keys_;   // GGUF-layout pointers registered with STRATA_Q8_PACKED=1
+    std::vector<const void*> mmac_keys_;
     void* scratch_ = nullptr;
     uint64_t bytes_ = 0;
     uint64_t allocated_ = 0;

@@ -1,4 +1,5 @@
 #include "strata/core/native_head.hpp"
+#include "strata/kernels/q8_mmac.hpp"
 #include "strata/artifact/gguf_reader.hpp"
 #include "strata/kernels/iq_kernels.hpp"
 #include "strata/kernels/native_mmvq.hpp"
@@ -17,6 +18,8 @@ NativeHead::~NativeHead() {
 }
 
 void NativeHead::unload() {
+    if (weights_) strata::kernels::q8_mmac_unregister(weights_);
+    mmac_bytes_ = 0;
     if (weights_) strata::kernels::native_q6_k_unpack(weights_);
     if (weights_) strata::kernels::native_q8_0_sm60_release(weights_);
     if (scratch_) cudaFree(scratch_);
@@ -72,6 +75,8 @@ bool NativeHead::load(const std::vector<std::string>& shards, int64_t n_in, int6
         n_in_ = (int) n_in;
         n_out_ = (int) n_out;
         type_ = (int) tensor->type;
+        if (type_ == 8)
+            mmac_bytes_ = strata::kernels::q8_mmac_register_host(weights_, gguf.tensor_data(*tensor), n_in_, n_out_);
         if (type_ == 14 && strata::kernels::native_q6_k_packed_enabled())   // STRATA_Q6_PACKED=1
             strata::kernels::native_q6_k_pack(weights_, n_in_, n_out_, "output head");
         if (type_ == 8)   // STRATA_Q8_SM60=1 (a no-op otherwise); the MTP draft head reads the same matrix

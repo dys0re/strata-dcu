@@ -1,4 +1,5 @@
 #include "strata/core/native_dense.hpp"
+#include "strata/kernels/q8_mmac.hpp"
 #include <cstdlib>
 #include "strata/core/weights.hpp"
 #include "strata/artifact/gguf_reader.hpp"
@@ -219,6 +220,9 @@ bool NativeDense::weight_bytes_for(const std::vector<std::string>& shards, Weigh
                     return false;
                 }
                 total += alloc_bytes(strata::kernels::native_mmvq_weight_bytes(tensor.type, (int) ref.ne0, (int) ref.ne1));
+                if (tensor.type == 8 && strata::kernels::q8_mmac_eligible((int) ref.ne0, (int) ref.ne1))
+                    total += alloc_bytes(strata::kernels::q8_mmac_weight_bytes((int) ref.ne0, (int) ref.ne1)) +
+                             strata::kernels::q8_mmac_workspace_bytes((int) ref.ne1);
             }
         }
         out = total;
@@ -250,6 +254,7 @@ NativeDense::~NativeDense() {
             for (void*& b : cl)
                 if (b != nullptr && std::find(weights_.begin(), weights_.end(), b) != weights_.end()) b = nullptr;
     for (const void* p : packed_keys_) strata::kernels::native_q8_0_packed_unregister(p);
+    for (const void* p : mmac_keys_) strata::kernels::q8_mmac_unregister(p);
     if (scratch_) cudaFree(scratch_);
     for (void* p : weights_) cudaFree(p);
 }
@@ -367,6 +372,13 @@ bool NativeDense::load(const std::vector<std::string>& shards, WeightTable& tabl
                 max_in = (std::max)(max_in, (int) ref.ne0);
                 total += bytes;
                 allocated += alloc_bytes(bytes);
+                if (tensor.type == 8 && strata::kernels::q8_mmac_eligible((int) ref.ne0, (int) ref.ne1)) {
+                    const auto extra = strata::kernels::q8_mmac_register_host(data.get(), gguf.tensor_data(tensor),
+                                                                            (int) ref.ne0, (int) ref.ne1);
+                    mmac_keys_.push_back(data.get());
+                    total += extra;
+                    allocated += alloc_bytes(extra) + strata::kernels::q8_mmac_workspace_bytes((int) ref.ne1);
+                }
                 // STRATA_Q8_PACKED=1: a second, packed copy of an eligible Q8_0 matrix for the decode MMVQ (the GGUF
                 // copy stays: the prompt path's GEMMs read it).
                 DevicePtr packed;
