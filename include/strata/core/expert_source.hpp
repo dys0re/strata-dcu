@@ -58,7 +58,7 @@ namespace detail {
 /// Sentinel used by the pure complement planner for a blob that remains in the mmap fallback.
 inline constexpr uint64_t kNoCacheComplement = ~uint64_t{0};
 
-/// Required cgroup-v2 usage counters for the conservative cache-reclaim allowance.
+/// Normalized cgroup usage counters for the conservative cache-reclaim allowance.
 struct CgroupMemoryStat {
     uint64_t current = 0;
     uint64_t inactive_file = 0;
@@ -87,8 +87,8 @@ struct HostMemory {
 
 /// Linux reads `meminfo`, `self_cgroup` and the cgroup tree under `cgroup_root` (the parameters are for tests; the
 /// defaults are the real files).  cgroup v2 as before (an unreadable limit of a group that has one fails); cgroup v1's
-/// memory controller (`<root>/memory/<path>`: memory.limit_in_bytes - memory.usage_in_bytes); no cgroup line at all is
-/// MemAvailable alone.  False when the RAM cannot be determined.
+/// memory controller credits clean total_inactive_file under memory.limit_in_bytes when all required total_ counters
+/// are available, else uses limit minus usage. No cgroup line at all is MemAvailable alone. False when unknown.
 bool host_available_memory(HostMemory& m, const std::string& meminfo = "/proc/meminfo",
                            const std::string& self_cgroup = "/proc/self/cgroup",
                            const std::string& cgroup_root = "/sys/fs/cgroup");

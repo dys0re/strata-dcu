@@ -605,6 +605,28 @@ void test_host_memory() {
     put("fs/memory/memory.usage_in_bytes", std::to_string(50 * GiB) + "\n");
     require(probe("12:cpu,cpuacct:/docker/abc\n4:memory:/docker/abc\n1:name=systemd:/docker/abc\n") &&
             m.available == 22 * GiB && m.cgroup_limit == 32 * GiB, "v1 limit");
+    // A full cgroup may mostly contain reclaimable files from conversion or the GPU cache fill.
+    // Use hierarchical total_ counters, not the conflicting local counters or shmem-inclusive cache.
+    put("fs/memory/docker/abc/memory.usage_in_bytes", std::to_string(32 * GiB) + "\n");
+    put("fs/memory/docker/abc/memory.stat", "inactive_file " + std::to_string(GiB) +
+        "\ndirty 0\nwriteback 0\ncache " + std::to_string(31 * GiB) +
+        "\ntotal_cache " + std::to_string(31 * GiB) + "\ntotal_shmem " + std::to_string(7 * GiB) +
+        "\ntotal_inactive_file " + std::to_string(24 * GiB) + "\ntotal_dirty " + std::to_string(2 * GiB) +
+        "\ntotal_writeback " + std::to_string(GiB) + "\n");
+    require(probe("4:memory:/docker/abc\n") && m.available == 21 * GiB - GiB / 2 && m.cgroup_limit == 32 * GiB,
+            "v1 clean inactive cache must count, excluding dirty/writeback and the watermark");
+    put("fs/memory/memory.limit_in_bytes", std::to_string(40 * GiB) + "\n");
+    put("fs/memory/memory.usage_in_bytes", std::to_string(40 * GiB) + "\n");
+    put("fs/memory/memory.stat", "total_inactive_file " + std::to_string(8 * GiB) +
+        "\ntotal_dirty 0\ntotal_writeback 0\n");
+    require(probe("4:memory:/docker/abc\n") && m.available == 8 * GiB - 40 * GiB / 64 && m.cgroup_limit == 32 * GiB,
+            "v1 ancestor reclaim allowance must also bound available memory");
+    put("fs/memory/memory.limit_in_bytes", "9223372036854771712\n");
+    put("fs/memory/docker/abc/memory.stat", "total_inactive_file " + std::to_string(24 * GiB) + "\ntotal_dirty 0\n");
+    require(probe("4:memory:/docker/abc\n") && m.available == 0 && m.cgroup_limit == 32 * GiB,
+            "v1 incomplete stat must fall back to limit minus usage");
+    fs::remove(t.path / "fs/memory/docker/abc/memory.stat");
+    put("fs/memory/docker/abc/memory.usage_in_bytes", std::to_string(10 * GiB) + "\n");
     put("fs/memory/docker/abc/memory.limit_in_bytes", "9223372036854771712\n");
     require(probe("4:memory:/docker/abc\n") && m.available == 100 * GiB && m.cgroup_limit == ~0ull, "v1 unlimited");
     // a v1 group not visible here (another namespace): MemAvailable alone

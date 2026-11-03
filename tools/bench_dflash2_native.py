@@ -6,6 +6,11 @@ resource.setrlimit(resource.RLIMIT_CORE,(0,0))
 
 ap=argparse.ArgumentParser(__doc__)
 ap.add_argument('--engine',required=True)
+ap.add_argument('--project-root',default='/root/strata-dcu',help='deployed root containing Strata/')
+ap.add_argument('--model',default='/root/private_data/Qwen3.8-F',help='original tokenizer/checkpoint directory')
+ap.add_argument('--cache',help='prepared AutoRound cache; defaults to PROJECT_ROOT/autoround')
+ap.add_argument('--ple-gguf',help='optional prepared PLE table with the same row/hash layout')
+ap.add_argument('--pool-workers',type=int,help='override CPU expert worker count')
 ap.add_argument('--dense-gguf',help='optional non-expert weight variant; expert pack stays fixed')
 ap.add_argument('--mtp-runtime',help='optional compatible MTP runtime variant')
 ap.add_argument('--smoke',action='store_true')
@@ -49,7 +54,7 @@ assert a.pcie_frac == -1 or 0 <= a.pcie_frac <= 1
 assert a.request_pcie_frac is None or 0 <= a.request_pcie_frac <= 1
 assert not a.long_checks or a.context>=2300
 out=Path(a.out);out.mkdir(parents=True,exist_ok=False)
-root=Path('/root/strata-dcu'); cache=root/'autoround'
+root=Path(a.project_root); cache=Path(a.cache) if a.cache else root/'autoround'
 source_files=['CMakeLists.txt','src/program/generate.cpp','src/core/verify.cpp','src/prefill/prefill.cpp','include/strata/core/dflash_bridge.hpp','include/strata/core/verify.hpp','include/strata/prefill/prefill.hpp','src/kernels/cuda/native_mmvq.cu','include/strata/kernels/native_mmvq.hpp','src/core/mtp.cpp','include/strata/core/mtp.hpp','tools/dflash2_worker.py','tools/strata_dflash2.py','third_party/dflash/model.py','third_party/dflash/LICENSE','third_party/dflash/VERSION','include/strata/core/dflash_native.hpp','src/prefill/dflash.cu','src/prefill/dflash_witness.cpp','tools/dflash2_pack.py','tools/test_dflash2_native.py']
 source_files+=['src/kernels/cpu/native_expert.cpp','src/kernels/cpu/q4_avx512.cpp',
  'include/strata/kernels/cpu/q4_avx512.hpp','src/kernels/cuda/bf16_small.cu',
@@ -60,6 +65,10 @@ def sha(path):
 (out/'provenance.json').write_text(json.dumps({'engine_sha256':sha(a.engine),'source_sha256':{f:sha(root/'Strata'/f) for f in source_files},'driver_sha256':sha(__file__)},indent=2)+'\n')
 
 cmd=json.loads((cache/'run-command.json').read_text());cmd[0]=a.engine
+if a.ple_gguf:cmd[cmd.index('--ple-gguf')+1]=str(Path(a.ple_gguf).resolve())
+if a.pool_workers is not None:
+ assert a.pool_workers>0
+ cmd[cmd.index('--pool-workers')+1]=str(a.pool_workers)
 for flag,n in [('--mtp',2),('--mtp-adaptive',1),('--dflash2',2),('--dflash-adaptive',1),('--dflash-eager',1),('--dflash-mtp-prefix',2)]:
  if flag in cmd:
   i=cmd.index(flag);del cmd[i:i+n]
@@ -86,7 +95,7 @@ if a.mode in ['native','joint']:
  if a.mode=='joint':cmd+=['--dflash-mtp-prefix',str(a.joint_prefix)]
 if a.corrupt:cmd+=['--spec-corrupt',str(a.corrupt)]
 if a.mode=='ipc':
- cmd=['python3',str(root/'Strata/tools/strata_dflash2.py'),'--checkpoint','/root/private_data/strata-dcu/dflash2/checkpoint','--model','/root/private_data/Qwen3.8-F','--stats-file',str(out/'worker.json')]+(['--graph'] if a.graph else [])+(['--adaptive'] if a.draft_adaptive else [])+['--']+cmd
+ cmd=['python3',str(root/'Strata/tools/strata_dflash2.py'),'--checkpoint','/root/private_data/strata-dcu/dflash2/checkpoint','--model',a.model,'--stats-file',str(out/'worker.json')]+(['--graph'] if a.graph else [])+(['--adaptive'] if a.draft_adaptive else [])+['--']+cmd
 env=os.environ.copy()
 for key in ['STRATA_VERIFY_PROFILE','STRATA_DECODE_TIMING','STRATA_DUMP_FIRST_LOGITS','STRATA_SPEC_PROB','STRATA_MTP_FRONT_CHECK','STRATA_SH_STREAM','STRATA_DFLASH_FD','STRATA_DFLASH_NATIVE']:
  env.pop(key,None)
@@ -110,10 +119,10 @@ if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRAT
 if a.timing_only:env['STRATA_DECODE_TIMING']='1'
 if a.spec_prob:env['STRATA_SPEC_PROB']='1'
 if a.checks and (a.profile or a.dump_logits):env['STRATA_DUMP_FIRST_LOGITS']=str(out/'logits.f32')
-(out/'command.json').write_text(json.dumps(dict(command=cmd,overrides=settings,hc_environment={k:env.get(k) for k in ['STRATA_HC_SPLIT','STRATA_GR_FAST']},profile=a.profile,timing_only=a.timing_only,spec_prob=a.spec_prob,checks=a.checks,dump_logits='STRATA_DUMP_FIRST_LOGITS' in env),indent=2)+'\n')
+(out/'command.json').write_text(json.dumps(dict(command=cmd,overrides=settings,gpu_visibility={k:env.get(k) for k in ['ROCR_VISIBLE_DEVICES','HIP_VISIBLE_DEVICES','CUDA_VISIBLE_DEVICES']},hc_environment={k:env.get(k) for k in ['STRATA_HC_SPLIT','STRATA_GR_FAST']},profile=a.profile,timing_only=a.timing_only,spec_prob=a.spec_prob,checks=a.checks,dump_logits='STRATA_DUMP_FIRST_LOGITS' in env),indent=2)+'\n')
 from transformers import AutoTokenizer
-tok=AutoTokenizer.from_pretrained('/root/private_data/Qwen3.8-F',local_files_only=True)
-tok.chat_template=Path('/root/private_data/Qwen3.8-F/chat_template.jinja').read_text()
+tok=AutoTokenizer.from_pretrained(a.model,local_files_only=True)
+tok.chat_template=(Path(a.model)/'chat_template.jinja').read_text()
 story='Write a detailed 800-word story about a robot exploring an abandoned observatory. Begin the story immediately and continue with rich descriptions and dialogue.'
 workloads=[('story',story),('chinese','请详细解释大语言模型的 prefill 和 decode 阶段有什么区别，以及它们各自的性能瓶颈。请分段说明并举例。'),('code','Write a Python LRU cache class using OrderedDict. Include get and put methods, explain their complexity, and give a usage example.')]
 cases=[('warmup',story,128,None,0)]
@@ -154,7 +163,10 @@ if a.extended_qa:
 records=[]
 mem=Path('/sys/fs/cgroup')
 def memory_snapshot():
- return {n:(mem/n).read_text() for n in ['memory.current','memory.peak','memory.events','memory.max'] if (mem/n).exists()}
+ names=['memory.current','memory.peak','memory.events','memory.max']
+ if not (mem/'memory.current').exists():
+  names=['memory/memory.usage_in_bytes','memory/memory.max_usage_in_bytes','memory/memory.oom_control','memory/memory.failcnt','memory/memory.limit_in_bytes']
+ return {n:(mem/n).read_text() for n in names if (mem/n).exists()}
 (out/'memory-before.json').write_text(json.dumps(memory_snapshot(),indent=2)+'\n')
 with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
  p=subprocess.Popen(cmd,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=err,text=True,bufsize=1)
@@ -221,7 +233,8 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
     for key,value in places.items():nodes[key]=nodes.get(key,0)+value
     if int(fields['anon'])>100000:large.append(dict(anon_pages=int(fields['anon']),nodes=places,policy=row.split()[1]))
    status=[s for s in (proc/'status').read_text().splitlines() if s.startswith(('VmRSS:','VmSwap:','Cpus_allowed_list:','Mems_allowed_list:'))]
-   (out/'process-placement.json').write_text(json.dumps(dict(pid=p.pid,status=status,anonymous_nodes=nodes,large_regions=large,cpu_stat=(mem/'cpu.stat').read_text()),indent=2)+'\n')
+   cpu_stat=mem/'cpu.stat' if (mem/'cpu.stat').exists() else mem/'cpu/cpu.stat'
+   (out/'process-placement.json').write_text(json.dumps(dict(pid=p.pid,status=status,anonymous_nodes=nodes,large_regions=large,cpu_stat=cpu_stat.read_text()),indent=2)+'\n')
   for name,prompt,n,expected,temperature in cases:
    prompt_ids,request=gen(prompt,n,temperature,name in ['context_tail','window-crossing'] or (a.long_checks and name=='lookup-copy'))
    (out/(name+'.request.txt')).write_text(request)
@@ -255,6 +268,7 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
    _,request=gen(story,256);send(request);ids,done=finish(stop=True);assert done.split()[5]=='cancel'
    _,request=gen('Reply with exactly OK.',16);send(request);ids,recovery=finish();assert tok.decode(ids,skip_special_tokens=True).strip()=='OK'
    (out/'protocol.json').write_text(json.dumps(dict(cancel=done,recovery=recovery,seed_repeat=seed_repeat,one_token_limit=True,context_tail=True),indent=2)+'\n')
+   assert seed_repeat,'same seed and prompt produced different sampled token IDs'
   send('QUIT\n');p.wait(timeout=30);assert p.returncode==0
  finally:
   if p.poll() is None:p.kill();p.wait()

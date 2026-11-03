@@ -289,11 +289,14 @@ namespace {
 
 #if defined(__linux__)
 bool read_cgroup_memory_stat(const std::filesystem::path& path, uint64_t current,
-                             detail::CgroupMemoryStat& stat) {
+                             detail::CgroupMemoryStat& stat, bool v1 = false) {
     std::ifstream input(path / "memory.stat");
     if (!input) return false;
 
     bool inactive_file = false, file_dirty = false, file_writeback = false, file = false;
+    const char* inactive_key = v1 ? "total_inactive_file" : "inactive_file";
+    const char* dirty_key = v1 ? "total_dirty" : "file_dirty";
+    const char* writeback_key = v1 ? "total_writeback" : "file_writeback";
     std::string line;
     while (std::getline(input, line)) {
         std::istringstream fields(line);
@@ -303,19 +306,19 @@ bool read_cgroup_memory_stat(const std::filesystem::path& path, uint64_t current
         fields >> std::ws;
         if (!fields.eof()) return false;
 
-        if (key == "inactive_file") {
+        if (key == inactive_key) {
             if (inactive_file) return false;
             inactive_file = true;
             stat.inactive_file = value;
-        } else if (key == "file_dirty") {
+        } else if (key == dirty_key) {
             if (file_dirty) return false;
             file_dirty = true;
             stat.file_dirty = value;
-        } else if (key == "file_writeback") {
+        } else if (key == writeback_key) {
             if (file_writeback) return false;
             file_writeback = true;
             stat.file_writeback = value;
-        } else if (key == "file") {   // 149: optional (every v2 kernel has it); 0 = inactive_file alone
+        } else if (!v1 && key == "file") {   // v1 cache also contains shmem: credit inactive_file only
             if (file) return false;
             file = true;
             stat.file = value;
@@ -411,7 +414,14 @@ bool host_available_memory(HostMemory& m, const std::string& meminfo, const std:
             std::ifstream limit_file(path / "memory.limit_in_bytes"), usage_file(path / "memory.usage_in_bytes");
             uint64_t cap = 0, usage = 0;
             if (limit_file >> cap && usage_file >> usage && cap < (1ull << 62)) {
-                bytes = std::min(bytes, usage < cap ? cap - usage : 0);
+                uint64_t available = usage < cap ? cap - usage : 0;
+                CgroupMemoryStat stat;
+                // v1 usage includes the clean page cache, just like v2 memory.current. The total_ counters
+                // include child groups, matching the controller's hierarchical usage. Without complete stat
+                // counters retain the previous, conservative limit-minus-usage estimate.
+                if (read_cgroup_memory_stat(path, usage, stat, true))
+                    cgroup_available_bytes(cap, stat, available);
+                bytes = std::min(bytes, available);
                 m.cgroup_limit = std::min(m.cgroup_limit, cap);
             }
             if (path == mroot) break;

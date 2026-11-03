@@ -1,8 +1,9 @@
 """Import symmetric AutoRound GPTQ INT4 without re-quantizing its weights.
 
 Expert codes are losslessly reblocked as Q4_0 (same FP16 scale, zero point 8).
-Unquantized projections remain BF16/F32. PLE stays in the original Safetensors
-file: a tiny descriptor supplies its validated byte span to Strata's disk reader.
+Unquantized projections remain BF16/F32. By default PLE stays in the original
+Safetensors file: a tiny descriptor supplies its validated byte span to Strata's
+disk reader. --ple-gguf selects a separately prepared compatible PLE table.
 
 Requires the engine's pinned llama.cpp converter, torch, numpy and safetensors.
 No model file is modified. Prepared files are bound to the source inventory.
@@ -449,8 +450,12 @@ def run_model(ck, out, a):
     token_file = out / "prompt.ids"
     token_file.write_text(",".join(map(str, ids)) + "\n")
     dense_file = Path(a.dense_gguf).resolve() if a.dense_gguf else out / "dense.gguf"
+    ple_override = getattr(a, "ple_gguf", None)
+    ple_file = Path(ple_override).resolve() if ple_override else out / "ple.gguf"
+    if ple_override and not ple_file.is_file():
+        raise ValueError("prepared PLE GGUF does not exist: " + str(ple_file))
     cmd = [str(Path(a.engine).resolve()), "--native", str(dense_file),
-           "--pack", str(out / "pack"), "--ple-gguf", str(out / "ple.gguf"),
+           "--pack", str(out / "pack"), "--ple-gguf", str(ple_file),
            "--tokens-file", str(token_file), "--max-new", str(a.max_new),
            "--eos-ids", ",".join(map(str, eos)),
            # Native packs require --spec >= 2, but this entry has no drafter.
@@ -573,6 +578,8 @@ def run_model(ck, out, a):
                                  "cpu_result_direct": env.get("STRATA_CPU_RESULT_DIRECT") == "1",
                                  "dflash_small_gemv": env.get("STRATA_DFLASH_SMALL_GEMV") == "1"},
               "finish_reason": "eos" if generated and generated[-1] in eos else "length"}
+    if ple_override:
+        report["model_variants"]["ple_gguf"] = str(ple_file)
     if a.dflash2:
         report.update(draft_method="mtp+dflash2" if a.dflash_mtp_prefix else "dflash2", draft_backend=a.dflash_backend,
                       draft_graph=not a.dflash_eager, draft_adaptive=not a.dflash_fixed,
@@ -604,6 +611,7 @@ def main():
     ap.add_argument("--verify-experts", type=int, default=12)
     ap.add_argument("--engine", default=str(HERE.parent / "build" / "strata"))
     ap.add_argument("--dense-gguf", help="optional prepared non-expert weight variant; expert pack stays fixed")
+    ap.add_argument("--ple-gguf", help="optional prepared PLE GGUF with the checkpoint's original row/hash layout")
     ap.add_argument("--mtp-runtime", help="optional compatible prepared MTP runtime, with source-bound ready.json")
     ap.add_argument("--prompt", default="Reply with exactly OK.")
     ap.add_argument("--max-new", type=int, default=32)

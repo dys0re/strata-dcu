@@ -15,6 +15,12 @@ struct Act { half2 ds; int8_t q[32]; };
 struct Entry { void* packed=nullptr; float* partial=nullptr; int ni=0,no=0; };
 auto& entries() { static std::unordered_map<const void*,Entry> e; return e; }
 void check(cudaError_t e) { if(e!=cudaSuccess) throw std::runtime_error(cudaGetErrorString(e)); }
+bool stable_widths() {
+    static const bool on=[] { const char* v=std::getenv("STRATA_Q8_MMAC_STABLE");
+        return v && std::strcmp(v,"1")==0;
+    }();
+    return on;
+}
 template<int T> __global__ void compute(const uint64_t* w,const half* d,const Act* x,float* y,int ni,int no,int split) {
     const int part=blockIdx.y,l=threadIdx.x&63,g=l/16,r=l%16;
     const int tile=blockIdx.x*4+threadIdx.x/64,tiles=(no+15)/16,nb=ni/32;
@@ -82,14 +88,24 @@ void q8_mmac_unregister(const void* key) {auto it=entries().find(key);if(it==ent
     if(it->second.partial)cudaFree(it->second.partial);cudaFree(it->second.packed);entries().erase(it);
 }
 bool q8_mmac_try(const void* key,const void* x,float* y,int ni,int no,int t,void* stream) {
-    if(!q8_mmac_enabled() || t<1 || t>5 || (t==1 && no<65536))return false;
+    if(!q8_mmac_enabled() || t<1 || t>5)return false;
+    const bool stable=stable_widths();
+    if(!stable && t==1 && no<65536)return false;
     auto it=entries().find(key);if(it==entries().end())return false;const Entry&e=it->second;
     if(e.ni!=ni || e.no!=no)throw std::runtime_error("Q8 MMAC shape mismatch");
     int split=1;if(no<65536) {
-        if(ni==6144)split=t==4?8:16;
-        else if(no==6144)split=t==4?4:16;
-        else if(no==12288)split=t==4?4:8;
-        else split=t==4?8:4;
+        // Adaptive verification changes T between requests. Keeping the same kernel path and
+        // split for every width preserves each row's accumulation order, including T=1.
+        if(stable) {
+            if(ni==6144 || no==6144)split=16;
+            else if(no==12288)split=8;
+            else split=4;
+        } else {
+            if(ni==6144)split=t==4?8:16;
+            else if(no==6144)split=t==4?4:16;
+            else if(no==12288)split=t==4?4:8;
+            else split=t==4?8:4;
+        }
     }
     auto s=static_cast<cudaStream_t>(stream);const auto*a=static_cast<const Act*>(x);
     switch(t) {
@@ -98,7 +114,7 @@ bool q8_mmac_try(const void* key,const void* x,float* y,int ni,int no,int t,void
 #undef GO
     }
     check(cudaGetLastError());
-    static bool shown[6]={};if(!shown[t]){shown[t]=true;std::fprintf(stderr,"strata q8 mmac: dispatch T=%d split=%d\n",t,split);}
+    static bool shown[6]={};if(!shown[t]){shown[t]=true;std::fprintf(stderr,"strata q8 mmac: dispatch T=%d split=%d stable=%d\n",t,split,int(stable));}
     return true;
 }
 }

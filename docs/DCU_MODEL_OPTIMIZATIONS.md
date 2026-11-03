@@ -125,3 +125,49 @@ STRATA_DCU_MODEL_DEFAULTS=0 bash /root/strata-dcu/run-autoround.sh --prompt 'Rep
 2026-10-25 补充：后段骤降的主要原因已通过同进程换核对照定位为固定核心上的宿主用户态争用。
 当前默认组合的256-token英文生成从9.72TPS恢复到33.24TPS，移回后12.18TPS。
 这次只定位原因，没有更改生产绑核默认值；详见 [诊断记录](../profile_output/cpu-slowdown-20261025/README.md)。
+
+## PLE 四位表（2026-11-03）
+
+在一台 BW/gfx936、32 CPU / 121.5 GiB 内存的 worker 上，
+`Intel/Qwen3.8-Flash-Next-W4A16-AutoRound` 保留了 BF16 PLE：
+128 个 `[2500012, 160]` 存储分片，共 320001536 行。已从原始 BF16 直接生成独立的
+IQ4_NL GGUF，没有改写原 checkpoint 或再次量化专家。每 32 个数保存 16 字节编码和
+2 字节 FP16 scale，每行 90 字节，实际为 4.5 bits/weight。
+
+输出为独立的 `ple-iq4_nl.gguf`，
+大小 28800138816 字节（28.80 GB / 26.82 GiB），原分片为 102400512256 字节。
+输出 SHA256 为 `744182bb2bb330a6a006c94fa3c5be669915ed75f9ec9d58e2ca91bd29dae899`。
+原始分片仍保留，因此此次生成副本没有回收原文件占用的空间。
+
+转换使用项目固定的 GGML `3cf03257f219afbe7334045ff7c6a06ac68c627d`，
+调用 `quantize_iq4_nl` 的标准 scale 搜索，不使用 imatrix。
+在全部原始分片中采样 16639 行、2662240 个值，Q4_0 / IQ4_NL 的相对重建 RMSE
+分别为 8.5593% / 7.6013%。这是权重重建误差，不是模型准确率。
+两种格式同为 90 字节/行；IQ4_NL 使用非均匀码本，Q4_0 使用均匀刻度。
+Q4_K 通常需要 256 元素块，不能直接用于这里的 160 维行；Q4_K_M/S 则是整模型的混合精度配方。
+
+`tools/ple_quant_pack.py` 分块读取，内存随 worker 数和 chunk 大小有界。示例：
+
+```bash
+python3 tools/ple_quant_pack.py \
+  --model /path/to/Qwen3.8-Flash-Next-W4A16-AutoRound \
+  --libggml /path/to/pinned-build/bin/libggml-base.so \
+  --format IQ4_NL --workers 28 \
+  --source-sha256 59d1ce2df8a9e4441e0d6328b5fd620f427734274bf559ba4f15a8f98bf35abf \
+  --out /persistent/ple-iq4_nl.gguf
+```
+
+工具保留 `.part`，源文件 SHA256、输出完整回读 SHA256 和抽样重新量化均通过后才发布结果。
+不覆盖已有结果。当前不支持恢复未完成的量化；部分结果保留供检查，重新执行应选择新的输出名。
+转换结束后的 4352 行覆盖原始分片边界、随机位置和 EOF，写出的编码与 GGML 重新量化逐位一致，
+独立 NumPy 解码与 GGML 解码逐位一致。使用实际 Strata `PleTable` 源码编译的
+`tools/check_ple_table.cpp` 在 direct / mmap 两种路径上也与独立解码逐位一致。
+
+`tools/autoround_pack.py run` 新增可选的 `--ple-gguf /persistent/ple-iq4_nl.gguf`，
+并将显式选择记录到生成报告。不传时继续使用原来的 BF16 descriptor。
+上述转换检查不代替完整模型质量基准。后续已部署完整文本推理缓存并完成单卡生成检查；
+MMAC 的模型级验证范围见 [MMAC 接入记录](DCU_Q8_MMAC_PLAN.md#稳定验证窗口的可选路径2026-11-03)。
+原始 HF checkpoint 的索引仍依赖 BF16 源分片，不能把删除该片后的目录当作完整 HF checkpoint。
+
+原始结果：[转换与对照](../profile_output/ple-iq4-20261103/conversion.json)、
+[Strata 读取检查](../profile_output/ple-iq4-20261103/reader_check.json)。
