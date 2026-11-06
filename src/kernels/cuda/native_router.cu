@@ -24,6 +24,7 @@
 #include <cuda_runtime.h>
 #include <atomic>
 #include <cfloat>
+#include <cstdio>
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
@@ -148,6 +149,116 @@ __global__ void route_multi(const float* __restrict__ logits, int32_t* __restric
     const float inverse_selected_sum = 1.0f / selected_sum;
     if (lane < 10) weights[lane] = selected * inverse_selected_sum;
 }
+// A CPU-only-miss graph needs no host GPU plan. Publish CPU inputs immediately after routing,
+// then form the resident groups while the CPU starts its experts. One block owns every token.
+__global__ __launch_bounds__(256, 1) void route_publish(RouterPublishArgs a) {
+    const int tid = int(threadIdx.y) * 32 + int(threadIdx.x), tk = int(threadIdx.y);
+    if (tk < a.n_tok) {
+        const float* logits = a.logits;
+        int32_t* ids = a.ids;
+        float* weights = a.weights;
+        logits += (size_t) tk * 512; ids += (size_t) tk * 10; weights += (size_t) tk * 10;
+        const int lane = threadIdx.x;
+        float values[16];
+#pragma unroll
+        for (int i = 0; i < 16; ++i) values[i] = logits[lane + i * 32];
+        __syncwarp();
+        float maximum = -INFINITY;
+#pragma unroll
+        for (int i = 0; i < 16; ++i) maximum = max(maximum, values[i]);
+        maximum = warp_max(maximum);
+        float sum = 0.0f;
+#pragma unroll
+        for (int i = 0; i < 16; ++i) {
+            values[i] = expf(values[i] - maximum);
+            sum += values[i];
+        }
+        const float reciprocal = 1.0f / warp_sum(sum);
+#pragma unroll
+        for (int i = 0; i < 16; ++i) {
+            values[i] *= reciprocal;
+            if (__isnanf(values[i])) values[i] = -FLT_MAX;
+        }
+        float selected = 0.0f, selected_sum = 0.0f;
+        for (int rank = 0; rank < 10; ++rank) {
+            float best = values[0];
+            int expert = lane;
+#pragma unroll
+            for (int i = 1; i < 16; ++i) {
+                if (values[i] > best) { best = values[i]; expert = lane + i * 32; }
+            }
+#pragma unroll
+            for (int mask = 16; mask; mask >>= 1) {
+                const float other = __shfl_xor_sync(0xffffffffu, best, mask, 32);
+                const int other_id = __shfl_xor_sync(0xffffffffu, expert, mask, 32);
+                if (other > best || (other == best && other_id < expert)) { best = other; expert = other_id; }
+            }
+            if ((expert & 31) == lane) {
+                values[expert / 32] = -INFINITY;
+                ids[rank] = expert;
+                selected_sum += best;
+            }
+            if (rank == lane) selected = best;
+        }
+        selected_sum = max(warp_sum(selected_sum), 6.103515625e-5f);
+        const float inverse_selected_sum = 1.0f / selected_sum;
+        if (lane < 10) weights[lane] = selected * inverse_selected_sum;
+    }
+    __syncthreads();
+    constexpr int K = 10;
+    const int n = a.n_tok * K;
+    __shared__ int sid[80], first[80], count[80];
+    int eid = -1, slot = -1;
+    if (tid < n) {
+        eid = a.ids[tid]; sid[tid] = eid;
+        slot = eid >= 0 && eid < 512 ? a.resident[eid] : -1;
+        a.host_ids[tid] = eid;
+    }
+    const bool any_miss = __syncthreads_or(tid < n && slot < 0);
+    if (any_miss) {
+        const auto* x = reinterpret_cast<const float4*>(a.x);
+        auto* out = reinterpret_cast<float4*>(a.host_x);
+        for (int i = tid; i < a.n_tok * (a.n_embd / 4); i += 256) out[i] = x[i];
+    }
+    __threadfence_system();
+    __syncthreads();
+    if (tid == 0) {
+        *reinterpret_cast<volatile uint32_t*>(a.host_seq) = a.ring;
+        __threadfence_system();
+    }
+    int f = tid, rank = 0, size = 0;
+    if (tid < n) {
+        for (int j = 0; j < n; ++j) if (sid[j] == eid) {
+            f = min(f, j); rank += j < tid; ++size;
+        }
+        first[tid] = slot >= 0 ? f : -1;
+        count[tid] = slot >= 0 && f == tid ? size : 0;
+    }
+    __syncthreads();
+    int32_t* start = a.plan + 4;
+    int32_t* dst = start + a.cap + 1;
+    int32_t* tok = dst + a.cap;
+    const int64_t ptr_off = ((4 + (a.cap + 1) + 2 * a.cap) + 1) & ~int64_t(1);
+    auto* ptr = reinterpret_cast<unsigned long long*>(a.plan + ptr_off);
+    if (tid < n && slot >= 0) {
+        int group = 0, offset = 0;
+        for (int j = 0; j < f; ++j) if (first[j] == j) { ++group; offset += count[j]; }
+        if (tid == f) {
+            start[group] = offset;
+            ptr[group] = reinterpret_cast<unsigned long long>(a.cache +
+                (a.slot_offsets ? a.slot_offsets[slot] : uint64_t(slot) * a.blob_bytes));
+        }
+        dst[offset + rank] = tid;
+        tok[offset + rank] = tid / K;
+    }
+    if (tid == 0) {
+        int groups = 0, entries = 0;
+        for (int j = 0; j < n; ++j) if (first[j] == j) { ++groups; entries += count[j]; }
+        a.plan[0] = groups; a.plan[1] = entries; a.plan[2] = 0;
+        start[groups] = entries;
+        a.plan[ptr_off + 4 * a.cap] = entries;
+    }
+}
 // The same contract for other (experts, top-k) shapes - Qwen3.6-35B-A3B's 256 / 8 - one warp per token, n_tok tokens
 // (8 per block).  The 512 / 10 path keeps its own kernels above (the Flash-Next bits), this template is only used
 // for the other shapes.
@@ -230,6 +341,19 @@ void native_router_top10_multi(const float* logits, int32_t* ids, float* weights
         !valid(weights, (size_t) n_tok * 10 * 4))
         throw std::invalid_argument("native router (multi) requires a stream and aligned [n,512]/[n,10] buffers");
     route_multi<<<(unsigned) ((n_tok + 7) / 8), dim3(32, 8), 0, static_cast<cudaStream_t>(stream)>>>(logits, ids, weights, n_tok);
+    const auto error = cudaGetLastError();
+    if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
+}
+void native_router_top10_publish(const RouterPublishArgs& a, void* stream) {
+    if (!stream || a.n_tok < 1 || a.n_tok > 8 || a.n_embd <= 0 || a.n_embd % 4 ||
+        a.cap < a.n_tok * 10 || a.cap > 80 || !a.ring || !a.logits || !a.x || !a.ids || !a.weights ||
+        !a.resident || !a.cache || !a.plan || !a.host_x || !a.host_ids || !a.host_seq ||
+        reinterpret_cast<uintptr_t>(a.x) % 16 || reinterpret_cast<uintptr_t>(a.host_x) % 16)
+        throw std::invalid_argument("fused router requires 1..8 tokens, aligned payloads, and a bounded resident plan");
+    route_publish<<<1, dim3(32, 8), 0, static_cast<cudaStream_t>(stream)>>>(a);
+    static std::atomic<unsigned> seen{0};
+    if (!(seen.fetch_or(1u << a.n_tok) & (1u << a.n_tok)))
+        std::fprintf(stderr, "strata router: fused topk/publish/plan T=%d\n", a.n_tok);
     const auto error = cudaGetLastError();
     if (error != cudaSuccess) throw std::runtime_error(cudaGetErrorString(error));
 }

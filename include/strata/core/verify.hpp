@@ -343,7 +343,10 @@ public:
     /// residency table catches up with the host's (the adaptive tier's evictions while its copies are in flight).
     /// It gets this verifier's stream; false (with the message in `err`) fails the launch.
     void set_pre_launch(std::function<bool(cudaStream_t cs, std::string& err)> f) { pre_launch_ = std::move(f); }
-    /// the pool never plans a PCIe share (--pcie-frac 0): the window skips that path.  Before the first run.
+    /// At request boundaries, select the CPU-only-miss graph when the caller guarantees no PCIe offload or
+    /// automatic balancing for this request. Opt-in STRATA_CPU_MISS_GRAPH=1 on gfx936-compatible HIP builds.
+    /// Separate graph caches permit a later request to restore PCIe offload without reusing the pruned graph.
+    void set_cpu_miss_graph(bool no_pcie);
 
     /// The PCIe count of each layer from measured costs (PcieModel) instead of a fixed share: the spin kernels stamp
     /// each step's GPU work (the plan's arrival, the PCIe part's start, the wait for the CPU's rows; GPU clock), the host
@@ -538,6 +541,11 @@ private:
     cudaEvent_t df_join_[2] = {};
     cudaGraphExec_t exec_[9] = {};
     cudaGraphExec_t exec_nr_[9] = {};   // #871: the doorbell variant of a stage that is all-resident otherwise
+    cudaGraphExec_t exec_cpu_miss_[9] = {};
+    bool cpu_miss_graph_ = false;
+    cudaGraphExec_t& window_exec(int T) {
+        return cpu_miss_graph_ ? exec_cpu_miss_[T] : (ar_off_ ? exec_nr_[T] : exec_[T]);
+    }
     // fork 34a35db (STRATA_SIDE_MIXER=1): the GDN gates and the QSA indexer on a branch of the window's graph beside the
     // mixer's projections, joined before the recurrence / the attention
     cudaStream_t side_ = nullptr;

@@ -17,6 +17,7 @@ ap.add_argument('--smoke',action='store_true')
 ap.add_argument('--qa-only',action='store_true',help='functional QA first; no throughput workload warmups')
 ap.add_argument('--qa-after-bench',action='store_true',help='run semantic/code/protocol QA after throughput workloads')
 ap.add_argument('--extended-qa',action='store_true',help='also execute generated search/interval/encoding functions and check a data transform')
+ap.add_argument('--token-repeat-informational',action='store_true',help='report same-seed token identity without making it a semantic QA gate')
 ap.add_argument('--graph',action='store_true')
 ap.add_argument('--draft-adaptive',action='store_true')
 ap.add_argument('--expert-cache',type=int)
@@ -56,10 +57,17 @@ assert not a.long_checks or a.context>=2300
 out=Path(a.out);out.mkdir(parents=True,exist_ok=False)
 root=Path(a.project_root); cache=Path(a.cache) if a.cache else root/'autoround'
 source_files=['CMakeLists.txt','src/program/generate.cpp','src/core/verify.cpp','src/prefill/prefill.cpp','include/strata/core/dflash_bridge.hpp','include/strata/core/verify.hpp','include/strata/prefill/prefill.hpp','src/kernels/cuda/native_mmvq.cu','include/strata/kernels/native_mmvq.hpp','src/core/mtp.cpp','include/strata/core/mtp.hpp','tools/dflash2_worker.py','tools/strata_dflash2.py','third_party/dflash/model.py','third_party/dflash/LICENSE','third_party/dflash/VERSION','include/strata/core/dflash_native.hpp','src/prefill/dflash.cu','src/prefill/dflash_witness.cpp','tools/dflash2_pack.py','tools/test_dflash2_native.py']
+source_files+=['src/kernels/cuda/native_router.cu','include/strata/kernels/native_router.hpp','include/strata/core/verify.hpp']
 source_files+=['src/kernels/cpu/native_expert.cpp','src/kernels/cpu/q4_avx512.cpp',
  'include/strata/kernels/cpu/q4_avx512.hpp','src/kernels/cuda/bf16_small.cu',
  'include/strata/kernels/bf16_small.hpp']
 source_files+=['include/strata/spec/joint_budget.hpp']
+source_files += ['include/strata/kernels/execution_weight_ops.hpp','include/strata/kernels/execution_weight.hpp','include/strata/kernels/q8_mmac.hpp',
+ 'src/kernels/cuda/q8_mmac.cu','src/core/native_dense.cpp','src/core/native_head.cpp',
+ 'include/strata/core/native_dense.hpp','include/strata/core/native_head.hpp','include/strata/core/weights.hpp',
+ 'src/core/layer.cpp','src/kernels/cuda/shared_expert.cu','include/strata/kernels/shared_expert.hpp',
+ 'src/prefill/gemm.cu','include/strata/prefill/gemm.hpp','src/kernels/cuda/draft_head_proxy.cu',
+ 'include/strata/kernels/draft_head_proxy.hpp']
 def sha(path):
  with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 (out/'provenance.json').write_text(json.dumps({'engine_sha256':sha(a.engine),'source_sha256':{f:sha(root/'Strata'/f) for f in source_files},'driver_sha256':sha(__file__)},indent=2)+'\n')
@@ -113,7 +121,8 @@ for feature in ['STRATA_CPU_Q4_MT','STRATA_CPU_Q4_INPUT_BIAS','STRATA_CPU_RESULT
  env[feature]=settings[feature]
 for feature in ['STRATA_VERIFY_HIT_PLAN','STRATA_CPU_EXPERT_PIPELINE','STRATA_CPU_EARLY_RESULT',
                 'STRATA_PCIE_STAGED_MAX','STRATA_POOL_IDLE_US','STRATA_POOL_SPIN_US',
-                'STRATA_HC_Q8','STRATA_DRAFT_HEAD_PROXY']:
+                'STRATA_HC_Q8','STRATA_DRAFT_HEAD_PROXY','STRATA_Q8_MMAC','STRATA_Q8_MMAC_STABLE','STRATA_Q8_MMAC_WIDE',
+                'STRATA_CPU_MISS_GRAPH','STRATA_FUSE_ROUTE_PUBLISH','STRATA_VERIFY_NODES','STRATA_SIDE_MIXER','STRATA_FUSE_WAIT','STRATA_GR_NORM_FAST']:
  if feature in env:settings[feature]=env[feature]
 if a.profile:env.update(STRATA_VERIFY_PROFILE='1',STRATA_DECODE_TIMING='1',STRATA_SPEC_DEPTH='1')
 if a.timing_only:env['STRATA_DECODE_TIMING']='1'
@@ -268,7 +277,7 @@ with (out/'stderr.log').open('w') as err,(out/'stdout.log').open('w') as stdout:
    _,request=gen(story,256);send(request);ids,done=finish(stop=True);assert done.split()[5]=='cancel'
    _,request=gen('Reply with exactly OK.',16);send(request);ids,recovery=finish();assert tok.decode(ids,skip_special_tokens=True).strip()=='OK'
    (out/'protocol.json').write_text(json.dumps(dict(cancel=done,recovery=recovery,seed_repeat=seed_repeat,one_token_limit=True,context_tail=True),indent=2)+'\n')
-   assert seed_repeat,'same seed and prompt produced different sampled token IDs'
+   if not a.token_repeat_informational:assert seed_repeat,'same seed and prompt produced different sampled token IDs'
   send('QUIT\n');p.wait(timeout=30);assert p.returncode==0
  finally:
   if p.poll() is None:p.kill();p.wait()

@@ -341,7 +341,7 @@ private:
         int expert = 0, r0 = 0, r1 = 0;
         bool up = true;
     };
-    struct alignas(64) PipelineExpert { std::atomic<int> gu_left{0}; };
+    struct alignas(64) PipelineExpert { std::atomic<int> gu_left{0}; int parts = 1; };
     static constexpr int kPipelineCapacity = 2 * (kMaxTasks + kMaxSplitMulti);
     std::unique_ptr<PipelineSlot[]> pipeline_slots_;
     std::unique_ptr<PipelineExpert[]> pipeline_experts_;
@@ -350,6 +350,7 @@ private:
     alignas(64) std::atomic<int> pipeline_down_left_{0};
     int pipeline_parts_ = 1;
     bool native_pipeline_ = false;
+    bool pipeline_cost_schedule_ = false;
     double ms_pipeline_ = 0;
     int64_t pipeline_batches_ = 0, pipeline_jobs_ = 0;
     PoolAffinity affinity_ = PoolAffinity::All;

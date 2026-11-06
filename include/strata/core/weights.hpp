@@ -28,6 +28,7 @@
 #pragma once
 
 #include <cstdint>
+#include "strata/kernels/execution_weight.hpp"
 #include <map>
 #include <set>
 #include <string>
@@ -85,8 +86,14 @@ struct WeightRef {
 
     bool quantized() const { return code_bits != 0; }
 
-    // Optional native GGUF projection, owned by NativeDense. All references in
+    // Optional native execution projection, owned by NativeDense. All references in
     // one table share its scratch and must execute on one ordered session stream.
+    // Main CUDA/HIP loaders publish the typed view. Legacy backend adapters and
+    // PLE's GGUF-only API keep native_data/type; non-GGUF storage is never exposed there.
+    strata::kernels::ExecutionWeight execution;
+    strata::kernels::ExecutionWeight native_weight() const {
+        return execution.data ? execution : strata::kernels::ExecutionWeight{native_data, native_type, int(ne0), int(ne1)};
+    }
     const void* native_data = nullptr;
     void* native_q8_1 = nullptr;
     int native_type = -1;

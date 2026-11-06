@@ -17,6 +17,7 @@
 #include <cstdint>
 
 #include "strata/kernels/s_gemv.hpp"
+#include "strata/kernels/execution_weight.hpp"
 
 namespace strata::kernels {
 
@@ -33,6 +34,10 @@ bool shared_expert_native_bf16_enabled();
 /// (n_embd for gate/up, n_ff for down), sized by native_q8_1_bytes. All storage
 /// must survive graph execution; use one ordered nonnull stream with no overlap.
 struct NativeSharedWeights {
+    ExecutionWeight gate_execution, up_execution, down_execution;
+    ExecutionWeight gate_weight(int ni, int no) const { return gate_execution.data ? gate_execution : ExecutionWeight{gate_data,gate_type,ni,no}; }
+    ExecutionWeight up_weight(int ni, int no) const { return up_execution.data ? up_execution : ExecutionWeight{up_data,up_type,ni,no}; }
+    ExecutionWeight down_weight(int ni, int no) const { return down_execution.data ? down_execution : ExecutionWeight{down_data,down_type,ni,no}; }
     int gate_type = -1, up_type = -1, down_type = -1;
     const void* gate_data = nullptr;
     const void* up_data = nullptr;

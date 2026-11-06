@@ -1682,6 +1682,12 @@ if(STRATA_NATIVE_EXPERTS)
     add_test(NAME pool_expert_pipeline COMMAND pool_tasks_test)
     set_tests_properties(pool_expert_pipeline PROPERTIES TIMEOUT 180
       ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1")
+    add_test(NAME pool_expert_cost COMMAND pool_tasks_test)
+    set_tests_properties(pool_expert_cost PROPERTIES TIMEOUT 180
+      ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_POOL_COST=1;STRATA_CPU_Q4_MT=1;STRATA_CPU_Q4_INPUT_BIAS=1")
+    add_test(NAME pool_expert_cost_sleep COMMAND pool_tasks_test)
+    set_tests_properties(pool_expert_cost_sleep PROPERTIES TIMEOUT 180
+      ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_POOL_COST=1;STRATA_CPU_Q4_MT=1;STRATA_CPU_Q4_INPUT_BIAS=1;STRATA_POOL_IDLE_US=0;STRATA_POOL_TEST_DELAY_US=2000")
     add_test(NAME pool_expert_pipeline_sleep COMMAND pool_tasks_test)
     set_tests_properties(pool_expert_pipeline_sleep PROPERTIES TIMEOUT 180
       ENVIRONMENT "STRATA_CPU_EXPERT_PIPELINE=1;STRATA_CPU_Q4_MT=1;STRATA_POOL_IDLE_US=0;STRATA_POOL_TEST_DELAY_US=2000")
@@ -2272,6 +2278,13 @@ endif()
 # ---- HIP gfx906: every CUDA source of the tree (and the ggml-cuda MMQ sources) is compiled as HIP ----
 if(STRATA_HIP_GFX906)
   target_sources(strata_kernels PRIVATE src/kernels/cuda/q8_mmac.cu)
+  add_executable(q8_execution_weight_test EXCLUDE_FROM_ALL tools/test_q8_mmac_width.cpp)
+  target_include_directories(q8_execution_weight_test PRIVATE ${_strata_gpu_include_directories})
+  target_link_libraries(q8_execution_weight_test PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+  add_executable(route_publish_test EXCLUDE_FROM_ALL tools/test_route_publish.cpp)
+  target_include_directories(route_publish_test PRIVATE ${_strata_gpu_include_directories})
+  target_link_libraries(route_publish_test PRIVATE strata_kernels ${_strata_gpu_runtime_target})
+  target_compile_features(route_publish_test PRIVATE cxx_std_20)
   file(GLOB_RECURSE _strata_cu CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu ${CMAKE_CURRENT_SOURCE_DIR}/bench/micro/*.cu
        ${CMAKE_CURRENT_SOURCE_DIR}/tools/vision/*.cu)
   if(_strata_mmq)

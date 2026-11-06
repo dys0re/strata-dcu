@@ -645,6 +645,8 @@ ExpertPool::ExpertPool(int n_workers, bool pin, bool host_works, PoolAffinity af
     split_.resize((size_t) kMaxSplit);
     split_multi_.resize((size_t) kMaxSplitMulti);
     if (const char* e = std::getenv("STRATA_CPU_EXPERT_PIPELINE")) native_pipeline_ = std::atoi(e) != 0;
+    if (const char* e = std::getenv("STRATA_CPU_POOL_COST")) pipeline_cost_schedule_ = std::atoi(e) != 0;
+    if (pipeline_cost_schedule_) std::fprintf(stderr, "strata cpu pool: cost-weighted parts and longest expert first enabled\n");
     if (native_pipeline_) {
         pipeline_slots_.reset(new PipelineSlot[kPipelineCapacity]);
         pipeline_experts_.reset(new PipelineExpert[kMaxSplitMulti]);
@@ -1040,13 +1042,38 @@ void ExpertPool::run_native_pipeline(const NativeFmt& f, ExpertJobMulti* jobs, i
         pipeline_parts_ = (std::min)((int) (std::min)(f.n_ff, f.n_embd), (wanted + nb - 1) / nb);
         const int ngu = nb * pipeline_parts_, total = 2 * ngu;
         for (int i = 0; i < total; ++i) pipeline_slots_[i].ready.store(false, std::memory_order_relaxed);
+        int order[kMaxSplitMulti];
         for (int e = 0; e < nb; ++e) {
-            pipeline_experts_[e].gu_left.store(pipeline_parts_, std::memory_order_relaxed);
-            for (int part = 0; part < pipeline_parts_; ++part) {
-                auto& task = pipeline_slots_[e * pipeline_parts_ + part];
+            order[e] = e;
+            pipeline_experts_[e].parts = pipeline_cost_schedule_ ? 1 : pipeline_parts_;
+        }
+        if (pipeline_cost_schedule_) {
+            // Same task budget as the old pipeline. Split the largest remaining
+            // estimated slice; nt approximates work, without changing arithmetic.
+            for (int extra = nb; extra < ngu; ++extra) {
+                int best = -1;
+                for (int e = 0; e < nb; ++e) {
+                    const int pe = pipeline_experts_[e].parts;
+                    if (pe >= (std::min)(f.n_ff, f.n_embd)) continue;
+                    if (best < 0 || int64_t(mjobs_[e].nt) * pipeline_experts_[best].parts >
+                                    int64_t(mjobs_[best].nt) * pe) best = e;
+                }
+                if (best < 0) throw std::logic_error("expert task budget exceeds row capacity");
+                ++pipeline_experts_[best].parts;
+            }
+            std::sort(order, order + nb, [&](int a, int b) {
+                return mjobs_[a].nt != mjobs_[b].nt ? mjobs_[a].nt > mjobs_[b].nt : a < b;
+            });
+        }
+        int slot = 0;
+        for (int index = 0; index < nb; ++index) {
+            const int e = order[index], parts = pipeline_experts_[e].parts;
+            pipeline_experts_[e].gu_left.store(parts, std::memory_order_relaxed);
+            for (int part = 0; part < parts; ++part) {
+                auto& task = pipeline_slots_[slot++];
                 task.expert = e; task.up = true;
-                task.r0 = (int) (f.n_ff * part / pipeline_parts_);
-                task.r1 = (int) (f.n_ff * (part + 1) / pipeline_parts_);
+                task.r0 = (int) (f.n_ff * part / parts);
+                task.r1 = (int) (f.n_ff * (part + 1) / parts);
                 task.ready.store(true, std::memory_order_relaxed);
             }
         }
@@ -1093,12 +1120,13 @@ void ExpertPool::drain_pipeline(int id) {
                 for (int t = 0; t < mjobs_[e].nt; ++t)
                     if (q2_native_kernels(f.d_type)) act_quant_any(sb.ff[t], (int) f.n_ff, sb.a2[t]);
                     else native_quant_h(f, sb.ff[t], sb.hq[t]);
-                const int first = pipeline_tail_.fetch_add(pipeline_parts_, std::memory_order_relaxed);
-                for (int part = 0; part < pipeline_parts_; ++part) {
+                const int parts = pipeline_experts_[e].parts;
+                const int first = pipeline_tail_.fetch_add(parts, std::memory_order_relaxed);
+                for (int part = 0; part < parts; ++part) {
                     auto& next = pipeline_slots_[first + part];
                     next.expert = e; next.up = false;
-                    next.r0 = (int) (f.n_embd * part / pipeline_parts_);
-                    next.r1 = (int) (f.n_embd * (part + 1) / pipeline_parts_);
+                    next.r0 = (int) (f.n_embd * part / parts);
+                    next.r1 = (int) (f.n_embd * (part + 1) / parts);
                     next.ready.store(true, std::memory_order_release);
                 }
             }

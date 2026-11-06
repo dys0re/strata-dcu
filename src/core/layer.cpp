@@ -167,7 +167,7 @@ void project_bf16_pair(const float* x, const uint16_t* x_bf16, const uint16_t* w
 /// picks.  Producing only the one it thinks it needs is how the assumption gets baked in again.
 bool gemv_quantized(const WeightRef& w, const Planes& p, const strata::kernels::SForm& f, const uint8_t* x80, const uint8_t* xq8k,                    float* y, int64_t n_in, int64_t n_out, const std::string& name, void* stream,                    std::string& err, const float* x_f32 = nullptr, bool x_q8_1_ready = false) {
     using namespace strata::kernels;
-    if (w.native_data) {
+    if (w.native_weight().data) {
         if (!x_f32 || !w.native_q8_1 || !stream || n_in != w.ne0 || n_out != w.ne1) {
             err = name + ": native projection requires matching FP32 input and session scratch";
             return false;
@@ -176,7 +176,7 @@ bool gemv_quantized(const WeightRef& w, const Planes& p, const strata::kernels::
             // Plan v0.3 P3: a caller whose previous native projection quantized the SAME x into the shared
             // scratch, with no native projection in between, passes x_q8_1_ready and the quantize is skipped.
             if (!x_q8_1_ready) native_quantize_q8_1(x_f32, w.native_q8_1, (int) n_in, 1, stream);
-            native_mmvq(w.native_type, w.native_data, w.native_q8_1, y,
+            native_mmvq(w.native_weight(), w.native_q8_1, y,
                         (int) n_in, (int) n_out, 1, stream);
         } catch (const std::exception& error) {
             err = name + ": " + error.what();
@@ -260,7 +260,7 @@ const float* conv_kernel = (const float*) w_conv->data;    const float* ssm_norm
 //         layer - producing only the "right" one is how the per-role assumption gets baked back in.
 st_begin(layer, 8, stream);
     // Plan v0.3 P3: the canonical activation images only when a canonical projection reads them.
-    if (!w_qkv->native_data || !w_gate->native_data) {
+    if (!w_qkv->native_weight().data || !w_gate->native_weight().data) {
 #if defined(STRATA_EXPERIMENTAL_SM60)
     if (strata::kernels::fuse_decode()) {
         quantize_act_images(mixed, g.n_embd, b.x_q8_0, b.x_q8k, nullptr, stream);   // ONE pass, was two kernels
@@ -360,7 +360,7 @@ st_begin(layer, 12, stream);
 // ---- 7. z, then y = rms_norm(o) * ssm_norm * sigmoid(z).  SIGMOID, not SiLU.
 // qkv's native quantize of `mixed` is still in the shared q8_1 scratch: nothing native ran in between.
 if (!gemv_quantized(*w_gate, p_gate, f_gate, b.x_q8_0, b.x_q8k, b.z, g.n_embd, g.ssm_value_dim, v.name("attn_gate.weight"), stream, err, mixed,
-                    w_qkv->native_data != nullptr && w_gate->native_data != nullptr)) return false;
+                    w_qkv->native_weight().data != nullptr && w_gate->native_weight().data != nullptr)) return false;
 try {
     if (fused_gdn) fused_gdn_step_norm(b.state, b.h, b.h + qk, b.h + 2 * qk, b.gate, b.beta, b.z, ssm_norm, RMS_EPS, b.y,
                                        (int) g.ssm_k_heads, (int) g.ssm_v_heads, stream);
@@ -370,7 +370,7 @@ try {
 st_end(layer, 14, stream);
 // ---- 8. out = ssm_out @ y, whose activation is whatever THIS layer's `ssm_out` asks for
 st_begin(layer, 15, stream);
-    if (!w_out->native_data) {
+    if (!w_out->native_weight().data) {
 #if defined(STRATA_EXPERIMENTAL_SM60)
     if (strata::kernels::fuse_decode()) {
         quantize_act_images(b.y, g.ssm_value_dim, b.y_q8_0, b.y_q8k, nullptr, stream);   // ONE pass, was two
@@ -479,7 +479,7 @@ if (w_ginp->kind != WeightKind::Bf16InF32) {        err = v.name("ffn_gate_inp_s
 // and each projection takes the one its own form asks for.
 // ONE pass over `x` produces the bf16 image and both quantized images (was three kernels): which quantized
 // one is wanted is a property of the TENSOR and the pack mixes them by layer, so both are produced.
-    if (!w_sgate->native_data || !w_sup->native_data) {
+    if (!w_sgate->native_weight().data || !w_sup->native_weight().data) {
 #if defined(STRATA_EXPERIMENTAL_SM60)
     if (strata::kernels::fuse_decode()) {
         quantize_act_images(x, g.n_embd, b.x_q8_0, b.x_q8k, b.x_bf16, stream);   // ONE pass, was three kernels
@@ -494,9 +494,9 @@ if (w_ginp->kind != WeightKind::Bf16InF32) {        err = v.name("ffn_gate_inp_s
         f32_to_bf16_bulk(x, b.x_bf16, g.n_embd, stream);
     }
     NativeSharedWeights native;
-    native.gate_type = w_sgate->native_type; native.gate_data = w_sgate->native_data;
-    native.up_type = w_sup->native_type; native.up_data = w_sup->native_data;
-    native.down_type = w_sdown->native_type; native.down_data = w_sdown->native_data;
+    native.gate_execution = w_sgate->native_weight();
+    native.up_execution = w_sup->native_weight();
+    native.down_execution = w_sdown->native_weight();
     // The NativeDense owner publishes one shared workspace for this ordered session stream.
     native.q8_1 = w_sgate->native_q8_1 ? w_sgate->native_q8_1 :
                   w_sup->native_q8_1 ? w_sup->native_q8_1 : w_sdown->native_q8_1;
@@ -1149,14 +1149,14 @@ if (w_idxk->kind != WeightKind::Bf16InF32 || w_idxq->kind != WeightKind::Bf16InF
 // ---- 1. the three activation formats, once each
 bool images_fused = false;
 #if defined(STRATA_EXPERIMENTAL_SM60)
-if (strata::kernels::fuse_decode() && (!w_attnk->native_data || !w_attnv->native_data || !w_attnq->native_data)) {
+if (strata::kernels::fuse_decode() && (!w_attnk->native_weight().data || !w_attnv->native_weight().data || !w_attnq->native_weight().data)) {
     quantize_act_images(x, g.n_embd, b.x_q8_0, b.x_q8k,
                         native_bf16_projections ? nullptr : b.x_bf16, stream);   // ONE pass, was two or three
     images_fused = true;
 }
 #endif
 if (!images_fused) {
-    if (!w_attnk->native_data || !w_attnv->native_data || !w_attnq->native_data) {
+    if (!w_attnk->native_weight().data || !w_attnv->native_weight().data || !w_attnq->native_weight().data) {
         quantize_q8_K(x, b.x_q8k, g.n_embd, stream);
         quantize_q8_0(x, b.x_q8_0, g.n_embd, stream);
     }
@@ -1198,7 +1198,7 @@ SForm f_k, f_v, f_o, f_q;    if (!sform_of(*w_attnk, f_k, v.name("attn_k.weight"
 // artifact, but the dispatch is here for the same reason it is in `gdn_layer`: the pack decides per tensor,
 // and "it happens to be uniform here" is the assumption that was wrong for `attn_q`.
 if (!gemv_quantized(*w_attnk, p_k, f_k, b.x_q8_0, b.x_q8k, b.kcur, g.n_embd, g.n_head_kv * g.head_dim,                        v.name("attn_k.weight"), stream, err, x)) return false;
-    if (!gemv_quantized(*w_attnv, p_v, f_v, b.x_q8_0, b.x_q8k, b.vcur, g.n_embd, g.n_head_kv * g.head_dim,                        v.name("attn_v.weight"), stream, err, x, w_attnk->native_data && w_attnv->native_data)) return false;    dump_slot(dump, g, layer, b.vcur,                            (uint64_t) 2 * g.n_embd + 2 * g.hc + (uint64_t) g.n_head * g.head_dim,                            (uint64_t) g.n_head_kv * g.head_dim, stream);
+    if (!gemv_quantized(*w_attnv, p_v, f_v, b.x_q8_0, b.x_q8k, b.vcur, g.n_embd, g.n_head_kv * g.head_dim,                        v.name("attn_v.weight"), stream, err, x, w_attnk->native_weight().data && w_attnv->native_weight().data)) return false;    dump_slot(dump, g, layer, b.vcur,                            (uint64_t) 2 * g.n_embd + 2 * g.hc + (uint64_t) g.n_head * g.head_dim,                            (uint64_t) g.n_head_kv * g.head_dim, stream);
     if (!normalize_rotate(b.kcur, w_kn, (int) g.n_head_kv, (int) g.head_dim)) return false;
 // ---- 5. into the cache, and the indexer's append (which pools AND rotates on a block completion).
 // EVERY ENTRY POINT FROM HERE ON IS THE CAPTURABLE ONE: the per-token counts come from `st.step` and every
@@ -1237,7 +1237,7 @@ if (st.kv_q4) {
 // four, and this line used to call `s2_gemv_q8` unconditionally - so TEN of the twelve layers decoded an
 // S4 code plane with a Q8_0 activation.  Both are "a quantized activation", both produce a plausible
 // vector, and the difference is 0.6-1.4%.
-if (!gemv_quantized(*w_attnq, p_q, f_q, b.x_q8_0, b.x_q8k, b.q_full, g.n_embd, g.n_head * 2 * g.head_dim,                        v.name("attn_q.weight"), stream, err, x, w_attnv->native_data && w_attnq->native_data)) return false;
+if (!gemv_quantized(*w_attnq, p_q, f_q, b.x_q8_0, b.x_q8k, b.q_full, g.n_embd, g.n_head * 2 * g.head_dim,                        v.name("attn_q.weight"), stream, err, x, w_attnv->native_weight().data && w_attnq->native_weight().data)) return false;
 // `per_head[:, :head_dim]` - the FIRST half of each head's 2*head_dim block, copied out contiguously so
 // the norm and the rotation see whole rows.  A 2-D copy is a memcpy node, which captures (`pinned_capture`
 // case A) and needs no kernel.
@@ -1298,8 +1298,8 @@ try {
     if (native_qsa_enabled()) native_qsa_gate_apply(b.attn, b.q_full, b.attn32, (int) g.n_head, (int) g.head_dim, stream);
     else qsa_gate_apply_f32(b.attn, b.q_full, s, b.attn32, stream);
 } catch (const std::exception& error) { err = v.name("qsa_gate") + ": " + error.what(); return false; }
-    if (!w_attno->native_data) quantize_q8_K(b.attn32, b.attn_q8k, g.n_head * g.head_dim, stream);
-    if (w_attno->native_data) {
+    if (!w_attno->native_weight().data) quantize_q8_K(b.attn32, b.attn_q8k, g.n_head * g.head_dim, stream);
+    if (w_attno->native_weight().data) {
     if (!gemv_quantized(*w_attno, p_o, f_o, nullptr, b.attn_q8k, out,
         g.n_head * g.head_dim, g.n_embd, v.name("attn_output.weight"), stream, err, b.attn32)) return false;
 } else {

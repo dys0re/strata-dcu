@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include "strata/kernels/execution_weight.hpp"
 
 namespace strata::prefill {
 
@@ -57,6 +58,9 @@ public:
     /// the card's shared memory runs through llama.cpp's int8 MMQ instead (opt-in: STRATA_DENSE_MMQ=1).
     void native(const uint16_t* X, int ggml_type, const void* W_blocks, float* Y, int64_t T, int64_t N, int64_t K,
                 int64_t ldy = 0, float beta = 0.0f, int64_t ldx = 0);
+
+    void native(const uint16_t* X, const strata::kernels::ExecutionWeight& W, float* Y,
+                int64_t T, int64_t N, int64_t K, int64_t ldy = 0, float beta = 0.0f, int64_t ldx = 0);
 
     /// HIP gfx103x (prompt_f16()): bf16() takes X as the FP16 image the prompt path's kernels write (set_act_f16),
     /// and bf16() / f16() / native() run the GEMM with FP16 out (rocBLAS's tuned kernels there), widened in place in

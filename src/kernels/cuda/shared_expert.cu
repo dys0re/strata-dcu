@@ -215,8 +215,10 @@ bool fused_swiglu_q81_enabled() {
 void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, const NativeSharedWeights& nw,
                          const uint16_t* gate_inp_bf16, float* gate, float* up, float* g, float* out, int64_t n_embd,
                          int64_t n_ff, void* stream, const void* x_q8_1_ready, int lfuse) {
+    const auto wg=nw.gate_weight((int)n_embd,(int)n_ff), wu=nw.up_weight((int)n_embd,(int)n_ff),
+               wd=nw.down_weight((int)n_ff,(int)n_embd);
     const bool gate_deferred = (lfuse & 1) != 0, pair = (lfuse & 2) != 0;
-    if (n_tok < 1 || n_tok > 8 || !nw.q8_1 || !nw.gate_data || !nw.up_data || !nw.down_data || !stream)
+    if (n_tok < 1 || n_tok > 8 || !nw.q8_1 || !wg.data || !wu.data || !wd.data || !stream)
         throw std::invalid_argument("shared_expert_multi: needs 1..8 tokens, native weights, scratch and a stream");
     cudaStream_t cs = (cudaStream_t) stream;
     // the activation's q8_1: the caller's (STRATA_VERIFY_QDEDUP, x_q8_1_ready) or the descriptor's, else quantized here
@@ -226,10 +228,10 @@ void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, cons
         x_q8_1 = nw.q8_1;
     }
     // S26 STRATA_LFUSE (gate_deferred): gate and up in one launch where the pair applies (bitwise the two calls)
-    if (!(pair && nw.gate_type == nw.up_type &&
-          native_mmvq_pair(nw.gate_type, nw.gate_data, nw.up_data, x_q8_1, gate, up, (int) n_embd, (int) n_ff, n_tok, stream))) {
-        native_mmvq(nw.gate_type, nw.gate_data, x_q8_1, gate, (int) n_embd, (int) n_ff, n_tok, stream);
-        native_mmvq(nw.up_type, nw.up_data, x_q8_1, up, (int) n_embd, (int) n_ff, n_tok, stream);
+    if (!(pair && wg.gguf() && wu.gguf() && wg.type == wu.type &&
+          native_mmvq_pair(wg.type, wg.data, wu.data, x_q8_1, gate, up, (int) n_embd, (int) n_ff, n_tok, stream))) {
+        native_mmvq(wg, x_q8_1, gate, (int) n_embd, (int) n_ff, n_tok, stream);
+        native_mmvq(wu, x_q8_1, up, (int) n_embd, (int) n_ff, n_tok, stream);
     }
     const int n = (int) (n_ff * n_tok);
     if (fused_swiglu_q81_enabled()) {
@@ -238,7 +240,7 @@ void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, cons
         native_swiglu_kernel<<<(unsigned) ((n + THREADS - 1) / THREADS), THREADS, 0, cs>>>(gate, up, gate, n);
         native_quantize_q8_1(gate, nw.q8_1, (int) n_ff, n_tok, stream);
     }
-    native_mmvq(nw.down_type, nw.down_data, nw.q8_1, out, (int) n_ff, (int) n_embd, n_tok, stream);
+    native_mmvq(wd, nw.q8_1, out, (int) n_ff, (int) n_embd, n_tok, stream);
     if (gate_deferred) {   // the caller computed g (raw) with the router and scales `out` in the combine
         const cudaError_t e = cudaGetLastError();
         if (e != cudaSuccess) throw std::runtime_error(std::string("shared_expert_multi: ") + cudaGetErrorString(e));
@@ -283,10 +285,13 @@ void shared_expert(const uint8_t* x_q8_0, const uint8_t* x_q8k, const uint16_t* 
                    int64_t n_embd, int64_t n_ff, int tpr, void* stream, const float* x_f32,
                    const NativeSharedWeights* native) {
     if (n_embd <= 0 || n_ff <= 0) return;
+    const auto wg=native?native->gate_weight((int)n_embd,(int)n_ff):ExecutionWeight{},
+               wu=native?native->up_weight((int)n_embd,(int)n_ff):ExecutionWeight{},
+               wd=native?native->down_weight((int)n_ff,(int)n_embd):ExecutionWeight{};
     const bool use_native = native_bf16;
-    const bool native_gate = native && native->gate_data && native_mmvq_supported(native->gate_type);
-    const bool native_up = native && native->up_data && native_mmvq_supported(native->up_type);
-    const bool native_down = native && native->down_data && native_mmvq_supported(native->down_type);
+    const bool native_gate = native && wg.data && native_mmvq_supported(wg.type);
+    const bool native_up = native && wu.data && native_mmvq_supported(wu.type);
+    const bool native_down = native && wd.data && native_mmvq_supported(wd.type);
     const bool native_projection = native_gate || native_up || native_down;
     if ((use_native || native_gate || native_up) && !x_f32)
         throw std::invalid_argument("shared_expert native input projection requires unrounded x_f32");
@@ -294,9 +299,9 @@ void shared_expert(const uint8_t* x_q8_0, const uint8_t* x_q8k, const uint16_t* 
         if (!native->q8_1 || !stream || n_embd > INT_MAX || n_ff > INT_MAX)
             throw std::invalid_argument("shared_expert native projections require scratch, stream and int32 dimensions");
         // Validate every active shape before any kernel is enqueued.
-        if (native_gate) native_mmvq_weight_bytes(native->gate_type, (int) n_embd, (int) n_ff);
-        if (native_up) native_mmvq_weight_bytes(native->up_type, (int) n_embd, (int) n_ff);
-        if (native_down) native_mmvq_weight_bytes(native->down_type, (int) n_ff, (int) n_embd);
+        if (native_gate) native_mmvq_weight_bytes(wg.type, (int) n_embd, (int) n_ff);
+        if (native_up) native_mmvq_weight_bytes(wu.type, (int) n_embd, (int) n_ff);
+        if (native_down) native_mmvq_weight_bytes(wd.type, (int) n_ff, (int) n_embd);
     }
     if (scratch == nullptr) {
         std::fprintf(stderr, "shared_expert: scratch is null; the caller owns it "
@@ -349,11 +354,11 @@ void shared_expert(const uint8_t* x_q8_0, const uint8_t* x_q8k, const uint16_t* 
         // `gate` already holds the products
     } else {
         if (native_gate)
-            native_mmvq(native->gate_type, native->gate_data, native->q8_1, gate, (int) n_embd, (int) n_ff, 1, stream);
+            native_mmvq(wg, native->q8_1, gate, (int) n_embd, (int) n_ff, 1, stream);
         else
             gemv(gate_form, gate_codes, gate_scales, gate_off, x_q8_0, x_q8k, gate, n_embd, n_ff);
         if (native_up)
-            native_mmvq(native->up_type, native->up_data, native->q8_1, up, (int) n_embd, (int) n_ff, 1, stream);
+            native_mmvq(wu, native->q8_1, up, (int) n_embd, (int) n_ff, 1, stream);
         else
             gemv(up_form, up_codes, up_scales, up_off, x_q8_0, x_q8k, up, n_embd, n_ff);
     }
@@ -408,7 +413,7 @@ void shared_expert(const uint8_t* x_q8_0, const uint8_t* x_q8k, const uint16_t* 
         swilu_quantize_q8_0(gate, up, gate, n_ff, 0, h_q8_0, stream);
     }
     if (native_down) {
-        native_mmvq(native->down_type, native->down_data, native->q8_1, out, (int) n_ff, (int) n_embd, 1, stream);
+        native_mmvq(wd, native->q8_1, out, (int) n_ff, (int) n_embd, 1, stream);
     } else {
         gemv(down_form, down_codes, down_scales, down_off, h_q8_0, h_q8k, out, n_ff, n_embd);
     }
@@ -419,16 +424,16 @@ void shared_expert(const uint8_t* x_q8_0, const uint8_t* x_q8k, const uint16_t* 
     if (native_gate || native_up)
         native_quantize_q8_1(x_f32, native->q8_1, (int) n_embd, 1, stream);
     if (native_gate)
-        native_mmvq(native->gate_type, native->gate_data, native->q8_1, gate, (int) n_embd, (int) n_ff, 1, stream);
+        native_mmvq(wg, native->q8_1, gate, (int) n_embd, (int) n_ff, 1, stream);
     else
         gemv(gate_form, gate_codes, gate_scales, gate_off, x_q8_0, x_q8k, gate, n_embd, n_ff);
     if (native_up)
-        native_mmvq(native->up_type, native->up_data, native->q8_1, up, (int) n_embd, (int) n_ff, 1, stream);
+        native_mmvq(wu, native->q8_1, up, (int) n_embd, (int) n_ff, 1, stream);
     else
         gemv(up_form, up_codes, up_scales, up_off, x_q8_0, x_q8k, up, n_embd, n_ff);
     if (native_projection && native_down && fused_swiglu_q81_enabled()) {
         native_swiglu_quantize_q8_1(gate, up, native->q8_1, (int) n_ff, 1, stream);
-        native_mmvq(native->down_type, native->down_data, native->q8_1, out, (int) n_ff, (int) n_embd, 1, stream);
+        native_mmvq(wd, native->q8_1, out, (int) n_ff, (int) n_embd, 1, stream);
     } else {
         if (native_projection)
             native_swiglu_kernel<<<g_ff, THREADS, 0, (cudaStream_t) stream>>>(gate, up, gate, (int) n_ff);
@@ -440,7 +445,7 @@ void shared_expert(const uint8_t* x_q8_0, const uint8_t* x_q8k, const uint16_t* 
         // justification beyond "the kernel takes fp16".
         if (native_down) {
             native_quantize_q8_1(gate, native->q8_1, (int) n_ff, 1, stream);
-            native_mmvq(native->down_type, native->down_data, native->q8_1, out, (int) n_ff, (int) n_embd, 1, stream);
+            native_mmvq(wd, native->q8_1, out, (int) n_ff, (int) n_embd, 1, stream);
         } else if (down_form.act_kind == 1) {
             if (n_ff % 256 != 0) {
                 std::fprintf(stderr, "shared_expert: the down weight wants Q8_K but n_ff %lld is not a multiple "

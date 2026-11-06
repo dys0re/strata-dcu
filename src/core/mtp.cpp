@@ -9,6 +9,7 @@
 #include "strata/core/progress.hpp"
 
 #include "strata/core/native_head.hpp"
+#include "strata/kernels/execution_weight_ops.hpp"
 #include "strata/core/peer_experts.hpp"
 #include "strata/platform/memory.hpp"
 #include "strata/kernels/bf16_gemv.hpp"
@@ -737,8 +738,7 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
                            cudaMalloc((void**) &dv, raw.size()) == cudaSuccess &&
                            cudaMemcpy(dv, raw.data(), raw.size(), cudaMemcpyHostToDevice) == cudaSuccess;
                     if (ok_x) {
-                        strata::kernels::gather_rows((const uint8_t*) head->weights(), row_bytes, dv, n_dvocab_,
-                                                     (uint8_t*) tmp, nullptr);
+                        strata::kernels::execution_gather_rows(head->execution(), dv, n_dvocab_, (uint8_t*) tmp, nullptr);
                         ok_x = cudaDeviceSynchronize() == cudaSuccess;
                     }
                 }
@@ -750,7 +750,7 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
                 }
                 if (!ok_x) { err = "mtp: the draft head's rows could not be copied from the head's card"; return false; }
             } else {
-                strata::kernels::gather_rows((const uint8_t*) head->weights(), row_bytes, dvocab_, n_dvocab_, dhead_, nullptr);
+                strata::kernels::execution_gather_rows(head->execution(), dvocab_, n_dvocab_, dhead_, nullptr);
             }
             cudaDeviceSynchronize();
             vram_ += (uint64_t) (n_dvocab_ * row_bytes) + raw.size();
@@ -776,7 +776,7 @@ bool MtpDrafter::bind(const WeightTable& wt, const NativeHead* head, const float
         if (cudaMalloc(&draft_proxy_, wb) != cudaSuccess || cudaMalloc(&draft_proxy_scratch_, sb) != cudaSuccess) {
             err = "MTP draft head proxy allocation failed"; return false;
         }
-        strata::kernels::draft_head_proxy_pack(type, dhead_ ? dhead_ : head_->weights(), draft_proxy_, rows, cs_);
+        strata::kernels::draft_head_proxy_pack(dhead_ ? strata::kernels::ExecutionWeight{dhead_, type, int(g_->n_embd), rows} : head_->execution(), draft_proxy_, rows, cs_);
         if (cudaStreamSynchronize(cs_) != cudaSuccess) { err = "MTP draft head proxy packing failed"; return false; }
         draft_proxy_bytes_ = wb; weight_bytes_ += wb; vram_ += wb + sb;
         std::fprintf(stderr, "strata mtp: draft-only 2-bit head screening, rows=%d weights=%zu scratch=%zu exact<=64\n", rows, wb, sb);
@@ -1237,13 +1237,12 @@ bool MtpDrafter::record_rest(int step_row, cudaStream_t cs, std::string& err) {
         bool screened = false;
 #ifdef STRATA_HAS_DRAFT_HEAD_PROXY
         if (draft_proxy_)
-            screened = draft_head_proxy_logits(sub ? dhead_type_ : head_->type(), draft_proxy_,
-                sub ? dhead_ : head_->weights(), xq_, head_logits_, (int) nv, T,
+            screened = draft_head_proxy_logits(sub ? strata::kernels::ExecutionWeight{dhead_, dhead_type_, int(N), int(nv)} : head_->execution(), draft_proxy_, xq_, head_logits_, (int) nv, T,
                 sub ? dvocab_ : nullptr, draft_proxy_scratch_, cs);
 #endif
         if (!screened)
-            native_mmvq(sub ? dhead_type_ : head_->type(), sub ? dhead_ : head_->weights(), xq_, head_logits_, (int) N,
-                        (int) nv, T, cs);
+            native_mmvq(sub ? strata::kernels::ExecutionWeight{dhead_, dhead_type_, int(N), int(nv)} : head_->execution(),
+                        xq_, head_logits_, (int) N, (int) nv, T, cs);
         g_mp.stamp(14, cs);
         if (coupled_rec_) {
             // coupled draft sampling: the target's chain and Philox draw for the row that will verify this draft

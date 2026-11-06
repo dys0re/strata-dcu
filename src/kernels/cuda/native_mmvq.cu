@@ -3021,7 +3021,6 @@ bool native_mmvq_pair(int ggml_type, const void* w1, const void* w2, const void*
 
 void native_q8_0_mmvq(const void* weights, const void* x_q8_1, float* y,
                        int n_in, int n_out, int ncols, void* stream) {
-    if (q8_mmac_try(weights, x_q8_1, y, n_in, n_out, ncols, stream)) return;
     if (q8_packed_mmvq(weights, x_q8_1, y, n_in, n_out, ncols, stream)) return;   // STRATA_Q8_PACKED=1 tensors
     small_mmvq<Q80Block, 8>(weights, x_q8_1, y, n_in, n_out, ncols, stream);
 }

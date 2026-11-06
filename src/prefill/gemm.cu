@@ -1,6 +1,7 @@
 // src/prefill/gemm.cu - see include/strata/prefill/gemm.hpp.
 #include "strata/prefill/gemm.hpp"
 #include "strata/kernels/dequant_bf16.hpp"
+#include "strata/kernels/execution_weight_ops.hpp"
 #if defined(STRATA_PREFILL_MMQ) && defined(__HIPCC__)
 #include "strata/prefill/moe_mmq.hpp"
 #endif
@@ -1230,6 +1231,17 @@ void Gemm::f16_inplace(const uint16_t* X, const uint16_t* W, float* Y, int64_t T
 
 void Gemm::native(const uint16_t* X, int ggml_type, const void* W_blocks, float* Y, int64_t T, int64_t N, int64_t K,
                   int64_t ldy, float beta, int64_t ldx) {
+    native(X, strata::kernels::ExecutionWeight{W_blocks, ggml_type, int(K), int(N)}, Y, T, N, K, ldy, beta, ldx);
+}
+
+void Gemm::native(const uint16_t* X, const strata::kernels::ExecutionWeight& W, float* Y,
+                  int64_t T, int64_t N, int64_t K, int64_t ldy, float beta, int64_t ldx) {
+    if (!W.data || W.n_in != K || W.n_out != N) throw std::invalid_argument("prefill execution weight shape mismatch");
+    const int ggml_type = W.type;
+    const void* W_blocks = W.data;
+    auto dequant = [&](int64_t r0, int64_t n, int64_t ld) {
+        return strata::kernels::execution_dequant_f16(W, r0, n, ld, scratch_, stream_);
+    };
 #ifdef STRATA_USE_HIP
     // S23 (opt-in STRATA_PF_PAD=1, with STRATA_PF_GEMM=1 on chunks of STRATA_PF_SWITCH_MIN_T+ tokens): the weight
     // dequantized into the scratch with row stride K + 64 halves, so no 4 KB-multiple stride camps on the memory
@@ -1239,7 +1251,7 @@ void Gemm::native(const uint16_t* X, int ggml_type, const void* W_blocks, float*
     static const int64_t pf_min_t = [] { const char* v = std::getenv("STRATA_PF_SWITCH_MIN_T"); return v ? (int64_t) std::atoll(v) : (int64_t) 0; }();
     if (pad_on && pf_on && T >= pf_min_t && T >= 64 && N >= 512 && K % 32 == 0 && N * (K + 64) <= scratch_elems_) {
         const int64_t ldw = K + 64;
-        if (strata::kernels::dequant_f16_ld(ggml_type, W_blocks, 0, N, K, ldw, scratch_, stream_) &&
+        if (dequant(0, N, ldw) &&
             strata_pf_gemm_f16_ld(X, ldx > 0 ? ldx : K, scratch_, ldw, Y, T, N, K, ldy, beta, stream_)) {
             return;
         }
@@ -1254,7 +1266,7 @@ void Gemm::native(const uint16_t* X, int ggml_type, const void* W_blocks, float*
         if (ldy <= 0) ldy = N;
         for (int64_t r0 = 0; ok && r0 < N; r0 += rows) {
             const int64_t n = (N - r0 < rows) ? N - r0 : rows;
-            strata::kernels::dequant_f16(ggml_type, W_blocks, r0, n, K, scratch_, stream_);
+            dequant(r0, n, K);
             ok = strata_pf_gemm_f16_ld(X, ldx, scratch_, K, Y + r0, T, n, K, ldy, beta, stream_);
         }
         if (ok) return;
@@ -1264,7 +1276,7 @@ void Gemm::native(const uint16_t* X, int ggml_type, const void* W_blocks, float*
         std::exit(1);
     }
 #if defined(STRATA_PREFILL_MMQ) && defined(__HIPCC__)
-    if (beta == 0.0f && (ldx == 0 || ldx == K) && native_mmq(X, ggml_type, W_blocks, Y, T, N, K, ldy)) return;
+    if (W.gguf() && beta == 0.0f && (ldx == 0 || ldx == K) && native_mmq(X, ggml_type, W_blocks, Y, T, N, K, ldy)) return;
 #endif
     if (N * K > scratch_elems_) {
         // Too large for the scratch at once: in row slices.
@@ -1273,12 +1285,12 @@ void Gemm::native(const uint16_t* X, int ggml_type, const void* W_blocks, float*
         if (ldy <= 0) ldy = N;
         for (int64_t r0 = 0; r0 < N; r0 += rows) {
             const int64_t n = (N - r0 < rows) ? N - r0 : rows;
-            strata::kernels::dequant_f16(ggml_type, W_blocks, r0, n, K, scratch_, stream_);
+            dequant(r0, n, K);
             f16(X, scratch_, Y + r0, T, n, K, ldy, beta);
         }
         return;
     }
-    strata::kernels::dequant_f16(ggml_type, W_blocks, 0, N, K, scratch_, stream_);
+    dequant(0, N, K);
     f16(X, scratch_, Y, T, N, K, ldy, beta);
 }
 

@@ -9,8 +9,8 @@ namespace strata::core {
 class WeightTable;
 struct WeightRef;
 
-// Experimental GDN/QSA/shared-expert projection overrides. Upload unchanged native GGUF
-// blocks once, then attach them to the matching canonical WeightRef. Unsupported
+// Experimental GDN/QSA/shared-expert projection overrides. Upload one execution
+// layout and attach its typed view to the matching WeightRef. Unsupported
 // types retain their canonical paths. Owns one Q8_1 scratch vector shared by all
 // these projections, so use one ordered session stream and keep this object
 // alive until all graphs that reference it have been destroyed and synchronized.
@@ -60,7 +60,7 @@ public:
 private:
     std::vector<void*> weights_;
     std::vector<const void*> packed_keys_;   // GGUF-layout pointers registered with STRATA_Q8_PACKED=1
-    std::vector<const void*> mmac_keys_;
+    std::vector<void*> execution_scratch_;
     void* scratch_ = nullptr;
     uint64_t bytes_ = 0;
     uint64_t allocated_ = 0;

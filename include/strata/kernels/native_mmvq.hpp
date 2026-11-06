@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include "strata/kernels/q8_mmac.hpp"
 
 namespace strata::kernels {
 
@@ -175,5 +176,21 @@ void native_mmvq_il(int ggml_type, const void* weights, const void* x_q8_1, cons
 int native_mmvq_il_rows_for(int cc, int ggml_type, int ncols, int n_out);
 // Tests and benchmarks: every native_mmvq_il call takes `rows` a warp (0: the table).
 void native_mmvq_il_tune(int rows);
+
+// Layout-aware entry points. Shapes are checked before capture; dispatch never allocates.
+inline void native_mmvq(const ExecutionWeight& w, const void* x, float* y,
+                        int ni, int no, int t, void* stream) {
+    if (!w.data || ni != w.n_in || no != w.n_out)
+        throw std::invalid_argument("execution weight shape mismatch");
+    if (w.gguf()) native_mmvq(w.type, w.data, x, y, ni, no, t, stream);
+    else q8_mmac_run(w, x, y, t, stream);
+}
+inline void native_mmvq_il(const ExecutionWeight& w, const void* x, const void* il, float* y,
+                           int ni, int no, int t, void* stream) {
+    if (!w.data || ni != w.n_in || no != w.n_out)
+        throw std::invalid_argument("execution weight shape mismatch");
+    if (w.gguf()) native_mmvq_il(w.type, w.data, x, il, y, ni, no, t, stream);
+    else q8_mmac_run(w, x, y, t, stream);
+}
 
 } // namespace strata::kernels

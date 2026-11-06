@@ -12220,6 +12220,7 @@ int main(int argc, char** argv) {
             double req_pcie_frac = o.pcie_frac, req_spec_min_p = o.spec_min_p;
             double req_pipe = -1.0;   // --prefill-pipe for this request (setup's calibration of a layer split)
             int req_aux_cpus = -1;   // aux_cpus=0|1: --aux-cpus for this request (-1 = the start-up value)
+            bool req_cpu_miss_graph = true;   // cpu_miss_graph=0: retain the generic graph for same-process A/B
             // #2228: img_keys=<hex>,<hex>,... (GENI): each picture's key from the server (its normalized bytes' hash),
             // in prompt order.  With them the conversation cache matches a picture by its key and grid, not by its
             // embedding floats, so a picture encoded again with other bits still matches.  Absent: the embeddings' hash.
@@ -12251,6 +12252,7 @@ int main(int argc, char** argv) {
                     else if (key == "penalty_present") req_penalty_present = fv;
                     else if (key == "seed") req_seed = std::strtoull(tok.c_str() + eq + 1, nullptr, 10);
                     else if (key == "pcie_frac") { req_pcie_frac = std::clamp((double) fv, 0.0, 1.0); req_pcie_set = true; }
+                    else if (key == "cpu_miss_graph") req_cpu_miss_graph = std::atoi(tok.c_str() + eq + 1) != 0;
                     else if (key == "spec_min_p") req_spec_min_p = std::clamp((double) fv, 0.0, 1.0);
                     else if (key == "pipe") req_pipe = std::max(0.0, (double) fv);
                     else if (key == "aux_cpus") req_aux_cpus = std::atoi(tok.c_str() + eq + 1) != 0 ? 1 : 0;
@@ -13867,6 +13869,8 @@ int main(int argc, char** argv) {
             }
             ver.pause_pcie_balance(req_pcie_set);   // the measured costs keep across requests
             drive.d.pcie_num = std::max(0, std::min(256, (int) (req_pcie_frac * 256.0 + 0.5)));
+            ver.set_cpu_miss_graph(req_cpu_miss_graph && req_pcie_frac == 0.0 && !o.pcie_frac_auto && !pcie_balance() &&
+                                   n_stages == 1 && o.batch == 0 && o.peer_device < 0 && drive.d.remote_count == 0 && !pipe);
             // a layer split: CUDA0's share as asked; a later GPU keeps its own (its link) unless the request sets one
             for (int st = 0; st < split_drive.n; ++st)
                 split_drive.pcie_num[st] = (st == 0 || split_same || req_pcie_frac != o.pcie_frac)
@@ -14048,8 +14052,8 @@ int main(int argc, char** argv) {
                     return 1;
                 }
                 // the verify windows' captured graphs read the head at the address of their capture
-                if (prefill_head_alias_at == nullptr) prefill_head_alias_at = native_head.weights();
-                if (native_head.weights() != prefill_head_alias_at) {
+                if (prefill_head_alias_at == nullptr) prefill_head_alias_at = native_head.storage();
+                if (native_head.storage() != prefill_head_alias_at) {
                     std::printf("ERR --prefill-head-alias: the output head was reloaded at another address, so the "
                                 "captured verify graphs would read freed memory\n");
                     return 1;
@@ -16145,6 +16149,7 @@ int main(int argc, char** argv) {
         ver.set_pcie_mode(o.pcie_mode == "dma" ? 0 : o.pcie_mode == "direct" ? 1 : 2);
         drive.d.plan = ver.plan_sink();
         drive.d.pcie_num = (int) (o.pcie_frac * 256.0 + 0.5);
+        ver.set_cpu_miss_graph(o.pcie_frac == 0.0 && !o.pcie_frac_auto && !pcie_balance() && o.peer_device < 0 && drive.d.remote_count == 0);
         if (drive.d.pcie_num < 0) drive.d.pcie_num = 0;
         if (drive.d.pcie_num > 256) drive.d.pcie_num = 256;
         const int64_t pcie0 = drive.d.pcie_experts;
@@ -16361,7 +16366,7 @@ int main(int argc, char** argv) {
         // generated token and the MTP's first cell); otherwise the token loop already did that.
         bool first_window = native_pack;
         const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, o.spec) : o.spec;
-        strata::spec::MtpBudget mtp_budget(S_mtp);
+        strata::spec::MtpBudget mtp_budget(S_mtp);   // online costs/acceptance persist across serial requests
         if (o.mtp_adaptive) mtp_budget.begin_request();
         int mtp_planned_t = 1;
         double mtp_prepared_ms = 0;

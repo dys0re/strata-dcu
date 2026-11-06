@@ -4,11 +4,12 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "strata/kernels/execution_weight.hpp"
 
 namespace strata::core {
 
-/// Opt-in native output projection. Uploads unchanged GGUF blocks once at startup and owns its
-/// activation scratch. The normal canonical head remains available for numerical A/B comparisons.
+/// Opt-in native output projection. Owns one device execution layout and its scratch.
+/// GGUF quantization and device layout are separate; execution() describes both.
 /// Plan v0.3 P6: any type the native MMVQ takes (Q5_K in the Q2_0 / IQ3_XXS files, IQ4_XS in IQ2_XS).
 /// `load` takes the model's shards (strata::gguf_split_paths): the architecture is checked on the first, the
 /// tensor is read from the shard that holds it.
@@ -22,21 +23,26 @@ public:
     bool load(const std::vector<std::string>& shards, int64_t n_in, int64_t n_out, std::string& err);
     void unload();
     bool run(const float* mixed, float* logits, void* stream, std::string& err) const;
-    uint64_t weight_bytes() const { return bytes_ + mmac_bytes_; }
+    uint64_t weight_bytes() const { return bytes_; }
     bool loaded() const { return weights_ != nullptr; }
-    /// Plan v0.3 P6: the GGUF blocks, for the verify window's multi-column head.
-    const void* weights() const { return weights_; }
+    // Raw access is GGUF-only (e.g. the BF16 DFlash head). General consumers use execution().
+    const void* weights() const { return execution_.gguf() ? weights_ : nullptr; }
+    const void* storage() const { return weights_; }
+    strata::kernels::ExecutionWeight execution() const {
+        return execution_.data ? execution_ : strata::kernels::ExecutionWeight{weights_, type_, n_in_, n_out_};
+    }
     int type() const { return type_; }
     /// The device whose memory holds the weights (the one current when `load` ran; -1 before).
     int device() const { return device_; }
-    /// Bytes of one vocabulary row.
-    size_t row_bytes() const { return n_out_ > 0 ? (size_t) (bytes_ / (uint64_t) n_out_) : 0; }
+    /// Bytes of one reconstructed GGUF vocabulary row (independent of execution padding).
+    size_t row_bytes() const { return row_bytes_ ? row_bytes_ : n_out_ > 0 ? (size_t) (bytes_ / (uint64_t) n_out_) : 0; }
 
 private:
+    strata::kernels::ExecutionWeight execution_;
+    size_t row_bytes_ = 0;
     void* weights_ = nullptr;
     void* scratch_ = nullptr;
     uint64_t bytes_ = 0;
-    uint64_t mmac_bytes_ = 0;
     int n_in_ = 0, n_out_ = 0;
     int type_ = -1;
     int device_ = -1;

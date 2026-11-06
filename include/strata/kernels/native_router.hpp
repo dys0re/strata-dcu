@@ -16,6 +16,28 @@ bool native_router_enabled();
 void native_router_top10(const float* logits, int32_t* ids, float* weights, void* stream);
 /// n_tok rows at once (logits [n,512], ids/weights [n,10]); each row exactly as the single call.
 void native_router_top10_multi(const float* logits, int32_t* ids, float* weights, int n_tok, void* stream);
+/// Single-CTA top-10, CPU payload publication and resident grouping for the CPU-only-miss graph.
+/// The host sees the payload before the kernel finishes grouping resident experts. All spans are borrowed;
+/// the caller guarantees no routing adjustment or PCIe expert offload after this operation.
+struct RouterPublishArgs {
+    const float* logits = nullptr;
+    const float* x = nullptr;
+    int32_t* ids = nullptr;
+    float* weights = nullptr;
+    const int32_t* resident = nullptr;
+    const uint8_t* cache = nullptr;
+    const unsigned long long* slot_offsets = nullptr;
+    int64_t blob_bytes = 0;
+    int64_t cap = 0;
+    int32_t* plan = nullptr;
+    float* host_x = nullptr;
+    int32_t* host_ids = nullptr;
+    uint32_t* host_seq = nullptr;
+    int n_tok = 0;
+    int n_embd = 0;
+    uint32_t ring = 0;
+};
+void native_router_top10_publish(const RouterPublishArgs& args, void* stream);
 /// The same contract for a model family's (experts, top-k): 512 / 10 (Flash-Next: the two calls above, unchanged) and
 /// 256 / 8 (Qwen3.6-35B-A3B).  logits [n_tok, n_expert], ids / weights [n_tok, k].  CUDA / HIP.
 bool native_router_topk_supported(int n_expert, int k);

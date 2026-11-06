@@ -57,19 +57,29 @@ __global__ __launch_bounds__(128) void score_float_kernel(const uint4* wq, const
     }
 }
 #endif
-__device__ float weight_at(int type, const void* weights, int row, int col) {
-    if (type == 30) return __uint_as_float(unsigned(((const uint16_t*) weights)[size_t(row) * K + col]) << 16);
-    const uint8_t* p = (const uint8_t*) weights + (size_t(row) * NB + col / 32) * 34;
-    const float d = __half2float(__ushort_as_half(*(const uint16_t*) p));
-    return d * float(((const int8_t*) (p + 2))[col % 32]);
+__device__ int8_t q8_code(const ExecutionWeight& w,int row,int col) {
+    if(w.layout==WeightLayout::Gguf)
+        return ((const int8_t*)w.data)[(size_t(row)*NB+col/32)*34+2+col%32];
+    const int tiles=(w.n_out+15)/16,j=col%32;
+    return ((const int8_t*)w.data)[((size_t(col/32)*tiles+row/16)*64+(j/8)*16+row%16)*8+j%8];
+}
+__device__ float q8_scale(const ExecutionWeight& w,int row,int group) {
+    if(w.layout==WeightLayout::Gguf)
+        return __half2float(__ushort_as_half(*(const uint16_t*)((const uint8_t*)w.data+(size_t(row)*NB+group)*34)));
+    const int tiles=(w.n_out+15)/16;
+    return __half2float(((const half*)((const uint8_t*)w.data+size_t(tiles)*16*K))[(size_t(group)*tiles+row/16)*16+row%16]);
+}
+__device__ float weight_at(const ExecutionWeight& w,int row,int col) {
+    if(w.type==30)return __uint_as_float(unsigned(((const uint16_t*)w.data)[size_t(row)*K+col])<<16);
+    return q8_scale(w,row,col/32)*float(q8_code(w,row,col));
 }
 
-__global__ void pack_kernel(int type, const void* weights, void* proxy, int rows) {
+__global__ void pack_kernel(ExecutionWeight weights, void* proxy, int rows) {
     const int i = int(blockIdx.x * blockDim.x + threadIdx.x);
     if (i >= rows * NB) return;
     const int row = i / NB, group = i % NB;
     float w[32];
-    for (int j = 0; j < 32; ++j) w[j] = weight_at(type, weights, row, group * 32 + j);
+    for (int j = 0; j < 32; ++j) w[j] = weight_at(weights, row, group * 32 + j);
     draft_px::pack_group<true>(w, row, group, (uint4*) proxy, draft_px::scales(proxy, rows));
 }
 
@@ -118,7 +128,7 @@ __global__ void finish_candidates(const float2* input, int n, int padded, int32_
     }
 }
 
-__global__ void exact_kernel(int type, const void* weights, const draft_px::X81* x,
+__global__ void exact_kernel(ExecutionWeight weights, const draft_px::X81* x,
                               const int32_t* selected, float* logits) {
     const int c = int(blockIdx.x), tid = int(threadIdx.x);
     if (c >= selected[0]) return;
@@ -127,14 +137,13 @@ __global__ void exact_kernel(int type, const void* weights, const draft_px::X81*
     float value = 0;
     for (int b = tid; b < NB; b += 128) {
         const float dx = __low2float(x[b].ds);
-        if (type == 8) {
-            const uint8_t* p = (const uint8_t*) weights + (size_t(row) * NB + b) * 34;
+        if (weights.type == 8) {
             int dot = 0;
-            for (int j = 0; j < 32; ++j) dot += int(((const int8_t*) (p + 2))[j]) * int(x[b].qs[j]);
-            value += float(dot) * (__half2float(__ushort_as_half(*(const uint16_t*) p)) * dx);
+            for (int j = 0; j < 32; ++j) dot += int(q8_code(weights, row, b * 32 + j)) * int(x[b].qs[j]);
+            value += float(dot) * (q8_scale(weights, row, b) * dx);
         } else {
             float part = 0;
-            for (int j = 0; j < 32; ++j) part += weight_at(type, weights, row, b * 32 + j) * float(x[b].qs[j]);
+            for (int j = 0; j < 32; ++j) part += weight_at(weights, row, b * 32 + j) * float(x[b].qs[j]);
             value += part * dx;
         }
     }
@@ -149,13 +158,25 @@ size_t draft_head_proxy_scratch_bytes(int rows) {
     return rows > 0 ? draft_px::scratch_bytes(rows) + 2 * size_t(draft_px::tiles(rows)) * draft_px::kPer * sizeof(float2) + 65 * sizeof(int32_t) : 0;
 }
 void draft_head_proxy_pack(int type, const void* weights, void* proxy, int rows, void* stream) {
+    draft_head_proxy_pack(ExecutionWeight{weights,type,K,rows},proxy,rows,stream);
+}
+void draft_head_proxy_pack(const ExecutionWeight& w, void* proxy, int rows, void* stream) {
+    const int type=w.type;const void* weights=w.data;
+    if(w.n_in!=K || w.n_out!=rows || (type==30 && !w.gguf()))throw std::invalid_argument("proxy execution weight shape/layout");
     if ((type != 30 && type != 8) || !weights || !proxy || rows < 1 || rows > 300000)
         throw std::invalid_argument("draft head proxy: expected BF16/Q8, width2560, <=300000 rows");
-    pack_kernel<<<(rows * NB + 255) / 256, 256, 0, (cudaStream_t) stream>>>(type, weights, proxy, rows);
+    pack_kernel<<<(rows * NB + 255) / 256, 256, 0, (cudaStream_t) stream>>>(w, proxy, rows);
 }
 bool draft_head_proxy_logits(int type, const void* proxy, const void* weights, const void* x,
                              float* logits, int rows, int columns, const int32_t* map,
                              void* scratch, void* stream, void* const* diagnostic_events) {
+    return draft_head_proxy_logits(ExecutionWeight{weights,type,K,rows},proxy,x,logits,rows,columns,map,scratch,stream,diagnostic_events);
+}
+bool draft_head_proxy_logits(const ExecutionWeight& w, const void* proxy, const void* x,
+                             float* logits, int rows, int columns, const int32_t* map,
+                             void* scratch, void* stream, void* const* diagnostic_events) {
+    const int type=w.type;const void* weights=w.data;
+    if(w.n_in!=K || w.n_out!=rows || (type==30 && !w.gguf()))return false;
     if ((type != 30 && type != 8) || columns != 1 || rows < 1 || rows > 300000 ||
         !proxy || !weights || !x || !logits || !scratch) return false;
     const int tiles = int(draft_px::tiles(rows));
@@ -187,7 +208,7 @@ bool draft_head_proxy_logits(int type, const void* proxy, const void* weights, c
     int padded = 1; while (padded < count) padded *= 2;
     finish_candidates<<<1, 256, size_t(padded) * sizeof(float2), cs>>>(current, count, padded, selected);
     mark(2);
-    exact_kernel<<<64, 128, 0, cs>>>(type, weights, (const draft_px::X81*) x, selected, logits);
+    exact_kernel<<<64, 128, 0, cs>>>(w, (const draft_px::X81*) x, selected, logits);
     mark(3);
     return true;
 }

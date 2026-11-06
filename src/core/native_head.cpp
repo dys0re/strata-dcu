@@ -18,14 +18,15 @@ NativeHead::~NativeHead() {
 }
 
 void NativeHead::unload() {
-    if (weights_) strata::kernels::q8_mmac_unregister(weights_);
-    mmac_bytes_ = 0;
+    if (execution_.partial) cudaFree(execution_.partial);
+    execution_ = {};
     if (weights_) strata::kernels::native_q6_k_unpack(weights_);
     if (weights_) strata::kernels::native_q8_0_sm60_release(weights_);
     if (scratch_) cudaFree(scratch_);
     if (weights_) cudaFree(weights_);
     scratch_ = nullptr;
     weights_ = nullptr;
+    // Preserve size/shape metadata: --prefill-head-alias reserves the released head as workspace.
 }
 
 bool NativeHead::load(const std::vector<std::string>& shards, int64_t n_in, int64_t n_out, std::string& err) {
@@ -54,35 +55,34 @@ bool NativeHead::load(const std::vector<std::string>& shards, int64_t n_in, int6
             err = "native head: truncated output.weight payload";
             return false;
         }
-        void* weights = nullptr;
-        void* scratch = nullptr;
-        cudaError_t status = cudaMalloc(&weights, bytes);
-        if (status == cudaSuccess)
-            status = cudaMalloc(&scratch, strata::kernels::native_q8_1_bytes((int) n_in, 1));
         strata::platform::advise_willneed(gguf.tensor_data(*tensor), bytes);
-        if (status == cudaSuccess)
-            status = cudaMemcpy(weights, gguf.tensor_data(*tensor), bytes, cudaMemcpyHostToDevice);
-        if (status != cudaSuccess) {
-            if (scratch) cudaFree(scratch);
-            if (weights) cudaFree(weights);
-            err = std::string("native head upload: ") + cudaGetErrorString(status);
-            return false;
+        if (tensor->type == 8 && strata::kernels::q8_mmac_eligible((int) n_in, (int) n_out)) {
+            execution_ = strata::kernels::q8_mmac_upload_host(gguf.tensor_data(*tensor), (int) n_in, (int) n_out);
+            weights_ = const_cast<void*>(execution_.data);
+        } else {
+            if (cudaMalloc(&weights_, bytes) != cudaSuccess ||
+                cudaMemcpy(weights_, gguf.tensor_data(*tensor), bytes, cudaMemcpyHostToDevice) != cudaSuccess) {
+                unload(); err = "native head upload failed"; return false;
+            }
+            execution_ = {weights_, (int) tensor->type, (int) n_in, (int) n_out};
+            execution_.bytes = bytes;
         }
-        weights_ = weights;
+        if (cudaMalloc(&scratch_, strata::kernels::native_q8_1_bytes((int) n_in, 1)) != cudaSuccess) {
+            unload(); err = "native head activation scratch allocation failed"; return false;
+        }
+        row_bytes_ = bytes / (uint64_t) n_out;
         { int d = -1; if (cudaGetDevice(&d) == cudaSuccess) device_ = d; }
-        scratch_ = scratch;
-        bytes_ = bytes;
+        bytes_ = execution_.bytes;
         n_in_ = (int) n_in;
         n_out_ = (int) n_out;
         type_ = (int) tensor->type;
-        if (type_ == 8)
-            mmac_bytes_ = strata::kernels::q8_mmac_register_host(weights_, gguf.tensor_data(*tensor), n_in_, n_out_);
         if (type_ == 14 && strata::kernels::native_q6_k_packed_enabled())   // STRATA_Q6_PACKED=1
             strata::kernels::native_q6_k_pack(weights_, n_in_, n_out_, "output head");
-        if (type_ == 8)   // STRATA_Q8_SM60=1 (a no-op otherwise); the MTP draft head reads the same matrix
+        if (type_ == 8 && execution_.gguf())   // STRATA_Q8_SM60=1 (a no-op otherwise); the MTP draft head reads the same matrix
             strata::kernels::native_q8_0_sm60_pack(weights_, n_in_, n_out_, "output head");
         return true;
     } catch (const std::exception& error) {
+        unload();
         err = std::string("native head: ") + error.what();
         return false;
     }
@@ -98,7 +98,7 @@ bool NativeHead::run(const float* mixed, float* logits, void* stream, std::strin
             strata::kernels::native_q5_k_f32(weights_, mixed, scratch_, logits, n_in_, n_out_, 1, stream);
         } else {
             strata::kernels::native_quantize_q8_1(mixed, scratch_, n_in_, 1, stream);
-            strata::kernels::native_mmvq(type_, weights_, scratch_, logits, n_in_, n_out_, 1, stream);
+            strata::kernels::native_mmvq(execution(), scratch_, logits, n_in_, n_out_, 1, stream);
         }
     } catch (const std::exception& error) {
         err = std::string("native head launch: ") + error.what();

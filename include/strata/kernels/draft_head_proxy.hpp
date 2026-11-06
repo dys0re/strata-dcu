@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include "strata/kernels/execution_weight.hpp"
 
 namespace strata::kernels {
 // Optional approximate DRAFT logits only, fixed input width 2560. GGML BF16(30) and Q8_0(8).
@@ -13,6 +14,10 @@ size_t draft_head_proxy_scratch_bytes(int rows);
 // Last 65 int32 words of scratch: count, then <=64 selected row indices (diagnostics/tests).
 void draft_head_proxy_pack(int type, const void* weights, void* proxy, int rows, void* stream);
 bool draft_head_proxy_logits(int type, const void* proxy, const void* weights, const void* x_q8_1,
+                             float* logits, int rows, int columns, const int32_t* map,
+                             void* scratch, void* stream, void* const* diagnostic_events = nullptr);
+void draft_head_proxy_pack(const ExecutionWeight& w, void* proxy, int rows, void* stream);
+bool draft_head_proxy_logits(const ExecutionWeight& w, const void* proxy, const void* x_q8_1,
                              float* logits, int rows, int columns, const int32_t* map,
                              void* scratch, void* stream, void* const* diagnostic_events = nullptr);
 } // namespace strata::kernels
