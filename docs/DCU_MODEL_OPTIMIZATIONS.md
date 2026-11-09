@@ -1,5 +1,9 @@
 # Qwen3.8-F 的权重、MTP 与草稿输出头
 
+本文保留模型变体的准备方法及各自日期的验证记录。历史 `/root/private_data` 路径、
+引擎摘要和瞬时状态不代表当前部署；最新环境见 [envs.md](../envs.md)，
+当前队列测量见 [CPU 队列](DCU_HETERO_SCHEDULING.md)。
+
 这组实现基于提交 faf59ad5，继续固定增强 MTP 的 8500 个 GPU 专家、原生/联合模式的 8300 个。
 全部 GPU 模型权重仍受物理显存 50% 上限约束。PLE 和大文件继续放持久盘。
 本机增强 MTP 入口已默认选择 HC Q8、Q8 投影/输出头与蒸馏 MTP；筛选头默认关闭。
@@ -118,7 +122,7 @@ STRATA_DCU_MODEL_DEFAULTS=0 bash /root/strata-dcu/run-autoround.sh --prompt 'Rep
 这些默认值只由本机 wrapper 启用，通用引擎不自行选择机器上的权重变体。
 
 2026-10-25同一配置新增可选布尔值`cpu_q4_input_bias`，当前本机增强MTP选择true，
-用于[CPU INT4输入修正复用](DCU_Q4_INPUT_BIAS.md)。显式`STRATA_CPU_Q4_INPUT_BIAS=0`可关闭。
+用于[CPU INT4输入修正复用](DCU_KERNEL_OPTIMIZATIONS.md#cpu-q4-专家)。显式`STRATA_CPU_Q4_INPUT_BIAS=0`可关闭。
 `STRATA_DCU_MODEL_DEFAULTS=0`也会停用该配置项的默认注入；用户显式环境值仍然有效。
 
 
@@ -166,7 +170,7 @@ python3 tools/ple_quant_pack.py \
 `tools/autoround_pack.py run` 新增可选的 `--ple-gguf /persistent/ple-iq4_nl.gguf`，
 并将显式选择记录到生成报告。不传时继续使用原来的 BF16 descriptor。
 上述转换检查不代替完整模型质量基准。后续已部署完整文本推理缓存并完成单卡生成检查；
-MMAC 的模型级验证范围见 [MMAC 接入记录](DCU_Q8_MMAC_PLAN.md#稳定验证窗口的可选路径2026-11-03)。
+MMAC 的模型级验证范围见 [MMAC 接入记录](DCU_Q8_MMAC_PLAN.md)。
 原始 HF checkpoint 的索引仍依赖 BF16 源分片，不能把删除该片后的目录当作完整 HF checkpoint。
 
 原始结果：[转换与对照](../profile_output/ple-iq4-20261103/conversion.json)、

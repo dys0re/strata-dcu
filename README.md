@@ -15,27 +15,26 @@ Build this fork from source to use its DCU changes.
 | Area | Work in this branch |
 | --- | --- |
 | DCU runtime | DTK/HYHAL integration, gfx936 wave64 compatibility and graph execution fixes |
-| Model preparation | AutoRound INT4 expert import and disk-backed PLE access |
+| Model preparation | AutoRound INT4 import, verified per-layer expert recovery and disk-backed BF16/IQ4_NL PLE |
 | Drafting | Enhanced adaptive MTP, native DFlash2 and joint MTP + DFlash2 |
 | CPU experts | AVX-512/VNNI Q4 computation, multi-position weight decoding reuse and input correction reuse |
 | GPU projections | Native gfx936 integer dot products and coalesced Q8 weight reads |
-| Experimental MMAC | Tiled Q8 weights, DCU matrix instructions and split-K reduction, enabled with `STRATA_Q8_MMAC=1` |
+| Q8 execution | One MMAC weight allocation shared by decode, prefill and MTP; stable split-K across verification widths |
+| Scheduling | Fused route publication, CPU miss graphs and cost-weighted CPU expert queues |
 
-The MMAC path currently covers eligible large Q8 projections and the main output head. It retains
-execution weight copies for this experimental integration and counts them in the GPU weight budget.
-Projection fusion and a single execution weight layout remain development work.
+The MMAC path covers eligible Q8 projections and the output head without retaining a full second
+GPU weight copy. Optional paths remain opt-in in the generic engine; the validated worker wrapper
+selects its own model and kernel settings.
 
 ## Validated environment
 
-Runtime testing has used one BW/gfx936 DCU with 65,520 MiB VRAM, a Hygon CPU allocation of 15 CPU
-time equivalents, and a 59 GiB RAM limit. The software stack is Linux with DTK 26.04 and HYHAL.
-These fork-specific measurements cover text inference; support inherited from upstream has not
-been revalidated across every GPU, operating system or model.
+The latest worker tests used Linux, DTK 26.04/HYHAL, one BW/gfx936 DCU with 65,520 MiB VRAM,
+32 available CPUs and 121.5 GiB RAM. Earlier tests used a different 15-CPU / 59 GiB instance.
+The fork-specific runtime evidence covers single-request text inference on gfx936.
 
-Test settings keep all GPU model weights, including draft weights and execution copies, within
-**50% of physical VRAM**. Expert counts are fixed at 8,500 GPU experts for enhanced MTP and 8,300
-for native DFlash2 or joint mode. PLE and large model/cache/build files use persistent storage.
-See [the test standard](docs/DCU_TEST_STANDARD.md) and [environment notes](envs.md).
+All GPU model weights, including drafting and execution layouts, stay within **50% of physical VRAM**.
+Enhanced MTP uses 8,500 GPU experts; native DFlash2/joint experiments use 8,300.
+See [the test standard](docs/DCU_TEST_STANDARD.md) and [environment/setup notes](envs.md).
 
 ## Build
 
@@ -81,38 +80,49 @@ python3 tools/autoround_pack.py run \
   --prompt 'Reply with exactly OK.' --max-new 32
 ```
 
-The [host wrapper](strata-test/run-autoround.sh) documents the settings used on the validation
+The historical [host wrapper](strata-test/run-autoround.sh) documents the settings used on the validation
 machine; its paths are specific to that machine. See [native DFlash2](docs/DFLASH2_NATIVE.md) and
 [joint drafting](docs/JOINT_DRAFT.md) for their checkpoints, preparation and invocation.
 
 MMAC requires prepared **Q8 non-expert projections**, selected with `--dense-gguf`, and a build
-containing the gfx936 MMAC implementation. Set `STRATA_Q8_MMAC=1` for that run. Preparing those
+containing the gfx936 MMAC implementation. Set `STRATA_Q8_MMAC=1 STRATA_Q8_MMAC_STABLE=1` for that run. Preparing those
 weight variants is documented in [DCU model optimizations](docs/DCU_MODEL_OPTIMIZATIONS.md).
 MMAC is disabled by default.
 
-## Measurements
+## Measurements and current status
 
-One warmed LRU Cache generation sample, 384 output tokens per mode, enhanced MTP, context 512,
-12 CPU workers plus the host thread, and the same 8,500 GPU experts:
+Latest queue comparison (2026-11-07): GPU0, 12 workers plus the host thread, 8,500 GPU experts,
+Q8 dense/head and HC, stable MMAC, distilled adaptive MTP/maxT5, disk-backed IQ4_NL PLE,
+INT8 KV and context512. Four fresh processes in ABBA order; six 256-token requests per domain
+and mode after warmup. Decode excludes model loading and prefill.
 
-| Metric | MMAC off | MMAC on |
+| Workload | Original CPU queue | Optimized CPU queue |
 | --- | ---: | ---: |
-| Decode throughput | 58.95 tokens/s | 61.60 tokens/s |
-| Request time, including prefill | 6.99 s | 6.69 s |
-| GPU model weights, including execution copies | 29.37 GB | 32.86 GB |
+| English | 37.42 tokens/s | 37.30 tokens/s |
+| Chinese | 51.33 tokens/s | 51.21 tokens/s |
+| Code | 62.63 tokens/s | 66.72 tokens/s |
 
-This is a **single-sample observation**, not an average speedup claim. Both generations reached
-the token limit; this sample is not a complete executable-code QA result. Isolated four-position
-Q8 operator prototypes measured about 1.9× speed, which does not imply 1.9× end-to-end throughput.
-Raw experiment outputs are kept locally and are not included in new commits.
+These are medians from descriptive single-host measurements: code +6.54%, three-domain geometric
+mean +1.95%. They do not establish a general or statistically significant speedup. The worker
+wrapper selects the CPU queue optimization and disables PCIe offload; generic engine defaults stay opt-in.
+GPU model weights total 29,373,360,352 B (27.36 GiB). The unified Q8 layout saves 3.24 GiB at the same
+expert count compared with the previous two-copy MMAC implementation.
 
-## Development notes
+Recorded checks passed HIP and CUDA sm80 builds, 552 CPU pool comparisons, delayed-wakeup tests,
+18 model QA cases, generated-code execution and cancellation/recovery. CUDA was compile-only;
+no NVIDIA runtime, broad model-quality or long-context qualification is claimed. AutoRound recovery
+also verified 48 expert layers with 432 reference comparisons and generation before/after migration.
+Raw experiment outputs remain local under `profile_output/`.
 
-- [gfx936 dot4 and Q8 load implementation](docs/DCU_GFX936_DOT4.md)
-- [Q8 MMAC design and prototype results](docs/DCU_Q8_MMAC_PLAN.md)
-- [Runtime options](docs/DCU_RUNTIME_OPTIONS.md)
-- [Native DFlash2](docs/DFLASH2_NATIVE.md)
-- [Test standard](docs/DCU_TEST_STANDARD.md)
+## Documentation
+
+- [Environment and model preparation](envs.md)
+- [Model variants: Q8, distilled MTP and IQ4_NL PLE](docs/DCU_MODEL_OPTIMIZATIONS.md)
+- [Q8 MMAC layout and reproducibility](docs/DCU_Q8_MMAC_PLAN.md)
+- [CPU/GPU kernel reference](docs/DCU_KERNEL_OPTIMIZATIONS.md)
+- [CPU expert queues](docs/DCU_HETERO_SCHEDULING.md) and [graph scheduling](docs/DCU_GRAPH_SCHEDULING.md)
+- [Runtime options](docs/DCU_RUNTIME_OPTIONS.md) and [test standard](docs/DCU_TEST_STANDARD.md)
+- [Native DFlash2](docs/DFLASH2_NATIVE.md) and [joint drafting](docs/JOINT_DRAFT.md)
 
 ## License and credit
 

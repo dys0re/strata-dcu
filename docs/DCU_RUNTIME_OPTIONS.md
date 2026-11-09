@@ -1,65 +1,56 @@
-# DCU 原生选项与 prompt lookup
+# DCU 运行选项
 
-本机 Qwen3.8-F、BS=1 的入口为 `/root/strata-dcu/run-autoround.sh`。
-全部 GPU 模型权重仍限制在物理显存的 50% 以内；增强 MTP 固定 8500 个 GPU 专家，
-DFlash2 和联合模式固定 8300 个。PLE 继续从持久化磁盘读取。
+适用范围为 Qwen3.8-F、BW/gfx936、单卡、BS=1。
+通用引擎不会自动选择机器上的模型变体；wrapper 的默认值取决于部署配置。
+目前验证 worker 选择 Q8 dense/head、HC Q8、stable MMAC、蒸馏 adaptive MTP/maxT5，
+8500 GPU 专家、12 workers、IQ4_NL PLE、INT8 KV、context512。
+CPU 队列优化开启，PCIe 分流关闭，全部 GPU 权重受半显存预算约束。
 
-本轮修复了 HC 两个归一化函数中的隐式浮点乘加合并差异，保留严格自检。
-原先 split/staged 因数值差异回退到 plain；修复后两者在 gfx936 上通过逐位检查。
-实测 staged 有收益，入口选择 `STRATA_HC_SPLIT=2`；可设为 0 或 1 复现 plain 或 split。
-这项修复仅约束 DTK wave64 兼容构建中的两个函数，没有全局关闭 FMA。
+## 模型和草稿
 
-入口与基准脚本均提供以下选项：
+| 选项 | 用途 |
+|---|---|
+| `--dense-gguf FILE` | 选择预先生成的非专家矩阵变体 |
+| `--mtp-runtime DIR` | 选择准备并验证过的 MTP runtime |
+| `--mtp-mode adaptive` | 自适应 MTP；与实际窗口上限一起记录 |
+| `--dflash2 DIR` | 显式选择原生 DFlash2；不能搭配要求 BF16 共享头却已量化为 Q8 的配置 |
+| `--suffix-draft N` | prompt lookup 最小匹配长度；当前机器入口为 0 |
 
-| 选项 | 默认 | 含义 |
-|---|---:|---|
-| `--adapt-every` | 0 | 每隔多少验证窗口交换缓存专家；0 关闭，上游值为 4 |
-| `--adapt-swaps` | 96 | 每轮交换上限；不增加 GPU 专家槽数 |
-| `--pcie-frac` | 0 | 未命中专家的 GPU 分流比例；-1 使用引擎自动策略 |
-| `--pcie-mode` | auto | auto/kernel 使用 GPU 拷贝 kernel；dma 使用拷贝引擎；direct 直接读取映射内存 |
-| `--resident-pin` / `--no-resident-pin` | 自动 | 显式非零 pcie-frac 时尝试锁页；分流实际生效还需要锁页映射成功 |
-| `--suffix-draft` | 0 | prompt lookup 的最小匹配长度；3 为上游值 |
+lookup 草稿仍由目标模型验证；MTP/DFlash 缓存按实际提交状态更新。
+增强 MTP 神经草稿最多验证五行，lookup 可扩展到七行；DFlash2/联合总上限为八行。
+剩余输出长度和上下文会进一步限制窗口。当前通用任务未建立 lookup 的稳定收益。
 
-本机对缓存交换和 GPU 拷贝分流的测量均出现退步，因此保持可配置、默认关闭。
-2026-10-24 增加的 [层内交接选项](DCU_LAYER_SCHEDULING.md) 在本机增强 MTP 入口默认开启
-GPU 自行安排常驻专家、CPU 按专家推进和结果提前交回。原生 DFlash2/联合模式仍为显式选择。
-`STRATA_PCIE_STAGED_MAX=2` 使用约 44 MB 锁页中转区，可不锁页整个 RAM 专家副本；
-它实际使用 DMA 并覆盖普通 pcie-mode。此分流及层末休眠仍默认关闭。
-`pcie-frac=-1` 本身不能证明发生了搬运；应检查实际 PCIe 专家数。
-48.5 GB/s 左右的启动探测值来自 DMA，不能作为 GPU 拷贝 kernel 的速度。
-`direct` 仅暴露原有接口，本轮没有测试，不作为推荐配置。
+模型准备见 [模型变体](DCU_MODEL_OPTIMIZATIONS.md)，草稿使用见
+[原生 DFlash2](DFLASH2_NATIVE.md)和[联合模式](JOINT_DRAFT.md)。
 
-开启 prompt lookup：
+## 内核和调度
 
-```bash
-bash /root/strata-dcu/run-autoround.sh --suffix-draft 3 --prompt 'Reply with exactly OK.' --max-new 16
-bash /root/strata-dcu/run-autoround.sh --dflash2 /root/private_data/strata-dcu/dflash2/checkpoint --suffix-draft 3 --prompt 'Reply with exactly OK.' --max-new 16
-bash /root/strata-dcu/run-autoround.sh --dflash2 /root/private_data/strata-dcu/dflash2/checkpoint --dflash-mtp-prefix 2 --suffix-draft 3 --prompt 'Reply with exactly OK.' --max-new 16
-```
+| 环境变量 | 用途 |
+|---|---|
+| `STRATA_Q8_MMAC=1`、`STRATA_Q8_MMAC_STABLE=1` | 单份 Q8 MMAC 执行权重，固定 T1–5 累加策略 |
+| `STRATA_HC_Q8=1` | 载入 HC Q8 权重，区别于 HC_REQ8 |
+| `STRATA_HC_SPLIT=2` | gfx936 staged HC；0/1 分别选择 plain/split |
+| `STRATA_CPU_Q4_MT=1`、`STRATA_CPU_Q4_INPUT_BIAS=1` | CPU Q4 多位置计算与输入修正复用 |
+| `STRATA_VERIFY_HIT_PLAN=1` | GPU 独立安排常驻专家 |
+| `STRATA_CPU_EXPERT_PIPELINE=1`、`STRATA_CPU_EARLY_RESULT=1` | 按专家推进，输出完成后提前通知 GPU |
+| `STRATA_CPU_MISS_GRAPH=1`、`STRATA_FUSE_ROUTE_PUBLISH=1` | 无 PCIe 分流条件下的专用图和融合路由发布 |
+| `STRATA_CPU_POOL_COST=1` | 长任务优先、按服务 token 数分配行块；依赖专家流水 |
+| `STRATA_CPU_RESULT_DIRECT=1` | 显式实验：GPU 直接读取 CPU 输出；当前机器入口关闭 |
+| `STRATA_POOL_IDLE_US=N` | 层末自旋后休眠；没有稳定吞吐收益，当前入口不启用 |
 
-lookup 替代神经网络草稿时，目标模型照常验证。MTP 和 DFlash 的缓存按实际提交的目标状态补齐，
-被替代的草稿不参与各自接受率的更新。联合模式把整个 lookup 窗口作为查找草稿验证，
-不会把其中一段误当成 MTP 前缀。IPC 后端同步增加了丢弃反馈命令，须使用同版本 worker。
+详见 [内核参考](DCU_KERNEL_OPTIMIZATIONS.md)、[MMAC](DCU_Q8_MMAC_PLAN.md)、
+[层内交接](DCU_LAYER_SCHEDULING.md)、[专用图](DCU_GRAPH_SCHEDULING.md)和
+[CPU 队列](DCU_HETERO_SCHEDULING.md)。环境值只表示请求，必须核对实际分发日志。
 
-增强 MTP 开启 lookup 时，MTP 自身仍最多验证 5 行；lookup 可以扩展到 7 行。
-DFlash2 与联合模式总上限仍为 8 行。剩余输出长度和上下文会进一步限制窗口。
-本轮通用三项任务没有观察到 suffix 的稳定净收益，故默认关闭。
+## 专家交换和 PCIe
 
-性能与完整验证记录见 [本轮记录](../profile_output/lookup-compat-20261023/README.md)
-和 [原生选项测量](../profile_output/upstream-options-20261023/README.md)。
+`--adapt-every 0` 关闭交换，`--adapt-swaps` 控制每轮交换上限。
+`--pcie-frac 0` 关闭普通分流，`-1` 请求自动策略；`--pcie-mode auto|kernel|dma|direct`
+选择传输方式。`--resident-pin` 只请求锁页映射，成功与否要检查日志。
+`STRATA_PCIE_STAGED_MAX` 使用小型锁页中转区，不要求锁页整个 RAM 专家副本。
 
+当前机器入口保留 CPU 队列优化并关闭 PCIe 分流，未删除上游通用 PCIe 支持。
+不要把启动 DMA 带宽、请求的非零比例或自动策略开关当成实际搬运的证据；应记录真实 PCIe 专家数。
 
-2026-10-24 的 [模型权重优化](DCU_MODEL_OPTIMIZATIONS.md) 已加入本机增强 MTP 默认入口：
-HC Q8、Q8 非专家投影/输出头、发布的蒸馏 MTP。草稿筛选仍默认关闭。
-`--dense-gguf FILE`、`--mtp-runtime DIR` 显式选择准备好的变体；原生 DFlash2 的共享输出头须保留 BF16。
-`STRATA_DCU_MODEL_DEFAULTS=0` 恢复此前权重选择，原有层内交接默认仍保留。
-配置路径由 `STRATA_DCU_MODEL_CONFIG` 指定，当前文件在持久盘 `model-specific-20261024/selected-model.json`。
-
-2026-10-25 的 [CPU INT4 输入修正复用](DCU_Q4_INPUT_BIAS.md) 在同一本机模型配置中启用
-`cpu_q4_input_bias=true`，只作用于增强MTP默认入口。显式设置`STRATA_CPU_Q4_INPUT_BIAS=0`可关闭。
-原生DFlash2和联合模式保持显式选择；新算式还需要`STRATA_CPU_Q4_MT=1`及现有CPU能力检查通过。
-
-2026-10-25 的 [CPU 输出直接合并](DCU_CPU_RESULT_DIRECT.md) 可通过
-`STRATA_CPU_RESULT_DIRECT=1` 显式启用，0使用原结果拷贝与合并流程。
-当前gfx936兼容构建的单GPU原生专家路径支持它；全部GPU权重、专家数和量化格式不变。
-本轮正常测速未建立整体收益，本机模型配置`cpu_result_direct=false`，默认仍关闭。
+逐层 trace/profile 用于诊断，会影响耗时；正式 TPS 使用不带这些记录的运行。
+完整测量要求见 [测试标准](DCU_TEST_STANDARD.md)。

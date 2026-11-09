@@ -51,7 +51,7 @@ DFlash2 等外部草稿进程的 GPU 权重也必须计入同一个预算，不�
 `STRATA_HC_Q8`、`STRATA_DRAFT_HEAD_PROXY`，以及原有调度选项。
 本轮加入四项语义与代码执行 QA，共 18 项；不以长输出 token 一致作为通过条件。
 
-2026-10-25：测量 [CPU INT4 输入修正复用](DCU_Q4_INPUT_BIAS.md) 时，必须记录
+2026-10-25：测量 [CPU INT4 输入修正复用](DCU_KERNEL_OPTIMIZATIONS.md#cpu-q4-专家) 时，必须记录
 `STRATA_CPU_Q4_MT` 和 `STRATA_CPU_Q4_INPUT_BIAS`，并检查实际分发标记。
 继续使用空闲选核，保留实际核心掩码、权重内存位置与请求边界线程排队时间。
 带逐层时间戳的结果用于定位；正常TPS对照使用不加逐层记录的运行。
@@ -59,7 +59,7 @@ DFlash2 等外部草稿进程的 GPU 权重也必须计入同一个预算，不�
 直接运行`tools/bench_dflash2_native.py`不会读取本机模型默认配置，须显式传入该环境值，
 并像其他开关一样核验command.json和实际分发标记，避免无意关闭已选用的路径。
 
-测试 [CPU 输出直接合并](DCU_CPU_RESULT_DIRECT.md) 时另记录`STRATA_CPU_RESULT_DIRECT`及实际选择标记。
+测试 [CPU 输出直接合并](DCU_KERNEL_OPTIMIZATIONS.md#cpu-输出直接合并) 时另记录`STRATA_CPU_RESULT_DIRECT`及实际选择标记。
 本机当前默认0，1为显式实验选项；不要把局部微基准的收益当成正常decode收益。
 完整层记录中，新路径的23到34已包含合并，旧路径该段仅为结果拷贝；
 应比较22到24的完整返回区间，并注明共享专家等待与记录节点开销。
